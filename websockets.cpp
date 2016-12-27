@@ -1,20 +1,19 @@
 #include "websockets.h"
 
-Websockets::Websockets(quint16 port, WebTable *pWebTable):
-    m_pWebSocketServer(Q_NULLPTR), //przypisanie pustego wskaźnika
+Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
+    QObject(parent),
     m_clients()
 {
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
                                               QWebSocketServer::NonSecureMode,
-                                              this);//nowy serwer websocket
-    if (m_pWebSocketServer->listen(QHostAddress::Any, port)) //nasłuchuj na porcie
+                                              this); //nowy serwer websocket
+    if (m_pWebSocketServer->listen(QHostAddress::Any, port))
     {
-        addTextToWebsocketConsole("Server listening on port " + QString::number(port) + "\n");
-        //połącz slot nowego połączenia wbudowanej metody websocket z moją metodą onNewConnection
-        //czyli jeżeli będzie nowe połączenie na websocketach, to odpali się funckja onNewConnection
-        connect(m_pWebSocketServer, &QWebSocketServer::newConnection, this, onNewConnection);
+        qDebug() << "WebSocket server listening on port" << port;
+        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
+                this, &Websockets::onNewConnection);
+        //connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &Websockets::closed);
     }
-
     _pWebTable = pWebTable;
 }
 
@@ -24,23 +23,35 @@ Websockets::~Websockets()
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
 
+/*void Websockets::startWebsocketServer(quint16 port)
+{
+    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
+                                              QWebSocketServer::NonSecureMode,
+                                              this);//nowy serwer websocket
+    if (m_pWebSocketServer->listen(QHostAddress::Any, port)) //nasłuchuj na porcie
+    {
+        //qDebug() << "Server listening on port" << QString::number(port) << "\n";
+        emit addTextToWebsocketConsole("Server listening on port " + QString::number(port) + "\n");
+        //połącz slot nowego połączenia wbudowanej metody websocket z moją metodą onNewConnection
+        //czyli jeżeli będzie nowe połączenie na websocketach, to odpali się funckja onNewConnection
+        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
+                this, &Websockets::onNewConnection);
+    }
+}*/
+
 void Websockets::onNewConnection() //nowe połączenia
 {
     //!!! zacięcie czasami przy nowymn połączeniu !!! już nie?
+    qDebug() << "Websockets::onNewConnection() \n";
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
 
-    //jeżeli socket dostanie wiadomość, to odpalamy metody przetwarzająca ją
-    //sygnał textMessageReceived emituje QStringa do processWebsocketMsg
+    //jeżeli socket dostanie wiadomość, to odpalamy metody przetwarzająca ją...
+    //...sygnał textMessageReceived emituje QStringa do processWebsocketMsg
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::processWebsocketMsg);
-
-    //a jak disconnect, to disconnect
-    connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
-
+    connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected); //a jak disconnect, to disconnect
     m_clients << pSocket;
-
-    addTextToWebsocketConsole("New connection \n");
+    emit addTextToWebsocketConsole("New connection \n");
 }
-
 
 //TODO: podzielić funkcje poniższej metody na te które wymagają blokady zapytań tcp i te które tego
 //nie robią. tu rozróżnić 2 opcje- jeżeli natrafmy na wiadomość dla tcp podczas gdy jedną wiadomość
@@ -100,7 +111,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     else
     {
         Q_FOREACH (QWebSocket *pClient, m_clients) //dla każdego klienta wykonaj
-        //TODO: gracze dostają komunikatów gracza przeciwnego. naprawić to (przy BAD_MOVE jest dłuższy komentarz)
+            //TODO: gracze dostają komunikatów gracza przeciwnego. naprawić to (przy BAD_MOVE jest dłuższy komentarz)
         {
             if (QsWsMsgToProcess.left(17) == "white_player_name")
                 //TODO: sprawdzić czy emit nie działa skrajnie asynchronicznie, tj. będzie próbowało...
@@ -144,7 +155,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
                 pClient->sendTextMessage("promote_to_what");
             }
             else if (QsWsMsgToProcess.left(8) == "BAD_MOVE") //wiadomosc przychodzi tutaj przez klase 'chess'
-            /* TODO: Muszę odpowiedzieć pytającemu graczowi że spierdolił zapytanie. By to zrobić muszę go odczytać
+                /* TODO: Muszę odpowiedzieć pytającemu graczowi że spierdolił zapytanie. By to zrobić muszę go odczytać
              * z systemu (znaleźć który to gracz w 'pClient'ach, bo tą wiadomość dostaję z tcp, a nie od gracza który
              * zrobił błąd. Najgorszą tymczasową opcją jest odpowiadanie wszsytkim użytkownikom websocketów,
              * a (TODO2:) na stronie przyjmowanie tej wiadomości tylko wtedy gdy jest tura gracza wykonującego ruch.
@@ -162,7 +173,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
                 pClient->sendTextMessage("Error11! Wrong msg from tcp: " + QsWsMsgToProcess);
             }
             //TODO: rozgraniczyć które wiadomośći są "send to web" a które "to chess"
-            this->addTextToWebsocketConsole("Send to web: " + QsWebsocketConsoleMsg + "\n");
+            emit addTextToWebsocketConsole("Send to web: " + QsWebsocketConsoleMsg + "\n");
             QsWebsocketConsoleMsg.clear();
         }
 
@@ -251,6 +262,6 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
     {
         m_clients.removeAll(pClient);
         pClient->deleteLater();
-        addTextToWebsocketConsole("Disconnected\n");
+        emit addTextToWebsocketConsole("Disconnected\n");
     }
 }

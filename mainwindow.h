@@ -28,8 +28,8 @@
 #include "dobot.h"
 #include "chess.h"
 
-QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
-QT_FORWARD_DECLARE_CLASS(QWebSocket)
+/*QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
+QT_FORWARD_DECLARE_CLASS(QWebSocket)*/
 
 namespace Ui
 {
@@ -41,7 +41,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(quint16 port, QWidget *parent = 0); //konstruktor. pobiera port tcp.
+    explicit MainWindow(quint16 websocketPort, QWidget *parent = 0); //konstruktor. pobiera port tcp.
     //dobrze by było nadać temu portowi jakiś przydomek typu "tcp_port" by się wyróżniał od portu usb...
     //...nie udało mi się to ostatnim razem
 
@@ -53,12 +53,14 @@ public:
 private:
     Ui::MainWindow *ui; //??? o co tu chodzi
 
-    Dobot DobotArm; //TODO: ?? nie mogę tworzyć tego obiektu tam gdzie inne, bo mam błędy, przez...
+    //Dobot *DobotArm; //TODO: ?? nie mogę tworzyć tego obiektu tam gdzie inne, bo mam błędy, przez...
     //... co muszę tworzyć obiektyw tutaj. tak wogle można???
 
     void refreshBtn();
     void initDobot();
     //void initControl();
+
+    Dobot *_pDobotArm;
 
 private slots:
     //void onChangedMode();
