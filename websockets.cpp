@@ -13,6 +13,7 @@ Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
         //connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &Websockets::closed);
+        emit addTextToWebsocketConsole("WebSocket server listening on port" + port);
     }
     _pWebTable = pWebTable;
 }
@@ -22,22 +23,6 @@ Websockets::~Websockets()
     m_pWebSocketServer->close();
     qDeleteAll(m_clients.begin(), m_clients.end());
 }
-
-/*void Websockets::startWebsocketServer(quint16 port)
-{
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
-                                              QWebSocketServer::NonSecureMode,
-                                              this);//nowy serwer websocket
-    if (m_pWebSocketServer->listen(QHostAddress::Any, port)) //nasłuchuj na porcie
-    {
-        //qDebug() << "Server listening on port" << QString::number(port) << "\n";
-        emit addTextToWebsocketConsole("Server listening on port " + QString::number(port) + "\n");
-        //połącz slot nowego połączenia wbudowanej metody websocket z moją metodą onNewConnection
-        //czyli jeżeli będzie nowe połączenie na websocketach, to odpali się funckja onNewConnection
-        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
-                this, &Websockets::onNewConnection);
-    }
-}*/
 
 void Websockets::onNewConnection() //nowe połączenia
 {
@@ -64,6 +49,7 @@ void Websockets::onNewConnection() //nowe połączenia
 //przetwarzanie wiadomośći otrzymanej przez websockety
 void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
 {
+    qDebug() << "Websockets::processWebsocketMsg received: " << QsWsMsgToProcess << "/n";
     QString QsWebsocketConsoleMsg; //wiadomość na konsolę
     //QWebSocket *pSender = qobject_cast<QWebSocket *>(sender()); // !! unused variable !! wykomentować?
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -75,37 +61,40 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     else if (QsWsMsgToProcess == "new" || QsWsMsgToProcess.left(4) == "move" ||
              QsWsMsgToProcess.left(10) == "promote_to")
     {
+        qDebug() << "Websockets::processWebsocketMsg- Sending to 'chess' class: " << QsWsMsgToProcess;
         QsWebsocketConsoleMsg = "Send to 'chess' class: " + QsWsMsgToProcess; //TODO: naprawić text
-        qDebug() << "Sending to 'chess' class: " << QsWsMsgToProcess;
         emit MsgFromWebsocketsToChess(QsWsMsgToProcess);
     }
     else if (QsWsMsgToProcess == "game_in_progress") //gra w toku
     {
-        QsWebsocketConsoleMsg = "game_in_progress ";
         qDebug() << "Sending to site: game_in_progress";
+        QsWebsocketConsoleMsg = "game_in_progress ";
         pClient->sendTextMessage("game_in_progress ");
     }
     else if (QsWsMsgToProcess.left(5) == "check")
     {
         if (QsWsMsgToProcess.mid(6) == "white_player")
         {
+            qDebug() << "Sending to site: checked_wp_is " << _pWebTable->getNameWhite();
             QsWebsocketConsoleMsg = "checked_wp_is " + _pWebTable->getNameWhite();
             pClient->sendTextMessage("checked_wp_is " + _pWebTable->getNameWhite());
         }
         else if (QsWsMsgToProcess.mid(6) == "black_player")
         {
+            qDebug() << "Sending to site: checked_bp_is " << _pWebTable->getNameBlack();
             QsWebsocketConsoleMsg = "checked_bp_is " + _pWebTable->getNameBlack();
             pClient->sendTextMessage("checked_bp_is " + _pWebTable->getNameBlack());
         }
         else if (QsWsMsgToProcess.mid(6) == "whose_turn")
         {
+            qDebug() << "Sending to site: checked_wt_is " << _pWebTable->getWhoseTurn();
             QsWebsocketConsoleMsg = "checked_wt_is " + _pWebTable->getWhoseTurn();
             pClient->sendTextMessage("checked_wt_is " + _pWebTable->getWhoseTurn());
         }
         else
         {
-            QsWebsocketConsoleMsg = "error: wrong check value.";
             qDebug() << "error: wrong check value.";
+            QsWebsocketConsoleMsg = "error: wrong check value.";
         }
     }
     else
@@ -117,41 +106,44 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
                 //TODO: sprawdzić czy emit nie działa skrajnie asynchronicznie, tj. będzie próbowało...
                 //... odczytać zmienną z get'era, podczas gry set'er w emit'ie nie uwstawił jeszcze nowej zmiennej.
             {
+                qDebug() << "new_white " << _pWebTable->getNameWhite();
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj imię białego gracza
                 QsWebsocketConsoleMsg = "new_white " + _pWebTable->getNameWhite();
                 pClient->sendTextMessage("new_white " + _pWebTable->getNameWhite()); //wyślij do websocketowców nową nazwę białego
             }
             else if (QsWsMsgToProcess.left(17) == "black_player_name")
             {
+                qDebug() << "new_black " << _pWebTable->getNameBlack();
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj imię czarnego gracza
                 QsWebsocketConsoleMsg = "new_black " + _pWebTable->getNameBlack();
                 pClient->sendTextMessage("new_black " + _pWebTable->getNameBlack()); //wyślij do websocketowców nową nazwę czarnego
             }
             else if (QsWsMsgToProcess.left(10) == "whose_turn")
             {
+                qDebug() << "whose_turn " << _pWebTable->getWhoseTurn();
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj czyja jest tura
                 QsWebsocketConsoleMsg = "whose_turn " + _pWebTable->getWhoseTurn();
                 pClient->sendTextMessage("whose_turn " + _pWebTable->getWhoseTurn()); //wyślij do websocketowców info o turze
             }
             else if (QsWsMsgToProcess == "new_game") //udało się rozpocząć nową grę. wyślij info o tym na WWW
             {
-                QsWebsocketConsoleMsg = "new_game";
                 qDebug() << "New game started. Send to site: new_game";
+                QsWebsocketConsoleMsg = "new_game";
                 pClient->sendTextMessage("new_game");
             }
             else if (QsWsMsgToProcess == "white_won" || QsWsMsgToProcess == "black_won" ||
                      QsWsMsgToProcess == "draw") //koniec gry
             {
-                QsWebsocketConsoleMsg = QsWsMsgToProcess;
                 qDebug() << "End of game. Send to site: " << QsWsMsgToProcess;
+                QsWebsocketConsoleMsg = QsWsMsgToProcess;
                 pClient->sendTextMessage(QsWsMsgToProcess);
             }
             else if (QsWsMsgToProcess == "promote_to_what") //test promocji ok. zapytaj się WWW na co promować pionka.
                 //TODO: ten sam problem co w BAD_MOVE- nie wiem jak odpowiedzieć do danego gracza, więc...
                 //...póki co odpowiadam wszsytkim, a oni będą filtrowali dane przychodzące.
             {
-                QsWebsocketConsoleMsg = "promote_to_what";
                 qDebug() << " Send to site: " << QsWsMsgToProcess;
+                QsWebsocketConsoleMsg = "promote_to_what";
                 pClient->sendTextMessage("promote_to_what");
             }
             else if (QsWsMsgToProcess.left(8) == "BAD_MOVE") //wiadomosc przychodzi tutaj przez klase 'chess'
@@ -169,6 +161,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
             }
             else //jeżeli chenard da inną odpowiedź (nie powinien)
             {
+                qDebug() << "Error11! Wrong msg from tcp: " << QsWsMsgToProcess;
                 QsWebsocketConsoleMsg = "Error11! Wrong msg from tcp: " + QsWsMsgToProcess;
                 pClient->sendTextMessage("Error11! Wrong msg from tcp: " + QsWsMsgToProcess);
             }

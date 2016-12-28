@@ -70,7 +70,7 @@ static const uint qt_meta_data_Websockets[] = {
 
  // slots: name, argc, parameters, tag, flags
        7,    1,   53,    2, 0x0a /* Public */,
-       9,    0,   56,    2, 0x08 /* Private */,
+       9,    0,   56,    2, 0x0a /* Public */,
       10,    0,   57,    2, 0x08 /* Private */,
 
  // signals: parameters

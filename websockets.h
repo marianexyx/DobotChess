@@ -3,6 +3,9 @@
 
 #include "QtWebSockets/QWebSocketServer"
 #include "QtWebSockets/QWebSocket"
+#include <QtCore/QObject>
+#include <QtCore/QList>
+#include <QtCore/QByteArray>
 #include "webtable.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
@@ -16,10 +19,14 @@ class Websockets: public QObject
 public:
     Websockets(WebTable *pWebTable, quint16 port, QObject *parent = Q_NULLPTR);
 
+    QWebSocketServer *m_pWebSocketServer;
+    QList<QWebSocket *> m_clients;
+
     ~Websockets();
 
 public Q_SLOTS:
     void processWebsocketMsg(QString QS_WbstMsgToProcess);
+    void onNewConnection();
 
 signals:
     void addTextToWebsocketConsole(QString QStrMsg);
@@ -27,13 +34,10 @@ signals:
     void MsgFromWebsocketsToWebtable(QString QStrMsgFromWebsockets);
 
 private:
-    QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
-
     WebTable *_pWebTable;
 
-private Q_SLOTS: //czym to się różni od zwykłego private? i zwykłego slots?
-    void onNewConnection();
+private Q_SLOTS: //czym to się różni od zwykłego private/zwykłego slots?
+    //void onNewConnection();
     void socketDisconnected();
 };
 

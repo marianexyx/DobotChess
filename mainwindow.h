@@ -6,9 +6,9 @@
 #include <QMainWindow>
 /*#include <QSerialPort>
 #include <QSerialPortInfo>*/
-#include <QtCore/QObject>
+/*#include <QtCore/QObject>
 #include <QtCore/QList>
-#include <QtCore/QByteArray>
+#include <QtCore/QByteArray>*/
 /*#include <QMessageBox>
 #include <QDebug>
 #include <QSignalMapper>
@@ -16,14 +16,14 @@
 #include <QScrollBar>
 #include <QTcpSocket>
 #include <QAbstractSocket>
-#include "QtWebSockets/QWebSocketServer"
-#include "QtWebSockets/QWebSocket"
+/*#include "QtWebSockets/QWebSocketServer"
+#include "QtWebSockets/QWebSocket"*/
 #include "DobotDll.h"
 #include "DobotType.h"
 #include "Thread.h"
 //#include "chessboard.h"
 //#include "tcpmsgs.h"
-//#include "websockets.h"
+#include "websockets.h"
 //#include "webtable.h"
 #include "dobot.h"
 #include "chess.h"
@@ -41,7 +41,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(quint16 websocketPort, QWidget *parent = 0); //konstruktor. pobiera port tcp.
+    explicit MainWindow(WebTable *pWebTable, Websockets *pWebSockets, QWidget *parent = 0); //konstruktor. pobiera port tcp.
     //dobrze by było nadać temu portowi jakiś przydomek typu "tcp_port" by się wyróżniał od portu usb...
     //...nie udało mi się to ostatnim razem
 
@@ -53,14 +53,15 @@ public:
 private:
     Ui::MainWindow *ui; //??? o co tu chodzi
 
+    Dobot *_pDobotArm;
+    WebTable *_pWebTable;
+    Websockets *_pWebSockets;
     //Dobot *DobotArm; //TODO: ?? nie mogę tworzyć tego obiektu tam gdzie inne, bo mam błędy, przez...
     //... co muszę tworzyć obiektyw tutaj. tak wogle można???
 
     void refreshBtn();
     void initDobot();
     //void initControl();
-
-    Dobot *_pDobotArm;
 
 private slots:
     //void onChangedMode();

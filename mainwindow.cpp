@@ -5,7 +5,7 @@ QT_USE_NAMESPACE
 
 //mainwindow odpowiada za UI (przyciski itd. inne klasy odwołują się do niego przez:
 //http://www.qtcentre.org/threads/25075-How-to-access-the-UI-from-another-class?s=d4d369d4d7c12212dd9ba8eacc9f0dce&p=287198#post287198
-MainWindow::MainWindow(quint16 websocketPort, QWidget *parent) : //konstruktor
+MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, QWidget *parent) : //konstruktor
     //lista inicjalizacyjna:
     QMainWindow(parent),
     _pDobotArm(new Dobot()), //?? ciekawe czy zabieg się uda
@@ -15,6 +15,8 @@ MainWindow::MainWindow(quint16 websocketPort, QWidget *parent) : //konstruktor
 {
     ui->setupUi(this);
 
+    _pWebTable = pWebTable;
+    _pWebSockets = pWebSockets;
     //_pDobotArm = new Dobot();
     //Dobot *DobotArm;
 
@@ -26,13 +28,10 @@ MainWindow::MainWindow(quint16 websocketPort, QWidget *parent) : //konstruktor
     _pDobotArm->getPoseTimer();
 
     Chessboard DobotChessboard001;
-    WebTable WebTable001;
-    qDebug() << "Tworzenie obiektu Websocketów";
-    Websockets Websockety(&WebTable001, websocketPort); //tworzenie obiektu odpowiadającego za websockety
+    //WebTable WebTable001;
+    //Websockets Websockety(&WebTable001, websocketPort); //tworzenie obiektu odpowiadającego za websockety
     TCPMsgs TCPCommunication;
-    qDebug() << "Obiekt TCPMsgs stworzony. Tworzenie obiektu ChessCore";
-    Chess ChessCore(_pDobotArm, &DobotChessboard001, &TCPCommunication, &Websockety, &WebTable001);
-    qDebug() << "Obiekt Chess stworzony. Imprelemntacja connectów Mainwindow";
+    Chess ChessCore(_pDobotArm, &DobotChessboard001, &TCPCommunication, _pWebSockets, _pWebTable);
 
     //dzięki tym connectom (jeśli działają) można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString)),
@@ -49,21 +48,18 @@ MainWindow::MainWindow(quint16 websocketPort, QWidget *parent) : //konstruktor
             this, SLOT(writeInTcpConsole(QString))); //ERROR: segmentation fault
     connect(&ChessCore, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString)));
-    connect(&Websockety, SIGNAL(addTextToWebsocketConsole(QString)),
+    connect(_pWebSockets, SIGNAL(addTextToWebsocketConsole(QString)),
             this, SLOT(writeInWebsocketConsole(QString)));
     connect(&DobotChessboard001, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString))); //ERROR: segmentation fault
 
-    qDebug() << "Imprelemntacja connectów komunikujacych klasy z soba";
     //connecty komunikujące klasy z sobą
     connect(&TCPCommunication, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
             &ChessCore, SLOT(checkMsgFromChenard(QString)));  //...na silnk gry.
-    connect(&Websockety, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z websocketów...
+    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z websocketów...
             &ChessCore, SLOT(checkMsgFromWebsockets(QString))); //...na silnk gry.
-    connect(&Websockety, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z websocketów...
-            &WebTable001, SLOT(checkWebsocketMsg(QString))); //...na stół gry.
-
-    //Websockety.startWebsocketServer(websocketPort);
+    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z websocketów...
+            _pWebTable, SLOT(checkWebsocketMsg(QString))); //...na stół gry.
 }
 
 MainWindow::~MainWindow()
