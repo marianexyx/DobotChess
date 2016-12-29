@@ -5,20 +5,20 @@ QT_USE_NAMESPACE
 
 //mainwindow odpowiada za UI (przyciski itd. inne klasy odwołują się do niego przez:
 //http://www.qtcentre.org/threads/25075-How-to-access-the-UI-from-another-class?s=d4d369d4d7c12212dd9ba8eacc9f0dce&p=287198#post287198
-MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, QWidget *parent) : //konstruktor
-    //lista inicjalizacyjna:
+MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
+                        TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent) :
     QMainWindow(parent),
-    _pDobotArm(new Dobot()), //?? ciekawe czy zabieg się uda
-    /*m_pWebSocketServer(Q_NULLPTR), //przypisanie pustego wskaźnika
-        m_clients(),*/
+    /*_pDobotArm(new Dobot()),*/
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    _pDobotArm = pDobotArm;
     _pWebTable = pWebTable;
     _pWebSockets = pWebSockets;
-    //_pDobotArm = new Dobot();
-    //Dobot *DobotArm;
+    _pChessboard = pChessboard;
+    _pTCPmsg = pTCPmsg;
+    _pChess = pChess;
 
     connect(ui->connectBtn, SIGNAL(clicked(bool)), _pDobotArm, SLOT(onConnectDobot())); //connect dobot
     connect(ui->sendBtn, SIGNAL(clicked(bool)), this, SLOT(onPTPsendBtnClicked())); //send PTP data
@@ -27,11 +27,11 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, QWidget *pa
     _pDobotArm->setPeriodicTaskTimer();
     _pDobotArm->getPoseTimer();
 
-    Chessboard DobotChessboard001;
+    //Chessboard DobotChessboard001;
     //WebTable WebTable001;
     //Websockets Websockety(&WebTable001, websocketPort); //tworzenie obiektu odpowiadającego za websockety
-    TCPMsgs TCPCommunication;
-    Chess ChessCore(_pDobotArm, &DobotChessboard001, &TCPCommunication, _pWebSockets, _pWebTable);
+    //TCPMsgs TCPCommunication;
+    //Chess ChessCore(_pDobotArm, _pChessboard, _pTCPmsg, _pWebSockets, _pWebTable);
 
     //dzięki tym connectom (jeśli działają) można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString)),
@@ -44,20 +44,20 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, QWidget *pa
             this, SLOT(setConnectButtonText(bool)));
     connect(_pDobotArm, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));
-    connect(&TCPCommunication, SIGNAL(addTextToTcpConsole(QString)),
+    connect(_pTCPmsg, SIGNAL(addTextToTcpConsole(QString)),
             this, SLOT(writeInTcpConsole(QString))); //ERROR: segmentation fault
-    connect(&ChessCore, SIGNAL(addTextToDobotConsole(QString)),
+    connect(_pChess, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString)));
     connect(_pWebSockets, SIGNAL(addTextToWebsocketConsole(QString)),
             this, SLOT(writeInWebsocketConsole(QString)));
-    connect(&DobotChessboard001, SIGNAL(addTextToDobotConsole(QString)),
+    connect(_pChessboard, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString))); //ERROR: segmentation fault
 
     //connecty komunikujące klasy z sobą
-    connect(&TCPCommunication, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
-            &ChessCore, SLOT(checkMsgFromChenard(QString)));  //...na silnk gry.
+    connect(_pTCPmsg, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
+            _pChess, SLOT(checkMsgFromChenard(QString)));  //...na silnk gry.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z websocketów...
-            &ChessCore, SLOT(checkMsgFromWebsockets(QString))); //...na silnk gry.
+            _pChess, SLOT(checkMsgFromWebsockets(QString))); //...na silnk gry.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z websocketów...
             _pWebTable, SLOT(checkWebsocketMsg(QString))); //...na stół gry.
 }
@@ -177,7 +177,7 @@ void MainWindow::writeInTcpConsole(QString QS_msg)
 
 void MainWindow::writeInWebsocketConsole(QString QStrMsg)
 {
-    qDebug() << "MainWindow::writeInWebsocketConsole received: " << QStrMsg;
+    //qDebug() << "MainWindow::writeInWebsocketConsole received: " << QStrMsg;
     if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
 
     if(QStrMsg == "/clear") //czy czyścimy okno

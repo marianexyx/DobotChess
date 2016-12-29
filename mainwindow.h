@@ -41,9 +41,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(WebTable *pWebTable, Websockets *pWebSockets, QWidget *parent = 0); //konstruktor. pobiera port tcp.
-    //dobrze by było nadać temu portowi jakiś przydomek typu "tcp_port" by się wyróżniał od portu usb...
-    //...nie udało mi się to ostatnim razem
+    explicit MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
+                        TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent = 0);
 
     virtual ~MainWindow(); //tutaj virtual?
 
@@ -51,13 +50,14 @@ public:
     void closeEvent(QCloseEvent *);*/
 
 private:
-    Ui::MainWindow *ui; //??? o co tu chodzi
+    Ui::MainWindow *ui;
 
     Dobot *_pDobotArm;
     WebTable *_pWebTable;
     Websockets *_pWebSockets;
-    //Dobot *DobotArm; //TODO: ?? nie mogę tworzyć tego obiektu tam gdzie inne, bo mam błędy, przez...
-    //... co muszę tworzyć obiektyw tutaj. tak wogle można???
+    Chessboard *_pChessboard;
+    TCPMsgs *_pTCPmsg;
+    Chess *_pChess;
 
     void refreshBtn();
     void initDobot();

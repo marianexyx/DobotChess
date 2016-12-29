@@ -231,6 +231,7 @@ bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia enpassant
 
 void Chess::checkMsgFromChenard(QString QStrMsgFromChenardTcp)
 {
+    qDebug() << "Chess::checkMsgFromChenard: " << QStrMsgFromChenardTcp;
     if (QStrMsgFromChenardTcp == "OK 1\n") this->MoveOk();
     else if (QStrMsgFromChenardTcp == "OK\n") this->GameStarted();
     else if (QStrMsgFromChenardTcp.left(3) == "OK " && QStrMsgFromChenardTcp != "OK 1\n") this->TestOk(); //odp. na np. 'test e2e4' to 'OK e2e4'
@@ -244,6 +245,7 @@ void Chess::checkMsgFromChenard(QString QStrMsgFromChenardTcp)
 
 void Chess::checkMsgFromWebsockets(QString QStrMsgFromWebsockets)
 {
+    qDebug() << "Chess::checkMsgFromWebsockets: received: " << QStrMsgFromWebsockets;
     if (QStrMsgFromWebsockets == "new") this->NewGame();
     else if (QStrMsgFromWebsockets.left(4) == "move") this->MovePiece(QStrMsgFromWebsockets);
     else if (QStrMsgFromWebsockets.left(10) == "promote_to") this->Promote(QStrMsgFromWebsockets); //odp. z WWW odnośnie tego na co promujemy
@@ -252,6 +254,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsgFromWebsockets)
 
 void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o stan
 {
+    qDebug() << "-Begin move sequence-";
     emit addTextToDobotConsole("-Begin move sequence-");
 
     if (b_test_enpassant) this->enpassantMovingSequence(); //jeżeli test na enpassant się powiódł, to rozpocznij ten ruch
@@ -294,7 +297,6 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
             //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
         {
             _pWebsockets->addTextToWebsocketConsole("Sending 'new' game command to tcp. \n");
-            qDebug() << "Sending 'new' game command to tcp. \n";
             _pTCPMsgs->doTcpConnect("new");
         }
         else _pWebsockets->addTextToWebsocketConsole("Error09! Wrong players names.\n");
@@ -371,7 +373,7 @@ void Chess::GameInProgress() //gra w toku
     //podaj na stronę info o tym że ruch został wykonany
     //TODO: sprawdzić czy strona się nie wykrzaczy, bo usunąłem potwierdzenie na stronę...
     //...o tym jaki ruch został wykonany
-    qDebug() << "Sending 'game_in_progress' to websockets";
+    qDebug() << "Chess::GameInProgress(): Sending to Websockets: 'game_in_progress'";
     _pWebsockets->processWebsocketMsg("game_in_progress");
     _pTCPMsgs->setBlokadaZapytan(false); //chenard przetworzył właśnie wiadomość. uwolnienie blokady zapytań
 }
