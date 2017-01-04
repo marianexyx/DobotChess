@@ -19,7 +19,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    Thread.cpp \
     chess.cpp \
     dobot.cpp \
     tcpmsgs.cpp \
@@ -27,7 +26,8 @@ SOURCES += main.cpp\
     #debug/moc_Thread.cpp \
     webtable.cpp \
     chessboard.cpp \
-    websockets.cpp
+    websockets.cpp \
+    workerThread.cpp
 
 HEADERS  +=  webtable.h \
     websockets.h \
@@ -39,7 +39,7 @@ HEADERS  +=  webtable.h \
     DobotDll/DobotType.h \
     mainwindow.h \
     ui_mainwindow.h \
-    Thread.h
+    workerThread.h
 
 
 FORMS    += mainwindow.ui

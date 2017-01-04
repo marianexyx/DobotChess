@@ -45,29 +45,29 @@ OBJECTS_DIR   = release
 
 SOURCES       = main.cpp \
 		mainwindow.cpp \
-		Thread.cpp \
 		chess.cpp \
 		dobot.cpp \
 		tcpmsgs.cpp \
 		webtable.cpp \
 		chessboard.cpp \
-		websockets.cpp release\moc_webtable.cpp \
+		websockets.cpp \
+		workerThread.cpp release\moc_webtable.cpp \
 		release\moc_websockets.cpp \
 		release\moc_tcpmsgs.cpp \
 		release\moc_chessboard.cpp \
 		release\moc_dobot.cpp \
 		release\moc_chess.cpp \
 		release\moc_mainwindow.cpp \
-		release\moc_Thread.cpp
+		release\moc_workerThread.cpp
 OBJECTS       = release/main.o \
 		release/mainwindow.o \
-		release/Thread.o \
 		release/chess.o \
 		release/dobot.o \
 		release/tcpmsgs.o \
 		release/webtable.o \
 		release/chessboard.o \
 		release/websockets.o \
+		release/workerThread.o \
 		release/moc_webtable.o \
 		release/moc_websockets.o \
 		release/moc_tcpmsgs.o \
@@ -75,7 +75,7 @@ OBJECTS       = release/main.o \
 		release/moc_dobot.o \
 		release/moc_chess.o \
 		release/moc_mainwindow.o \
-		release/moc_Thread.o
+		release/moc_workerThread.o
 
 DIST          = DobotDll/DobotDll.lib \
 		DobotDll/DobotDemoForQt.exe \
@@ -94,15 +94,15 @@ DIST          = DobotDll/DobotDll.lib \
 		DobotDll\DobotType.h \
 		mainwindow.h \
 		ui_mainwindow.h \
-		Thread.h main.cpp \
+		workerThread.h main.cpp \
 		mainwindow.cpp \
-		Thread.cpp \
 		chess.cpp \
 		dobot.cpp \
 		tcpmsgs.cpp \
 		webtable.cpp \
 		chessboard.cpp \
-		websockets.cpp
+		websockets.cpp \
+		workerThread.cpp
 QMAKE_TARGET  = DobotChessCore
 DESTDIR        = DobotDll\ #avoid trailing-slash linebreak
 TARGET         = DobotChessCore.exe
@@ -125,7 +125,7 @@ dist:
 	$(ZIP) DobotChessCore.zip $(SOURCES) $(DIST) DobotChessCore.pro ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\spec_pre.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\qdevice.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\device_config.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\common\angle.conf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\qconfig.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dcore.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dcore_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dextras.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dextras_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dinput.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dinput_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dlogic.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dlogic_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquick.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquick_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquickextras.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquickextras_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquickinput.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquickinput_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquickrender.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3dquickrender_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3drender.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_3drender_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_axbase.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_axbase_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_axcontainer.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_axcontainer_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_axserver.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_axserver_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_bluetooth.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_bluetooth_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_bootstrap_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_clucene_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_concurrent.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_concurrent_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_core.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_core_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_dbus.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_dbus_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_designer.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_designer_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_designercomponents_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_gamepad.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_gamepad_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_gui.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_gui_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_help.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_help_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_location.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_location_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_multimedia.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_multimedia_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_multimediawidgets.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_multimediawidgets_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_network.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_network_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_nfc.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_nfc_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_opengl.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_opengl_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_openglextensions.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_openglextensions_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_packetprotocol_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_platformsupport_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_positioning.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_positioning_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_printsupport.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_printsupport_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_purchasing.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_purchasing_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qml.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qml_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qmldebug_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qmldevtools_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qmltest.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qmltest_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quick.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quick_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quickcontrols2.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quickcontrols2_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quickparticles_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quicktemplates2_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quickwidgets.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_quickwidgets_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_script.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_script_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_scripttools.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_scripttools_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_scxml.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_scxml_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_sensors.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_sensors_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_serialbus.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_serialbus_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_serialport.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_serialport_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_sql.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_sql_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_svg.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_svg_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_testlib.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_testlib_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_uiplugin.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_uitools.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_uitools_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_webchannel.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_webchannel_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_websockets.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_websockets_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_widgets.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_widgets_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_winextras.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_winextras_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_xml.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_xml_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_xmlpatterns.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\modules\qt_lib_xmlpatterns_private.pri ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\qt_functions.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\qt_config.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\win32\qt_config.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\win32-g++\qmake.conf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\spec_post.prf .qmake.stash ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\exclusive_builds.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\default_pre.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\win32\default_pre.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\resolve_config.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\exclusive_builds_post.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\default_post.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\build_pass.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\qml_debug.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\win32\rtti.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\precompile_header.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\warn_on.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\qt.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\resources.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\moc.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\win32\opengl.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\uic.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\file_copies.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\win32\windows.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\testcase_targets.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\exceptions.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\yacc.prf ..\..\..\..\Qt\5.7\mingw53_32\mkspecs\features\lex.prf DobotChessCore.pro ..\..\..\..\Qt\5.7\mingw53_32\lib\qtmain.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5PrintSupport.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5Widgets.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5Gui.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5WebSockets.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5Network.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5Xml.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5SerialPort.prl ..\..\..\..\Qt\5.7\mingw53_32\lib\Qt5Core.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) release\main.o release\mainwindow.o release\Thread.o release\chess.o release\dobot.o release\tcpmsgs.o release\webtable.o release\chessboard.o release\websockets.o release\moc_webtable.o release\moc_websockets.o release\moc_tcpmsgs.o release\moc_chessboard.o release\moc_dobot.o release\moc_chess.o release\moc_mainwindow.o release\moc_Thread.o
+	-$(DEL_FILE) release\main.o release\mainwindow.o release\chess.o release\dobot.o release\tcpmsgs.o release\webtable.o release\chessboard.o release\websockets.o release\workerThread.o release\moc_webtable.o release\moc_websockets.o release\moc_tcpmsgs.o release\moc_chessboard.o release\moc_dobot.o release\moc_chess.o release\moc_mainwindow.o release\moc_workerThread.o
 
 distclean: clean 
 	-$(DEL_FILE) .qmake.stash
@@ -144,9 +144,9 @@ compiler_no_pch_compiler_make_all:
 compiler_no_pch_compiler_clean:
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: release/moc_webtable.cpp release/moc_websockets.cpp release/moc_tcpmsgs.cpp release/moc_chessboard.cpp release/moc_dobot.cpp release/moc_chess.cpp release/moc_mainwindow.cpp release/moc_Thread.cpp
+compiler_moc_header_make_all: release/moc_webtable.cpp release/moc_websockets.cpp release/moc_tcpmsgs.cpp release/moc_chessboard.cpp release/moc_dobot.cpp release/moc_chess.cpp release/moc_mainwindow.cpp release/moc_workerThread.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) release\moc_webtable.cpp release\moc_websockets.cpp release\moc_tcpmsgs.cpp release\moc_chessboard.cpp release\moc_dobot.cpp release\moc_chess.cpp release\moc_mainwindow.cpp release\moc_Thread.cpp
+	-$(DEL_FILE) release\moc_webtable.cpp release\moc_websockets.cpp release\moc_tcpmsgs.cpp release\moc_chessboard.cpp release\moc_dobot.cpp release\moc_chess.cpp release\moc_mainwindow.cpp release\moc_workerThread.cpp
 release/moc_webtable.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QString \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qstring.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qchar.h \
@@ -307,6 +307,8 @@ release/moc_websockets.cpp: ../../../../Qt/5.7/mingw53_32/include/QtWebSockets/Q
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		webtable.h \
 		websockets.h \
 		../../../../Qt/5.7/mingw53_32/bin/moc.exe
@@ -559,7 +561,7 @@ release/moc_dobot.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
-		Thread.h \
+		workerThread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
@@ -683,7 +685,7 @@ release/moc_chess.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QString \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
-		Thread.h \
+		workerThread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
@@ -717,6 +719,8 @@ release/moc_chess.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QString \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		webtable.h \
 		tcpmsgs.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QTcpSocket \
@@ -824,9 +828,6 @@ release/moc_mainwindow.cpp: ../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMai
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qtouchdevice.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qicon.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QScrollBar \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qscrollbar.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qabstractslider.h \
@@ -834,6 +835,15 @@ release/moc_mainwindow.cpp: ../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMai
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qtcpsocket.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qabstractsocket.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QAbstractSocket \
+		DobotDll/DobotDll.h \
+		DobotDll/DobotType.h \
+		workerThread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
+		websockets.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/QWebSocketServer \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/qwebsocketserver.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/qwebsockets_global.h \
@@ -860,13 +870,9 @@ release/moc_mainwindow.cpp: ../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMai
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
-		DobotDll/DobotDll.h \
-		DobotDll/DobotType.h \
-		Thread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
+		webtable.h \
 		dobot.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMessageBox \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qmessagebox.h \
@@ -881,14 +887,12 @@ release/moc_mainwindow.cpp: ../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMai
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		chess.h \
 		chessboard.h \
-		websockets.h \
-		webtable.h \
 		tcpmsgs.h \
 		mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/bin/moc.exe
 	C:\Qt\5.7\mingw53_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.7/mingw53_32/mkspecs/win32-g++ -IC:/Users/mar/Desktop/DobotChess -IC:/Users/mar/Desktop/DobotChess/DobotDll -IC:/Qt/5.7/mingw53_32/include -IC:/Qt/5.7/mingw53_32/include/QtPrintSupport -IC:/Qt/5.7/mingw53_32/include/QtWidgets -IC:/Qt/5.7/mingw53_32/include/QtGui -IC:/Qt/5.7/mingw53_32/include/QtANGLE -IC:/Qt/5.7/mingw53_32/include/QtWebSockets -IC:/Qt/5.7/mingw53_32/include/QtNetwork -IC:/Qt/5.7/mingw53_32/include/QtXml -IC:/Qt/5.7/mingw53_32/include/QtSerialPort -IC:/Qt/5.7/mingw53_32/include/QtCore -IC:/Qt/Tools/mingw530_32/lib/gcc/i686-w64-mingw32/5.3.0/include -IC:/Qt/Tools/mingw530_32/lib/gcc/i686-w64-mingw32/5.3.0/include-fixed -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++ -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++/i686-w64-mingw32 -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++/backward mainwindow.h -o release\moc_mainwindow.cpp
 
-release/moc_Thread.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
+release/moc_workerThread.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qobject.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qobjectdefs.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qnamespace.h \
@@ -956,9 +960,9 @@ release/moc_Thread.cpp: ../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
-		Thread.h \
+		workerThread.h \
 		../../../../Qt/5.7/mingw53_32/bin/moc.exe
-	C:\Qt\5.7\mingw53_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.7/mingw53_32/mkspecs/win32-g++ -IC:/Users/mar/Desktop/DobotChess -IC:/Users/mar/Desktop/DobotChess/DobotDll -IC:/Qt/5.7/mingw53_32/include -IC:/Qt/5.7/mingw53_32/include/QtPrintSupport -IC:/Qt/5.7/mingw53_32/include/QtWidgets -IC:/Qt/5.7/mingw53_32/include/QtGui -IC:/Qt/5.7/mingw53_32/include/QtANGLE -IC:/Qt/5.7/mingw53_32/include/QtWebSockets -IC:/Qt/5.7/mingw53_32/include/QtNetwork -IC:/Qt/5.7/mingw53_32/include/QtXml -IC:/Qt/5.7/mingw53_32/include/QtSerialPort -IC:/Qt/5.7/mingw53_32/include/QtCore -IC:/Qt/Tools/mingw530_32/lib/gcc/i686-w64-mingw32/5.3.0/include -IC:/Qt/Tools/mingw530_32/lib/gcc/i686-w64-mingw32/5.3.0/include-fixed -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++ -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++/i686-w64-mingw32 -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++/backward Thread.h -o release\moc_Thread.cpp
+	C:\Qt\5.7\mingw53_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.7/mingw53_32/mkspecs/win32-g++ -IC:/Users/mar/Desktop/DobotChess -IC:/Users/mar/Desktop/DobotChess/DobotDll -IC:/Qt/5.7/mingw53_32/include -IC:/Qt/5.7/mingw53_32/include/QtPrintSupport -IC:/Qt/5.7/mingw53_32/include/QtWidgets -IC:/Qt/5.7/mingw53_32/include/QtGui -IC:/Qt/5.7/mingw53_32/include/QtANGLE -IC:/Qt/5.7/mingw53_32/include/QtWebSockets -IC:/Qt/5.7/mingw53_32/include/QtNetwork -IC:/Qt/5.7/mingw53_32/include/QtXml -IC:/Qt/5.7/mingw53_32/include/QtSerialPort -IC:/Qt/5.7/mingw53_32/include/QtCore -IC:/Qt/Tools/mingw530_32/lib/gcc/i686-w64-mingw32/5.3.0/include -IC:/Qt/Tools/mingw530_32/lib/gcc/i686-w64-mingw32/5.3.0/include-fixed -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++ -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++/i686-w64-mingw32 -IC:/Qt/Tools/mingw530_32/i686-w64-mingw32/include/c++/backward workerThread.h -o release\moc_workerThread.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1082,9 +1086,6 @@ release/main.o: main.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qtouchdevice.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qicon.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QScrollBar \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qscrollbar.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qabstractslider.h \
@@ -1092,6 +1093,15 @@ release/main.o: main.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qtcpsocket.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qabstractsocket.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QAbstractSocket \
+		DobotDll/DobotDll.h \
+		DobotDll/DobotType.h \
+		workerThread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
+		websockets.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/QWebSocketServer \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/qwebsocketserver.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/qwebsockets_global.h \
@@ -1118,13 +1128,9 @@ release/main.o: main.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
-		DobotDll/DobotDll.h \
-		DobotDll/DobotType.h \
-		Thread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
+		webtable.h \
 		dobot.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMessageBox \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qmessagebox.h \
@@ -1139,8 +1145,6 @@ release/main.o: main.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		chess.h \
 		chessboard.h \
-		websockets.h \
-		webtable.h \
 		tcpmsgs.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QApplication \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qapplication.h \
@@ -1252,9 +1256,6 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qtouchdevice.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qicon.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QScrollBar \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qscrollbar.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qabstractslider.h \
@@ -1262,6 +1263,15 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qtcpsocket.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qabstractsocket.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QAbstractSocket \
+		DobotDll/DobotDll.h \
+		DobotDll/DobotType.h \
+		workerThread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
+		websockets.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/QWebSocketServer \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/qwebsocketserver.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWebSockets/qwebsockets_global.h \
@@ -1288,13 +1298,9 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
-		DobotDll/DobotDll.h \
-		DobotDll/DobotType.h \
-		Thread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
+		webtable.h \
 		dobot.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QMessageBox \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qmessagebox.h \
@@ -1309,8 +1315,6 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		chess.h \
 		chessboard.h \
-		websockets.h \
-		webtable.h \
 		tcpmsgs.h \
 		ui_mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QAction \
@@ -1325,11 +1329,14 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtGui/qinputmethod.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QButtonGroup \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qbuttongroup.h \
-		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QGridLayout \
-		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qgridlayout.h \
+		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QFormLayout \
+		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qformlayout.h \
+		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QLayout \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qlayout.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qlayoutitem.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qboxlayout.h \
+		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qgridlayout.h \
+		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QGridLayout \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QGroupBox \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qgroupbox.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qframe.h \
@@ -1376,77 +1383,6 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/qtoolbar.h \
 		../../../../Qt/5.7/mingw53_32/include/QtWidgets/QWidget
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\mainwindow.o mainwindow.cpp
-
-release/Thread.o: Thread.cpp Thread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qobject.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qobjectdefs.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qnamespace.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qglobal.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qconfig.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qfeatures.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qsystemdetection.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qprocessordetection.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qcompilerdetection.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qtypeinfo.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qtypetraits.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qisenum.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qsysinfo.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qlogging.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qflags.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qbasicatomic.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic_bootstrap.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qgenericatomic.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic_cxx11.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic_msvc.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qglobalstatic.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qmutex.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qnumeric.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qversiontagging.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qobjectdefs_impl.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qstring.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qchar.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qbytearray.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qrefcount.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qarraydata.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qstringbuilder.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qlist.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qalgorithms.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qiterator.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qhashfunctions.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qpair.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qbytearraylist.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qstringlist.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qregexp.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qstringmatcher.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qcoreevent.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qscopedpointer.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qmetatype.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qvarlengtharray.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qcontainerfwd.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qobject_impl.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qdebug.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qhash.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qmap.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qtextstream.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qiodevice.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qlocale.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qvariant.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qshareddata.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qvector.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qpoint.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qset.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qcontiguouscache.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qsharedpointer.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/qsharedpointer_impl.h \
-		DobotDll/DobotDll.h \
-		DobotDll/DobotType.h \
-		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\Thread.o Thread.cpp
 
 release/chess.o: chess.cpp chess.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QString \
@@ -1565,7 +1501,7 @@ release/chess.o: chess.cpp chess.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
-		Thread.h \
+		workerThread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex \
@@ -1599,6 +1535,8 @@ release/chess.o: chess.cpp chess.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		webtable.h \
 		tcpmsgs.h \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QTcpSocket
@@ -1716,7 +1654,7 @@ release/dobot.o: dobot.cpp dobot.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qregularexpression.h \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
-		Thread.h \
+		workerThread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex
@@ -2016,8 +1954,81 @@ release/websockets.o: websockets.cpp websockets.h \
 		../../../../Qt/5.7/mingw53_32/include/QtCore/QVariant \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/QNetworkProxy \
 		../../../../Qt/5.7/mingw53_32/include/QtNetwork/qnetworkproxy.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QList \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QByteArray \
 		webtable.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\websockets.o websockets.cpp
+
+release/workerThread.o: workerThread.cpp workerThread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QObject \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qobject.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qobjectdefs.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qnamespace.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qglobal.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qconfig.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qfeatures.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qsystemdetection.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qprocessordetection.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qcompilerdetection.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qtypeinfo.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qtypetraits.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qisenum.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qsysinfo.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qlogging.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qflags.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qbasicatomic.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qgenericatomic.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qatomic_msvc.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qglobalstatic.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qmutex.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qnumeric.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qversiontagging.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qstring.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qchar.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qbytearray.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qrefcount.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qarraydata.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qstringbuilder.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qlist.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qalgorithms.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qiterator.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qhashfunctions.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qpair.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qbytearraylist.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qstringlist.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qregexp.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qstringmatcher.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qcoreevent.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qscopedpointer.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qmetatype.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qvarlengtharray.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qcontainerfwd.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qobject_impl.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QThread \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qthread.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QDebug \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qdebug.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qhash.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qmap.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qtextstream.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qiodevice.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qlocale.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qvariant.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qshareddata.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qvector.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qpoint.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qset.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qcontiguouscache.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qsharedpointer.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/qsharedpointer_impl.h \
+		DobotDll/DobotDll.h \
+		DobotDll/DobotType.h \
+		../../../../Qt/5.7/mingw53_32/include/QtCore/QMutex
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\workerThread.o workerThread.cpp
 
 release/moc_webtable.o: release/moc_webtable.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_webtable.o release\moc_webtable.cpp
@@ -2040,8 +2051,8 @@ release/moc_chess.o: release/moc_chess.cpp
 release/moc_mainwindow.o: release/moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_mainwindow.o release\moc_mainwindow.cpp
 
-release/moc_Thread.o: release/moc_Thread.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_Thread.o release\moc_Thread.cpp
+release/moc_workerThread.o: release/moc_workerThread.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_workerThread.o release\moc_workerThread.cpp
 
 ####### Install
 

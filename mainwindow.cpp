@@ -11,7 +11,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     /*_pDobotArm(new Dobot()),*/
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    ui->setupUi(this); //bodajże wskazuje że UI dziedziczy to tej (this) klasie, przez co zostanie...
+    //... zniszczona razem z mainwindow.
 
     _pDobotArm = pDobotArm;
     _pWebTable = pWebTable;
@@ -22,16 +23,10 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 
     connect(ui->connectBtn, SIGNAL(clicked(bool)), _pDobotArm, SLOT(onConnectDobot())); //connect dobot
     connect(ui->sendBtn, SIGNAL(clicked(bool)), this, SLOT(onPTPsendBtnClicked())); //send PTP data
-    setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
+    this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
-    _pDobotArm->setPeriodicTaskTimer();
-    _pDobotArm->getPoseTimer();
-
-    //Chessboard DobotChessboard001;
-    //WebTable WebTable001;
-    //Websockets Websockety(&WebTable001, websocketPort); //tworzenie obiektu odpowiadającego za websockety
-    //TCPMsgs TCPCommunication;
-    //Chess ChessCore(_pDobotArm, _pChessboard, _pTCPmsg, _pWebSockets, _pWebTable);
+    /*_pDobotArm->setPeriodicTaskTimer();
+    _pDobotArm->getPoseTimer();*/
 
     //dzięki tym connectom (jeśli działają) można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString)),

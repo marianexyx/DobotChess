@@ -20,7 +20,7 @@
 #include "QtWebSockets/QWebSocket"*/
 #include "DobotDll.h"
 #include "DobotType.h"
-#include "Thread.h"
+#include "workerThread.h"
 //#include "chessboard.h"
 //#include "tcpmsgs.h"
 #include "websockets.h"

@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -33,14 +34,7 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralWidget;
-    QGroupBox *groupBox_4;
-    QGridLayout *gridLayout_4;
-    QLabel *label_14;
-    QLabel *label_12;
-    QLabel *label_13;
-    QPlainTextEdit *dobot_debug;
-    QPlainTextEdit *websocket_debug;
-    QPlainTextEdit *tcp_debug;
+    QFormLayout *formLayout;
     QGroupBox *groupBox_5;
     QGridLayout *gridLayout_5;
     QGroupBox *groupBox;
@@ -53,18 +47,6 @@ public:
     QLabel *label_10;
     QLabel *label_11;
     QSpacerItem *verticalSpacer_2;
-    QGroupBox *groupBox_3;
-    QGridLayout *gridLayout_3;
-    QLabel *label_19;
-    QLineEdit *zPTPEdit;
-    QLineEdit *xPTPEdit;
-    QLineEdit *rPTPEdit;
-    QLabel *label_17;
-    QPushButton *sendBtn;
-    QLabel *label_18;
-    QLabel *label_20;
-    QLineEdit *yPTPEdit;
-    QSpacerItem *verticalSpacer;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout;
     QLabel *joint4Label;
@@ -84,6 +66,26 @@ public:
     QLabel *rLabel;
     QLabel *label_8;
     QSpacerItem *horizontalSpacer;
+    QGroupBox *groupBox_3;
+    QGridLayout *gridLayout_3;
+    QLabel *label_19;
+    QLineEdit *zPTPEdit;
+    QLineEdit *xPTPEdit;
+    QLineEdit *rPTPEdit;
+    QLabel *label_17;
+    QPushButton *sendBtn;
+    QLabel *label_18;
+    QLabel *label_20;
+    QLineEdit *yPTPEdit;
+    QSpacerItem *verticalSpacer;
+    QGroupBox *groupBox_4;
+    QGridLayout *gridLayout_4;
+    QLabel *label_14;
+    QLabel *label_12;
+    QLabel *label_13;
+    QPlainTextEdit *dobot_debug;
+    QPlainTextEdit *websocket_debug;
+    QPlainTextEdit *tcp_debug;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -92,51 +94,15 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(970, 400);
+        MainWindow->resize(805, 405);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        groupBox_4 = new QGroupBox(centralWidget);
-        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
-        groupBox_4->setGeometry(QRect(310, 0, 651, 351));
-        gridLayout_4 = new QGridLayout(groupBox_4);
-        gridLayout_4->setSpacing(6);
-        gridLayout_4->setContentsMargins(11, 11, 11, 11);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        label_14 = new QLabel(groupBox_4);
-        label_14->setObjectName(QStringLiteral("label_14"));
-
-        gridLayout_4->addWidget(label_14, 0, 0, 1, 1);
-
-        label_12 = new QLabel(groupBox_4);
-        label_12->setObjectName(QStringLiteral("label_12"));
-
-        gridLayout_4->addWidget(label_12, 0, 1, 1, 1);
-
-        label_13 = new QLabel(groupBox_4);
-        label_13->setObjectName(QStringLiteral("label_13"));
-
-        gridLayout_4->addWidget(label_13, 0, 2, 1, 1);
-
-        dobot_debug = new QPlainTextEdit(groupBox_4);
-        dobot_debug->setObjectName(QStringLiteral("dobot_debug"));
-        dobot_debug->setReadOnly(true);
-        dobot_debug->setOverwriteMode(false);
-
-        gridLayout_4->addWidget(dobot_debug, 1, 0, 1, 1);
-
-        websocket_debug = new QPlainTextEdit(groupBox_4);
-        websocket_debug->setObjectName(QStringLiteral("websocket_debug"));
-
-        gridLayout_4->addWidget(websocket_debug, 1, 1, 1, 1);
-
-        tcp_debug = new QPlainTextEdit(groupBox_4);
-        tcp_debug->setObjectName(QStringLiteral("tcp_debug"));
-
-        gridLayout_4->addWidget(tcp_debug, 1, 2, 1, 1);
-
+        formLayout = new QFormLayout(centralWidget);
+        formLayout->setSpacing(6);
+        formLayout->setContentsMargins(11, 11, 11, 11);
+        formLayout->setObjectName(QStringLiteral("formLayout"));
         groupBox_5 = new QGroupBox(centralWidget);
         groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
-        groupBox_5->setGeometry(QRect(10, 0, 291, 351));
         gridLayout_5 = new QGridLayout(groupBox_5);
         gridLayout_5->setSpacing(6);
         gridLayout_5->setContentsMargins(11, 11, 11, 11);
@@ -193,69 +159,6 @@ public:
 
 
         gridLayout_5->addWidget(groupBox, 1, 1, 1, 1);
-
-        groupBox_3 = new QGroupBox(groupBox_5);
-        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        gridLayout_3 = new QGridLayout(groupBox_3);
-        gridLayout_3->setSpacing(6);
-        gridLayout_3->setContentsMargins(11, 11, 11, 11);
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-        label_19 = new QLabel(groupBox_3);
-        label_19->setObjectName(QStringLiteral("label_19"));
-
-        gridLayout_3->addWidget(label_19, 2, 0, 1, 1);
-
-        zPTPEdit = new QLineEdit(groupBox_3);
-        zPTPEdit->setObjectName(QStringLiteral("zPTPEdit"));
-        zPTPEdit->setEnabled(false);
-
-        gridLayout_3->addWidget(zPTPEdit, 2, 1, 1, 1);
-
-        xPTPEdit = new QLineEdit(groupBox_3);
-        xPTPEdit->setObjectName(QStringLiteral("xPTPEdit"));
-        xPTPEdit->setEnabled(false);
-
-        gridLayout_3->addWidget(xPTPEdit, 0, 1, 1, 1);
-
-        rPTPEdit = new QLineEdit(groupBox_3);
-        rPTPEdit->setObjectName(QStringLiteral("rPTPEdit"));
-        rPTPEdit->setEnabled(false);
-
-        gridLayout_3->addWidget(rPTPEdit, 3, 1, 1, 1);
-
-        label_17 = new QLabel(groupBox_3);
-        label_17->setObjectName(QStringLiteral("label_17"));
-
-        gridLayout_3->addWidget(label_17, 0, 0, 1, 1);
-
-        sendBtn = new QPushButton(groupBox_3);
-        sendBtn->setObjectName(QStringLiteral("sendBtn"));
-        sendBtn->setEnabled(false);
-
-        gridLayout_3->addWidget(sendBtn, 5, 1, 1, 1);
-
-        label_18 = new QLabel(groupBox_3);
-        label_18->setObjectName(QStringLiteral("label_18"));
-
-        gridLayout_3->addWidget(label_18, 1, 0, 1, 1);
-
-        label_20 = new QLabel(groupBox_3);
-        label_20->setObjectName(QStringLiteral("label_20"));
-
-        gridLayout_3->addWidget(label_20, 3, 0, 1, 1);
-
-        yPTPEdit = new QLineEdit(groupBox_3);
-        yPTPEdit->setObjectName(QStringLiteral("yPTPEdit"));
-        yPTPEdit->setEnabled(false);
-
-        gridLayout_3->addWidget(yPTPEdit, 1, 1, 1, 1);
-
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout_3->addItem(verticalSpacer, 4, 1, 1, 1);
-
-
-        gridLayout_5->addWidget(groupBox_3, 1, 0, 1, 1);
 
         groupBox_2 = new QGroupBox(groupBox_5);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
@@ -352,10 +255,117 @@ public:
 
         gridLayout_5->addWidget(groupBox_2, 0, 0, 1, 2);
 
+        groupBox_3 = new QGroupBox(groupBox_5);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        gridLayout_3 = new QGridLayout(groupBox_3);
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setContentsMargins(11, 11, 11, 11);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        label_19 = new QLabel(groupBox_3);
+        label_19->setObjectName(QStringLiteral("label_19"));
+
+        gridLayout_3->addWidget(label_19, 2, 0, 1, 1);
+
+        zPTPEdit = new QLineEdit(groupBox_3);
+        zPTPEdit->setObjectName(QStringLiteral("zPTPEdit"));
+        zPTPEdit->setEnabled(false);
+
+        gridLayout_3->addWidget(zPTPEdit, 2, 1, 1, 1);
+
+        xPTPEdit = new QLineEdit(groupBox_3);
+        xPTPEdit->setObjectName(QStringLiteral("xPTPEdit"));
+        xPTPEdit->setEnabled(false);
+
+        gridLayout_3->addWidget(xPTPEdit, 0, 1, 1, 1);
+
+        rPTPEdit = new QLineEdit(groupBox_3);
+        rPTPEdit->setObjectName(QStringLiteral("rPTPEdit"));
+        rPTPEdit->setEnabled(false);
+
+        gridLayout_3->addWidget(rPTPEdit, 3, 1, 1, 1);
+
+        label_17 = new QLabel(groupBox_3);
+        label_17->setObjectName(QStringLiteral("label_17"));
+
+        gridLayout_3->addWidget(label_17, 0, 0, 1, 1);
+
+        sendBtn = new QPushButton(groupBox_3);
+        sendBtn->setObjectName(QStringLiteral("sendBtn"));
+        sendBtn->setEnabled(false);
+
+        gridLayout_3->addWidget(sendBtn, 5, 1, 1, 1);
+
+        label_18 = new QLabel(groupBox_3);
+        label_18->setObjectName(QStringLiteral("label_18"));
+
+        gridLayout_3->addWidget(label_18, 1, 0, 1, 1);
+
+        label_20 = new QLabel(groupBox_3);
+        label_20->setObjectName(QStringLiteral("label_20"));
+
+        gridLayout_3->addWidget(label_20, 3, 0, 1, 1);
+
+        yPTPEdit = new QLineEdit(groupBox_3);
+        yPTPEdit->setObjectName(QStringLiteral("yPTPEdit"));
+        yPTPEdit->setEnabled(false);
+
+        gridLayout_3->addWidget(yPTPEdit, 1, 1, 1, 1);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout_3->addItem(verticalSpacer, 4, 1, 1, 1);
+
+
+        gridLayout_5->addWidget(groupBox_3, 1, 0, 1, 1);
+
+
+        formLayout->setWidget(0, QFormLayout::LabelRole, groupBox_5);
+
+        groupBox_4 = new QGroupBox(centralWidget);
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        gridLayout_4 = new QGridLayout(groupBox_4);
+        gridLayout_4->setSpacing(6);
+        gridLayout_4->setContentsMargins(11, 11, 11, 11);
+        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        label_14 = new QLabel(groupBox_4);
+        label_14->setObjectName(QStringLiteral("label_14"));
+
+        gridLayout_4->addWidget(label_14, 0, 0, 1, 1);
+
+        label_12 = new QLabel(groupBox_4);
+        label_12->setObjectName(QStringLiteral("label_12"));
+
+        gridLayout_4->addWidget(label_12, 0, 1, 1, 1);
+
+        label_13 = new QLabel(groupBox_4);
+        label_13->setObjectName(QStringLiteral("label_13"));
+
+        gridLayout_4->addWidget(label_13, 0, 2, 1, 1);
+
+        dobot_debug = new QPlainTextEdit(groupBox_4);
+        dobot_debug->setObjectName(QStringLiteral("dobot_debug"));
+        dobot_debug->setReadOnly(true);
+        dobot_debug->setOverwriteMode(false);
+
+        gridLayout_4->addWidget(dobot_debug, 1, 0, 1, 1);
+
+        websocket_debug = new QPlainTextEdit(groupBox_4);
+        websocket_debug->setObjectName(QStringLiteral("websocket_debug"));
+
+        gridLayout_4->addWidget(websocket_debug, 1, 1, 1, 1);
+
+        tcp_debug = new QPlainTextEdit(groupBox_4);
+        tcp_debug->setObjectName(QStringLiteral("tcp_debug"));
+
+        gridLayout_4->addWidget(tcp_debug, 1, 2, 1, 1);
+
+
+        formLayout->setWidget(0, QFormLayout::FieldRole, groupBox_4);
+
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 970, 18));
+        menuBar->setGeometry(QRect(0, 0, 805, 18));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -363,6 +373,14 @@ public:
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         MainWindow->setStatusBar(statusBar);
+        QWidget::setTabOrder(xPTPEdit, yPTPEdit);
+        QWidget::setTabOrder(yPTPEdit, zPTPEdit);
+        QWidget::setTabOrder(zPTPEdit, rPTPEdit);
+        QWidget::setTabOrder(rPTPEdit, sendBtn);
+        QWidget::setTabOrder(sendBtn, connectBtn);
+        QWidget::setTabOrder(connectBtn, dobot_debug);
+        QWidget::setTabOrder(dobot_debug, websocket_debug);
+        QWidget::setTabOrder(websocket_debug, tcp_debug);
 
         retranslateUi(MainWindow);
 
@@ -372,10 +390,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        groupBox_4->setTitle(QApplication::translate("MainWindow", "Logs", 0));
-        label_14->setText(QApplication::translate("MainWindow", "Arm log", 0));
-        label_12->setText(QApplication::translate("MainWindow", "WebSockets", 0));
-        label_13->setText(QApplication::translate("MainWindow", "TCP socket", 0));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "Dobot Arm", 0));
         groupBox->setTitle(QApplication::translate("MainWindow", "Device", 0));
         DeviceNameLabel->setText(QString());
@@ -385,12 +399,6 @@ public:
         deviceSNLabel->setText(QString());
         label_10->setText(QApplication::translate("MainWindow", "Device Name:", 0));
         label_11->setText(QApplication::translate("MainWindow", "Device information:", 0));
-        groupBox_3->setTitle(QApplication::translate("MainWindow", "PTP", 0));
-        label_19->setText(QApplication::translate("MainWindow", "Z", 0));
-        label_17->setText(QApplication::translate("MainWindow", "X", 0));
-        sendBtn->setText(QApplication::translate("MainWindow", "Send", 0));
-        label_18->setText(QApplication::translate("MainWindow", "Y", 0));
-        label_20->setText(QApplication::translate("MainWindow", "R", 0));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Pose", 0));
         joint4Label->setText(QApplication::translate("MainWindow", "0", 0));
         joint1Label->setText(QApplication::translate("MainWindow", "0", 0));
@@ -408,6 +416,16 @@ public:
         label_7->setText(QApplication::translate("MainWindow", "Z", 0));
         rLabel->setText(QApplication::translate("MainWindow", "0", 0));
         label_8->setText(QApplication::translate("MainWindow", "R", 0));
+        groupBox_3->setTitle(QApplication::translate("MainWindow", "PTP", 0));
+        label_19->setText(QApplication::translate("MainWindow", "Z", 0));
+        label_17->setText(QApplication::translate("MainWindow", "X", 0));
+        sendBtn->setText(QApplication::translate("MainWindow", "Send", 0));
+        label_18->setText(QApplication::translate("MainWindow", "Y", 0));
+        label_20->setText(QApplication::translate("MainWindow", "R", 0));
+        groupBox_4->setTitle(QApplication::translate("MainWindow", "Logs", 0));
+        label_14->setText(QApplication::translate("MainWindow", "Arm log", 0));
+        label_12->setText(QApplication::translate("MainWindow", "WebSockets", 0));
+        label_13->setText(QApplication::translate("MainWindow", "TCP socket", 0));
     } // retranslateUi
 
 };

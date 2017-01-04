@@ -6,13 +6,22 @@ Dobot::Dobot()
 }
 
 //periodic task Timer
-void Dobot::setPeriodicTaskTimer()
+void Dobot::setPeriodicTaskTimer() //wykonywane raz
 {
-    QTimer *periodicTaskTimer = new QTimer(this);
+    //TODO: nie wiem czy obiekt QTimera nie znika po wyjściu z tej metody, jak i cała reszta
+    QTimer *periodicTaskTimer = new QTimer(this); //stworzenie zegarka liczącego czas. zegar liczy
+    //czas jak normalny zegar. new QTimer(this) oznacza że obiekt jest dzieckiem tej klasy, tj.
+    //dobota i razem z nim zostanie zniszczony. zegarek wymaga jeszcze
     periodicTaskTimer->setObjectName("periodicTaskTimer");
+
+    //kiedy timer zakończy żywot/zatrzyma się to odpal funkcję spod slotu
     connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
-    periodicTaskTimer->setSingleShot(true);
-    periodicTaskTimer->start(5);
+    periodicTaskTimer->setSingleShot(true); //ustawia zegar na jednorazowy(?). nie odpala się co ...
+    //... jakiś ustalony interwał sam z siebie zegar (cokolwiek to znaczy w praktyce).
+    periodicTaskTimer->start(5); //za każdym razem zakończ poprzedni timer i po 5ms zresetuj zegar.
+    //ustawienie na 0 (brak) drenowało by kompa z zasobów najprawdopodobniej.
+    //bodajże tutaj dostaję błąd:
+    //QObject::startTimer: Timers can only be used with threads started with QThread
 }
 
 //getPose Timer
@@ -25,9 +34,9 @@ void Dobot::getPoseTimer()
     getPoseTimer->start(200);
 }
 
-void Dobot::onPeriodicTaskTimer()
+void Dobot::onPeriodicTaskTimer() //wykonywane w kółko
 {
-    PeriodicTask();
+    PeriodicTask(); //??? kolejna z funkcji dobota która nei wiadomo jak działa
     QTimer *periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer");
     periodicTaskTimer->start();
 }
@@ -35,24 +44,18 @@ void Dobot::onPeriodicTaskTimer()
 void Dobot::onGetPoseTimer()
 {
     QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
+    Pose pose;
+    GetPose(&pose);
 
     emit JointLabelText(QString::number(thread.pose->jointAngle[0]), 1);
     emit JointLabelText(QString::number(thread.pose->jointAngle[1]), 2);
     emit JointLabelText(QString::number(thread.pose->jointAngle[2]), 3);
     emit JointLabelText(QString::number(thread.pose->jointAngle[3]), 4);
-    /*ui->joint1Label->setText(QString::number((thread.pose->jointAngle[0])));
-    ui->joint2Label->setText(QString::number((thread.pose->jointAngle[1])));
-    ui->joint3Label->setText(QString::number((thread.pose->jointAngle[2])));
-    ui->joint4Label->setText(QString::number((thread.pose->jointAngle[3])));*/
 
     emit AxisLabelText(QString::number(thread.pose->x), 'x');
     emit AxisLabelText(QString::number(thread.pose->y), 'y');
     emit AxisLabelText(QString::number(thread.pose->z), 'z');
     emit AxisLabelText(QString::number(thread.pose->r), 'r');
-    /*ui->xLabel->setText(QString::number(thread.pose->x));
-    ui->yLabel->setText(QString::number(thread.pose->y));
-    ui->zLabel->setText(QString::number(thread.pose->z));
-    ui->rLabel->setText(QString::number(thread.pose->r));*/
 
     getPoseTimer->start();
 }
@@ -60,7 +63,8 @@ void Dobot::onGetPoseTimer()
 void Dobot::onConnectDobot()
 {
     //connect dobot
-    if (!connectStatus) {
+    if (!connectStatus)
+    {
         if (ConnectDobot(0, 115200) != DobotConnect_NoError) emit DobotErrorMsgBox();
         connectStatus = true;
         refreshBtn();
@@ -69,15 +73,17 @@ void Dobot::onConnectDobot()
         //start subThread to getpose
         thread.start();
 
-        qDebug() << "connect success!!!";
-    }else {
+        qDebug() << "Dobot connection success";
+    }
+    else
+    {
         connectStatus = false;
         refreshBtn();
         DisconnectDobot();
     }
 }
 
-void Dobot::refreshBtn()
+void Dobot::refreshBtn() //TODO: nie mam tego przycisku?
 {
     if(connectStatus) emit ConnectButton(false);
     /*{
@@ -111,17 +117,13 @@ void Dobot::initDobot()
 
         char deviceSN[64];
         GetDeviceSN(deviceSN, sizeof(deviceSN));
-        //ui->deviceSNLabel->setText(deviceSN);
 
         char deviceName[64];
         GetDeviceName(deviceName, sizeof(deviceName));
-        //ui->DeviceNameLabel->setText(deviceName);
 
         uint8_t majorVersion, minorVersion, revision;
         GetDeviceVersion(&majorVersion, &minorVersion, &revision);
-        /*ui->DeviceInfoLabel->setText(QString::number(majorVersion) + "." +
-                                     QString::number(minorVersion) + "." +
-                                     QString::number(revision));*/
+
 
         emit deviceLabels(deviceSN, deviceName, QString::number(majorVersion) + "." +
                           QString::number(minorVersion) + "." +
@@ -133,6 +135,7 @@ void Dobot::initDobot()
         endEffectorParams.xBias = 59.7f;
         SetEndEffectorParams(&endEffectorParams, false, NULL);
 
+        //TODO: nie ma sensu ustawiać JOG parametrów, jak nie będę nigdy sterował tutaj kątami
         JOGJointParams jogJointParams;
         for (int i = 0; i < 4; i++)
         {
@@ -175,26 +178,43 @@ void Dobot::initDobot()
         SetPTPJumpParams(&ptpJumpParams, false, NULL);
 }
 
+//TODO: upchać to ładnie gdzie indziej
+static int nPtpCmd_xActualVal = 200;
+static int nPtpCmd_yActualVal = 0;
+static int nPtpCmd_zActualVal = 25;
+static int nPtpCmd_rActualVal = 0;
+
 void Dobot::PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int nPtpCmd_rVal)
 {
-    PTPCmd ptpCmd;
-    ptpCmd.ptpMode = PTPMOVLXYZMode;
-    ptpCmd.x = nPtpCmd_xVal;
-    ptpCmd.y = nPtpCmd_yVal;
-    ptpCmd.z = nPtpCmd_zVal;
-    ptpCmd.r = nPtpCmd_rVal;
+    if (nPtpCmd_xVal != 1000) nPtpCmd_xActualVal = nPtpCmd_xVal; //TODO: dla piękna kodu zrobić coś...
+    if (nPtpCmd_yVal != 1000) nPtpCmd_yActualVal = nPtpCmd_yVal; //...w stylu: #define ACTUAL_POS 1000;
+    if (nPtpCmd_zVal != 1000) nPtpCmd_zActualVal = nPtpCmd_zVal;
+    if (nPtpCmd_rVal != 1000) nPtpCmd_rActualVal = nPtpCmd_rVal;
 
-    SetPTPCmd(&ptpCmd, false, NULL);
+    PTPCmd ptpCmd;
+    ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
+
+    qDebug() << "Dobot::PTPvalues: x =" << nPtpCmd_xActualVal << ", y =" << nPtpCmd_yActualVal <<
+                ", z =" << nPtpCmd_zActualVal << ", r =" << nPtpCmd_rActualVal;
+    //TODO: sprawdzić jak się sprawdzi ruch kartezjański skokowy: JUMP_XYZ
+    ptpCmd.x = nPtpCmd_xActualVal;
+    ptpCmd.y = nPtpCmd_yActualVal;
+    ptpCmd.z = nPtpCmd_zActualVal;
+    ptpCmd.r = nPtpCmd_rActualVal; //TODO: co się stanie jak nie będę podawał do SetPTPCmd
+    //paramentru ptpCmd.r? zachowa aktualną wartość?
+
+    SetPTPCmd(&ptpCmd, true, NULL); //kolejkowanie zapytań ustawione na true
+    //TODO: 3ci parametr zmieniać z indexy po których będzie można sprawdzać czy ruch został wykonany...
+    //... i który ruch aktualnie się wykonuje (więcej w intrukcji do dobota)
+}
+
+void Dobot::gripperOpennedState(bool gripperOpenned)
+{
+    //TODO: nie czaję pierwszego parametru. dokumentacja tu jest żadna
+    SetEndEffectorGripper(true, gripperOpenned, true, NULL);
 }
 
 void Dobot::closeEvent(QCloseEvent *)
 {
     thread.quit();
-}
-
-void moveToPosition(QString QsMoveToPosition)
-{
-    if (QsMoveToPosition == ""){}; //TODO: rozpatrywać to co wpada
-    //TODO: wyciaganie pozycji z chessboard
-    //TODO: wrzucanie pozycji XYZ na dobota
 }

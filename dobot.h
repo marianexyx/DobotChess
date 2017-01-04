@@ -9,7 +9,7 @@
 #include <QValidator>
 #include "DobotDll.h"
 #include "DobotType.h"
-#include "Thread.h"
+#include "workerThread.h"
 
 class Dobot: public QObject
 {
@@ -17,7 +17,7 @@ class Dobot: public QObject
 
 private:
     bool connectStatus;
-    Thread thread;
+    WorkerThread thread;
 
 public:
     Dobot();
@@ -29,8 +29,7 @@ public:
     void closeEvent(QCloseEvent *);
 
     void PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int nPtpCmd_rVal);
-
-    void moveToPosition(QString QsMoveToPosition); //TODO: nieużywana funkcja
+    void gripperOpennedState(bool gripperOpenned);
 
 public slots:
     void onConnectDobot();

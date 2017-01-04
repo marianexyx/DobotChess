@@ -65,32 +65,24 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
         QsWebsocketConsoleMsg = "Sending to 'chess' class: " + QsWsMsgToProcess;
         emit MsgFromWebsocketsToChess(QsWsMsgToProcess);
     }
-    ///!!!TODO: tu błąd, nie jestem w stanie stwierdzić kto był pClientem. trzeba by odpowiedzieć
-    /// wszystkim
-    else if (QsWsMsgToProcess == "game_in_progress") //gra w toku
-    {
-        qDebug() << "Sending to web site: game_in_progress";
-        QsWebsocketConsoleMsg = "Sending to web site: game_in_progress";
-        pClient->sendTextMessage("game_in_progress");
-    }
     else if (QsWsMsgToProcess.left(5) == "check")
     {
         if (QsWsMsgToProcess.mid(6) == "white_player")
         {
-            qDebug() << "Sending to web site: checked_wp_is " << _pWebTable->getNameWhite();
-            QsWebsocketConsoleMsg = "Sending to web site: checked_wp_is " + _pWebTable->getNameWhite();
+            qDebug() << "Sending to website: checked_wp_is " << _pWebTable->getNameWhite();
+            QsWebsocketConsoleMsg = "Sending to website: checked_wp_is " + _pWebTable->getNameWhite();
             pClient->sendTextMessage("checked_wp_is " + _pWebTable->getNameWhite());
         }
         else if (QsWsMsgToProcess.mid(6) == "black_player")
         {
-            qDebug() << "Sending to web site: checked_bp_is " << _pWebTable->getNameBlack();
-            QsWebsocketConsoleMsg = "Sending to web site: checked_bp_is " + _pWebTable->getNameBlack();
+            qDebug() << "Sending to website: checked_bp_is " << _pWebTable->getNameBlack();
+            QsWebsocketConsoleMsg = "Sending to website: checked_bp_is " + _pWebTable->getNameBlack();
             pClient->sendTextMessage("checked_bp_is " + _pWebTable->getNameBlack());
         }
         else if (QsWsMsgToProcess.mid(6) == "whose_turn")
         {
-            qDebug() << "Sending to web site: checked_wt_is " << _pWebTable->getWhoseTurn();
-            QsWebsocketConsoleMsg = "Sending to web site: checked_wt_is " + _pWebTable->getWhoseTurn();
+            qDebug() << "Sending to website: checked_wt_is " << _pWebTable->getWhoseTurn();
+            QsWebsocketConsoleMsg = "Sending to website: checked_wt_is " + _pWebTable->getWhoseTurn();
             pClient->sendTextMessage("checked_wt_is " + _pWebTable->getWhoseTurn());
         }
         else
@@ -110,43 +102,43 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
                 //... - zadać to pytanie na forum QT
             {
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj imię białego gracza
-                qDebug() << "Echo back to web site: new_white " << _pWebTable->getNameWhite();
-                QsWebsocketConsoleMsg = "Echo back to web site: new_white " + _pWebTable->getNameWhite();
+                qDebug() << "Echo back to website: new_white " << _pWebTable->getNameWhite();
+                QsWebsocketConsoleMsg = "Echo back to website: new_white " + _pWebTable->getNameWhite();
                 pClient->sendTextMessage("new_white " + _pWebTable->getNameWhite()); //wyślij do WS nową nazwę białego
             }
             else if (QsWsMsgToProcess.left(17) == "black_player_name")
             {
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj imię czarnego gracza
-                qDebug() << "Echo back to web site: new_black " << _pWebTable->getNameBlack();
-                QsWebsocketConsoleMsg = "Echo back to web site: new_black " + _pWebTable->getNameBlack();
+                qDebug() << "Echo back to website: new_black " << _pWebTable->getNameBlack();
+                QsWebsocketConsoleMsg = "Echo back to website: new_black " + _pWebTable->getNameBlack();
                 pClient->sendTextMessage("new_black " + _pWebTable->getNameBlack()); //wyślij do WS nową nazwę czarnego
             }
             else if (QsWsMsgToProcess.left(10) == "whose_turn") //?TODO: wiadomość wyskakuje 2 razy w qdebug
             {
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj czyja jest tura
-                qDebug() << "Echo back to web site: whose_turn " << _pWebTable->getWhoseTurn();
-                QsWebsocketConsoleMsg = "Echo back to web site: whose_turn " + _pWebTable->getWhoseTurn();
+                qDebug() << "Echo back to website: whose_turn " << _pWebTable->getWhoseTurn();
+                QsWebsocketConsoleMsg = "Echo back to website: whose_turn " + _pWebTable->getWhoseTurn();
                 pClient->sendTextMessage("whose_turn " + _pWebTable->getWhoseTurn()); //wyślij do websocketowców info o turze
             }
             else if (QsWsMsgToProcess == "new_game") //udało się rozpocząć nową grę. wyślij info o tym na WWW
             {
-                qDebug() << "New game started. Sending to web site: new_game";
-                QsWebsocketConsoleMsg = "Sending to web site: new_game";
+                qDebug() << "New game started. Sending to website: new_game";
+                QsWebsocketConsoleMsg = "Sending to website: new_game";
                 pClient->sendTextMessage("new_game");
             }
             else if (QsWsMsgToProcess == "white_won" || QsWsMsgToProcess == "black_won" ||
                      QsWsMsgToProcess == "draw") //koniec gry
             {
-                qDebug() << "End of game. Sending to web site: " << QsWsMsgToProcess;
-                QsWebsocketConsoleMsg = "Sending to web site: " + QsWsMsgToProcess;
+                qDebug() << "End of game. Sending to website: " << QsWsMsgToProcess;
+                QsWebsocketConsoleMsg = "Sending to website: " + QsWsMsgToProcess;
                 pClient->sendTextMessage(QsWsMsgToProcess);
             }
             else if (QsWsMsgToProcess == "promote_to_what") //test promocji ok. zapytaj się WWW na co promować pionka.
                 //TODO: ten sam problem co w BAD_MOVE- nie wiem jak odpowiedzieć do danego gracza, więc...
                 //...póki co odpowiadam wszsytkim, a oni będą filtrowali dane przychodzące.
             {
-                qDebug() << " Sending to web site: " << QsWsMsgToProcess;
-                QsWebsocketConsoleMsg = "Sending to web site: promote_to_what";
+                qDebug() << " Sending to website: " << QsWsMsgToProcess;
+                QsWebsocketConsoleMsg = "Sending to website: promote_to_what";
                 pClient->sendTextMessage("promote_to_what");
             }
             else if (QsWsMsgToProcess.left(8) == "BAD_MOVE") //wiadomosc przychodzi tutaj przez klase 'chess'
@@ -158,9 +150,16 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
              * czymś podobnym. Zostanę na razie przy półśrodku, ale trzeba to zmienić.*/
             {
                 QString QsBadMove = QsWsMsgToProcess.mid(9);
-                qDebug() << "Sending to web site: BAD_MOVE...";
-                QsWebsocketConsoleMsg = "Sending to web site: BAD_MOVE " + QsBadMove.simplified();
+                qDebug() << "Sending to website: BAD_MOVE...";
+                QsWebsocketConsoleMsg = "Sending to website: BAD_MOVE " + QsBadMove.simplified();
                 pClient->sendTextMessage("BAD_MOVE " + QsBadMove.simplified());
+            }
+            //TODO: powinien był odpowiadać tylko graczom, a nie wszystkim
+            else if (QsWsMsgToProcess.left(16) == "game_in_progress") //gra w toku
+            {
+                qDebug() << "Sending to website: " << QsWsMsgToProcess;
+                QsWebsocketConsoleMsg = "Sending to website: " + QsWsMsgToProcess;
+                pClient->sendTextMessage(QsWsMsgToProcess);
             }
             else //jeżeli chenard da inną odpowiedź (nie powinien)
             {

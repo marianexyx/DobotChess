@@ -1,13 +1,13 @@
 INPUT(
 ./release\main.o
 ./release\mainwindow.o
-./release\Thread.o
 ./release\chess.o
 ./release\dobot.o
 ./release\tcpmsgs.o
 ./release\webtable.o
 ./release\chessboard.o
 ./release\websockets.o
+./release\workerThread.o
 ./release\moc_webtable.o
 ./release\moc_websockets.o
 ./release\moc_tcpmsgs.o
@@ -15,5 +15,5 @@ INPUT(
 ./release\moc_dobot.o
 ./release\moc_chess.o
 ./release\moc_mainwindow.o
-./release\moc_Thread.o
+./release\moc_workerThread.o
 );
