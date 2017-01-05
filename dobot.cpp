@@ -3,11 +3,8 @@
 Dobot::Dobot()
 {
     connectStatus = false;
-}
 
-//periodic task Timer
-void Dobot::setPeriodicTaskTimer() //wykonywane raz
-{
+    //periodic task Timer
     //TODO: nie wiem czy obiekt QTimera nie znika po wyjściu z tej metody, jak i cała reszta
     QTimer *periodicTaskTimer = new QTimer(this); //stworzenie zegarka liczącego czas. zegar liczy
     //czas jak normalny zegar. new QTimer(this) oznacza że obiekt jest dzieckiem tej klasy, tj.
@@ -22,16 +19,15 @@ void Dobot::setPeriodicTaskTimer() //wykonywane raz
     //ustawienie na 0 (brak) drenowało by kompa z zasobów najprawdopodobniej.
     //bodajże tutaj dostaję błąd:
     //QObject::startTimer: Timers can only be used with threads started with QThread
-}
 
-//getPose Timer
-void Dobot::getPoseTimer()
-{
+    //getPose Timer
     QTimer *getPoseTimer = new QTimer(this);
     getPoseTimer->setObjectName("getPoseTimer");
     connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
     getPoseTimer->setSingleShot(true);
-    getPoseTimer->start(200);
+    //getPoseTimer->start(200);
+
+
 }
 
 void Dobot::onPeriodicTaskTimer() //wykonywane w kółko
@@ -47,15 +43,15 @@ void Dobot::onGetPoseTimer()
     Pose pose;
     GetPose(&pose);
 
-    emit JointLabelText(QString::number(thread.pose->jointAngle[0]), 1);
-    emit JointLabelText(QString::number(thread.pose->jointAngle[1]), 2);
-    emit JointLabelText(QString::number(thread.pose->jointAngle[2]), 3);
-    emit JointLabelText(QString::number(thread.pose->jointAngle[3]), 4);
+    emit JointLabelText(QString::number(pose.jointAngle[0]), 1);
+    emit JointLabelText(QString::number(pose.jointAngle[1]), 2);
+    emit JointLabelText(QString::number(pose.jointAngle[2]), 3);
+    emit JointLabelText(QString::number(pose.jointAngle[3]), 4);
 
-    emit AxisLabelText(QString::number(thread.pose->x), 'x');
-    emit AxisLabelText(QString::number(thread.pose->y), 'y');
-    emit AxisLabelText(QString::number(thread.pose->z), 'z');
-    emit AxisLabelText(QString::number(thread.pose->r), 'r');
+    emit AxisLabelText(QString::number(pose.x), 'x');
+    emit AxisLabelText(QString::number(pose.y), 'y');
+    emit AxisLabelText(QString::number(pose.z), 'z');
+    emit AxisLabelText(QString::number(pose.r), 'r');
 
     getPoseTimer->start();
 }
@@ -67,18 +63,18 @@ void Dobot::onConnectDobot()
     {
         if (ConnectDobot(0, 115200) != DobotConnect_NoError) emit DobotErrorMsgBox();
         connectStatus = true;
-        refreshBtn();
+        refreshBtn(); //TODO: ?? chyab nei mam tego przycisku. jest on wirtualny?
         initDobot();
 
-        //start subThread to getpose
-        thread.start();
+        QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
+        getPoseTimer->start(200);
 
         qDebug() << "Dobot connection success";
     }
     else
     {
         connectStatus = false;
-        refreshBtn();
+        refreshBtn(); //TODO: ?? chyab nei mam tego przycisku. jest on wirtualny?
         DisconnectDobot();
     }
 }
@@ -105,6 +101,49 @@ void Dobot::refreshBtn() //TODO: nie mam tego przycisku?
         ui->zPTPEdit->setEnabled(false);
         ui->rPTPEdit->setEnabled(false);
     }*/
+
+    //w oryginale jest aktualnie:
+    /*
+        if(connectStatus) {
+        ui->connectBtn->setText(tr("Disconnect"));
+
+        ui->teachMode->setEnabled(true);
+        ui->baseAngleAddBtn->setEnabled(true);
+        ui->baseAngleSubBtn->setEnabled(true);
+        ui->longArmAddBtn->setEnabled(true);
+        ui->longArmSubBtn->setEnabled(true);
+        ui->shortArmAddBtn->setEnabled(true);
+        ui->shortArmSubBtn->setEnabled(true);
+        ui->rHeadAddBtn->setEnabled(true);
+        ui->rHeadSubBtn->setEnabled(true);
+
+        ui->sendBtn->setEnabled(true);
+        ui->sendCPBtn->setEnabled(true);
+        ui->xPTPEdit->setEnabled(true);
+        ui->yPTPEdit->setEnabled(true);
+        ui->zPTPEdit->setEnabled(true);
+        ui->rPTPEdit->setEnabled(true);
+    }else {
+        ui->connectBtn->setText(tr("Connect"));
+
+        ui->teachMode->setEnabled(false);
+        ui->baseAngleAddBtn->setEnabled(false);
+        ui->baseAngleSubBtn->setEnabled(false);
+        ui->longArmAddBtn->setEnabled(false);
+        ui->longArmSubBtn->setEnabled(false);
+        ui->shortArmAddBtn->setEnabled(false);
+        ui->shortArmSubBtn->setEnabled(false);
+        ui->rHeadAddBtn->setEnabled(false);
+        ui->rHeadSubBtn->setEnabled(false);
+
+        ui->sendBtn->setEnabled(false);
+        ui->sendCPBtn->setEnabled(false);
+        ui->xPTPEdit->setEnabled(false);
+        ui->yPTPEdit->setEnabled(false);
+        ui->zPTPEdit->setEnabled(false);
+        ui->rPTPEdit->setEnabled(false);
+    }
+     */
 }
 
 void Dobot::initDobot()
@@ -132,7 +171,8 @@ void Dobot::initDobot()
         //set the end effector parameters
         EndEffectorParams endEffectorParams;
         memset(&endEffectorParams, 0, sizeof(endEffectorParams));
-        endEffectorParams.xBias = 59.7f;
+        endEffectorParams.xBias = 71.6f; //59.7f; TODO: wcześniej była ta wartość. co
+        //ona oznacza w praktyce?
         SetEndEffectorParams(&endEffectorParams, false, NULL);
 
         //TODO: nie ma sensu ustawiać JOG parametrów, jak nie będę nigdy sterował tutaj kątami
@@ -216,5 +256,5 @@ void Dobot::gripperOpennedState(bool gripperOpenned)
 
 void Dobot::closeEvent(QCloseEvent *)
 {
-    thread.quit();
+    //TODO: w oryginale też jest puste od nowszej wersji. usunąć?
 }

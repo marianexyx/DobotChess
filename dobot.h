@@ -9,7 +9,6 @@
 #include <QValidator>
 #include "DobotDll.h"
 #include "DobotType.h"
-#include "workerThread.h"
 
 class Dobot: public QObject
 {
@@ -17,12 +16,11 @@ class Dobot: public QObject
 
 private:
     bool connectStatus;
-    WorkerThread thread;
 
 public:
     Dobot();
 
-    void setPeriodicTaskTimer();
+    //void setPeriodicTaskTimer();
     void refreshBtn();
     void initDobot();
     void onPTPsendBtnClicked();
@@ -34,7 +32,7 @@ public:
 public slots:
     void onConnectDobot();
     void onPeriodicTaskTimer();
-    void getPoseTimer();
+    //void getPoseTimer();
     void onGetPoseTimer();
 
 signals:

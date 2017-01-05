@@ -20,7 +20,7 @@
 #include "QtWebSockets/QWebSocket"*/
 #include "DobotDll.h"
 #include "DobotType.h"
-#include "workerThread.h"
+//#include "workerThread.h"
 //#include "chessboard.h"
 //#include "tcpmsgs.h"
 #include "websockets.h"
@@ -47,7 +47,7 @@ public:
     virtual ~MainWindow(); //tutaj virtual?
 
 /*protected:
-    void closeEvent(QCloseEvent *);*/
+    void closeEvent(QCloseEvent *);*/ //TODO: to się może chyba przydać
 
 private:
     Ui::MainWindow *ui;
@@ -61,7 +61,7 @@ private:
 
     void refreshBtn();
     void initDobot();
-    //void initControl();
+    //void initControl(); //odpowiedzialne za przyciski +/- xyzr, których ja nie używam
 
 private slots:
     //void onChangedMode();

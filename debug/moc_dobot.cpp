@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Dobot_t {
-    QByteArrayData data[21];
-    char stringdata0[269];
+    QByteArrayData data[20];
+    char stringdata0[256];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,8 +48,7 @@ QT_MOC_LITERAL(15, 173, 15), // "QSdeviceVersion"
 QT_MOC_LITERAL(16, 189, 16), // "DobotErrorMsgBox"
 QT_MOC_LITERAL(17, 206, 14), // "onConnectDobot"
 QT_MOC_LITERAL(18, 221, 19), // "onPeriodicTaskTimer"
-QT_MOC_LITERAL(19, 241, 12), // "getPoseTimer"
-QT_MOC_LITERAL(20, 254, 14) // "onGetPoseTimer"
+QT_MOC_LITERAL(19, 241, 14) // "onGetPoseTimer"
 
     },
     "Dobot\0addTextToDobotConsole\0\0QS_msg\0"
@@ -58,8 +57,7 @@ QT_MOC_LITERAL(20, 254, 14) // "onGetPoseTimer"
     "ConnectButton\0bConnectButton\0deviceLabels\0"
     "QSdeviceSN\0QSdeviceName\0QSdeviceVersion\0"
     "DobotErrorMsgBox\0onConnectDobot\0"
-    "onPeriodicTaskTimer\0getPoseTimer\0"
-    "onGetPoseTimer"
+    "onPeriodicTaskTimer\0onGetPoseTimer"
 };
 #undef QT_MOC_LITERAL
 
@@ -69,7 +67,7 @@ static const uint qt_meta_data_Dobot[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      10,   14, // methods
+       9,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -77,18 +75,17 @@ static const uint qt_meta_data_Dobot[] = {
        6,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   64,    2, 0x06 /* Public */,
-       4,    2,   67,    2, 0x06 /* Public */,
-       7,    2,   72,    2, 0x06 /* Public */,
-      10,    1,   77,    2, 0x06 /* Public */,
-      12,    3,   80,    2, 0x06 /* Public */,
-      16,    0,   87,    2, 0x06 /* Public */,
+       1,    1,   59,    2, 0x06 /* Public */,
+       4,    2,   62,    2, 0x06 /* Public */,
+       7,    2,   67,    2, 0x06 /* Public */,
+      10,    1,   72,    2, 0x06 /* Public */,
+      12,    3,   75,    2, 0x06 /* Public */,
+      16,    0,   82,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      17,    0,   88,    2, 0x0a /* Public */,
-      18,    0,   89,    2, 0x0a /* Public */,
-      19,    0,   90,    2, 0x0a /* Public */,
-      20,    0,   91,    2, 0x0a /* Public */,
+      17,    0,   83,    2, 0x0a /* Public */,
+      18,    0,   84,    2, 0x0a /* Public */,
+      19,    0,   85,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -99,7 +96,6 @@ static const uint qt_meta_data_Dobot[] = {
     QMetaType::Void,
 
  // slots: parameters
-    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -121,8 +117,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 5: _t->DobotErrorMsgBox(); break;
         case 6: _t->onConnectDobot(); break;
         case 7: _t->onPeriodicTaskTimer(); break;
-        case 8: _t->getPoseTimer(); break;
-        case 9: _t->onGetPoseTimer(); break;
+        case 8: _t->onGetPoseTimer(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -198,13 +193,13 @@ int Dobot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 10)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 10;
+        _id -= 9;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 10)
+        if (_id < 9)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 10;
+        _id -= 9;
     }
     return _id;
 }

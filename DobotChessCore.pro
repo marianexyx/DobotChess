@@ -26,8 +26,7 @@ SOURCES += main.cpp\
     #debug/moc_Thread.cpp \
     webtable.cpp \
     chessboard.cpp \
-    websockets.cpp \
-    workerThread.cpp
+    websockets.cpp
 
 HEADERS  +=  webtable.h \
     websockets.h \
@@ -38,8 +37,7 @@ HEADERS  +=  webtable.h \
     DobotDll/DobotDll.h \
     DobotDll/DobotType.h \
     mainwindow.h \
-    ui_mainwindow.h \
-    workerThread.h
+    ui_mainwindow.h
 
 
 FORMS    += mainwindow.ui
