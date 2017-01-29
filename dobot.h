@@ -28,7 +28,7 @@ public:
     void onPTPsendBtnClicked();
     void closeEvent(QCloseEvent *);
 
-    void PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int nPtpCmd_rVal);
+    void PTPvalues(float fPtpCmd_xVal, float fPtpCmd_yVal, float fPtpCmd_zVal, float fPtpCmd_rVal);
     void gripperOpennedState(bool gripperClosed);
     void gripperAngle(float fDutyCycle1, float fDutyCycle2);
 

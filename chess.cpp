@@ -12,38 +12,62 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 void Chess::normalPieceMoving() //sekwencja normalnego przemieszczanie bierki
 {
     _pDobot->PTPvalues(_pChessboard->PieceFrom.x, _pChessboard->PieceFrom.y,
-                       _pChessboard->PieceFrom.z, _pChessboard->PieceFrom.r);
+                       _pChessboard->PieceFrom.z + 45, _pChessboard->PieceFrom.r);
+    _pChessboard->PieceActualPos.x = _pChessboard->PieceFrom.x;
+    _pChessboard->PieceActualPos.y = _pChessboard->PieceFrom.y;
+    _pChessboard->PieceActualPos.z = _pChessboard->PieceFrom.z + 45;
+    _pChessboard->PieceActualPos.r = _pChessboard->PieceFrom.r;
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: PieceFrom: " + _pChessboard->QsPieceFrom + "\n");
 
     _pDobot->gripperOpennedState(false);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperOpenned\n");
 
-    _pDobot->PTPvalues(_pChessboard->ArmDown.x, _pChessboard->ArmDown.y,
-                       _pChessboard->ArmDown.z, _pChessboard->ArmDown.r);
+    _pDobot->PTPvalues(_pChessboard->PieceFrom.x, _pChessboard->PieceFrom.y,
+                       _pChessboard->PieceFrom.z, _pChessboard->PieceFrom.r);
+    _pChessboard->PieceActualPos.x = _pChessboard->PieceFrom.x;
+    _pChessboard->PieceActualPos.y = _pChessboard->PieceFrom.y;
+    _pChessboard->PieceActualPos.z = _pChessboard->PieceFrom.z;
+    _pChessboard->PieceActualPos.r = _pChessboard->PieceFrom.r;
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmDown\n");
 
     _pDobot->gripperOpennedState(true);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperClosed\n");
 
-    _pDobot->PTPvalues(_pChessboard->ArmUp.x, _pChessboard->ArmUp.y,
-                       _pChessboard->ArmUp.z, _pChessboard->ArmUp.r);
+    _pDobot->PTPvalues(_pChessboard->PieceFrom.x, _pChessboard->PieceFrom.y,
+                        _pChessboard->PieceFrom.z + 45, _pChessboard->PieceFrom.r);
+    _pChessboard->PieceActualPos.x = _pChessboard->PieceFrom.x;
+    _pChessboard->PieceActualPos.y = _pChessboard->PieceFrom.y;
+    _pChessboard->PieceActualPos.z = _pChessboard->PieceFrom.z + 45;
+    _pChessboard->PieceActualPos.r = _pChessboard->PieceFrom.r;
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmUp\n");
     _pChessboard->abBoard[_pChessboard->nLiteraPolaFrom][_pChessboard->nCyfraPolaFrom] = false; //miejsce ruszanego pionka jest już puste
 
     _pDobot->PTPvalues(_pChessboard->PieceTo.x, _pChessboard->PieceTo.y,
-                       _pChessboard->PieceTo.z, _pChessboard->PieceTo.r);
+                       _pChessboard->PieceTo.z + 45, _pChessboard->PieceTo.r);
+    _pChessboard->PieceActualPos.x = _pChessboard->PieceTo.x;
+    _pChessboard->PieceActualPos.y = _pChessboard->PieceTo.y;
+    _pChessboard->PieceActualPos.z = _pChessboard->PieceTo.z + 45;
+    _pChessboard->PieceActualPos.r = _pChessboard->PieceTo.r;
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: PieceTo: " + _pChessboard->QsPieceTo + "\n");
 
-    _pDobot->PTPvalues(_pChessboard->ArmDown.x, _pChessboard->ArmDown.y,
-                       _pChessboard->ArmDown.z, _pChessboard->ArmDown.r);
+    _pDobot->PTPvalues(_pChessboard->PieceTo.x, _pChessboard->PieceTo.y,
+                       _pChessboard->PieceTo.z, _pChessboard->PieceTo.r);
+    _pChessboard->PieceActualPos.x = _pChessboard->PieceTo.x;
+    _pChessboard->PieceActualPos.y = _pChessboard->PieceTo.y;
+    _pChessboard->PieceActualPos.z = _pChessboard->PieceTo.z;
+    _pChessboard->PieceActualPos.r = _pChessboard->PieceTo.r;
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmDown\n");
 
     _pDobot->gripperOpennedState(false);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperOpenned\n");
     _pChessboard->abBoard[_pChessboard->nLiteraPolaTo][_pChessboard->nCyfraPolaTo] = true; //nowe miejsce ruszanego pionka jest już teraz zajęte
 
-    _pDobot->PTPvalues(_pChessboard->ArmUp.x, _pChessboard->ArmUp.y,
-                       _pChessboard->ArmUp.z, _pChessboard->ArmUp.r);
+    _pDobot->PTPvalues(_pChessboard->PieceTo.x, _pChessboard->PieceTo.y,
+                       _pChessboard->PieceTo.z + 45, _pChessboard->PieceTo.r);
+    _pChessboard->PieceActualPos.x = _pChessboard->PieceTo.x;
+    _pChessboard->PieceActualPos.y = _pChessboard->PieceTo.y;
+    _pChessboard->PieceActualPos.z = _pChessboard->PieceTo.z + 45;
+    _pChessboard->PieceActualPos.r = _pChessboard->PieceTo.r;
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmUp\n-End of move sequence-\n");
 }
 

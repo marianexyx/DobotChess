@@ -88,6 +88,8 @@ private slots:
     void writeInWebsocketConsole(QString QStrMsg);
     void on_gripperBtn_clicked();
     void on_homeBtn_clicked();
+    void on_upBtn_clicked();
+    void on_downBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

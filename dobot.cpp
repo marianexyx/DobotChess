@@ -171,30 +171,30 @@ void Dobot::initDobot()
 }
 
 //TODO: upchać to ładnie gdzie indziej
-static int nPtpCmd_xActualVal = 200;
-static int nPtpCmd_yActualVal = 0;
-static int nPtpCmd_zActualVal = 25;
-static int nPtpCmd_rActualVal = 0;
+static int fPtpCmd_xActualVal = 200;
+static int fPtpCmd_yActualVal = 0;
+static int fPtpCmd_zActualVal = 25;
+static int fPtpCmd_rActualVal = 0;
 
-void Dobot::PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int nPtpCmd_rVal)
+void Dobot::PTPvalues(float fPtpCmd_xVal, float fPtpCmd_yVal, float fPtpCmd_zVal, float fPtpCmd_rVal)
 {
-    if (nPtpCmd_xVal != 1000) nPtpCmd_xActualVal = nPtpCmd_xVal; //TODO: dla piękna kodu zrobić coś...
-    if (nPtpCmd_yVal != 1000) nPtpCmd_yActualVal = nPtpCmd_yVal; //...w stylu: #define ACTUAL_POS 1000;
-    if (nPtpCmd_zVal != 1000) nPtpCmd_zActualVal = nPtpCmd_zVal;
-    if (nPtpCmd_rVal != 1000) nPtpCmd_rActualVal = nPtpCmd_rVal;
+    if (fPtpCmd_xVal != 1000) fPtpCmd_xActualVal = fPtpCmd_xVal; //TODO: dla piękna kodu zrobić coś...
+    if (fPtpCmd_yVal != 1000) fPtpCmd_yActualVal = fPtpCmd_yVal; //...w stylu: #define ACTUAL_POS 1000;
+    if (fPtpCmd_zVal != 1000) fPtpCmd_zActualVal = fPtpCmd_zVal;
+    if (fPtpCmd_rVal != 1000) fPtpCmd_rActualVal = fPtpCmd_rVal;
 
     PTPCmd ptpCmd;
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
 
 
-    qDebug() << "Dobot::PTPvalues: x =" << nPtpCmd_xActualVal << ", y =" << nPtpCmd_yActualVal <<
-                ", z =" << nPtpCmd_zActualVal << ", r =" << nPtpCmd_rActualVal;
+    qDebug() << "Dobot::PTPvalues: x =" << fPtpCmd_xActualVal << ", y =" << fPtpCmd_yActualVal <<
+                ", z =" << fPtpCmd_zActualVal << ", r =" << fPtpCmd_rActualVal;
     //TODO: sprawdzić jak się sprawdzi ruch kartezjański skokowy: JUMP_XYZ
-    ptpCmd.x = nPtpCmd_xActualVal;
-    ptpCmd.y = nPtpCmd_yActualVal;
-    ptpCmd.z = nPtpCmd_zActualVal;
-    ptpCmd.r = nPtpCmd_rActualVal; //TODO: co się stanie jak nie będę podawał do SetPTPCmd
+    ptpCmd.x = fPtpCmd_xActualVal;
+    ptpCmd.y = fPtpCmd_yActualVal;
+    ptpCmd.z = fPtpCmd_zActualVal;
+    ptpCmd.r = fPtpCmd_rActualVal; //TODO: co się stanie jak nie będę podawał do SetPTPCmd
     //paramentru ptpCmd.r? zachowa aktualną wartość?
     //ptpCmd.velocity = 100; //niech używa wartości które ma aktualnie
 
@@ -212,6 +212,11 @@ void Dobot::gripperOpennedState(bool gripperClosed)
     //SetIOPWM(IOPWM *ioPWM, bool isQueued, uint64_t *queuedCmdIndex);
     SetIOPWM(&m_gripperServo1, true, NULL);
     SetIOPWM(&m_gripperServo2, true, NULL);
+
+    WAITCmd gripperMoveDelay;
+    gripperMoveDelay.timeout = 500; //czekaj 0,5 sekundy po dojściu na pozycję by chwytaka
+    //silniki zdążyły się ruszyć, zanimramię zacznie wykonywać kolejny ruch
+    SetWAITCmd(&gripperMoveDelay, true, NULL);
 }
 
 void Dobot::gripperAngle(float fDutyCycle1, float fDutyCycle2)

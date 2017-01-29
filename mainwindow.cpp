@@ -131,6 +131,9 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->servo1GripperEdit->setEnabled(false);
         ui->servo2GripperEdit->setEnabled(false);
         ui->homeBtn->setEnabled(false);
+        ui->serviceCheckBox->setEnabled(false);
+        ui->upBtn->setEnabled(false);
+        ui->downBtn->setEnabled(false);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
@@ -159,9 +162,11 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->servo1GripperEdit->setEnabled(true);
         ui->servo2GripperEdit->setEnabled(true);
         ui->homeBtn->setEnabled(true);
+        ui->serviceCheckBox->setEnabled(true);
+        ui->upBtn->setEnabled(true);
+        ui->downBtn->setEnabled(true);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
-        //ui->sendSimulatedMsgBtn->setEnabled(true);
 
         ui->gripperBtn->setEnabled(true);
     }
@@ -311,10 +316,27 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 {
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
     {
-        _pChess->setServiceTests(true);
-        _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
-        ui->emulatePlayerMsgLineEdit->clear();
-        _pChess->setServiceTests(false);
+        if (ui->serviceCheckBox->isChecked()) //tylko wartości pola np. "e2"
+        {
+            QString QsServiceMsg = ui->emulatePlayerMsgLineEdit->text();
+            //qDebug() << "QsServiceMsg = " << QsServiceMsg;
+            int nServiceLetterPos = _pChessboard->findPieceLetterPos(QsServiceMsg.left(1));
+            int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
+            //qDebug() << "nServiceLetterPos = " << nServiceLetterPos << ", nServiceDigitPos = " << nServiceDigitPos;
+            float fService_x = _pChessboard->afChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
+            float fService_y = _pChessboard->afChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
+            qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y;
+            _pDobotArm->PTPvalues(fService_x, fService_y, 1000, 1000); //1000 = actual_val
+            _pChessboard->PieceActualPos.x = fService_x;
+            _pChessboard->PieceActualPos.y = fService_y;
+        }
+        else
+        {
+            _pChess->setServiceTests(true);
+            _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
+            ui->emulatePlayerMsgLineEdit->clear();
+            _pChess->setServiceTests(false);
+        }
     }
 }
 
@@ -337,4 +359,18 @@ void MainWindow::on_homeBtn_clicked()
     HOMECmd HOMEChess;
     HOMEChess.reserved = 1; //? co(ś) ten indeks daje?
     SetHOMECmd(&HOMEChess, true, NULL);
+}
+
+void MainWindow::on_upBtn_clicked()
+{
+    _pDobotArm->PTPvalues(_pChessboard->PieceActualPos.x, _pChessboard->PieceActualPos.y,
+                          _pChessboard->PieceActualPos.z + 45, 1000);
+    qDebug() << "arm up: z = " << _pChessboard->PieceActualPos.z + 45;
+}
+
+void MainWindow::on_downBtn_clicked()
+{
+    _pDobotArm->PTPvalues(_pChessboard->PieceActualPos.x, _pChessboard->PieceActualPos.y,
+                          _pChessboard->PieceActualPos.z, 1000);
+    qDebug() << "arm down: z = " << _pChessboard->PieceActualPos.z;
 }

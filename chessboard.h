@@ -25,14 +25,14 @@ public:
     Chessboard();
 
     void findDobotXYZVals(QString QS_msg);
-
     void findBoardPos(QString QsPiecePositions);
+    int findPieceLetterPos(QString QsLetter);
     bool removeStatements();
     bool castlingStatements(QString QsPossibleCastlingVal);
 
     //TODO: jeżeli zrobię poniższe dane jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
-    ArmPosition PieceFrom, PieceTo, ArmUp, ArmDown;
+    ArmPosition PieceFrom, PieceTo, PieceActualPos/*, ArmUp, ArmDown*/;
 
     QString QsPiecieFromTo;                // f.e. "e2e4"
 
@@ -67,6 +67,7 @@ public:
 
     float afChessboardPositions_x[8][8];
     float afChessboardPositions_y[8][8];
+    float afChessboardPositions_z[8][8];
 
 
 

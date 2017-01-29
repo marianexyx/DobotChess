@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
@@ -66,11 +67,14 @@ public:
     QPushButton *rHeadAddBtn;
     QPushButton *rHeadSubBtn;
     QPushButton *homeBtn;
+    QPushButton *upBtn;
+    QPushButton *downBtn;
     QGroupBox *groupBox_6;
     QGridLayout *gridLayout_6;
     QPushButton *sendSimulatedMsgBtn;
     QSpacerItem *verticalSpacer_4;
     QLineEdit *emulatePlayerMsgLineEdit;
+    QCheckBox *serviceCheckBox;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout;
     QLabel *label_5;
@@ -228,55 +232,67 @@ public:
         baseAngleAddBtn->setObjectName(QStringLiteral("baseAngleAddBtn"));
         baseAngleAddBtn->setEnabled(false);
 
-        formLayout->setWidget(2, QFormLayout::LabelRole, baseAngleAddBtn);
+        formLayout->setWidget(3, QFormLayout::LabelRole, baseAngleAddBtn);
 
         baseAngleSubBtn = new QPushButton(JOGgroupBox);
         baseAngleSubBtn->setObjectName(QStringLiteral("baseAngleSubBtn"));
         baseAngleSubBtn->setEnabled(false);
 
-        formLayout->setWidget(2, QFormLayout::FieldRole, baseAngleSubBtn);
+        formLayout->setWidget(3, QFormLayout::FieldRole, baseAngleSubBtn);
 
         longArmAddBtn = new QPushButton(JOGgroupBox);
         longArmAddBtn->setObjectName(QStringLiteral("longArmAddBtn"));
         longArmAddBtn->setEnabled(false);
 
-        formLayout->setWidget(4, QFormLayout::LabelRole, longArmAddBtn);
+        formLayout->setWidget(5, QFormLayout::LabelRole, longArmAddBtn);
 
         longArmSubBtn = new QPushButton(JOGgroupBox);
         longArmSubBtn->setObjectName(QStringLiteral("longArmSubBtn"));
         longArmSubBtn->setEnabled(false);
 
-        formLayout->setWidget(4, QFormLayout::FieldRole, longArmSubBtn);
+        formLayout->setWidget(5, QFormLayout::FieldRole, longArmSubBtn);
 
         shortArmAddBtn = new QPushButton(JOGgroupBox);
         shortArmAddBtn->setObjectName(QStringLiteral("shortArmAddBtn"));
         shortArmAddBtn->setEnabled(false);
 
-        formLayout->setWidget(5, QFormLayout::LabelRole, shortArmAddBtn);
+        formLayout->setWidget(6, QFormLayout::LabelRole, shortArmAddBtn);
 
         shortArmSubBtn = new QPushButton(JOGgroupBox);
         shortArmSubBtn->setObjectName(QStringLiteral("shortArmSubBtn"));
         shortArmSubBtn->setEnabled(false);
 
-        formLayout->setWidget(5, QFormLayout::FieldRole, shortArmSubBtn);
+        formLayout->setWidget(6, QFormLayout::FieldRole, shortArmSubBtn);
 
         rHeadAddBtn = new QPushButton(JOGgroupBox);
         rHeadAddBtn->setObjectName(QStringLiteral("rHeadAddBtn"));
         rHeadAddBtn->setEnabled(false);
 
-        formLayout->setWidget(6, QFormLayout::LabelRole, rHeadAddBtn);
+        formLayout->setWidget(7, QFormLayout::LabelRole, rHeadAddBtn);
 
         rHeadSubBtn = new QPushButton(JOGgroupBox);
         rHeadSubBtn->setObjectName(QStringLiteral("rHeadSubBtn"));
         rHeadSubBtn->setEnabled(false);
 
-        formLayout->setWidget(6, QFormLayout::FieldRole, rHeadSubBtn);
+        formLayout->setWidget(7, QFormLayout::FieldRole, rHeadSubBtn);
 
         homeBtn = new QPushButton(JOGgroupBox);
         homeBtn->setObjectName(QStringLiteral("homeBtn"));
         homeBtn->setEnabled(false);
 
         formLayout->setWidget(1, QFormLayout::FieldRole, homeBtn);
+
+        upBtn = new QPushButton(JOGgroupBox);
+        upBtn->setObjectName(QStringLiteral("upBtn"));
+        upBtn->setEnabled(false);
+
+        formLayout->setWidget(2, QFormLayout::LabelRole, upBtn);
+
+        downBtn = new QPushButton(JOGgroupBox);
+        downBtn->setObjectName(QStringLiteral("downBtn"));
+        downBtn->setEnabled(false);
+
+        formLayout->setWidget(2, QFormLayout::FieldRole, downBtn);
 
 
         gridLayout_9->addWidget(JOGgroupBox, 0, 1, 1, 1);
@@ -292,17 +308,23 @@ public:
         sendSimulatedMsgBtn->setEnabled(false);
         sendSimulatedMsgBtn->setAutoDefault(true);
 
-        gridLayout_6->addWidget(sendSimulatedMsgBtn, 3, 0, 1, 1);
+        gridLayout_6->addWidget(sendSimulatedMsgBtn, 4, 0, 1, 1);
 
         verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout_6->addItem(verticalSpacer_4, 1, 0, 1, 1);
+        gridLayout_6->addItem(verticalSpacer_4, 2, 0, 1, 1);
 
         emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
         emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
         emulatePlayerMsgLineEdit->setEnabled(false);
 
         gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 1);
+
+        serviceCheckBox = new QCheckBox(groupBox_6);
+        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
+        serviceCheckBox->setEnabled(false);
+
+        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
 
 
         gridLayout_9->addWidget(groupBox_6, 1, 1, 1, 1);
@@ -582,8 +604,11 @@ public:
         rHeadAddBtn->setText(QApplication::translate("MainWindow", "J4+", 0));
         rHeadSubBtn->setText(QApplication::translate("MainWindow", "J4-", 0));
         homeBtn->setText(QApplication::translate("MainWindow", "HOME", 0));
+        upBtn->setText(QApplication::translate("MainWindow", "Up", 0));
+        downBtn->setText(QApplication::translate("MainWindow", "Down", 0));
         groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate message from player", 0));
         sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "Send", 0));
+        serviceCheckBox->setText(QApplication::translate("MainWindow", "service message", 0));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Pose", 0));
         label_5->setText(QApplication::translate("MainWindow", "J4", 0));
         joint4Label->setText(QApplication::translate("MainWindow", "0", 0));
