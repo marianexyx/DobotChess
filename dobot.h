@@ -16,23 +16,25 @@ class Dobot: public QObject
 
 private:
     bool connectStatus;
+    //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
+    IOPWM m_gripperServo1;
+    IOPWM m_gripperServo2;
 
 public:
     Dobot();
 
-    //void setPeriodicTaskTimer();
     void refreshBtn();
     void initDobot();
     void onPTPsendBtnClicked();
     void closeEvent(QCloseEvent *);
 
     void PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int nPtpCmd_rVal);
-    void gripperOpennedState(bool gripperOpenned);
+    void gripperOpennedState(bool gripperClosed);
+    void gripperAngle(float fDutyCycle1, float fDutyCycle2);
 
 public slots:
     void onConnectDobot();
     void onPeriodicTaskTimer();
-    //void getPoseTimer();
     void onGetPoseTimer();
 
 signals:
@@ -40,7 +42,7 @@ signals:
     void addTextToDobotConsole(QString QS_msg); //dodawanie komunikatu do konsoli dobota
     void JointLabelText(QString QSLabelText, short sJoint);
     void AxisLabelText(QString QSAxisLabelText, char chAxis);
-    void ConnectButton(bool bConnectButton);
+    void RefreshDobotButtonsStates(bool bDobotButtonsStates);
     void deviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
     void DobotErrorMsgBox();
 };

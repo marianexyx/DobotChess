@@ -1,7 +1,7 @@
 #include "chess.h"
 
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-             Websockets *pWebsockets, WebTable *pWebTable)
+             Websockets *pWebsockets, WebTable *pWebTable): _bServiceTests(false)
 {
     _pTCPMsgs = pTCPMsgs;
     _pDobot = pDobot;
@@ -15,14 +15,14 @@ void Chess::normalPieceMoving() //sekwencja normalnego przemieszczanie bierki
                        _pChessboard->PieceFrom.z, _pChessboard->PieceFrom.r);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: PieceFrom: " + _pChessboard->QsPieceFrom + "\n");
 
-    _pDobot->gripperOpennedState(true);
+    _pDobot->gripperOpennedState(false);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperOpenned\n");
 
     _pDobot->PTPvalues(_pChessboard->ArmDown.x, _pChessboard->ArmDown.y,
                        _pChessboard->ArmDown.z, _pChessboard->ArmDown.r);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmDown\n");
 
-    _pDobot->gripperOpennedState(false);
+    _pDobot->gripperOpennedState(true);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperClosed\n");
 
     _pDobot->PTPvalues(_pChessboard->ArmUp.x, _pChessboard->ArmUp.y,
@@ -38,7 +38,7 @@ void Chess::normalPieceMoving() //sekwencja normalnego przemieszczanie bierki
                        _pChessboard->ArmDown.z, _pChessboard->ArmDown.r);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmDown\n");
 
-    _pDobot->gripperOpennedState(true);
+    _pDobot->gripperOpennedState(false);
     emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperOpenned\n");
     _pChessboard->abBoard[_pChessboard->nLiteraPolaTo][_pChessboard->nCyfraPolaTo] = true; //nowe miejsce ruszanego pionka jest już teraz zajęte
 
@@ -215,8 +215,9 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
         //TODO: program gdzieś musi stackować zapytania których nie może jeszcze przetworzyć
     {
         _pTCPMsgs->setBlokadaZapytan(true);
-        if (_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
-                !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) //jeżeli obaj gracze siedzą przy stole
+        if ((_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
+                !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
+                _bServiceTests) //albo jeżeli mamy do czynienia z zapytaniem serwisowym
             //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
         {
             _pWebsockets->addTextToWebsocketConsole("Sending 'new' game command to tcp. \n");
@@ -231,7 +232,7 @@ void Chess::GameStarted() //prześlij info na stronę o tym że gra wystartował
 {
     _pWebsockets->addTextToWebsocketConsole("new_game");
     qDebug() << "Sending 'new_game' to site";
-    _pWebsockets->processWebsocketMsg("new_game");
+    if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
     _pTCPMsgs->setBlokadaZapytan(false); //chenard przetworzył wiadomość. uwolnienie blokady zapytań.
 }
 

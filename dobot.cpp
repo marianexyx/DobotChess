@@ -4,8 +4,14 @@ Dobot::Dobot()
 {
     connectStatus = false;
 
-    //periodic task Timer
-    //TODO: nie wiem czy obiekt QTimera nie znika po wyjściu z tej metody, jak i cała reszta
+    m_gripperServo1.address = 6;
+    m_gripperServo1.frequency = 50.f;
+    m_gripperServo1.dutyCycle = 7.5f;
+    m_gripperServo2.address = 4;
+    m_gripperServo2.frequency = 50.f;
+    m_gripperServo2.dutyCycle = 7.5f;
+
+    //potrzebny jest poniższy timer dla dobota, bo tylko w nim obracane są jego komendy.
     QTimer *periodicTaskTimer = new QTimer(this); //stworzenie zegarka liczącego czas. zegar liczy
     //czas jak normalny zegar. new QTimer(this) oznacza że obiekt jest dzieckiem tej klasy, tj.
     //dobota i razem z nim zostanie zniszczony. zegarek wymaga jeszcze
@@ -17,7 +23,7 @@ Dobot::Dobot()
     //... jakiś ustalony interwał sam z siebie zegar (cokolwiek to znaczy w praktyce).
     periodicTaskTimer->start(5); //za każdym razem zakończ poprzedni timer i po 5ms zresetuj zegar.
     //ustawienie na 0 (brak) drenowało by kompa z zasobów najprawdopodobniej.
-    //bodajże tutaj dostaję błąd:
+    //ciągle dostaję błąd:
     //QObject::startTimer: Timers can only be used with threads started with QThread
 
     //getPose Timer
@@ -26,8 +32,6 @@ Dobot::Dobot()
     connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
     getPoseTimer->setSingleShot(true);
     //getPoseTimer->start(200);
-
-
 }
 
 void Dobot::onPeriodicTaskTimer() //wykonywane w kółko
@@ -63,87 +67,28 @@ void Dobot::onConnectDobot()
     {
         if (ConnectDobot(0, 115200) != DobotConnect_NoError) emit DobotErrorMsgBox();
         connectStatus = true;
-        refreshBtn(); //TODO: ?? chyab nei mam tego przycisku. jest on wirtualny?
-        initDobot();
+        this->refreshBtn();
+        this->initDobot();
 
         QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
         getPoseTimer->start(200);
 
         qDebug() << "Dobot connection success";
+        this->addTextToDobotConsole("Dobot connected");
     }
     else
     {
         connectStatus = false;
-        refreshBtn(); //TODO: ?? chyab nei mam tego przycisku. jest on wirtualny?
+        refreshBtn();
         DisconnectDobot();
     }
 }
 
-void Dobot::refreshBtn() //TODO: nie mam tego przycisku?
+void Dobot::refreshBtn() //niby button, ale używamy póki co tylko jako funkcja
 {
-    if(connectStatus) emit ConnectButton(false);
-    /*{
-        ui->connectBtn->setText(tr("Disconnect"));
+    if(connectStatus) emit RefreshDobotButtonsStates(false);
+    else emit RefreshDobotButtonsStates(true);
 
-        ui->sendBtn->setEnabled(true);
-        ui->xPTPEdit->setEnabled(true);
-        ui->yPTPEdit->setEnabled(true);
-        ui->zPTPEdit->setEnabled(true);
-        ui->rPTPEdit->setEnabled(true);
-    }*/
-    else emit ConnectButton(true);
-    /*{
-        ui->connectBtn->setText(tr("Connect"));
-
-        ui->sendBtn->setEnabled(false);
-        ui->xPTPEdit->setEnabled(false);
-        ui->yPTPEdit->setEnabled(false);
-        ui->zPTPEdit->setEnabled(false);
-        ui->rPTPEdit->setEnabled(false);
-    }*/
-
-    //w oryginale jest aktualnie:
-    /*
-        if(connectStatus) {
-        ui->connectBtn->setText(tr("Disconnect"));
-
-        ui->teachMode->setEnabled(true);
-        ui->baseAngleAddBtn->setEnabled(true);
-        ui->baseAngleSubBtn->setEnabled(true);
-        ui->longArmAddBtn->setEnabled(true);
-        ui->longArmSubBtn->setEnabled(true);
-        ui->shortArmAddBtn->setEnabled(true);
-        ui->shortArmSubBtn->setEnabled(true);
-        ui->rHeadAddBtn->setEnabled(true);
-        ui->rHeadSubBtn->setEnabled(true);
-
-        ui->sendBtn->setEnabled(true);
-        ui->sendCPBtn->setEnabled(true);
-        ui->xPTPEdit->setEnabled(true);
-        ui->yPTPEdit->setEnabled(true);
-        ui->zPTPEdit->setEnabled(true);
-        ui->rPTPEdit->setEnabled(true);
-    }else {
-        ui->connectBtn->setText(tr("Connect"));
-
-        ui->teachMode->setEnabled(false);
-        ui->baseAngleAddBtn->setEnabled(false);
-        ui->baseAngleSubBtn->setEnabled(false);
-        ui->longArmAddBtn->setEnabled(false);
-        ui->longArmSubBtn->setEnabled(false);
-        ui->shortArmAddBtn->setEnabled(false);
-        ui->shortArmSubBtn->setEnabled(false);
-        ui->rHeadAddBtn->setEnabled(false);
-        ui->rHeadSubBtn->setEnabled(false);
-
-        ui->sendBtn->setEnabled(false);
-        ui->sendCPBtn->setEnabled(false);
-        ui->xPTPEdit->setEnabled(false);
-        ui->yPTPEdit->setEnabled(false);
-        ui->zPTPEdit->setEnabled(false);
-        ui->rPTPEdit->setEnabled(false);
-    }
-     */
 }
 
 void Dobot::initDobot()
@@ -216,6 +161,13 @@ void Dobot::initDobot()
         ptpJumpParams.jumpHeight = 20;
         ptpJumpParams.zLimit = 150;
         SetPTPJumpParams(&ptpJumpParams, false, NULL);
+
+        HOMEParams HomeChess;
+        HomeChess.x = 140;
+        HomeChess.y = 0;
+        HomeChess.z = 10; //niżej będzie waliło w szachownicę
+        HomeChess.r = 0;
+        SetHOMEParams(&HomeChess, false, NULL);
 }
 
 //TODO: upchać to ładnie gdzie indziej
@@ -233,6 +185,8 @@ void Dobot::PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int 
 
     PTPCmd ptpCmd;
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
+    //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
+
 
     qDebug() << "Dobot::PTPvalues: x =" << nPtpCmd_xActualVal << ", y =" << nPtpCmd_yActualVal <<
                 ", z =" << nPtpCmd_zActualVal << ", r =" << nPtpCmd_rActualVal;
@@ -242,16 +196,32 @@ void Dobot::PTPvalues(int nPtpCmd_xVal, int nPtpCmd_yVal, int nPtpCmd_zVal, int 
     ptpCmd.z = nPtpCmd_zActualVal;
     ptpCmd.r = nPtpCmd_rActualVal; //TODO: co się stanie jak nie będę podawał do SetPTPCmd
     //paramentru ptpCmd.r? zachowa aktualną wartość?
+    //ptpCmd.velocity = 100; //niech używa wartości które ma aktualnie
 
+    //SetQueuedCmdStartExec(); //TODO: co to robi? było w dobocie po patchu. dokumentacja cienka.
     SetPTPCmd(&ptpCmd, true, NULL); //kolejkowanie zapytań ustawione na true
     //TODO: 3ci parametr zmieniać z indexy po których będzie można sprawdzać czy ruch został wykonany...
     //... i który ruch aktualnie się wykonuje (więcej w intrukcji do dobota)
 }
 
-void Dobot::gripperOpennedState(bool gripperOpenned)
+void Dobot::gripperOpennedState(bool gripperClosed)
 {
-    //TODO: nie czaję pierwszego parametru. dokumentacja tu jest żadna
-    SetEndEffectorGripper(true, gripperOpenned, true, NULL);
+    m_gripperServo1.dutyCycle = gripperClosed ? 3.1f : 3.6f;
+    m_gripperServo2.dutyCycle = gripperClosed ? 8.8f : 8.3f;
+
+    //SetIOPWM(IOPWM *ioPWM, bool isQueued, uint64_t *queuedCmdIndex);
+    SetIOPWM(&m_gripperServo1, true, NULL);
+    SetIOPWM(&m_gripperServo2, true, NULL);
+}
+
+void Dobot::gripperAngle(float fDutyCycle1, float fDutyCycle2)
+{
+    if (fDutyCycle1 != 0) m_gripperServo1.dutyCycle = fDutyCycle1;
+    if (fDutyCycle2 != 0) m_gripperServo2.dutyCycle = fDutyCycle2;
+    qDebug() << "m_gripperServo1.dutyCycle = " << fDutyCycle1;
+    qDebug() << "m_gripperServo2.dutyCycle = " << fDutyCycle2;
+    SetIOPWM(&m_gripperServo1, true, NULL);
+    SetIOPWM(&m_gripperServo2, true, NULL);
 }
 
 void Dobot::closeEvent(QCloseEvent *)

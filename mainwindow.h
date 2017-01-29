@@ -9,10 +9,10 @@
 /*#include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>*/
-/*#include <QMessageBox>
+#include <QMessageBox>
 #include <QDebug>
 #include <QSignalMapper>
-#include <QTimer>*/
+/*#include <QTimer>*/
 #include <QScrollBar>
 #include <QTcpSocket>
 #include <QAbstractSocket>
@@ -61,14 +61,12 @@ private:
 
     void refreshBtn();
     void initDobot();
-    //void initControl(); //odpowiedzialne za przyciski +/- xyzr, których ja nie używam
+    void initControl();
 
 private slots:
-    //void onChangedMode();
-    //void onConnectDobot();
-    //void onJOGCtrlBtnPressed(int index);
-    //void onJOGCtrlBtnReleased();
-    //void onPeriodicTaskTimer();
+    void onChangedMode();
+    void onJOGCtrlBtnPressed(int index);
+    void onJOGCtrlBtnReleased();
     void onPTPsendBtnClicked();
 
     /*---sloty do używania GUI MainWindow---*/
@@ -77,15 +75,19 @@ private slots:
     void setDobotValidators();
     void setJointLabelText(QString QSJointLabelText, short sJoint);
     void setAxisLabelText(QString QSAxisLabelText, char chAxis);
-    void setConnectButtonText(bool bConnectButton);
+    void setDobotButtonsStates(bool bDobotButtonsStates);
     void setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
     void showDobotErrorMsgBox();
+    void on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged);
+    void on_sendSimulatedMsgBtn_clicked();
 
     //tcp slots
     void writeInTcpConsole(QString QS_msg);
 
     //websocket slots
     void writeInWebsocketConsole(QString QStrMsg);
+    void on_gripperBtn_clicked();
+    void on_homeBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

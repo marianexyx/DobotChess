@@ -1,23 +1,26 @@
 #include "chessboard.h"
 
 #define ACTUAL_POS  1000;
-#define ARM_UP      0;
-#define ARM_DOWN    -50;
+#define ARM_UP      50;
+#define ARM_DOWN    3;
 
 Chessboard::Chessboard()
 {
-    int a1_x = 150;     int a1_y = 75;
-    int a8_x = 300;     //int a8_y = 75;
-    /*int h1_x = 150;*/ int h1_y = -75;
-    //int h8_x = 300;   int h8_y = -75;
+    int a1_x = 184.5; int a1_y = 76.3; //int a1_z = -2.1;
+    int a8_x = 330.3; int a8_y = 73.1; //int a8_z = 2.2;
+    int h1_x = 184.5; int h1_y = -81.8; //int h1_z = -2.7;
+    int h8_x = 329.2; int h8_y = -78.5; //int h8_z = 1.6;
 
-    //założenie że plansza leży idealnie symetrycznie po środku osi 'y'
     for (int cyfry = 0; cyfry <= 7; cyfry++)
     {
         for (int litery = 0; litery <= 7; litery++)
         {
-            afChessboardPositions_x[cyfry][litery] = a1_x + (cyfry*((a8_x - a1_x)/8));
-            afChessboardPositions_y[cyfry][litery] = h1_y + (litery*((abs(a1_y)+abs(h1_y))/8));
+            afChessboardPositions_x[cyfry][litery] = a1_x +
+                    cyfry*(((a8_x-a1_x)/7)+((litery/14)*(((a1_x-h1_x)/7)-((a8_x-h8_x)/7))))-
+                    litery*(((a1_x-h1_x)/7)-((cyfry/14)*(((h8_x-h1_x)/7)-((a8_x-a1_x)/7))));
+            afChessboardPositions_y[cyfry][litery] = a1_y +
+                    cyfry*(((a8_y-a1_y)/7)+((litery/14)*(((a1_y-h1_y)/7)-((a8_y-h8_y)/7))))-
+                    litery*(((a1_y-h1_y)/7)-((cyfry/14)*(((h8_y-h1_y)/7)-((a8_y-a1_y)/7))));
             /*qDebug() << "position " << litery << cyfry << " = " << afChessboardPositions_x[cyfry][litery]
                         << afChessboardPositions_y[cyfry][litery];*/
         }
@@ -61,13 +64,13 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
     else if (QsLiteraPolaTo== "g" || QsLiteraPolaTo== "G") {nLiteraPolaTo = 6; QsLiteraPolaTo= "g";}
     else if (QsLiteraPolaTo== "h" || QsLiteraPolaTo== "H") {nLiteraPolaTo = 7; QsLiteraPolaTo= "h";}
 
-    PieceFrom.x = afChessboardPositions_x[nLiteraPolaFrom][nCyfraPolaFrom];
-    PieceFrom.y = afChessboardPositions_y[nLiteraPolaFrom][nCyfraPolaFrom];
+    PieceFrom.x = afChessboardPositions_x[nCyfraPolaFrom][nLiteraPolaFrom];
+    PieceFrom.y = afChessboardPositions_y[nCyfraPolaFrom][nLiteraPolaFrom];
     PieceFrom.z = ACTUAL_POS;
     PieceFrom.r = ACTUAL_POS;
 
-    PieceTo.x = afChessboardPositions_x[nLiteraPolaTo][nCyfraPolaTo];
-    PieceTo.y = afChessboardPositions_y[nLiteraPolaTo][nCyfraPolaTo];
+    PieceTo.x = afChessboardPositions_x[nCyfraPolaTo][nLiteraPolaTo];
+    PieceTo.y = afChessboardPositions_y[nCyfraPolaTo][nLiteraPolaTo];
     PieceTo.z = ACTUAL_POS;
     PieceTo.r = ACTUAL_POS;
 

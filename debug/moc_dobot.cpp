@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Dobot_t {
     QByteArrayData data[20];
-    char stringdata0[256];
+    char stringdata0[273];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,25 +39,26 @@ QT_MOC_LITERAL(6, 63, 6), // "sJoint"
 QT_MOC_LITERAL(7, 70, 13), // "AxisLabelText"
 QT_MOC_LITERAL(8, 84, 15), // "QSAxisLabelText"
 QT_MOC_LITERAL(9, 100, 6), // "chAxis"
-QT_MOC_LITERAL(10, 107, 13), // "ConnectButton"
-QT_MOC_LITERAL(11, 121, 14), // "bConnectButton"
-QT_MOC_LITERAL(12, 136, 12), // "deviceLabels"
-QT_MOC_LITERAL(13, 149, 10), // "QSdeviceSN"
-QT_MOC_LITERAL(14, 160, 12), // "QSdeviceName"
-QT_MOC_LITERAL(15, 173, 15), // "QSdeviceVersion"
-QT_MOC_LITERAL(16, 189, 16), // "DobotErrorMsgBox"
-QT_MOC_LITERAL(17, 206, 14), // "onConnectDobot"
-QT_MOC_LITERAL(18, 221, 19), // "onPeriodicTaskTimer"
-QT_MOC_LITERAL(19, 241, 14) // "onGetPoseTimer"
+QT_MOC_LITERAL(10, 107, 25), // "RefreshDobotButtonsStates"
+QT_MOC_LITERAL(11, 133, 19), // "bDobotButtonsStates"
+QT_MOC_LITERAL(12, 153, 12), // "deviceLabels"
+QT_MOC_LITERAL(13, 166, 10), // "QSdeviceSN"
+QT_MOC_LITERAL(14, 177, 12), // "QSdeviceName"
+QT_MOC_LITERAL(15, 190, 15), // "QSdeviceVersion"
+QT_MOC_LITERAL(16, 206, 16), // "DobotErrorMsgBox"
+QT_MOC_LITERAL(17, 223, 14), // "onConnectDobot"
+QT_MOC_LITERAL(18, 238, 19), // "onPeriodicTaskTimer"
+QT_MOC_LITERAL(19, 258, 14) // "onGetPoseTimer"
 
     },
     "Dobot\0addTextToDobotConsole\0\0QS_msg\0"
     "JointLabelText\0QSLabelText\0sJoint\0"
     "AxisLabelText\0QSAxisLabelText\0chAxis\0"
-    "ConnectButton\0bConnectButton\0deviceLabels\0"
-    "QSdeviceSN\0QSdeviceName\0QSdeviceVersion\0"
-    "DobotErrorMsgBox\0onConnectDobot\0"
-    "onPeriodicTaskTimer\0onGetPoseTimer"
+    "RefreshDobotButtonsStates\0bDobotButtonsStates\0"
+    "deviceLabels\0QSdeviceSN\0QSdeviceName\0"
+    "QSdeviceVersion\0DobotErrorMsgBox\0"
+    "onConnectDobot\0onPeriodicTaskTimer\0"
+    "onGetPoseTimer"
 };
 #undef QT_MOC_LITERAL
 
@@ -112,7 +113,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 0: _t->addTextToDobotConsole((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 1: _t->JointLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< short(*)>(_a[2]))); break;
         case 2: _t->AxisLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
-        case 3: _t->ConnectButton((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 3: _t->RefreshDobotButtonsStates((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 4: _t->deviceLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3]))); break;
         case 5: _t->DobotErrorMsgBox(); break;
         case 6: _t->onConnectDobot(); break;
@@ -146,7 +147,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         }
         {
             typedef void (Dobot::*_t)(bool );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::ConnectButton)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::RefreshDobotButtonsStates)) {
                 *result = 3;
                 return;
             }
@@ -226,7 +227,7 @@ void Dobot::AxisLabelText(QString _t1, char _t2)
 }
 
 // SIGNAL 3
-void Dobot::ConnectButton(bool _t1)
+void Dobot::RefreshDobotButtonsStates(bool _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);

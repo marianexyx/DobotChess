@@ -18,6 +18,11 @@ public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
           Websockets *pWebsockets, WebTable *pWebTable);
 
+    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
+    bool getServiceTests() const                { return _bServiceTests; }
+
+    void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
+
 public slots:
     void checkMsgFromChenard(QString QStrMsgFromChenardTcp);
     void checkMsgFromWebsockets(QString QStrMsgFromWebsockets); //TODO: podpiąć wszędzie w ...
@@ -32,6 +37,8 @@ private:
     Chessboard *_pChessboard;
     Websockets *_pWebsockets;
     WebTable *_pWebTable;
+
+    bool _bServiceTests;
 
     bool b_test_enpassant = false;	//zmienna odpowiadająca za wykonywanie ruchu enpassant
     QString QS_enpassantToReject;   //zmienna: pozycja pionka bitego w enpassant

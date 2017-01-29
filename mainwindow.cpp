@@ -21,12 +21,10 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     _pTCPmsg = pTCPmsg;
     _pChess = pChess;
 
+    connect(ui->teachMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)), _pDobotArm, SLOT(onConnectDobot())); //connect dobot
     connect(ui->sendBtn, SIGNAL(clicked(bool)), this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
-
-    /*_pDobotArm->setPeriodicTaskTimer();
-    _pDobotArm->getPoseTimer();*/
 
     //dzięki tym connectom (jeśli działają) można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString)),
@@ -35,8 +33,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobotArm, SIGNAL(AxisLabelText(QString, char)),
             this, SLOT(setAxisLabelText(QString, char)));
-    connect(_pDobotArm, SIGNAL(ConnectButton(bool)),
-            this, SLOT(setConnectButtonText(bool)));
+    connect(_pDobotArm, SIGNAL(RefreshDobotButtonsStates(bool)),
+            this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobotArm, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));
     connect(_pTCPmsg, SIGNAL(addTextToTcpConsole(QString)),
@@ -55,6 +53,9 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             _pChess, SLOT(checkMsgFromWebsockets(QString))); //...na silnk gry.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z websocketów...
             _pWebTable, SLOT(checkWebsocketMsg(QString))); //...na stół gry.
+
+    //init JOG control
+    this->initControl();
 }
 
 MainWindow::~MainWindow()
@@ -81,8 +82,6 @@ void MainWindow::writeInDobotConsole(QString QStrMsg)
 
 void MainWindow::setDobotValidators()
 {
-    //not more than 1000
-    //QRegExp regExp("500|[-]|[1-9][0-9]{0,2}[.][0-9]{1,3}"); //oryginał
     QRegExp regExp("0|[-+]?[1-9][0-9]{0,2}[.][0-9]{1,3}");
     QValidator *validator = new QRegExpValidator(regExp);
 
@@ -108,25 +107,63 @@ void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
      else if (chAxis == 'r') ui->rLabel->setText(QSAxisLabelText);
 }
 
-void MainWindow::setConnectButtonText(bool bConnectButton)
+void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
 {
-    if (bConnectButton)
+    if (bDobotButtonsStates)
     {
         ui->connectBtn->setText(tr("Connect"));
+
+        ui->teachMode->setEnabled(false);
+        ui->baseAngleAddBtn->setEnabled(false);
+        ui->baseAngleSubBtn->setEnabled(false);
+        ui->longArmAddBtn->setEnabled(false);
+        ui->longArmSubBtn->setEnabled(false);
+        ui->shortArmAddBtn->setEnabled(false);
+        ui->shortArmSubBtn->setEnabled(false);
+        ui->rHeadAddBtn->setEnabled(false);
+        ui->rHeadSubBtn->setEnabled(false);
+
         ui->sendBtn->setEnabled(false);
         ui->xPTPEdit->setEnabled(false);
         ui->yPTPEdit->setEnabled(false);
         ui->zPTPEdit->setEnabled(false);
         ui->rPTPEdit->setEnabled(false);
+        ui->servo1GripperEdit->setEnabled(false);
+        ui->servo2GripperEdit->setEnabled(false);
+        ui->homeBtn->setEnabled(false);
+
+        ui->emulatePlayerMsgLineEdit->setEnabled(false);
+        ui->sendSimulatedMsgBtn->setEnabled(false);
+
+        ui->gripperBtn->setEnabled(false);
     }
     else
     {
         ui->connectBtn->setText(tr("Disconnect"));
+
+        ui->teachMode->setEnabled(true);
+        ui->baseAngleAddBtn->setEnabled(true);
+        ui->baseAngleSubBtn->setEnabled(true);
+        ui->longArmAddBtn->setEnabled(true);
+        ui->longArmSubBtn->setEnabled(true);
+        ui->shortArmAddBtn->setEnabled(true);
+        ui->shortArmSubBtn->setEnabled(true);
+        ui->rHeadAddBtn->setEnabled(true);
+        ui->rHeadSubBtn->setEnabled(true);
+
         ui->sendBtn->setEnabled(true);
         ui->xPTPEdit->setEnabled(true);
         ui->yPTPEdit->setEnabled(true);
         ui->zPTPEdit->setEnabled(true);
         ui->rPTPEdit->setEnabled(true);
+        ui->servo1GripperEdit->setEnabled(true);
+        ui->servo2GripperEdit->setEnabled(true);
+        ui->homeBtn->setEnabled(true);
+
+        ui->emulatePlayerMsgLineEdit->setEnabled(true);
+        //ui->sendSimulatedMsgBtn->setEnabled(true);
+
+        ui->gripperBtn->setEnabled(true);
     }
 }
 
@@ -143,8 +180,12 @@ void MainWindow::onPTPsendBtnClicked()
     int nPtpCmd_y = ui->yPTPEdit->text().toFloat();
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
+    if (nPtpCmd_x != 0) _pDobotArm->PTPvalues(nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
-    _pDobotArm->PTPvalues(nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+    float fServoDutyCycle1 = ui->servo1GripperEdit->text().toFloat();
+    float fServoDutyCycle2 = ui->servo2GripperEdit->text().toFloat();
+    if (fServoDutyCycle1 !=0 && fServoDutyCycle2 !=0)
+        _pDobotArm->gripperAngle(fServoDutyCycle1, fServoDutyCycle2);
 }
 
 void MainWindow::showDobotErrorMsgBox()
@@ -186,4 +227,114 @@ void MainWindow::writeInWebsocketConsole(QString QStrMsg)
     //auto scroll
     QScrollBar *scroll_websct = ui->websocket_debug->verticalScrollBar();
     scroll_websct->setValue(scroll_websct->maximum());
+}
+
+void MainWindow::initControl() {
+    QSignalMapper *signalMapper  = new QSignalMapper(this);
+    connect(ui->baseAngleAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->baseAngleSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->longArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->longArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->shortArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->shortArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->rHeadAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->rHeadSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+
+    signalMapper->setMapping(ui->baseAngleAddBtn, 0);
+    signalMapper->setMapping(ui->baseAngleSubBtn, 1);
+    signalMapper->setMapping(ui->longArmAddBtn, 2);
+    signalMapper->setMapping(ui->longArmSubBtn, 3);
+    signalMapper->setMapping(ui->shortArmAddBtn, 4);
+    signalMapper->setMapping(ui->shortArmSubBtn, 5);
+    signalMapper->setMapping(ui->rHeadAddBtn, 6);
+    signalMapper->setMapping(ui->rHeadSubBtn, 7);
+
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(onJOGCtrlBtnPressed(int)));
+
+    connect(ui->baseAngleAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->baseAngleSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->longArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->longArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->shortArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->shortArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->rHeadAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->rHeadSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+}
+
+void MainWindow::onChangedMode()
+{
+    if (ui->teachMode->currentIndex() == 1)
+    {
+        ui->baseAngleAddBtn->setText(tr("X+"));
+        ui->baseAngleSubBtn->setText(tr("X-"));
+        ui->longArmAddBtn->setText(tr("Y+"));
+        ui->longArmSubBtn->setText(tr("Y-"));
+        ui->shortArmAddBtn->setText(tr("Z+"));
+        ui->shortArmSubBtn->setText(tr("Z-"));
+        ui->rHeadAddBtn->setText(tr("R+"));
+        ui->rHeadSubBtn->setText(tr("R-"));
+    }
+    else
+    {
+        ui->baseAngleAddBtn->setText(tr("J1+"));
+        ui->baseAngleSubBtn->setText(tr("J1-"));
+        ui->longArmAddBtn->setText(tr("J2+"));
+        ui->longArmSubBtn->setText(tr("J2-"));
+        ui->shortArmAddBtn->setText(tr("J3+"));
+        ui->shortArmSubBtn->setText(tr("J3-"));
+        ui->rHeadAddBtn->setText(tr("J4+"));
+        ui->rHeadSubBtn->setText(tr("J4-"));
+    }
+}
+
+void MainWindow::onJOGCtrlBtnPressed(int index) {
+    JOGCmd jogCmd;
+    jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
+    jogCmd.cmd = index + 1;
+    SetJOGCmd(&jogCmd, false, NULL);
+}
+
+void MainWindow::onJOGCtrlBtnReleased() {
+    JOGCmd jogCmd;
+    jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
+    jogCmd.cmd = JogIdle;
+    SetJOGCmd(&jogCmd, false, NULL);
+}
+
+void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
+    else ui->sendSimulatedMsgBtn->setEnabled(false);
+}
+
+void MainWindow::on_sendSimulatedMsgBtn_clicked()
+{
+    if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
+    {
+        _pChess->setServiceTests(true);
+        _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
+        ui->emulatePlayerMsgLineEdit->clear();
+        _pChess->setServiceTests(false);
+    }
+}
+
+void MainWindow::on_gripperBtn_clicked()
+{
+    if (ui->gripperBtn->text() == "Open gripper")
+    {
+        _pDobotArm->gripperOpennedState(false);
+        ui->gripperBtn->setText(tr("Close gripper"));
+    }
+    else if (ui->gripperBtn->text() == "Close gripper")
+    {
+        _pDobotArm->gripperOpennedState(true);
+        ui->gripperBtn->setText(tr("Open gripper"));
+    }
+}
+
+void MainWindow::on_homeBtn_clicked()
+{
+    HOMECmd HOMEChess;
+    HOMEChess.reserved = 1; //? co(ś) ten indeks daje?
+    SetHOMECmd(&HOMEChess, true, NULL);
 }
