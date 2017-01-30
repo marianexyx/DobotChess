@@ -1,7 +1,11 @@
 #include "dobot.h"
 
-Dobot::Dobot()
+#define ACTUAL_POS  1000;
+
+Dobot::Dobot(Chessboard *pChessboard)
 {
+    _pChessboard = pChessboard;
+
     connectStatus = false;
 
     m_gripperServo1.address = 6;
@@ -93,81 +97,81 @@ void Dobot::refreshBtn() //niby button, ale używamy póki co tylko jako funkcja
 
 void Dobot::initDobot()
 {
-        //Command timeout
-        SetCmdTimeout(3000);
-        //clear old commands and set the queued command running
-        SetQueuedCmdClear();
-        SetQueuedCmdStartExec();
+    //Command timeout
+    SetCmdTimeout(3000);
+    //clear old commands and set the queued command running
+    SetQueuedCmdClear();
+    SetQueuedCmdStartExec();
 
-        char deviceSN[64];
-        GetDeviceSN(deviceSN, sizeof(deviceSN));
+    char deviceSN[64];
+    GetDeviceSN(deviceSN, sizeof(deviceSN));
 
-        char deviceName[64];
-        GetDeviceName(deviceName, sizeof(deviceName));
+    char deviceName[64];
+    GetDeviceName(deviceName, sizeof(deviceName));
 
-        uint8_t majorVersion, minorVersion, revision;
-        GetDeviceVersion(&majorVersion, &minorVersion, &revision);
+    uint8_t majorVersion, minorVersion, revision;
+    GetDeviceVersion(&majorVersion, &minorVersion, &revision);
 
 
-        emit deviceLabels(deviceSN, deviceName, QString::number(majorVersion) + "." +
-                          QString::number(minorVersion) + "." +
-                          QString::number(revision));
+    emit deviceLabels(deviceSN, deviceName, QString::number(majorVersion) + "." +
+                      QString::number(minorVersion) + "." +
+                      QString::number(revision));
 
-        //set the end effector parameters
-        EndEffectorParams endEffectorParams;
-        memset(&endEffectorParams, 0, sizeof(endEffectorParams));
-        endEffectorParams.xBias = 71.6f; //59.7f; TODO: wcześniej była ta wartość. co
-        //ona oznacza w praktyce?
-        SetEndEffectorParams(&endEffectorParams, false, NULL);
+    //set the end effector parameters
+    EndEffectorParams endEffectorParams;
+    memset(&endEffectorParams, 0, sizeof(endEffectorParams));
+    endEffectorParams.xBias = 71.6f; //59.7f; TODO: wcześniej była ta wartość. co
+    //ona oznacza w praktyce?
+    SetEndEffectorParams(&endEffectorParams, false, NULL);
 
-        //TODO: nie ma sensu ustawiać JOG parametrów, jak nie będę nigdy sterował tutaj kątami
-        JOGJointParams jogJointParams;
-        for (int i = 0; i < 4; i++)
-        {
-            jogJointParams.velocity[i] = 100;
-            jogJointParams.acceleration[i] = 100;
-        }
-        SetJOGJointParams(&jogJointParams, false, NULL);
+    //TODO: nie ma sensu ustawiać JOG parametrów, jak nie będę nigdy sterował tutaj kątami
+    JOGJointParams jogJointParams;
+    for (int i = 0; i < 4; i++)
+    {
+        jogJointParams.velocity[i] = 100;
+        jogJointParams.acceleration[i] = 100;
+    }
+    SetJOGJointParams(&jogJointParams, false, NULL);
 
-        JOGCoordinateParams jogCoordinateParams;
-        for (int i = 0; i < 4; i++)
-        {
-            jogCoordinateParams.velocity[i] = 100;
-            jogCoordinateParams.acceleration[i] = 100;
-        }
-        SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
+    JOGCoordinateParams jogCoordinateParams;
+    for (int i = 0; i < 4; i++)
+    {
+        jogCoordinateParams.velocity[i] = 100;
+        jogCoordinateParams.acceleration[i] = 100;
+    }
+    SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
 
-        JOGCommonParams jogCommonParams;
-        jogCommonParams.velocityRatio = 50;
-        jogCommonParams.accelerationRatio = 50;
-        SetJOGCommonParams(&jogCommonParams, false, NULL);
+    JOGCommonParams jogCommonParams;
+    jogCommonParams.velocityRatio = 50;
+    jogCommonParams.accelerationRatio = 50;
+    SetJOGCommonParams(&jogCommonParams, false, NULL);
 
-        PTPJointParams ptpJointParams;
-        for (int i = 0; i < 4; i++)
-        {
-            ptpJointParams.velocity[i] = 100;
-            ptpJointParams.acceleration[i] = 100;
-        }
-        SetPTPJointParams(&ptpJointParams, false, NULL);
+    PTPJointParams ptpJointParams;
+    for (int i = 0; i < 4; i++)
+    {
+        ptpJointParams.velocity[i] = 100;
+        ptpJointParams.acceleration[i] = 100;
+    }
+    SetPTPJointParams(&ptpJointParams, false, NULL);
 
-        PTPCoordinateParams ptpCoordinateParams;
-        ptpCoordinateParams.xyzVelocity = 100;
-        ptpCoordinateParams.xyzAcceleration = 100;
-        ptpCoordinateParams.rVelocity = 100;
-        ptpCoordinateParams.rAcceleration = 100;
-        SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
+    PTPCoordinateParams ptpCoordinateParams;
+    ptpCoordinateParams.xyzVelocity = 100;
+    ptpCoordinateParams.xyzAcceleration = 100;
+    ptpCoordinateParams.rVelocity = 100;
+    ptpCoordinateParams.rAcceleration = 100;
+    SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
 
-        PTPJumpParams ptpJumpParams;
-        ptpJumpParams.jumpHeight = 20;
-        ptpJumpParams.zLimit = 150;
-        SetPTPJumpParams(&ptpJumpParams, false, NULL);
+    PTPJumpParams ptpJumpParams;
+    ptpJumpParams.jumpHeight = 20;
+    ptpJumpParams.zLimit = 150;
+    SetPTPJumpParams(&ptpJumpParams, false, NULL);
 
-        HOMEParams HomeChess;
-        HomeChess.x = 140;
-        HomeChess.y = 0;
-        HomeChess.z = 10; //niżej będzie waliło w szachownicę
-        HomeChess.r = 0;
-        SetHOMEParams(&HomeChess, false, NULL);
+    HOMEParams HomeChess;
+    HomeChess.x = 140;
+    HomeChess.y = 0;
+    HomeChess.z = 10; //niżej będzie waliło w szachownicę
+    HomeChess.r = 0;
+    SetHOMEParams(&HomeChess, false, NULL);
 }
 
 //TODO: upchać to ładnie gdzie indziej
@@ -200,11 +204,46 @@ void Dobot::PTPvalues(float fPtpCmd_xVal, float fPtpCmd_yVal, float fPtpCmd_zVal
 
     //SetQueuedCmdStartExec(); //TODO: co to robi? było w dobocie po patchu. dokumentacja cienka.
     SetPTPCmd(&ptpCmd, true, NULL); //kolejkowanie zapytań ustawione na true
-    //TODO: 3ci parametr zmieniać z indexy po których będzie można sprawdzać czy ruch został wykonany...
-    //... i który ruch aktualnie się wykonuje (więcej w intrukcji do dobota)
+    //TODO: 3ci parametr zmieniać z indexy po których będzie można sprawdzać czy ruch został ...
+    //... wykonany i który ruch aktualnie się wykonuje (więcej w intrukcji do dobota)
 }
 
-void Dobot::gripperOpennedState(bool gripperClosed)
+void Dobot::gripperAngle(float fDutyCycle1, float fDutyCycle2)
+{
+    if (fDutyCycle1 != 0) m_gripperServo1.dutyCycle = fDutyCycle1;
+    if (fDutyCycle2 != 0) m_gripperServo2.dutyCycle = fDutyCycle2;
+    qDebug() << "m_gripperServo1.dutyCycle = " << fDutyCycle1;
+    qDebug() << "m_gripperServo2.dutyCycle = " << fDutyCycle2;
+    SetIOPWM(&m_gripperServo1, true, NULL);
+    SetIOPWM(&m_gripperServo2, true, NULL);
+}
+
+///TYPY RUCHÓW PO PLANSZY
+void Dobot::pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMovementType)
+{
+    float f_xFromTo = _pChessboard->afChessboardPositions_x[nLetter][nDigit];
+    float f_yFromTo = _pChessboard->afChessboardPositions_y[nLetter][nDigit];
+    float f_zFromTo = _pChessboard->afChessboardPositions_z[nLetter][nDigit];
+    float f_rFromTo = ACTUAL_POS;
+    this->PTPvalues(f_xFromTo, f_yFromTo, f_zFromTo + 45, f_rFromTo);
+
+    _pChessboard->PieceActualPos.Letter = nLetter;
+    _pChessboard->PieceActualPos.Digit = nDigit;
+
+    if (chMovementType == 'n')
+    {
+        if (bIsPieceMovingTo)
+            emit this->addTextToDobotConsole("normalPieceMoving: PieceTo: "
+                                             + _pChessboard->QsPieceTo + "\n");
+        else
+            emit this->addTextToDobotConsole("normalPieceMoving: PieceFrom: "
+                                             + _pChessboard->QsPieceFrom + "\n");
+    }
+    else emit this->addTextToDobotConsole("ERROR. Wrong movement type in Dobot::pieceFrom(): "
+                                          + static_cast<QString>(chMovementType) + "\n");
+}
+
+void Dobot::gripperOpennedState(bool gripperClosed, char chMovementType) //open/close
 {
     m_gripperServo1.dutyCycle = gripperClosed ? 3.1f : 3.6f;
     m_gripperServo2.dutyCycle = gripperClosed ? 8.8f : 8.3f;
@@ -217,17 +256,41 @@ void Dobot::gripperOpennedState(bool gripperClosed)
     gripperMoveDelay.timeout = 500; //czekaj 0,5 sekundy po dojściu na pozycję by chwytaka
     //silniki zdążyły się ruszyć, zanimramię zacznie wykonywać kolejny ruch
     SetWAITCmd(&gripperMoveDelay, true, NULL);
+
+    if (chMovementType == 'n') emit this->addTextToDobotConsole("normalPieceMoving: ");
+    else if (chMovementType == 's') emit this->addTextToDobotConsole("servicePieceMoving: ");
+    else emit this->addTextToDobotConsole("ERROR. Wrong movement type in "
+                                          "Dobot::gripperOpennedState(): " +
+                                          static_cast<QString>(chMovementType) + "\n");
+
+    if (gripperClosed) emit this->addTextToDobotConsole("GripperClosed\n");
+    else emit this->addTextToDobotConsole("GripperOpenned\n");
 }
 
-void Dobot::gripperAngle(float fDutyCycle1, float fDutyCycle2)
+void Dobot::armUpDown(bool isArmGoingUp, char chMovementType)
 {
-    if (fDutyCycle1 != 0) m_gripperServo1.dutyCycle = fDutyCycle1;
-    if (fDutyCycle2 != 0) m_gripperServo2.dutyCycle = fDutyCycle2;
-    qDebug() << "m_gripperServo1.dutyCycle = " << fDutyCycle1;
-    qDebug() << "m_gripperServo2.dutyCycle = " << fDutyCycle2;
-    SetIOPWM(&m_gripperServo1, true, NULL);
-    SetIOPWM(&m_gripperServo2, true, NULL);
+    float f_xUpDown = _pChessboard->afChessboardPositions_x
+            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+    float f_yUpDown = _pChessboard->afChessboardPositions_y
+            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+    float f_zUpDown;
+    if (isArmGoingUp) f_zUpDown = 45 + _pChessboard->afChessboardPositions_z
+            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+    else f_zUpDown = _pChessboard->afChessboardPositions_z
+            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+    float f_rUpDown = ACTUAL_POS;
+    this->PTPvalues(f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
+
+    if (chMovementType == 'n') emit this->addTextToDobotConsole("normalPieceMoving: ");
+    else if (chMovementType == 's') emit this->addTextToDobotConsole("servicePieceMoving: ");
+    else emit this->addTextToDobotConsole("ERROR. Wrong movement type in "
+                                          "Dobot::armUpDown(): " +
+                                          static_cast<QString>(chMovementType) + "\n");
+
+    if (isArmGoingUp) emit this->addTextToDobotConsole("ArmUp\n");
+    else emit this->addTextToDobotConsole("ArmDown\n");
 }
+/// END OF: TYPY RUCHÓW PO PLANSZY
 
 void Dobot::closeEvent(QCloseEvent *)
 {

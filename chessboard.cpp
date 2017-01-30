@@ -1,15 +1,12 @@
 #include "chessboard.h"
 
-#define ACTUAL_POS  1000;
-#define ARM_UP      50;
-#define ARM_DOWN    3;
-
 Chessboard::Chessboard()
 {
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
     float a8_x = 331.0; float a8_y = 74.3; float a8_z = -0.3;
     float h1_x = 186.5; float h1_y = -80.7; float h1_z = -4.1;
     float h8_x = 330.3; float h8_y = -77.6; float h8_z = -1.2;
+    //                                      "z" to pozycje na styku chwytaka z szachownicą
 
     for (int cyfry = 0; cyfry <= 7; cyfry++)
     {
@@ -39,17 +36,23 @@ void Chessboard::findDobotXYZVals(QString QS_msg) //tymczasowaFunkcjaZamieniajac
 
 void Chessboard::findBoardPos(QString QsPiecePositions)
 {
-    QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4
-    QsPieceFrom = QsPiecePositions.mid(5,2); // e2
-    QsPieceTo   = QsPiecePositions.mid(7,2); // e4
+    QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4     TODO: czy to jest potrzebne?
+    QsPieceFrom = QsPiecePositions.mid(5,2); // e2          TODO: czy to jest potrzebne?
+    QsPieceTo   = QsPiecePositions.mid(7,2); // e4          TODO: czy to jest potrzebne?
 
-    nLiteraPolaFrom = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
-    nLiteraPolaTo = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
+    //nLiteraPolaFrom = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
+    //nLiteraPolaTo = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
 
-    nCyfraPolaFrom = QsPiecePositions.mid(6,1).toInt() - 1;
-    nCyfraPolaTo = QsPiecePositions.mid(8,1).toInt() - 1;
+    //nCyfraPolaFrom = QsPiecePositions.mid(6,1).toInt() - 1;
+    //nCyfraPolaTo = QsPiecePositions.mid(8,1).toInt() - 1;
 
-    PieceFrom.x = afChessboardPositions_x[nLiteraPolaFrom][nCyfraPolaFrom];
+    PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
+    PieceTo.Digit = QsPiecePositions.mid(6,1).toInt() - 1;
+
+    PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
+    PieceTo.Digit = QsPiecePositions.mid(8,1).toInt() - 1;
+
+    /*PieceFrom.x = afChessboardPositions_x[nLiteraPolaFrom][nCyfraPolaFrom];
     PieceFrom.y = afChessboardPositions_y[nLiteraPolaFrom][nCyfraPolaFrom];
     PieceFrom.z = afChessboardPositions_z[nLiteraPolaFrom][nCyfraPolaFrom];
     PieceFrom.r = ACTUAL_POS;
@@ -57,7 +60,7 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
     PieceTo.x = afChessboardPositions_x[nLiteraPolaTo][nCyfraPolaTo];
     PieceTo.y = afChessboardPositions_y[nLiteraPolaTo][nCyfraPolaTo];
     PieceTo.z = afChessboardPositions_z[nLiteraPolaTo][nCyfraPolaTo];
-    PieceTo.r = ACTUAL_POS;
+    PieceTo.r = ACTUAL_POS;*/
 
    /*ArmUp.x = ACTUAL_POS;
     ArmUp.y = ACTUAL_POS;
@@ -68,6 +71,12 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
     ArmDown.y = ACTUAL_POS;
     ArmDown.z = ARM_DOWN;
     ArmDown.r = ACTUAL_POS;*/
+}
+
+void Chessboard::actualPos(int nLetter, int nDigit)
+{
+    PieceActualPos.Letter = nLetter;
+    PieceActualPos.Digit = nDigit;
 }
 
 int Chessboard::findPieceLetterPos(QString QsLetter)
@@ -88,7 +97,7 @@ int Chessboard::findPieceLetterPos(QString QsLetter)
 
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 {
-    if (abBoard[nLiteraPolaTo][nCyfraPolaTo] == true) //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte (nieprawdziwe dla enpassant)
+    if (abBoard[PieceTo.Letter][PieceTo.Digit] == true) //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte (nieprawdziwe dla enpassant)
     {
         QsPieceToReject = QsPieceTo; //zbijana jest bierka z tego pola na które chcemy iść
         return 1;
@@ -108,7 +117,7 @@ bool Chessboard::castlingStatements(QString QsPossibleCastlingVal) // sprawdzani
         QsKingPosT = "c_" + QsPieceTo + "K";
 
         //ustawiane skąd-dokąd przenoszona będzie wieża podczas roszady
-        if (QsLiteraPolaTo == "c")
+        if (PieceTo.Letter == 2) //old QsLiteraPolaTo == "c"
         {
             QsRookPosF = "c_[a";
             QsRookPosT = "c_[d";
@@ -118,7 +127,7 @@ bool Chessboard::castlingStatements(QString QsPossibleCastlingVal) // sprawdzani
             QsRookPosF = "c_[h";
             QsRookPosT = "c_[f";
         }
-        if(nCyfraPolaTo == 1)
+        if (PieceTo.Digit == 1)
         {
             QsRookPosF += "1]fR";
             QsRookPosT += "1]tR";

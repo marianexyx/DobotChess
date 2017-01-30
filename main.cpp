@@ -5,10 +5,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Dobot DobotArm001;
-    /*DobotArm001.setPeriodicTaskTimer();
-    DobotArm001.getPoseTimer();*/
     Chessboard ChessboardDobot001;
+    Dobot DobotArm001(&ChessboardDobot001);
     WebTable WebTable001;
     Websockets Websockety(&WebTable001, 1234); // 1234- na którym porcie websockety mają nasłuchiwać
     //TODO: odpalać server websocket po konstruktorze mainwindow

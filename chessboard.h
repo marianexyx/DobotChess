@@ -11,10 +11,8 @@
 
 struct ArmPosition
 {
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
-    float r = 0.0;
+    int Letter = -1;
+    int Digit = -1;
 };
 
 class Chessboard: public QObject
@@ -29,22 +27,23 @@ public:
     int findPieceLetterPos(QString QsLetter);
     bool removeStatements();
     bool castlingStatements(QString QsPossibleCastlingVal);
+    void actualPos(int nLetter, int nDigit);
 
-    //TODO: jeżeli zrobię poniższe dane jako private, to jak się potem do...
+    //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
     ArmPosition PieceFrom, PieceTo, PieceActualPos/*, ArmUp, ArmDown*/;
 
     QString QsPiecieFromTo;                // f.e. "e2e4"
 
-    int nCyfraPolaFrom;
-    int nLiteraPolaFrom;
-    QString QsLiteraPolaFrom;
-    QString QsPieceFrom;
+    //int nCyfraPolaFrom;
+    //int nLiteraPolaFrom;
+    //QString QsLiteraPolaFrom;
+    QString QsPieceFrom;                   // f.e. "e2"
 
-    int nCyfraPolaTo;
-    int nLiteraPolaTo;
-    QString QsLiteraPolaTo;
-    QString QsPieceTo;
+    //int nCyfraPolaTo;
+    //int nLiteraPolaTo;
+    //QString QsLiteraPolaTo;
+    QString QsPieceTo;                     // f.e. "e4"
 
     QString QsPieceToReject;               //zmienna: bierka która ma być zbita
 
@@ -68,8 +67,6 @@ public:
     float afChessboardPositions_x[8][8];
     float afChessboardPositions_y[8][8];
     float afChessboardPositions_z[8][8];
-
-
 
 signals:
     void addTextToDobotConsole(QString);

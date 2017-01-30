@@ -14,23 +14,6 @@ class Chess: public QObject
 {
     Q_OBJECT
 
-public:
-    Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-          Websockets *pWebsockets, WebTable *pWebTable);
-
-    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    bool getServiceTests() const                { return _bServiceTests; }
-
-    void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
-
-public slots:
-    void checkMsgFromChenard(QString QStrMsgFromChenardTcp);
-    void checkMsgFromWebsockets(QString QStrMsgFromWebsockets); //TODO: podpiąć wszędzie w ...
-    //...klasie websocketów. TODO2: wyzwalać tutaj pojemnik na komendy do tcp.
-
-signals:
-    void addTextToDobotConsole(QString QS_msg); //dodawanie komunikatu do konsoli dobota
-
 private:
     TCPMsgs *_pTCPMsgs;
     Dobot *_pDobot;
@@ -65,6 +48,24 @@ private:
     void GameInProgress();
     void EndOfGame(QString QStrMsgFromChenardTcp);
     void BadMove(QString QsMsgFromChenardTcp);
+
+public:
+    Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
+          Websockets *pWebsockets, WebTable *pWebTable);
+
+    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
+    bool getServiceTests() const                { return _bServiceTests; }
+
+    void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
+
+public slots:
+    void checkMsgFromChenard(QString QStrMsgFromChenardTcp);
+    void checkMsgFromWebsockets(QString QStrMsgFromWebsockets); //TODO: podpiąć wszędzie w ...
+    //...klasie websocketów. TODO2: wyzwalać tutaj pojemnik na komendy do tcp.
+
+signals:
+    void addTextToDobotConsole(QString QS_msg); //dodawanie komunikatu do konsoli dobota
+
 };
 
 #endif // CHESS_H

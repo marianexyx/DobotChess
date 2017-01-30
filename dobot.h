@@ -9,19 +9,22 @@
 #include <QValidator>
 #include "DobotDll.h"
 #include "DobotType.h"
+#include "chessboard.h"
 
 class Dobot: public QObject
 {
     Q_OBJECT
 
 private:
+    Chessboard *_pChessboard;
+
     bool connectStatus;
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM m_gripperServo1;
     IOPWM m_gripperServo2;
 
 public:
-    Dobot();
+    Dobot(Chessboard *pChessboard);
 
     void refreshBtn();
     void initDobot();
@@ -29,8 +32,11 @@ public:
     void closeEvent(QCloseEvent *);
 
     void PTPvalues(float fPtpCmd_xVal, float fPtpCmd_yVal, float fPtpCmd_zVal, float fPtpCmd_rVal);
-    void gripperOpennedState(bool gripperClosed);
     void gripperAngle(float fDutyCycle1, float fDutyCycle2);
+
+    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMovementType);
+    void gripperOpennedState(bool gripperClosed, char chMovementType);
+    void armUpDown(bool isArmGoingUp, char chMovementType);
 
 public slots:
     void onConnectDobot();

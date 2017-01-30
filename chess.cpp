@@ -9,66 +9,22 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
     _pWebsockets = pWebsockets;
     _pWebTable = pWebTable;
 }
+
 void Chess::normalPieceMoving() //sekwencja normalnego przemieszczanie bierki
 {
-    _pDobot->PTPvalues(_pChessboard->PieceFrom.x, _pChessboard->PieceFrom.y,
-                       _pChessboard->PieceFrom.z + 45, _pChessboard->PieceFrom.r);
-    _pChessboard->PieceActualPos.x = _pChessboard->PieceFrom.x;
-    _pChessboard->PieceActualPos.y = _pChessboard->PieceFrom.y;
-    _pChessboard->PieceActualPos.z = _pChessboard->PieceFrom.z + 45;
-    _pChessboard->PieceActualPos.r = _pChessboard->PieceFrom.r;
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: PieceFrom: " + _pChessboard->QsPieceFrom + "\n");
-
-    _pDobot->gripperOpennedState(false);
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperOpenned\n");
-
-    _pDobot->PTPvalues(_pChessboard->PieceFrom.x, _pChessboard->PieceFrom.y,
-                       _pChessboard->PieceFrom.z, _pChessboard->PieceFrom.r);
-    _pChessboard->PieceActualPos.x = _pChessboard->PieceFrom.x;
-    _pChessboard->PieceActualPos.y = _pChessboard->PieceFrom.y;
-    _pChessboard->PieceActualPos.z = _pChessboard->PieceFrom.z;
-    _pChessboard->PieceActualPos.r = _pChessboard->PieceFrom.r;
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmDown\n");
-
-    _pDobot->gripperOpennedState(true);
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperClosed\n");
-
-    _pDobot->PTPvalues(_pChessboard->PieceFrom.x, _pChessboard->PieceFrom.y,
-                        _pChessboard->PieceFrom.z + 45, _pChessboard->PieceFrom.r);
-    _pChessboard->PieceActualPos.x = _pChessboard->PieceFrom.x;
-    _pChessboard->PieceActualPos.y = _pChessboard->PieceFrom.y;
-    _pChessboard->PieceActualPos.z = _pChessboard->PieceFrom.z + 45;
-    _pChessboard->PieceActualPos.r = _pChessboard->PieceFrom.r;
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmUp\n");
-    _pChessboard->abBoard[_pChessboard->nLiteraPolaFrom][_pChessboard->nCyfraPolaFrom] = false; //miejsce ruszanego pionka jest już puste
-
-    _pDobot->PTPvalues(_pChessboard->PieceTo.x, _pChessboard->PieceTo.y,
-                       _pChessboard->PieceTo.z + 45, _pChessboard->PieceTo.r);
-    _pChessboard->PieceActualPos.x = _pChessboard->PieceTo.x;
-    _pChessboard->PieceActualPos.y = _pChessboard->PieceTo.y;
-    _pChessboard->PieceActualPos.z = _pChessboard->PieceTo.z + 45;
-    _pChessboard->PieceActualPos.r = _pChessboard->PieceTo.r;
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: PieceTo: " + _pChessboard->QsPieceTo + "\n");
-
-    _pDobot->PTPvalues(_pChessboard->PieceTo.x, _pChessboard->PieceTo.y,
-                       _pChessboard->PieceTo.z, _pChessboard->PieceTo.r);
-    _pChessboard->PieceActualPos.x = _pChessboard->PieceTo.x;
-    _pChessboard->PieceActualPos.y = _pChessboard->PieceTo.y;
-    _pChessboard->PieceActualPos.z = _pChessboard->PieceTo.z;
-    _pChessboard->PieceActualPos.r = _pChessboard->PieceTo.r;
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmDown\n");
-
-    _pDobot->gripperOpennedState(false);
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: GripperOpenned\n");
-    _pChessboard->abBoard[_pChessboard->nLiteraPolaTo][_pChessboard->nCyfraPolaTo] = true; //nowe miejsce ruszanego pionka jest już teraz zajęte
-
-    _pDobot->PTPvalues(_pChessboard->PieceTo.x, _pChessboard->PieceTo.y,
-                       _pChessboard->PieceTo.z + 45, _pChessboard->PieceTo.r);
-    _pChessboard->PieceActualPos.x = _pChessboard->PieceTo.x;
-    _pChessboard->PieceActualPos.y = _pChessboard->PieceTo.y;
-    _pChessboard->PieceActualPos.z = _pChessboard->PieceTo.z + 45;
-    _pChessboard->PieceActualPos.r = _pChessboard->PieceTo.r;
-    emit _pDobot->addTextToDobotConsole("normalPieceMoving: ArmUp\n-End of move sequence-\n");
+    //pieceFrom/pieceTo jest automatycznie zawsze jako "up". 1st arg. true == pieceTo, else pieceFrom
+    _pDobot->pieceFromTo(false, _pChessboard->PieceFrom.Letter, _pChessboard->PieceFrom.Digit, 'n');
+    _pDobot->gripperOpennedState(false, 'n');
+    _pDobot->armUpDown(false, 'n'); // true == up
+    _pDobot->gripperOpennedState(true, 'n');
+    _pDobot->armUpDown(true, 'n');
+    _pChessboard->abBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = false; //miejsce ruszanego pionka jest już puste
+    _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 'n');
+    _pDobot->armUpDown(false, 'n');
+    _pDobot->gripperOpennedState(false, 'n');
+    _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true; //nowe miejsce ruszanego pionka jest już teraz zajęte
+    _pDobot->armUpDown(true, 'n');
+    emit _pDobot->addTextToDobotConsole("-End of move sequence-\n");
 }
 
 void Chess::removePieceSequence(QString QS_msgFromSerial) //sekwencja ruchów przy zbijaniu bierki
@@ -82,7 +38,7 @@ void Chess::removePieceSequence(QString QS_msgFromSerial) //sekwencja ruchów pr
     else if (QS_msgFromSerial.left(9) == "r_trashed")
     {
         _pChessboard->findDobotXYZVals("r_open2");
-        _pChessboard->abBoard[_pChessboard->nLiteraPolaTo][_pChessboard->nCyfraPolaTo] = true; //miejsce już nie jest zajęte
+        _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true; //miejsce już nie jest zajęte
     }
     else if (QS_msgFromSerial.left(9) == "r_opened2") //zakończono usuwanie bierki...
     {
@@ -112,8 +68,8 @@ void Chess::castlingMovingSequence(QString QS_msgFromSerial)
     else if (QS_msgFromSerial.left(8) == "c_armUp4")
     {
         // zmiana miejsc na tablicy pól zajętych
-        _pChessboard->abBoard[_pChessboard->nLiteraPolaFrom][_pChessboard->nCyfraPolaFrom] = false;
-        _pChessboard->abBoard[_pChessboard->nLiteraPolaTo][_pChessboard->nCyfraPolaTo] = true;
+        _pChessboard->abBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = false;
+        _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true;
 
         emit _pDobot->addTextToDobotConsole("-End of move sequence- \n");
         _pWebsockets->processWebsocketMsg("OK 1\n");
@@ -123,16 +79,16 @@ void Chess::castlingMovingSequence(QString QS_msgFromSerial)
 bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
 {
     //sprawdzmay czy zapytanie/ruch może być biciem w przelocie
-    if (abs(_pChessboard->nLiteraPolaFrom - _pChessboard->nLiteraPolaTo) == 1 && //jeżeli pionek nie idzie po prostej (tj. po ukosie o 1 pole)...
-            ((_pWebTable->getWhoseTurn() == "white_turn" && _pChessboard->nCyfraPolaFrom == 5 &&
-              _pChessboard->nCyfraPolaTo == 6) || //... i jeżeli bije biały...
-             (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->nCyfraPolaFrom == 4 &&
-              _pChessboard->nCyfraPolaTo == 3)) && //... lub czarny...
+    if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1 && //jeżeli pionek nie idzie po prostej (tj. po ukosie o 1 pole)...
+            ((_pWebTable->getWhoseTurn() == "white_turn" && _pChessboard->PieceFrom.Digit == 5 &&
+              _pChessboard->PieceTo.Digit == 6) || //... i jeżeli bije biały...
+             (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 4 &&
+              _pChessboard->PieceTo.Digit == 3)) && //... lub czarny...
             //... i pole na które idzie nie jest zajete (inaczej byłoby zwykłe bicie)
-            _pChessboard->abBoard[_pChessboard->nLiteraPolaTo][_pChessboard->nCyfraPolaTo] == false)
+            _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == false)
     {
         b_test_enpassant = true;
-        _pTCPMsgs->doTcpConnect("test " /*+ QS_piecieFromTo*/);  //wykomentowane by uniknąć błędów podczas testów
+        _pTCPMsgs->doTcpConnect("test " /*+ QS_piecieFromTo*/);  //TODO: uzupełnić. wykomentowane by uniknąć błędów podczas testów
         return 1;
     }
     else return 0;
@@ -144,9 +100,9 @@ void Chess::enpassantMovingSequence()
     int nEnpassantCyfraPos;  //cyfra pionka bitego
 
     if (_pWebTable->getWhoseTurn() == "white_turn")
-        nEnpassantCyfraPos = _pChessboard->nCyfraPolaTo-1; //pozycja zbijanego czarnego pionka przez pionka białego w jego turze
+        nEnpassantCyfraPos = _pChessboard->PieceTo.Digit - 1; //pozycja zbijanego czarnego pionka przez pionka białego w jego turze
     else if (_pWebTable->getWhoseTurn() == "black_turn")
-        nEnpassantCyfraPos = _pChessboard->nCyfraPolaTo+1; //pozycja zbijanego białego pionka przez pionka czarnego w jego turze
+        nEnpassantCyfraPos = _pChessboard->PieceTo.Digit+1; //pozycja zbijanego białego pionka przez pionka czarnego w jego turze
     else
     {
         emit _pDobot->addTextToDobotConsole("Error03!: Wrong turn in enpassant statement /n");
@@ -154,18 +110,18 @@ void Chess::enpassantMovingSequence()
         return;
     }
     //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
-    QS_enpassantToReject = "r_[" + QString::number(_pChessboard->nLiteraPolaTo) + QString::number(nEnpassantCyfraPos) + "]";
+    QS_enpassantToReject = "r_[" + QString::number(_pChessboard->PieceTo.Letter) + QString::number(nEnpassantCyfraPos) + "]";
     b_test_enpassant = false; //wyłączenie, by nie zapętlać testów w odpowiedzi tcp
     _pChessboard->findDobotXYZVals(QS_enpassantToReject); //rozpocznij enpassant jeżeli test się powiódł
 }
 
 bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia enpassant
 {
-    if (((_pWebTable->getWhoseTurn() == "white_turn" &&  _pChessboard->nCyfraPolaFrom == 7 &&
-          _pChessboard->nCyfraPolaTo == 8) ||  //jeżelii bierka chce isc z pola 2 na 1 w turze bialego...
-         (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->nCyfraPolaFrom == 2 &&
-          _pChessboard->nCyfraPolaTo == 1)) &&   //...lub z pola 7 na 8 w turze czarnego...
-            abs(_pChessboard->nLiteraPolaFrom - _pChessboard->nLiteraPolaTo) <= 1) //... i ruch odbywa się max o 1 pole odległości liter po ukosie
+    if (((_pWebTable->getWhoseTurn() == "white_turn" &&  _pChessboard->PieceFrom.Digit == 7 &&
+          _pChessboard->PieceTo.Digit == 8) ||  //jeżelii bierka chce isc z pola 2 na 1 w turze bialego...
+         (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 2 &&
+          _pChessboard->PieceTo.Digit == 1)) &&   //...lub z pola 7 na 8 w turze czarnego...
+            abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) <= 1) //... i ruch odbywa się max o 1 pole odległości liter po ukosie
     {
         QS_futurePromote = _pChessboard->QsPiecieFromTo; //póki nie wiadomo na co promujemy to zapamiętaj zapytanie o ten ruch
         _pTCPMsgs->doTcpConnect("test " + _pChessboard->QsPiecieFromTo + "q"); //test awansu na któlową, który pójdzie na chenard

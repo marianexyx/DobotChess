@@ -327,8 +327,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             float fService_y = _pChessboard->afChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
             qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y;
             _pDobotArm->PTPvalues(fService_x, fService_y, 1000, 1000); //1000 = actual_val
-            _pChessboard->PieceActualPos.x = fService_x;
-            _pChessboard->PieceActualPos.y = fService_y;
+            _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
+            _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
         }
         else
         {
@@ -344,12 +344,12 @@ void MainWindow::on_gripperBtn_clicked()
 {
     if (ui->gripperBtn->text() == "Open gripper")
     {
-        _pDobotArm->gripperOpennedState(false);
+        _pDobotArm->gripperOpennedState(false, 's');
         ui->gripperBtn->setText(tr("Close gripper"));
     }
     else if (ui->gripperBtn->text() == "Close gripper")
     {
-        _pDobotArm->gripperOpennedState(true);
+        _pDobotArm->gripperOpennedState(true, 's');
         ui->gripperBtn->setText(tr("Open gripper"));
     }
 }
@@ -363,14 +363,10 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobotArm->PTPvalues(_pChessboard->PieceActualPos.x, _pChessboard->PieceActualPos.y,
-                          _pChessboard->PieceActualPos.z + 45, 1000);
-    qDebug() << "arm up: z = " << _pChessboard->PieceActualPos.z + 45;
+    _pDobotArm->armUpDown(true, 's');
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobotArm->PTPvalues(_pChessboard->PieceActualPos.x, _pChessboard->PieceActualPos.y,
-                          _pChessboard->PieceActualPos.z, 1000);
-    qDebug() << "arm down: z = " << _pChessboard->PieceActualPos.z;
+    _pDobotArm->armUpDown(false, 's');
 }
