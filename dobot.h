@@ -35,8 +35,9 @@ public:
     void gripperAngle(float fDutyCycle1, float fDutyCycle2);
 
     void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMovementType);
-    void gripperOpennedState(bool gripperClosed, char chMovementType);
+    void gripperOpennedState(bool gripperOpened, char chMovementType);
     void armUpDown(bool isArmGoingUp, char chMovementType);
+    void removePiece();
 
 public slots:
     void onConnectDobot();

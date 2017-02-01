@@ -78,7 +78,7 @@ void Dobot::onConnectDobot()
         getPoseTimer->start(200);
 
         qDebug() << "Dobot connection success";
-        this->addTextToDobotConsole("Dobot connected");
+        this->addTextToDobotConsole("Dobot connected \n");
     }
     else
     {
@@ -230,65 +230,121 @@ void Dobot::pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chM
     _pChessboard->PieceActualPos.Letter = nLetter;
     _pChessboard->PieceActualPos.Digit = nDigit;
 
-    if (chMovementType == 'n')
-    {
-        if (bIsPieceMovingTo)
-            emit this->addTextToDobotConsole("normalPieceMoving: PieceTo: "
-                                             + _pChessboard->QsPieceTo + "\n");
-        else
-            emit this->addTextToDobotConsole("normalPieceMoving: PieceFrom: "
-                                             + _pChessboard->QsPieceFrom + "\n");
-    }
-    else emit this->addTextToDobotConsole("ERROR. Wrong movement type in Dobot::pieceFrom(): "
-                                          + static_cast<QString>(chMovementType) + "\n");
+    if (chMovementType == 'n') emit this->addTextToDobotConsole("normalPieceMoving: ");
+    else if (chMovementType == 's') emit this->addTextToDobotConsole("servicePieceMoving: ");
+    else if (chMovementType == 'r' || chMovementType == 'R')
+        emit this->addTextToDobotConsole("removePieceMoving: ");
+    else emit this->addTextToDobotConsole("ERROR. Wrong movement type in "
+                                          "Dobot::pieceFromTo(): " +
+                                          static_cast<QString>(chMovementType) + "\n");
+
+    if (bIsPieceMovingTo) emit this->addTextToDobotConsole("normalPieceMoving: PieceTo: "
+                                                           + _pChessboard->QsPieceTo + "\n");
+    else emit this->addTextToDobotConsole("normalPieceMoving: PieceFrom: "
+                                          + _pChessboard->QsPieceFrom + "\n");
 }
 
-void Dobot::gripperOpennedState(bool gripperClosed, char chMovementType) //open/close
+void Dobot::gripperOpennedState(bool isGripperOpened, char chMovementType) //open/close
 {
-    m_gripperServo1.dutyCycle = gripperClosed ? 3.1f : 3.6f;
-    m_gripperServo2.dutyCycle = gripperClosed ? 8.8f : 8.3f;
+    m_gripperServo1.dutyCycle = isGripperOpened ? 3.6f : 3.1f;
+    m_gripperServo2.dutyCycle = isGripperOpened ? 8.3f : 8.8f;
 
     //SetIOPWM(IOPWM *ioPWM, bool isQueued, uint64_t *queuedCmdIndex);
     SetIOPWM(&m_gripperServo1, true, NULL);
     SetIOPWM(&m_gripperServo2, true, NULL);
 
     WAITCmd gripperMoveDelay;
-    gripperMoveDelay.timeout = 500; //czekaj 0,5 sekundy po dojściu na pozycję by chwytaka
+    gripperMoveDelay.timeout = 300; //czekaj 0,3 sekundy po dojściu na pozycję by chwytaka
     //silniki zdążyły się ruszyć, zanimramię zacznie wykonywać kolejny ruch
     SetWAITCmd(&gripperMoveDelay, true, NULL);
 
     if (chMovementType == 'n') emit this->addTextToDobotConsole("normalPieceMoving: ");
     else if (chMovementType == 's') emit this->addTextToDobotConsole("servicePieceMoving: ");
+    else if (chMovementType == 'r' || chMovementType == 'R')
+        emit this->addTextToDobotConsole("removePieceMoving: ");
     else emit this->addTextToDobotConsole("ERROR. Wrong movement type in "
                                           "Dobot::gripperOpennedState(): " +
                                           static_cast<QString>(chMovementType) + "\n");
 
-    if (gripperClosed) emit this->addTextToDobotConsole("GripperClosed\n");
-    else emit this->addTextToDobotConsole("GripperOpenned\n");
+    if (isGripperOpened) emit this->addTextToDobotConsole("GripperOpened\n");
+    else emit this->addTextToDobotConsole("GripperClosed\n");
 }
 
 void Dobot::armUpDown(bool isArmGoingUp, char chMovementType)
 {
-    float f_xUpDown = _pChessboard->afChessboardPositions_x
-            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-    float f_yUpDown = _pChessboard->afChessboardPositions_y
-            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-    float f_zUpDown;
-    if (isArmGoingUp) f_zUpDown = 45 + _pChessboard->afChessboardPositions_z
-            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-    else f_zUpDown = _pChessboard->afChessboardPositions_z
-            [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-    float f_rUpDown = ACTUAL_POS;
+    float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
+    if (chMovementType == 'R') //pozycje przy usuwaniu bierek
+    {
+        f_xUpDown = _pChessboard->afRemovedPiecesPositions_x
+                [_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+        f_yUpDown = _pChessboard->afRemovedPiecesPositions_y
+                [_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+        if (isArmGoingUp) f_zUpDown = 55 + _pChessboard->afRemovedPiecesPositions_z
+                [_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+        else f_zUpDown = _pChessboard->afRemovedPiecesPositions_z
+                [_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+        f_rUpDown = ACTUAL_POS;
+    }
+    else
+    {
+        f_xUpDown = _pChessboard->afRemovedPiecesPositions_x
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        f_yUpDown = _pChessboard->afRemovedPiecesPositions_y
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        if (isArmGoingUp) f_zUpDown = 45 + _pChessboard->afRemovedPiecesPositions_z
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        else f_zUpDown = _pChessboard->afRemovedPiecesPositions_z
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        f_rUpDown = ACTUAL_POS;
+    }
     this->PTPvalues(f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
 
     if (chMovementType == 'n') emit this->addTextToDobotConsole("normalPieceMoving: ");
     else if (chMovementType == 's') emit this->addTextToDobotConsole("servicePieceMoving: ");
+    else if (chMovementType == 'r' || chMovementType == 'R')
+        emit this->addTextToDobotConsole("removePieceMoving: ");
     else emit this->addTextToDobotConsole("ERROR. Wrong movement type in "
                                           "Dobot::armUpDown(): " +
                                           static_cast<QString>(chMovementType) + "\n");
 
     if (isArmGoingUp) emit this->addTextToDobotConsole("ArmUp\n");
     else emit this->addTextToDobotConsole("ArmDown\n");
+}
+
+void Dobot::removePiece()
+{
+    //qDebug() << "_pChessboard->nTransferredPiece = " << _pChessboard->nTransferredPiece;
+    //ustalanie pozycji dla bierki na polu bierek zbitych
+    if (_pChessboard->nTransferredPiece != 0)  //zabezpieczenie przed przypadkowym podaniem zera do mianownika
+    {
+        if (_pChessboard->nTransferredPiece % 8 != 0) //nie dla liczb (tj. bierek nr) 8, 16, 24 i 32.
+        {
+            _pChessboard->nRemovingRowPos = _pChessboard->nTransferredPiece / 8;
+            _pChessboard->nRemovingColumnPos = _pChessboard->nTransferredPiece - 1 - (_pChessboard->nRemovingRowPos * 8);
+        }
+        else //dla liczb (tj. bierek nr) 8, 16, 24 i 32.
+        {
+            _pChessboard->nRemovingRowPos = (_pChessboard->nTransferredPiece / 8) - 1;
+            _pChessboard->nRemovingColumnPos = 7;
+        }
+        _pChessboard->abRemoved[_pChessboard->nRemovingRowPos]
+                [_pChessboard->nRemovingColumnPos] = true; //pole zbite danej bierki jest zajęte
+    }
+    else
+    {
+        emit this->addTextToDobotConsole("ERROR. Chess::removePieceSequence(): próba dzielenia przez zero");
+        qDebug() << "ERROR. Dobot::removePiece(): proba dzielenia przez zero";
+    }
+
+    qDebug() << "nRemovingRowPos = " << _pChessboard->nRemovingRowPos;
+    qDebug() << "nRemovingColumnPos = " << _pChessboard->nRemovingColumnPos;
+    float f_xRemove = _pChessboard->afRemovedPiecesPositions_x[_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+    float f_yRemove = _pChessboard->afRemovedPiecesPositions_y[_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+    float f_zRemove = _pChessboard->afRemovedPiecesPositions_z[_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+    float f_rRemove = ACTUAL_POS;
+    qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
+                f_zRemove + 55 << ", r =" << f_rRemove;
+    this->PTPvalues(f_xRemove, f_yRemove, f_zRemove + 55, f_rRemove); //z_max = 40 dla x = 275, a najwyższe z na styku z podłogą to z = -16.5
 }
 /// END OF: TYPY RUCHÓW PO PLANSZY
 

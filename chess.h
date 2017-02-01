@@ -31,8 +31,8 @@ private:
     bool bPromotionConfirmed = false; //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
     //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
 
-    void normalPieceMoving();
-    void removePieceSequence(QString QS_msgFromSerial);
+    void normalPieceMovingSequence();
+    void removePieceSequence();
     void castlingMovingSequence(QString QS_msgFromSerial);
     void enpassantMovingSequence();
     bool testEnpassant();

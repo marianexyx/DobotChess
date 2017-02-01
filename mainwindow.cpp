@@ -316,9 +316,11 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 {
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
     {
-        if (ui->serviceCheckBox->isChecked()) //tylko wartości pola np. "e2"
+        if (ui->serviceCheckBox->isChecked()) //tylko wartości pola np. "e2" lub ew. usuwanie: "move xxe2"
         {
             QString QsServiceMsg = ui->emulatePlayerMsgLineEdit->text();
+            if (QsServiceMsg.left(4) == "move") QsServiceMsg = QsServiceMsg.mid(7);
+            qDebug() << "QsServiceMsg.mid(7) = " << QsServiceMsg;
             //qDebug() << "QsServiceMsg = " << QsServiceMsg;
             int nServiceLetterPos = _pChessboard->findPieceLetterPos(QsServiceMsg.left(1));
             int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
@@ -329,6 +331,12 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             _pDobotArm->PTPvalues(fService_x, fService_y, 1000, 1000); //1000 = actual_val
             _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
             _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
+            if (QsServiceMsg.right(1) == "r")
+            {
+                _pChessboard->findBoardPos("move xx" + QsServiceMsg.left(2));
+                _pChessboard->nTransferredPiece = _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit];
+                _pDobotArm->removePiece();
+            }
         }
         else
         {
@@ -342,14 +350,15 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_gripperBtn_clicked()
 {
+    qDebug() << "on_gripperBtn_clicked";
     if (ui->gripperBtn->text() == "Open gripper")
     {
-        _pDobotArm->gripperOpennedState(false, 's');
+        _pDobotArm->gripperOpennedState(true, 's');
         ui->gripperBtn->setText(tr("Close gripper"));
     }
     else if (ui->gripperBtn->text() == "Close gripper")
     {
-        _pDobotArm->gripperOpennedState(true, 's');
+        _pDobotArm->gripperOpennedState(false, 's');
         ui->gripperBtn->setText(tr("Open gripper"));
     }
 }

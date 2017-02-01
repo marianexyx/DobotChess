@@ -2,36 +2,68 @@
 
 Chessboard::Chessboard()
 {
+    nTransferredPiece = 0;
+
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
     float a8_x = 331.0; float a8_y = 74.3; float a8_z = -0.3;
     float h1_x = 186.5; float h1_y = -80.7; float h1_z = -4.1;
     float h8_x = 330.3; float h8_y = -77.6; float h8_z = -1.2;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
-    for (int cyfry = 0; cyfry <= 7; cyfry++)
+    for (int digit = 0; digit <= 7; digit++)
     {
-        for (int litery = 0; litery <= 7; litery++)
+        for (int letter = 0; letter <= 7; letter++)
         {
-            afChessboardPositions_x[litery][cyfry] = a1_x +
-                    cyfry*(((a8_x-a1_x)/7)+((litery/14)*(((a1_x-h1_x)/7)-((a8_x-h8_x)/7))))-
-                    litery*(((a1_x-h1_x)/7)-((cyfry/14)*(((h8_x-h1_x)/7)-((a8_x-a1_x)/7))));
-            afChessboardPositions_y[litery][cyfry] = a1_y +
-                    cyfry*(((a8_y-a1_y)/7)+((litery/14)*(((a1_y-h1_y)/7)-((a8_y-h8_y)/7))))-
-                    litery*(((a1_y-h1_y)/7)-((cyfry/14)*(((h8_y-h1_y)/7)-((a8_y-a1_y)/7))));
-            afChessboardPositions_z[litery][cyfry] = a1_z +
-                    cyfry*(((a8_z-a1_z)/7)+((litery/14)*(((a1_z-h1_z)/7)-((a8_z-h8_z)/7))))-
-                    litery*(((a1_z-h1_z)/7)-((cyfry/14)*(((h8_z-h1_z)/7)-((a8_z-a1_z)/7))));
+            afChessboardPositions_x[letter][digit] = a1_x +
+                    digit*(((a8_x-a1_x)/7)+((letter/14)*(((a1_x-h1_x)/7)-((a8_x-h8_x)/7))))-
+                    letter*(((a1_x-h1_x)/7)-((digit/14)*(((h8_x-h1_x)/7)-((a8_x-a1_x)/7))));
+            afChessboardPositions_y[letter][digit] = a1_y +
+                    digit*(((a8_y-a1_y)/7)+((letter/14)*(((a1_y-h1_y)/7)-((a8_y-h8_y)/7))))-
+                    letter*(((a1_y-h1_y)/7)-((digit/14)*(((h8_y-h1_y)/7)-((a8_y-a1_y)/7))));
+            afChessboardPositions_z[letter][digit] = a1_z +
+                    digit*(((a8_z-a1_z)/7)+((letter/14)*(((a1_z-h1_z)/7)-((a8_z-h8_z)/7))))-
+                    letter*(((a1_z-h1_z)/7)-((digit/14)*(((h8_z-h1_z)/7)-((a8_z-a1_z)/7))));
             /*qDebug() << "position " << litery << cyfry << " = " << afChessboardPositions_x[cyfry][litery]
                         << afChessboardPositions_y[cyfry][litery];*/
         }
     }
-}
 
-void Chessboard::findDobotXYZVals(QString QS_msg) //tymczasowaFunkcjaZamieniajacaRuchySzachoweNaWartosciKartezjanskie
-{
-    qDebug() << "In Chessboard::findDobotXYZVals received: " << QS_msg;
-    this->addTextToDobotConsole(QS_msg+"\n");
+    /*prawa strona:
+    x = 100 (skok po 25 mm)
+    rząd bliżej środka: y = -155
+    rząd zewnętrzny:    y = -185
+    z_max = 56
+    dla x = 100, y = -155  wynik z = -22.5
+    dla x = 275, y = -185  wynik z = -17
 
+    środek: x = 130, y = 0
+
+    lewa strona zatem:
+    x = 100 (skok po 25 mm)
+    rząd bliżej środka: y = 140
+    rząd zewnętrzny:    y = 170
+    z_max = 40 (a dla y = 145 -> z_max = 44.5)
+    dla x = 100, y = 140  wynik z = -22.3
+    dla x = 275, y = 170  wynik z = -16.5*/
+
+    for (int row = 0; row <= 1; row++)
+    {
+        for (int column = 0; column <= 7; column++)
+        {
+            afRemovedPiecesPositions_x[row][column] = 100 + column*25;
+            afRemovedPiecesPositions_y[row][column] = 140 + row*30;
+            afRemovedPiecesPositions_z[row][column] = -22.3 - column*((-22.3 + 16.5)/7);
+        }
+    }
+    for (int row = 2; row <= 3; row++)
+    {
+        for (int column = 0; column <= 7; column++)
+        {
+            afRemovedPiecesPositions_x[row][column] = 100 + column*25;
+            afRemovedPiecesPositions_y[row][column] = -155 - ((row-2)*30);
+            afRemovedPiecesPositions_z[row][column] = -22.5 - column*((-22.5 + 17)/7);
+        }
+    }
 }
 
 void Chessboard::findBoardPos(QString QsPiecePositions)
@@ -39,38 +71,13 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
     QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4     TODO: czy to jest potrzebne?
     QsPieceFrom = QsPiecePositions.mid(5,2); // e2          TODO: czy to jest potrzebne?
     QsPieceTo   = QsPiecePositions.mid(7,2); // e4          TODO: czy to jest potrzebne?
-
-    //nLiteraPolaFrom = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
-    //nLiteraPolaTo = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
-
-    //nCyfraPolaFrom = QsPiecePositions.mid(6,1).toInt() - 1;
-    //nCyfraPolaTo = QsPiecePositions.mid(8,1).toInt() - 1;
+    qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
 
     PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
-    PieceTo.Digit = QsPiecePositions.mid(6,1).toInt() - 1;
+    PieceFrom.Digit = QsPiecePositions.mid(6,1).toInt() - 1;
 
     PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
     PieceTo.Digit = QsPiecePositions.mid(8,1).toInt() - 1;
-
-    /*PieceFrom.x = afChessboardPositions_x[nLiteraPolaFrom][nCyfraPolaFrom];
-    PieceFrom.y = afChessboardPositions_y[nLiteraPolaFrom][nCyfraPolaFrom];
-    PieceFrom.z = afChessboardPositions_z[nLiteraPolaFrom][nCyfraPolaFrom];
-    PieceFrom.r = ACTUAL_POS;
-
-    PieceTo.x = afChessboardPositions_x[nLiteraPolaTo][nCyfraPolaTo];
-    PieceTo.y = afChessboardPositions_y[nLiteraPolaTo][nCyfraPolaTo];
-    PieceTo.z = afChessboardPositions_z[nLiteraPolaTo][nCyfraPolaTo];
-    PieceTo.r = ACTUAL_POS;*/
-
-   /*ArmUp.x = ACTUAL_POS;
-    ArmUp.y = ACTUAL_POS;
-    ArmUp.z = ARM_UP;
-    ArmUp.r = ACTUAL_POS;
-
-    ArmDown.x = ACTUAL_POS;
-    ArmDown.y = ACTUAL_POS;
-    ArmDown.z = ARM_DOWN;
-    ArmDown.r = ACTUAL_POS;*/
 }
 
 void Chessboard::actualPos(int nLetter, int nDigit)
@@ -97,9 +104,11 @@ int Chessboard::findPieceLetterPos(QString QsLetter)
 
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 {
-    if (abBoard[PieceTo.Letter][PieceTo.Digit] == true) //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte (nieprawdziwe dla enpassant)
+    if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0) // sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
+    //TODO: nieprawdziwe dla enpassant!
     {
-        QsPieceToReject = QsPieceTo; //zbijana jest bierka z tego pola na które chcemy iść
+        //QsPieceToReject = QsPieceTo; //zbijana jest bierka z tego pola na które chcemy iść
+        //!!!TODO: TO JEST NIEAKTUALNE
         return 1;
     }
     else return 0;
@@ -113,8 +122,8 @@ bool Chessboard::castlingStatements(QString QsPossibleCastlingVal) // sprawdzani
             QsPossibleCastlingVal == "e8g8" || QsPossibleCastlingVal == "e8G8" || QsPossibleCastlingVal == "E8g8" || QsPossibleCastlingVal == "E8G8" )
     {
         //ustawiane skąd-dokąd przenoszony będzie król podczas roszady
-        QsKingPosF = "c_" + QsPieceFrom + "K"; //jest to info dla arduino, że mamy do czynienia z roszadą
-        QsKingPosT = "c_" + QsPieceTo + "K";
+        //QsKingPosF = "c_" + QsPieceFrom + "K"; //jest to info dla arduino, że mamy do czynienia z roszadą
+        //QsKingPosT = "c_" + QsPieceTo + "K";
 
         //ustawiane skąd-dokąd przenoszona będzie wieża podczas roszady
         if (PieceTo.Letter == 2) //old QsLiteraPolaTo == "c"

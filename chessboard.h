@@ -22,7 +22,6 @@ class Chessboard: public QObject
 public:
     Chessboard();
 
-    void findDobotXYZVals(QString QS_msg);
     void findBoardPos(QString QsPiecePositions);
     int findPieceLetterPos(QString QsLetter);
     bool removeStatements();
@@ -49,24 +48,39 @@ public:
 
     //zmienne do roszady:
     //TODO: zastąpić to prostą matematyką typu +1, -1 jeżeli się da
-    QString QsKingPosF;                     // skąd najpierw idzie król
-    QString QsKingPosT;                     // dokąd najpierw idzie król
+    //QString QsKingPosF;                     // skąd najpierw idzie król
+    //QString QsKingPosT;                     // dokąd najpierw idzie król
     QString QsRookPosF;                     // skąd później idzie wieża
     QString QsRookPosT;                     // dokąd później idzie wieża
 
-    bool abBoard[8][8] =                    // plansza jako tablica. jedynki to zajęte pola
-    {{1, 1, 0, 0, 0, 0, 1, 1} ,             // TODO: nie liczyć tego tylko zawsze zapytywać TCP...
-    {1, 1, 0, 0, 0, 0, 1, 1} ,              //...o stan pola gry.
-    {1, 1, 0, 0, 0, 0, 1, 1} ,
-    {1, 1, 0, 0, 0, 0, 1, 1} ,
-    {1, 1, 0, 0, 0, 0, 1, 1} ,
-    {1, 1, 0, 0, 0, 0, 1, 1} ,
-    {1, 1, 0, 0, 0, 0, 1, 1} ,
-    {1, 1, 0, 0, 0, 0, 1, 1}};
+    int nTransferredPiece;
+
+    int anBoard[8][8] =                     // plansza jako tablica. liczby to zajęte pola.
+    {{1, 9, 0, 0, 0, 0, 17, 25} ,           // każda liczba to inna bierka.
+    {2, 10, 0, 0, 0, 0, 18, 26} ,           // TODO: nie liczyć tego tylko zawsze zapytywać TCP...
+    {3, 11, 0, 0, 0, 0, 19, 27} ,           //...o stan pola gry.
+    {4, 12, 0, 0, 0, 0, 20, 28} ,
+    {5, 13, 0, 0, 0, 0, 21, 29} ,
+    {6, 14, 0, 0, 0, 0, 22, 30} ,
+    {7, 15, 0, 0, 0, 0, 23, 31} ,
+    {8, 16, 0, 0, 0, 0, 24, 32}};
+
+    bool abRemoved[4][8] =                  //tablica usuniętych
+    {{0, 0, 0, 0, 0, 0, 0, 0} ,
+    {0, 0, 0, 0, 0, 0, 0, 0} ,
+    {0, 0, 0, 0, 0, 0, 0, 0} ,
+    {0, 0, 0, 0, 0, 0, 0, 0}};
+
+    int nRemovingRowPos;
+    int nRemovingColumnPos;
 
     float afChessboardPositions_x[8][8];
     float afChessboardPositions_y[8][8];
     float afChessboardPositions_z[8][8];
+
+    float afRemovedPiecesPositions_x[4][8];
+    float afRemovedPiecesPositions_y[4][8];
+    float afRemovedPiecesPositions_z[4][8];
 
 signals:
     void addTextToDobotConsole(QString);

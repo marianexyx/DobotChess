@@ -10,46 +10,47 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
     _pWebTable = pWebTable;
 }
 
-void Chess::normalPieceMoving() //sekwencja normalnego przemieszczanie bierki
+void Chess::normalPieceMovingSequence() //sekwencja normalnego przemieszczanie bierki
 {
+    _pDobot->gripperOpennedState(true, 'n'); //true == open. TODO: mózg to interpretuje na odwrót
     //pieceFrom/pieceTo jest automatycznie zawsze jako "up". 1st arg. true == pieceTo, else pieceFrom
     _pDobot->pieceFromTo(false, _pChessboard->PieceFrom.Letter, _pChessboard->PieceFrom.Digit, 'n');
-    _pDobot->gripperOpennedState(false, 'n');
     _pDobot->armUpDown(false, 'n'); // true == up
-    _pDobot->gripperOpennedState(true, 'n');
+    _pDobot->gripperOpennedState(false, 'n');
     _pDobot->armUpDown(true, 'n');
-    _pChessboard->abBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = false; //miejsce ruszanego pionka jest już puste
+    _pChessboard->nTransferredPiece = _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit]; //pochwycono bierkę
+    _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = 0; //miejsce ruszanego pionka jest już puste
     _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 'n');
     _pDobot->armUpDown(false, 'n');
-    _pDobot->gripperOpennedState(false, 'n');
-    _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true; //nowe miejsce ruszanego pionka jest już teraz zajęte
+    _pDobot->gripperOpennedState(true, 'n');
+    _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] =
+            _pChessboard->nTransferredPiece; //nowe miejsce ruszanego pionka jest już teraz zajęte
+    _pChessboard->nTransferredPiece = 0; //żadna bierka nie jest już chwytana
     _pDobot->armUpDown(true, 'n');
     emit _pDobot->addTextToDobotConsole("-End of move sequence-\n");
 }
 
-void Chess::removePieceSequence(QString QS_msgFromSerial) //sekwencja ruchów przy zbijaniu bierki
+void Chess::removePieceSequence() //sekwencja ruchów przy zbijaniu bierki
 {
-    //pierwszy ruch wykonywany z poziomu odpowiedzi z tcp
-    if (QS_msgFromSerial.left(9) == "r_movedTo") _pChessboard->findDobotXYZVals("r_open1");
-    else if (QS_msgFromSerial.left(9) == "r_opened1") _pChessboard->findDobotXYZVals("r_down");
-    else if (QS_msgFromSerial.left(6) == "r_down") _pChessboard->findDobotXYZVals("r_close");
-    else if (QS_msgFromSerial.left(8) == "r_closed") _pChessboard->findDobotXYZVals("r_up");
-    else if (QS_msgFromSerial.left(7) == "r_armUp") _pChessboard->findDobotXYZVals("r_trash");
-    else if (QS_msgFromSerial.left(9) == "r_trashed")
-    {
-        _pChessboard->findDobotXYZVals("r_open2");
-        _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true; //miejsce już nie jest zajęte
-    }
-    else if (QS_msgFromSerial.left(9) == "r_opened2") //zakończono usuwanie bierki...
-    {
-        //_pChessboard->findDobotXYZVals("n_" + QS_pieceFrom); //...rozpocznij normalne przenoszenie
-    }
-    else emit _pDobot->addTextToDobotConsole("Error02!: Wrong command /n");
+    _pDobot->gripperOpennedState(true, 'r'); //true == open
+    _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 'r');
+    _pDobot->armUpDown(false, 'r');
+    _pDobot->gripperOpennedState(false, 'r');
+    _pDobot->armUpDown(true, 'r');
+    _pChessboard->nTransferredPiece = _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit]; //pochwycono bierkę
+    _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = 0; //miejsce bitego pionka jest już puste
+    _pDobot->removePiece();
+    _pDobot->armUpDown(false, 'R');
+    _pDobot->gripperOpennedState(true, 'r');
+    _pDobot->armUpDown(true, 'R');
+    _pChessboard->nTransferredPiece = 0;
+    this->normalPieceMovingSequence();
+    //qDebug() << "normalPieceMoving();";
 }
 
 void Chess::castlingMovingSequence(QString QS_msgFromSerial)
 {
-    if (QS_msgFromSerial.left(12) == "c_movedFromK") _pChessboard->findDobotXYZVals("c_open1");
+    /*if (QS_msgFromSerial.left(12) == "c_movedFromK") _pChessboard->findDobotXYZVals("c_open1");
     else if (QS_msgFromSerial.left(9) == "c_opened1") _pChessboard->findDobotXYZVals("c_down1");
     else if (QS_msgFromSerial.left(10) == "c_armDown1") _pChessboard->findDobotXYZVals("c_close1");
     else if (QS_msgFromSerial.left(9) == "c_closed1") _pChessboard->findDobotXYZVals("c_up1");
@@ -68,12 +69,12 @@ void Chess::castlingMovingSequence(QString QS_msgFromSerial)
     else if (QS_msgFromSerial.left(8) == "c_armUp4")
     {
         // zmiana miejsc na tablicy pól zajętych
-        _pChessboard->abBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = false;
-        _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true;
+        _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = false;
+        _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true;
 
         emit _pDobot->addTextToDobotConsole("-End of move sequence- \n");
         _pWebsockets->processWebsocketMsg("OK 1\n");
-    }
+    }*/
 }
 
 bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
@@ -85,7 +86,7 @@ bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
              (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 4 &&
               _pChessboard->PieceTo.Digit == 3)) && //... lub czarny...
             //... i pole na które idzie nie jest zajete (inaczej byłoby zwykłe bicie)
-            _pChessboard->abBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == false)
+            _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == false)
     {
         b_test_enpassant = true;
         _pTCPMsgs->doTcpConnect("test " /*+ QS_piecieFromTo*/);  //TODO: uzupełnić. wykomentowane by uniknąć błędów podczas testów
@@ -112,7 +113,7 @@ void Chess::enpassantMovingSequence()
     //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
     QS_enpassantToReject = "r_[" + QString::number(_pChessboard->PieceTo.Letter) + QString::number(nEnpassantCyfraPos) + "]";
     b_test_enpassant = false; //wyłączenie, by nie zapętlać testów w odpowiedzi tcp
-    _pChessboard->findDobotXYZVals(QS_enpassantToReject); //rozpocznij enpassant jeżeli test się powiódł
+    //_pChessboard->findDobotXYZVals(QS_enpassantToReject); //rozpocznij enpassant jeżeli test się powiódł
 }
 
 bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia enpassant
@@ -163,24 +164,24 @@ void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o sta
     else if (_pChessboard->castlingStatements(_pChessboard->QsPiecieFromTo))
     {
         qDebug() << "Start castling move sequence";
-        _pChessboard->findDobotXYZVals(_pChessboard->QsKingPosF); //rozpocznij roszadę jeżeli spełnione są jej warunki
+        //_pChessboard->findDobotXYZVals(_pChessboard->QsKingPosF); //rozpocznij roszadę jeżeli spełnione są jej warunki
     }
-    else if (_pChessboard->removeStatements()) //jeżeli podczas ruchu następuje bicie
+    else if (_pChessboard->removeStatements()) //jeżeli podczas ruchu następuje bicie (TODO: bral warunku dla enpassant)
     {
         qDebug() << "Start remove piece sequence";
-        _pChessboard->findDobotXYZVals(_pChessboard->QsPieceToReject); //rozpocznij zbijanie jeżeli spełnione są jej warunki
+        //_pChessboard->removePieceSequence(); //rozpocznij zbijanie jeżeli spełnione są jej warunki
     }
     else if (bPromotionConfirmed) //rozpocznij zbijanie podczas promocji jeżeli spełnione jej są warunki
     {
         qDebug() << "Start promotion move sequence";
         if (_pChessboard->removeStatements()) //jeżeli przy promocji następuje bicie
-            _pChessboard->findDobotXYZVals(_pChessboard->QsPieceToReject); //to najpierw zbijamy
+            //_pChessboard->findDobotXYZVals(_pChessboard->QsPieceToReject); //to najpierw zbijamy
         bPromotionConfirmed = false;
     }
     else
     {
         qDebug() << "Start standard move sequence";
-        this->normalPieceMoving(); //rozpocznij normalny ruch
+        this->normalPieceMovingSequence(); //rozpocznij normalny ruch
     }
 
     //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
@@ -252,9 +253,9 @@ void Chess::Illegal() //któryś z wykonywanych testów się nie powiódł
 {
     //warunki ruchów specjalnych się znoszą, dlatego nie trzeba ich implementować.
     //jedynym wyjątkiem jest bicie podczas promocji zawarte w warunku poniżej
-    if(bPromotionConfirmed && _pChessboard->removeStatements()) //jeżeli dla testu promocji (który się nie powiódł) występuje inny special move (bicie bierki)..
+    /*if(bPromotionConfirmed && _pChessboard->removeStatements()) //jeżeli dla testu promocji (który się nie powiódł) występuje inny special move (bicie bierki)..
         _pChessboard->findDobotXYZVals(_pChessboard->QsPieceToReject); //...to wykonaj normalne bicie, które potem samo przejdzie w normalny ruch
-    else _pChessboard->findDobotXYZVals("n_" + _pChessboard->QsPieceFrom); //jako że innych przypadków nie trzeba rozpatrywać to każdy innych ruch jest zwykły
+    else _pChessboard->findDobotXYZVals("n_" + _pChessboard->QsPieceFrom); //jako że innych przypadków nie trzeba rozpatrywać to każdy innych ruch jest zwykły*/
 }
 
 void Chess::TestOk()
