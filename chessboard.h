@@ -24,48 +24,38 @@ public:
 
     void findBoardPos(QString QsPiecePositions);
     int findPieceLetterPos(QString QsLetter);
+    QString findPieceLetterPos(int nLetter);
     bool removeStatements();
-    bool castlingStatements(QString QsPossibleCastlingVal);
+    bool castlingStatements();
+    void castlingFindRookToMove();
     void actualPos(int nLetter, int nDigit);
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
-    ArmPosition PieceFrom, PieceTo, PieceActualPos/*, ArmUp, ArmDown*/;
+    ArmPosition PieceFrom, PieceTo, PieceActualPos;
 
-    QString QsPiecieFromTo;                // f.e. "e2e4"
+    QString QsPiecieFromTo;             // f.e. "e2e4"
+    int nTransferredPiece;              // nr bierki znajdującej się aktualnie w chwytaku
 
-    //int nCyfraPolaFrom;
-    //int nLiteraPolaFrom;
-    //QString QsLiteraPolaFrom;
-    QString QsPieceFrom;                   // f.e. "e2"
+    bool bTestEnpassant;                //czy wewnętrzny powierzchowny test na enpassant się powiódł
 
-    //int nCyfraPolaTo;
-    //int nLiteraPolaTo;
-    //QString QsLiteraPolaTo;
-    QString QsPieceTo;                     // f.e. "e4"
+    bool bTestPromotion;                //czy wewnętrzny powierzchowny test na promocję się powiódł
+    QString QsFuturePromote;            //zmienna pamiętająca jakie było zapytanie o ruch typu promocja...
+    //... Pójdzie drugie zapytanie na WWW i potrzeba będzie później stare skądś odczytać.
+    bool bPromotionConfirmed;           //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
+    //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
 
-    QString QsPieceToReject;               //zmienna: bierka która ma być zbita
-
-    //zmienne do roszady:
-    //TODO: zastąpić to prostą matematyką typu +1, -1 jeżeli się da
-    //QString QsKingPosF;                     // skąd najpierw idzie król
-    //QString QsKingPosT;                     // dokąd najpierw idzie król
-    QString QsRookPosF;                     // skąd później idzie wieża
-    QString QsRookPosT;                     // dokąd później idzie wieża
-
-    int nTransferredPiece;
-
-    int anBoard[8][8] =                     // plansza jako tablica. liczby to zajęte pola.
-    {{1, 9, 0, 0, 0, 0, 17, 25} ,           // każda liczba to inna bierka.
-    {2, 10, 0, 0, 0, 0, 18, 26} ,           // TODO: nie liczyć tego tylko zawsze zapytywać TCP...
-    {3, 11, 0, 0, 0, 0, 19, 27} ,           //...o stan pola gry.
+    int anBoard[8][8] =                 // plansza jako tablica. liczby to zajęte pola.
+    {{1, 9, 0, 0, 0, 0, 17, 25} ,       // każda liczba to inna bierka.
+    {2, 10, 0, 0, 0, 0, 18, 26} ,       // TODO: nie liczyć tego tylko zawsze zapytywać TCP...
+    {3, 11, 0, 0, 0, 0, 19, 27} ,       //...o stan pola gry.
     {4, 12, 0, 0, 0, 0, 20, 28} ,
     {5, 13, 0, 0, 0, 0, 21, 29} ,
     {6, 14, 0, 0, 0, 0, 22, 30} ,
     {7, 15, 0, 0, 0, 0, 23, 31} ,
     {8, 16, 0, 0, 0, 0, 24, 32}};
 
-    bool abRemoved[4][8] =                  //tablica usuniętych
+    bool abRemoved[4][8] =              //tablica usuniętych
     {{0, 0, 0, 0, 0, 0, 0, 0} ,
     {0, 0, 0, 0, 0, 0, 0, 0} ,
     {0, 0, 0, 0, 0, 0, 0, 0} ,

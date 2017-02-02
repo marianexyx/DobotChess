@@ -8,10 +8,13 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
     _pChessboard = pChessboard;
     _pWebsockets = pWebsockets;
     _pWebTable = pWebTable;
+
+    _bServiceTests = false;
 }
 
 void Chess::normalPieceMovingSequence() //sekwencja normalnego przemieszczanie bierki
 {
+    qDebug() << "Start normal move sequence";
     _pDobot->gripperOpennedState(true, 'n'); //true == open. TODO: mózg to interpretuje na odwrót
     //pieceFrom/pieceTo jest automatycznie zawsze jako "up". 1st arg. true == pieceTo, else pieceFrom
     _pDobot->pieceFromTo(false, _pChessboard->PieceFrom.Letter, _pChessboard->PieceFrom.Digit, 'n');
@@ -32,6 +35,7 @@ void Chess::normalPieceMovingSequence() //sekwencja normalnego przemieszczanie b
 
 void Chess::removePieceSequence() //sekwencja ruchów przy zbijaniu bierki
 {
+    qDebug() << "Start remove piece sequence";
     _pDobot->gripperOpennedState(true, 'r'); //true == open
     _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 'r');
     _pDobot->armUpDown(false, 'r');
@@ -44,89 +48,73 @@ void Chess::removePieceSequence() //sekwencja ruchów przy zbijaniu bierki
     _pDobot->gripperOpennedState(true, 'r');
     _pDobot->armUpDown(true, 'R');
     _pChessboard->nTransferredPiece = 0;
-    this->normalPieceMovingSequence();
-    //qDebug() << "normalPieceMoving();";
 }
 
-void Chess::castlingMovingSequence(QString QS_msgFromSerial)
+void Chess::castlingMovingSequence()
 {
-    /*if (QS_msgFromSerial.left(12) == "c_movedFromK") _pChessboard->findDobotXYZVals("c_open1");
-    else if (QS_msgFromSerial.left(9) == "c_opened1") _pChessboard->findDobotXYZVals("c_down1");
-    else if (QS_msgFromSerial.left(10) == "c_armDown1") _pChessboard->findDobotXYZVals("c_close1");
-    else if (QS_msgFromSerial.left(9) == "c_closed1") _pChessboard->findDobotXYZVals("c_up1");
-    //else if (QS_msgFromSerial.left(8) == "c_armUp1") _pChessboard->findDobotXYZVals(QS_kingPosT); //wykomentowane by uniknąć błędów podczas testów
-    else if (QS_msgFromSerial.left(10) == "c_movedToK") _pChessboard->findDobotXYZVals("c_down2");
-    else if (QS_msgFromSerial.left(10) == "c_armDown2") _pChessboard->findDobotXYZVals("c_open2");
-    else if (QS_msgFromSerial.left(9) == "c_opened2") _pChessboard->findDobotXYZVals("c_up2");
-    //else if (QS_msgFromSerial.left(8) == "c_armUp2") _pChessboard->findDobotXYZVals(QS_rookPosF); //wykomentowane by uniknąć błędów podczas testów
-    else if (QS_msgFromSerial.left(12) == "c_movedFromR") _pChessboard->findDobotXYZVals("c_down3");
-    else if (QS_msgFromSerial.left(10) == "c_armDown3") _pChessboard->findDobotXYZVals("c_close2");
-    else if (QS_msgFromSerial.left(9) == "c_closed2") _pChessboard->findDobotXYZVals("c_up3");
-    //else if (QS_msgFromSerial.left(8) == "c_armUp3") _pChessboard->findDobotXYZVals(QS_rookPosT); //wykomentowane by uniknąć błędów podczas testów
-    else if (QS_msgFromSerial.left(10) == "c_movedToR") _pChessboard->findDobotXYZVals("c_down4");
-    else if (QS_msgFromSerial.left(10) == "c_armDown4") _pChessboard->findDobotXYZVals("c_open3");
-    else if (QS_msgFromSerial.left(9) == "c_opened3") _pChessboard->findDobotXYZVals("c_up4");
-    else if (QS_msgFromSerial.left(8) == "c_armUp4")
-    {
-        // zmiana miejsc na tablicy pól zajętych
-        _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] = false;
-        _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = true;
-
-        emit _pDobot->addTextToDobotConsole("-End of move sequence- \n");
-        _pWebsockets->processWebsocketMsg("OK 1\n");
-    }*/
+    qDebug() << "Start castling move sequence";
+    this->normalPieceMovingSequence(); //wykonaj przemieszczenie królem
+    _pChessboard->castlingFindRookToMove(); //podmień pozycje ruszonego króla na pozycję wieży
+    this->normalPieceMovingSequence(); //wykonaj przemieszczenie wieżą
 }
 
-bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
+void Chess::enpassantMovingSequence()
 {
-    //sprawdzmay czy zapytanie/ruch może być biciem w przelocie
-    if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1 && //jeżeli pionek nie idzie po prostej (tj. po ukosie o 1 pole)...
-            ((_pWebTable->getWhoseTurn() == "white_turn" && _pChessboard->PieceFrom.Digit == 5 &&
-              _pChessboard->PieceTo.Digit == 6) || //... i jeżeli bije biały...
-             (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 4 &&
-              _pChessboard->PieceTo.Digit == 3)) && //... lub czarny...
-            //... i pole na które idzie nie jest zajete (inaczej byłoby zwykłe bicie)
-            _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == false)
+    qDebug() << "Start Enpassant move sequence /n";
+    this->normalPieceMovingSequence(); //wykonaj normalny ruch. jedyny przypadek bicia, gdzie mogę zbić po normalnym ruchu.
+
+    int nTempDigitPos = _pChessboard->PieceTo.Digit; // w razie czego zapaiętaj oryginalną wartość pola (cyfry) bijącego
+    if (_pWebTable->getWhoseTurn() == "white_turn")
+        _pChessboard->PieceTo.Digit -= 1; //pozycja zbijanego czarnego pionka przez pionka białego w jego turze (białego)
+    else if (_pWebTable->getWhoseTurn() == "black_turn")
+        _pChessboard->PieceTo.Digit += 1; //pozycja zbijanego białego pionka przez pionka czarnego w jego turze (czarnego)
+    else
     {
-        b_test_enpassant = true;
-        _pTCPMsgs->doTcpConnect("test " /*+ QS_piecieFromTo*/);  //TODO: uzupełnić. wykomentowane by uniknąć błędów podczas testów
+        emit _pDobot->addTextToDobotConsole("Error03!: Wrong turn in enpassant statement: " + _pWebTable->getWhoseTurn() + "/n");
+        qDebug() << "Error03!: Chess::enpassantMovingSequence(): Wrong turn: " << _pWebTable->getWhoseTurn() << "/n";
+        return;
+    }
+    //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
+    this->removePieceSequence(); //rozpocznij zbijanie ze zmienioną pozycją pionka bitego.
+    _pChessboard->PieceTo.Digit = nTempDigitPos; //wróć prewencyjnie do normalnej pozycji
+
+    _pChessboard->bTestEnpassant = false; //wyłączenie, by nie zapętlać testów w odpowiedzi tcp.
+}
+
+bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
+{
+    if (((_pWebTable->getWhoseTurn() == "white_turn" &&  _pChessboard->PieceFrom.Digit == 6 &&
+          _pChessboard->PieceTo.Digit == 7) ||  //jeżeli bierka chce isć z pola 7 na 8 w turze białego...
+         (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 1 &&
+          _pChessboard->PieceTo.Digit == 0)) && //...lub z pola 1 na 0 w turze czarnego...
+            abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) <= 1) //... i ruch odbywa się max o 1 pole odległości...
+        //...liter po ukosie (0 dla zwykłego ruchu, 1 dla bicia)
+        //TODO: mogę jeszcze wklepać warunek że to ma być pionek (bodajże nr bierki >8 i <25)
+    {
+        _pChessboard->bTestPromotion = true;
+        _pChessboard->QsFuturePromote = _pChessboard->QsPiecieFromTo; //póki nie wiadomo na co promujemy to zapamiętaj zapytanie o ten ruch
+        _pTCPMsgs->doTcpConnect("test " + _pChessboard->QsPiecieFromTo + "q"); //test awansu na cokolwiek (królową), który pójdzie na chenard
+        //odpowiedź z tcp będzie miała formę: "Ok e2e4 (...)" lub "ILLEGAL"
         return 1;
     }
     else return 0;
 }
 
-void Chess::enpassantMovingSequence()
+bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
 {
-    qDebug() << "Enpassant move sequence /n";
-    int nEnpassantCyfraPos;  //cyfra pionka bitego
-
-    if (_pWebTable->getWhoseTurn() == "white_turn")
-        nEnpassantCyfraPos = _pChessboard->PieceTo.Digit - 1; //pozycja zbijanego czarnego pionka przez pionka białego w jego turze
-    else if (_pWebTable->getWhoseTurn() == "black_turn")
-        nEnpassantCyfraPos = _pChessboard->PieceTo.Digit+1; //pozycja zbijanego białego pionka przez pionka czarnego w jego turze
-    else
+    //sprawdzamy czy zapytanie/ruch może być biciem w przelocie
+    if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1  //jeżeli pionek nie idzie po prostej (tj. po ukosie o 1 pole)...
+            && ((_pWebTable->getWhoseTurn() == "white_turn" && _pChessboard->PieceFrom.Digit == 4
+                 && _pChessboard->PieceTo.Digit == 5)  //... i jeżeli bije biały z pola 5 na 6
+                || (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 3
+                    && _pChessboard->PieceTo.Digit == 2))  //... lub czarny bije z pola 4 na 3
+            //... i pole na które idzie pionek nie jest zajete (inaczej byłoby to zwykłe bicie, a nie bicie w przelocie)
+            && _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == 0)
+        //TODO: mogę jeszcze wklepać warunek że to ma być pionek (bodajże nr bierki >8 i <25)
     {
-        emit _pDobot->addTextToDobotConsole("Error03!: Wrong turn in enpassant statement /n");
-        qDebug() << "Error03!: Wrong turn in enpassant statement /n";
-        return;
-    }
-    //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
-    QS_enpassantToReject = "r_[" + QString::number(_pChessboard->PieceTo.Letter) + QString::number(nEnpassantCyfraPos) + "]";
-    b_test_enpassant = false; //wyłączenie, by nie zapętlać testów w odpowiedzi tcp
-    //_pChessboard->findDobotXYZVals(QS_enpassantToReject); //rozpocznij enpassant jeżeli test się powiódł
-}
-
-bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia enpassant
-{
-    if (((_pWebTable->getWhoseTurn() == "white_turn" &&  _pChessboard->PieceFrom.Digit == 7 &&
-          _pChessboard->PieceTo.Digit == 8) ||  //jeżelii bierka chce isc z pola 2 na 1 w turze bialego...
-         (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 2 &&
-          _pChessboard->PieceTo.Digit == 1)) &&   //...lub z pola 7 na 8 w turze czarnego...
-            abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) <= 1) //... i ruch odbywa się max o 1 pole odległości liter po ukosie
-    {
-        QS_futurePromote = _pChessboard->QsPiecieFromTo; //póki nie wiadomo na co promujemy to zapamiętaj zapytanie o ten ruch
-        _pTCPMsgs->doTcpConnect("test " + _pChessboard->QsPiecieFromTo + "q"); //test awansu na któlową, który pójdzie na chenard
-        return 1;
+        _pChessboard->bTestEnpassant = true; //przy sprawdzaniu odpowiedzi z tcp warunek wpadnie na tą flagę, zamiast na normalny ruch
+        _pTCPMsgs->doTcpConnect("test " + _pChessboard->QsPiecieFromTo);
+        return 1; //możemy mieć do czynienia z enpassant
     }
     else return 0;
 }
@@ -137,8 +125,8 @@ void Chess::checkMsgFromChenard(QString QStrMsgFromChenardTcp)
     if (QStrMsgFromChenardTcp == "OK 1\n") this->MoveOk();
     else if (QStrMsgFromChenardTcp == "OK\n") this->GameStarted();
     else if (QStrMsgFromChenardTcp.left(3) == "OK " && QStrMsgFromChenardTcp.left(4) != "OK 1")
-        this->TestOk(); //odp. na np. 'test e2e4' to 'OK e2e4'
-    else if (QStrMsgFromChenardTcp.left(7) == "ILLEGAL") this->Illegal();
+        this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
+    else if (QStrMsgFromChenardTcp.left(7) == "ILLEGAL") this->MovePiece(_pChessboard->QsPiecieFromTo); //jednak to będzie zwykły ruch
     else if (QStrMsgFromChenardTcp.left(8) == "BAD_MOVE") this->BadMove(QStrMsgFromChenardTcp);
     else if (QStrMsgFromChenardTcp.left(1) == "*") this->GameInProgress();
     else if (QStrMsgFromChenardTcp.left(3) == "1-0" || QStrMsgFromChenardTcp.left(3) == "0-1" ||
@@ -150,39 +138,34 @@ void Chess::checkMsgFromWebsockets(QString QStrMsgFromWebsockets)
 {
     qDebug() << "Chess::checkMsgFromWebsockets: received: " << QStrMsgFromWebsockets;
     if (QStrMsgFromWebsockets == "new") this->NewGame();
-    else if (QStrMsgFromWebsockets.left(4) == "move") this->MovePiece(QStrMsgFromWebsockets);
+    else if (QStrMsgFromWebsockets.left(4) == "move") this->TestMove(QStrMsgFromWebsockets); //sprawdź najpierw czy nie występują ruchy specjalne
     else if (QStrMsgFromWebsockets.left(10) == "promote_to") this->Promote(QStrMsgFromWebsockets); //odp. z WWW odnośnie tego na co promujemy
     else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromWebsockets: " << QStrMsgFromWebsockets;
 }
 
-void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o stan
+void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o stan gry
 {
     qDebug() << "-Begin move sequence-";
-    emit addTextToDobotConsole("-Begin move sequence-\n");
+    emit this->addTextToDobotConsole("-Begin move sequence-\n");
 
-    if (b_test_enpassant) this->enpassantMovingSequence(); //jeżeli test na enpassant się powiódł, to rozpocznij ten ruch
-    else if (_pChessboard->castlingStatements(_pChessboard->QsPiecieFromTo))
+    if (_pChessboard->castlingStatements()) this->castlingMovingSequence(); //jeżeli warunki dla roszady spełnione to rozpocznij roszadę
+    //TODO: brak warunku bicia dla enpassant
+    else if (!_pChessboard->bPromotionConfirmed && _pChessboard->removeStatements()) //jeżeli warunki dla bicia spełnione, ale nie dla promocji...
     {
-        qDebug() << "Start castling move sequence";
-        //_pChessboard->findDobotXYZVals(_pChessboard->QsKingPosF); //rozpocznij roszadę jeżeli spełnione są jej warunki
+        this->removePieceSequence(); //... to rozpocznij zbijanie ...
+        this->normalPieceMovingSequence(); //... a potem wykonaj normalny ruch
     }
-    else if (_pChessboard->removeStatements()) //jeżeli podczas ruchu następuje bicie (TODO: bral warunku dla enpassant)
+    else if (_pChessboard->bPromotionConfirmed) //jeżeli tcp potwierdził wykonanie promocji to rozpocznij promocję (normalny ruch z ew. biciem).
     {
-        qDebug() << "Start remove piece sequence";
-        //_pChessboard->removePieceSequence(); //rozpocznij zbijanie jeżeli spełnione są jej warunki
-    }
-    else if (bPromotionConfirmed) //rozpocznij zbijanie podczas promocji jeżeli spełnione jej są warunki
-    {
-        qDebug() << "Start promotion move sequence";
+        qDebug() << "-Start promotion move sequence-";
         if (_pChessboard->removeStatements()) //jeżeli przy promocji następuje bicie
-            //_pChessboard->findDobotXYZVals(_pChessboard->QsPieceToReject); //to najpierw zbijamy
-        bPromotionConfirmed = false;
+            this->removePieceSequence(); //to najpierw zbijamy
+        this->normalPieceMovingSequence(); //promocja bez podmiany bierek na inne to póki co zwykły ruch
+        _pChessboard->bTestPromotion = false; //czyszczenie zmiennych
+        _pChessboard->bPromotionConfirmed = false;
+
     }
-    else
-    {
-        qDebug() << "Start standard move sequence";
-        this->normalPieceMovingSequence(); //rozpocznij normalny ruch
-    }
+    else this->normalPieceMovingSequence(); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
 
     //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
     _pWebsockets->addTextToWebsocketConsole("Sending 'status' command to tcp. \n");
@@ -217,22 +200,16 @@ void Chess::GameStarted() //prześlij info na stronę o tym że gra wystartował
     _pTCPMsgs->setBlokadaZapytan(false); //chenard przetworzył wiadomość. uwolnienie blokady zapytań.
 }
 
-void Chess::MovePiece(QString QStrMsgFromWebsockets)
+void Chess::TestMove(QString QStrMsgFromWebsockets)
 {
+    _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
+
     if (_pTCPMsgs->getBlokadaZapytan() == false) //jeżeli chenard nie przetwarza żadnego zapytania
         //TODO: program gdzieś musi stackować zapytania których nie może jeszcze przetworzyć
-    {
-        _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek, także dla ruchów specjalnych
-
-        if(this->testPromotion()) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij
-        else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i przerwij
-        else //a jeżeli było to każde inne rządzanie ruchu, to wykonuj przemieszczenie bierki...
-            //...(do tych ruchów zaliczają się: zwykły ruch, bicie, roszada)
-        {
-            _pWebsockets->addTextToWebsocketConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n");
-            qDebug() << "Sending normal move to tcp: " << QStrMsgFromWebsockets;
-            _pTCPMsgs->doTcpConnect(QStrMsgFromWebsockets);
-        }
+    { //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
+        if(this->testPromotion()) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
+        else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i przerwij jeśli test się powiódł.
+        else MovePiece(QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
     }
     else
     {
@@ -241,28 +218,40 @@ void Chess::MovePiece(QString QStrMsgFromWebsockets)
     }
 }
 
-void Chess::Promote(QString QStrMsgFromWebsockets)
-{
-    bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu promocja, by sprawdzić czy nie ma dodatkowo bicia
-    _pTCPMsgs->doTcpConnect("move" + QS_futurePromote + QStrMsgFromWebsockets.mid(11,1)); //scal żądanie o ruch z typem promocji
-    //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to ruch może się odbywać jako normalne przemieszczenie
-    qDebug() << "Send to TCP: move " << QS_futurePromote << QStrMsgFromWebsockets.mid(11,1);
+void Chess::MovePiece(QString QStrMsgFromWebsockets) // rządzanie ruchu- przemieszczenie bierki.
+{ //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
+    if (_pTCPMsgs->getBlokadaZapytan() == false) //jeżeli chenard nie przetwarza żadnego zapytania
+        //TODO: program gdzieś musi stackować zapytania których nie może jeszcze przetworzyć
+    {
+        _pWebsockets->addTextToWebsocketConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n");
+        qDebug() << "Sending normal move to tcp: " << QStrMsgFromWebsockets;
+        _pTCPMsgs->doTcpConnect(QStrMsgFromWebsockets); //zapytaj się tcp o poprawność prośby o ruch
+    }
+    {
+        _pWebsockets->addTextToWebsocketConsole("Error08! Previous TCP msg hasn't been processed.\n");
+        qDebug() << "Error18! Previous TCP msg hasn't been processed.\n";
+    }
 }
 
-void Chess::Illegal() //któryś z wykonywanych testów się nie powiódł
+void Chess::Promote(QString QStrMsgFromWs)
 {
-    //warunki ruchów specjalnych się znoszą, dlatego nie trzeba ich implementować.
-    //jedynym wyjątkiem jest bicie podczas promocji zawarte w warunku poniżej
-    /*if(bPromotionConfirmed && _pChessboard->removeStatements()) //jeżeli dla testu promocji (który się nie powiódł) występuje inny special move (bicie bierki)..
-        _pChessboard->findDobotXYZVals(_pChessboard->QsPieceToReject); //...to wykonaj normalne bicie, które potem samo przejdzie w normalny ruch
-    else _pChessboard->findDobotXYZVals("n_" + _pChessboard->QsPieceFrom); //jako że innych przypadków nie trzeba rozpatrywać to każdy innych ruch jest zwykły*/
+    _pChessboard->bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu promocja, by sprawdzić czy nie ma dodatkowo bicia
+    _pTCPMsgs->doTcpConnect("move " + _pChessboard->QsFuturePromote + QStrMsgFromWs.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
+    //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to ruch może się odbywać jako normalne przemieszczenie
+    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << QStrMsgFromWs.mid(11,1);
 }
 
 void Chess::TestOk()
 {
-    qDebug() << "Sending 'promote_to_what' to websockets";
-    _pWebsockets->processWebsocketMsg("promote_to_what");
-    _pTCPMsgs->setBlokadaZapytan(false); //chenard przetworzył wiadomość. uwolnienie blokady zapytań.
+    if(_pChessboard->bTestPromotion) //jeżeli to test na promocję wg tcp się powiódł
+    {
+        qDebug() << "Sending 'promote_to_what' to websockets";
+        _pWebsockets->processWebsocketMsg("promote_to_what"); //to trzeba jeszcze zapytać się na WWW na co ma być ta promocja.
+        _pTCPMsgs->setBlokadaZapytan(false); //chenard przetworzył wiadomość. uwolnienie blokady zapytań.
+    }
+    else if (_pChessboard->bTestEnpassant)
+        this->enpassantMovingSequence(); //jeżeli test na enpassant się powiódł, to rozpocznij ten ruch
+    else qDebug() << "Error: Chess::TestOk: None test is true.";
 }
 
 void Chess::BadMove(QString QsMsgFromChenardTcp)

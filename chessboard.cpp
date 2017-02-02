@@ -2,7 +2,14 @@
 
 Chessboard::Chessboard()
 {
+    QsPiecieFromTo = "";
     nTransferredPiece = 0;
+
+    bTestEnpassant = false;
+
+    bTestPromotion = false;
+    QsFuturePromote = "";
+    bPromotionConfirmed = false;
 
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
     float a8_x = 331.0; float a8_y = 74.3; float a8_z = -0.3;
@@ -69,8 +76,8 @@ Chessboard::Chessboard()
 void Chessboard::findBoardPos(QString QsPiecePositions)
 {
     QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4     TODO: czy to jest potrzebne?
-    QsPieceFrom = QsPiecePositions.mid(5,2); // e2          TODO: czy to jest potrzebne?
-    QsPieceTo   = QsPiecePositions.mid(7,2); // e4          TODO: czy to jest potrzebne?
+    //QsPieceFrom = QsPiecePositions.mid(5,2); // e2          TODO: czy to jest potrzebne?
+    //QsPieceTo   = QsPiecePositions.mid(7,2); // e4          TODO: czy to jest potrzebne?
     qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
 
     PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
@@ -98,8 +105,30 @@ int Chessboard::findPieceLetterPos(QString QsLetter)
     else if (QsLetter == "f" || QsLetter == "F") {nLetter = 5;}
     else if (QsLetter == "g" || QsLetter == "G") {nLetter = 6;}
     else if (QsLetter == "h" || QsLetter == "H") {nLetter = 7;}
+    else qDebug() << "ERROR: Chessboard::findPieceLetterPos(QString QsLetter): Unknown QsLetter value.";
 
     return nLetter;
+}
+
+//TODO: to co robię tutaj poniżej to omijanie czegoś co się zwie template/szablony?
+QString Chessboard::findPieceLetterPos(int nLetter)
+{
+    QString QsLetter;
+
+    switch(nLetter)
+    {
+        case 0: QsLetter = "a"; break;
+        case 1: QsLetter = "b"; break;
+        case 2: QsLetter = "c"; break;
+        case 3: QsLetter = "d"; break;
+        case 4: QsLetter = "e"; break;
+        case 5: QsLetter = "f"; break;
+        case 6: QsLetter = "g"; break;
+        case 7: QsLetter = "h"; break;
+        default: qDebug() << "ERROR: Chessboard::findPieceLetterPos(int nLetter): Unknown nLetter value."; break;
+    }
+
+    return QsLetter;
 }
 
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
@@ -114,40 +143,30 @@ bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
     else return 0;
 }
 
-bool Chessboard::castlingStatements(QString QsPossibleCastlingVal) // sprawdzanie czy dany ruch jest prośbą o roszadę i czy da się ją zrobić
+bool Chessboard::castlingStatements() // sprawdzanie czy dany ruch jest prośbą o roszadę
 {
-    if (QsPossibleCastlingVal == "e1c1" || QsPossibleCastlingVal == "e1C1" || QsPossibleCastlingVal == "E1c1" || QsPossibleCastlingVal == "E1C1" ||
-            QsPossibleCastlingVal == "e1g1" || QsPossibleCastlingVal == "e1G1" || QsPossibleCastlingVal == "E1g1" || QsPossibleCastlingVal == "E1G1" ||
-            QsPossibleCastlingVal == "e8c8" || QsPossibleCastlingVal == "e8C8" || QsPossibleCastlingVal == "E8c8" || QsPossibleCastlingVal == "E8C8" ||
-            QsPossibleCastlingVal == "e8g8" || QsPossibleCastlingVal == "e8G8" || QsPossibleCastlingVal == "E8g8" || QsPossibleCastlingVal == "E8G8" )
+    if (PieceFrom.Letter == 4 && (PieceFrom.Digit == 0 || PieceFrom.Digit == 7) //jeżeli ruszana jest bierka z pozycji króla
+            && (PieceTo.Letter == 2 || PieceTo.Letter == 6) // o 2 pola w lewo lub prawo
+            && (PieceTo.Digit == 0 || PieceTo.Digit == 7) //na tej samej linii
+            && (anBoard[PieceFrom.Letter][PieceFrom.Digit] == 5 //i jest to na pewno król (biały)
+                || anBoard[PieceFrom.Letter][PieceFrom.Digit] == 29)) //(lub czarny)
     {
-        //ustawiane skąd-dokąd przenoszony będzie król podczas roszady
-        //QsKingPosF = "c_" + QsPieceFrom + "K"; //jest to info dla arduino, że mamy do czynienia z roszadą
-        //QsKingPosT = "c_" + QsPieceTo + "K";
-
-        //ustawiane skąd-dokąd przenoszona będzie wieża podczas roszady
-        if (PieceTo.Letter == 2) //old QsLiteraPolaTo == "c"
-        {
-            QsRookPosF = "c_[a";
-            QsRookPosT = "c_[d";
-        }
-        else
-        {
-            QsRookPosF = "c_[h";
-            QsRookPosT = "c_[f";
-        }
-        if (PieceTo.Digit == 1)
-        {
-            QsRookPosF += "1]fR";
-            QsRookPosT += "1]tR";
-        }
-        else
-        {
-            QsRookPosF += "8]fR";
-            QsRookPosT += "8]tR";
-        }
-        return 1;
+        return 1; //to mamy do czynienia z roszadą
     }
     else
-        return 0;
+        return 0; //a jak nie to nie
+}
+
+void Chessboard::castlingFindRookToMove() //ustawiane skąd-dokąd przenoszona będzie wieża w roszadzie.
+{ //cyfra pola na którą wyląduje wieża pozostaje taka sama jak u króla.
+    if (PieceTo.Letter == 2)
+    {
+        PieceFrom.Letter = 0;
+        PieceTo.Letter = 3;
+    }
+    else
+    {
+        PieceFrom.Letter = 7;
+        PieceTo.Letter = 5;
+    }
 }

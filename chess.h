@@ -23,26 +23,18 @@ private:
 
     bool _bServiceTests;
 
-    bool b_test_enpassant = false;	//zmienna odpowiadająca za wykonywanie ruchu enpassant
-    QString QS_enpassantToReject;   //zmienna: pozycja pionka bitego w enpassant
-
-    QString QS_futurePromote = "";  //zmienna pamiętająca jakie było zapytanie o ruch...
-    //...typu promocja (pójdzie drugie zapytanie i potrzeba będzie stare skądś odczytać).
-    bool bPromotionConfirmed = false; //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
-    //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
-
     void normalPieceMovingSequence();
     void removePieceSequence();
-    void castlingMovingSequence(QString QS_msgFromSerial);
+    void castlingMovingSequence();
     void enpassantMovingSequence();
     bool testEnpassant();
     bool testPromotion();
 
+    void TestMove(QString QStrMsgFromWebsockets);
     void MovePiece(QString QStrMsgFromWebsockets);
     void NewGame();
     void MoveOk();
-    void Promote(QString QStrMsgFromWebsockets);
-    void Illegal();
+    void Promote(QString QStrMsgFromWs);
     void GameStarted();
     void TestOk();
     void GameInProgress();

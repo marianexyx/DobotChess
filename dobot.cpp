@@ -238,10 +238,12 @@ void Dobot::pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chM
                                           "Dobot::pieceFromTo(): " +
                                           static_cast<QString>(chMovementType) + "\n");
 
-    if (bIsPieceMovingTo) emit this->addTextToDobotConsole("normalPieceMoving: PieceTo: "
-                                                           + _pChessboard->QsPieceTo + "\n");
-    else emit this->addTextToDobotConsole("normalPieceMoving: PieceFrom: "
-                                          + _pChessboard->QsPieceFrom + "\n");
+    if (bIsPieceMovingTo)
+        emit this->addTextToDobotConsole("PieceTo: " + _pChessboard->findPieceLetterPos(_pChessboard->PieceTo.Letter)
+                                         +  (_pChessboard->PieceTo.Digit + 1) + "\n");
+    else
+        emit this->addTextToDobotConsole("PieceFrom: " + _pChessboard->findPieceLetterPos(_pChessboard->PieceFrom.Letter)
+                                         +  (_pChessboard->PieceFrom.Digit + 1) + "\n");
 }
 
 void Dobot::gripperOpennedState(bool isGripperOpened, char chMovementType) //open/close
