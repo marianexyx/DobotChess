@@ -1,7 +1,27 @@
 #include "chessboard.h"
 
-Chessboard::Chessboard()
+Chessboard::Chessboard():
+    anStartBoard{{1, 9, 0, 0, 0, 0, 17, 25} ,
+{2, 10, 0, 0, 0, 0, 18, 26} ,
+{3, 11, 0, 0, 0, 0, 19, 27} ,
+{4, 12, 0, 0, 0, 0, 20, 28} ,
+{5, 13, 0, 0, 0, 0, 21, 29} ,
+{6, 14, 0, 0, 0, 0, 22, 30} ,
+{7, 15, 0, 0, 0, 0, 23, 31} ,
+{8, 16, 0, 0, 0, 0, 24, 32}},
+
+    abRemoved{{0, 0, 0, 0} ,
+{0, 0, 0, 0} ,
+{0, 0, 0, 0} ,
+{0, 0, 0, 0} ,
+{0, 0, 0, 0} ,
+{0, 0, 0, 0} ,
+{0, 0, 0, 0} ,
+{0, 0, 0, 0}}
 {
+    memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //anBoard = anStartBoard
+    memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //anTempBoard = anStartBoard
+
     QsPiecieFromTo = "";
     nTransferredPiece = 0;
 
@@ -10,6 +30,15 @@ Chessboard::Chessboard()
     bTestPromotion = false;
     QsFuturePromote = "";
     bPromotionConfirmed = false;
+
+    /*anStartBoard = {{1, 9, 0, 0, 0, 0, 17, 25} ,
+                    {2, 10, 0, 0, 0, 0, 18, 26} ,
+                    {3, 11, 0, 0, 0, 0, 19, 27} ,
+                    {4, 12, 0, 0, 0, 0, 20, 28} ,
+                    {5, 13, 0, 0, 0, 0, 21, 29} ,
+                    {6, 14, 0, 0, 0, 0, 22, 30} ,
+                    {7, 15, 0, 0, 0, 0, 23, 31} ,
+                    {8, 16, 0, 0, 0, 0, 24, 32}};*/
 
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
     float a8_x = 331.0; float a8_y = 74.3; float a8_z = -0.3;
@@ -53,39 +82,53 @@ Chessboard::Chessboard()
     dla x = 100, y = 140  wynik z = -22.3
     dla x = 275, y = 170  wynik z = -16.5*/
 
-    for (int row = 0; row <= 1; row++)
+    for (int column = 0; column <= 1; column++)
     {
-        for (int column = 0; column <= 7; column++)
+        for (int row = 0; row <= 7; row++)
         {
-            afRemovedPiecesPositions_x[row][column] = 100 + column*25;
-            afRemovedPiecesPositions_y[row][column] = 140 + row*30;
-            afRemovedPiecesPositions_z[row][column] = -22.3 - column*((-22.3 + 16.5)/7);
+            afRemovedPiecesPositions_x[row][column] = 100 + row*25;
+            afRemovedPiecesPositions_y[row][column] = 140 + column*30;
+            afRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
         }
     }
-    for (int row = 2; row <= 3; row++)
+    for (int column = 2; column <= 3; column++)
     {
-        for (int column = 0; column <= 7; column++)
+        for (int row = 0; row <= 7; row++)
         {
-            afRemovedPiecesPositions_x[row][column] = 100 + column*25;
-            afRemovedPiecesPositions_y[row][column] = -155 - ((row-2)*30);
-            afRemovedPiecesPositions_z[row][column] = -22.5 - column*((-22.5 + 17)/7);
+            afRemovedPiecesPositions_x[row][column] = 100 + row*25;
+            afRemovedPiecesPositions_y[row][column] = -155 - ((column-2)*30);
+            afRemovedPiecesPositions_z[row][column] = -22.5 - row*((-22.5 + 17)/7);
         }
     }
 }
 
 void Chessboard::findBoardPos(QString QsPiecePositions)
 {
-    QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4     TODO: czy to jest potrzebne?
-    //QsPieceFrom = QsPiecePositions.mid(5,2); // e2          TODO: czy to jest potrzebne?
-    //QsPieceTo   = QsPiecePositions.mid(7,2); // e4          TODO: czy to jest potrzebne?
+    QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4. wycięte z "move e2e4".
     qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
 
     PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
     PieceFrom.Digit = QsPiecePositions.mid(6,1).toInt() - 1;
+    qDebug() << "Chessboard::findBoardPos: PieceFrom.Digit =" << PieceFrom.Digit;
 
     PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
     PieceTo.Digit = QsPiecePositions.mid(8,1).toInt() - 1;
+    qDebug() << "Chessboard::findBoardPos: PieceTo.Digit =" << PieceTo.Digit;
 }
+
+void Chessboard::findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit)
+{ //TODO: zrobić z tego strukture
+    QsPiecieFromTo = this->findPieceLetterPos(nFromLetter) + nFromDiggit +
+            this->findPieceLetterPos(nToLetter) + nToDiggit;
+    qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
+
+    PieceFrom.Letter = nFromLetter;
+    PieceFrom.Digit = nFromDiggit;
+
+    PieceTo.Letter = nToLetter;
+    PieceTo.Digit = nToDiggit;
+}
+
 
 void Chessboard::actualPos(int nLetter, int nDigit)
 {
@@ -117,15 +160,15 @@ QString Chessboard::findPieceLetterPos(int nLetter)
 
     switch(nLetter)
     {
-        case 0: QsLetter = "a"; break;
-        case 1: QsLetter = "b"; break;
-        case 2: QsLetter = "c"; break;
-        case 3: QsLetter = "d"; break;
-        case 4: QsLetter = "e"; break;
-        case 5: QsLetter = "f"; break;
-        case 6: QsLetter = "g"; break;
-        case 7: QsLetter = "h"; break;
-        default: qDebug() << "ERROR: Chessboard::findPieceLetterPos(int nLetter): Unknown nLetter value."; break;
+    case 0: QsLetter = "a"; break;
+    case 1: QsLetter = "b"; break;
+    case 2: QsLetter = "c"; break;
+    case 3: QsLetter = "d"; break;
+    case 4: QsLetter = "e"; break;
+    case 5: QsLetter = "f"; break;
+    case 6: QsLetter = "g"; break;
+    case 7: QsLetter = "h"; break;
+    default: qDebug() << "ERROR: Chessboard::findPieceLetterPos(int nLetter): Unknown nLetter value."; break;
     }
 
     return QsLetter;
@@ -134,7 +177,7 @@ QString Chessboard::findPieceLetterPos(int nLetter)
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 {
     if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0) // sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
-    //TODO: nieprawdziwe dla enpassant!
+        //TODO: nieprawdziwe dla enpassant!
     {
         //QsPieceToReject = QsPieceTo; //zbijana jest bierka z tego pola na które chcemy iść
         //!!!TODO: TO JEST NIEAKTUALNE

@@ -23,6 +23,7 @@ public:
     Chessboard();
 
     void findBoardPos(QString QsPiecePositions);
+    void findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit);
     int findPieceLetterPos(QString QsLetter);
     QString findPieceLetterPos(int nLetter);
     bool removeStatements();
@@ -45,21 +46,14 @@ public:
     bool bPromotionConfirmed;           //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
     //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
 
-    int anBoard[8][8] =                 // plansza jako tablica. liczby to zajęte pola.
-    {{1, 9, 0, 0, 0, 0, 17, 25} ,       // każda liczba to inna bierka.
-    {2, 10, 0, 0, 0, 0, 18, 26} ,       // TODO: nie liczyć tego tylko zawsze zapytywać TCP...
-    {3, 11, 0, 0, 0, 0, 19, 27} ,       //...o stan pola gry.
-    {4, 12, 0, 0, 0, 0, 20, 28} ,
-    {5, 13, 0, 0, 0, 0, 21, 29} ,
-    {6, 14, 0, 0, 0, 0, 22, 30} ,
-    {7, 15, 0, 0, 0, 0, 23, 31} ,
-    {8, 16, 0, 0, 0, 0, 24, 32}};
-
-    bool abRemoved[4][8] =              //tablica usuniętych
-    {{0, 0, 0, 0, 0, 0, 0, 0} ,
-    {0, 0, 0, 0, 0, 0, 0, 0} ,
-    {0, 0, 0, 0, 0, 0, 0, 0} ,
-    {0, 0, 0, 0, 0, 0, 0, 0}};
+    //TODO: wrzucić inicjalizacje tablic do pliku *.cpp
+    const int anStartBoard[8][8];       //do sprawdzania przy odkładaniu bierek na miejsce czy ...
+                                        //...szachownica osiągła swoje startowe ułożenie bierek.
+    int anBoard[8][8];                  //plansza jako tablica. liczby to zajęte pola.
+                                        //każda liczba to inna bierka.
+    int anTempBoard[8][8];              //pomocnicza tablica do sprawdzania czy udało się przywrócić...
+                                        //...bierki na szachownicy do oryginalnego/pierwotnego stanu.
+    bool abRemoved[8][4];               //tablica usuniętych
 
     int nRemovingRowPos;
     int nRemovingColumnPos;
@@ -68,9 +62,9 @@ public:
     float afChessboardPositions_y[8][8];
     float afChessboardPositions_z[8][8];
 
-    float afRemovedPiecesPositions_x[4][8];
-    float afRemovedPiecesPositions_y[4][8];
-    float afRemovedPiecesPositions_z[4][8];
+    float afRemovedPiecesPositions_x[8][4];
+    float afRemovedPiecesPositions_y[8][4];
+    float afRemovedPiecesPositions_z[8][4];
 
 signals:
     void addTextToDobotConsole(QString);

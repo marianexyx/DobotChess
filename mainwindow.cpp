@@ -331,12 +331,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             _pDobotArm->PTPvalues(fService_x, fService_y, 1000, 1000); //1000 = actual_val
             _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
             _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
-            if (QsServiceMsg.right(1) == "r")
-            {
-                _pChessboard->findBoardPos("move xx" + QsServiceMsg.left(2));
-                _pChessboard->nTransferredPiece = _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit];
-                _pDobotArm->removePiece();
-            }
+            if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);
         }
         else
         {

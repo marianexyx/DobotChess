@@ -40,6 +40,9 @@ private:
     void GameInProgress();
     void EndOfGame(QString QStrMsgFromChenardTcp);
     void BadMove(QString QsMsgFromChenardTcp);
+    int fieldNrToFieldPos(int nfieldNr, bool bRow);
+    void restorePieceSequence(int nPieceToRestore);
+    void resetPiecePositions();
 
 public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,

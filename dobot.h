@@ -37,7 +37,7 @@ public:
     void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMovementType);
     void gripperOpennedState(bool gripperOpened, char chMovementType);
     void armUpDown(bool isArmGoingUp, char chMovementType);
-    void removePiece();
+    void removePiece(int nPieceRowPos, int nPieceColumnPos);
 
 public slots:
     void onConnectDobot();

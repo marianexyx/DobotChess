@@ -1,5 +1,8 @@
 #include "chess.h"
 
+#define ROW 1
+#define COLUMN 0
+
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
              Websockets *pWebsockets, WebTable *pWebTable): _bServiceTests(false)
 {
@@ -15,7 +18,7 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 void Chess::normalPieceMovingSequence() //sekwencja normalnego przemieszczanie bierki
 {
     qDebug() << "Start normal move sequence";
-    _pDobot->gripperOpennedState(true, 'n'); //true == open. TODO: mózg to interpretuje na odwrót
+    _pDobot->gripperOpennedState(true, 'n'); //true == open.
     //pieceFrom/pieceTo jest automatycznie zawsze jako "up". 1st arg. true == pieceTo, else pieceFrom
     _pDobot->pieceFromTo(false, _pChessboard->PieceFrom.Letter, _pChessboard->PieceFrom.Digit, 'n');
     _pDobot->armUpDown(false, 'n'); // true == up
@@ -37,17 +40,43 @@ void Chess::removePieceSequence() //sekwencja ruchów przy zbijaniu bierki
 {
     qDebug() << "Start remove piece sequence";
     _pDobot->gripperOpennedState(true, 'r'); //true == open
-    _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 'r');
+    _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 'r'); //do usunięnia
     _pDobot->armUpDown(false, 'r');
     _pDobot->gripperOpennedState(false, 'r');
     _pDobot->armUpDown(true, 'r');
     _pChessboard->nTransferredPiece = _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit]; //pochwycono bierkę
     _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = 0; //miejsce bitego pionka jest już puste
-    _pDobot->removePiece();
+    _pDobot->removePiece(this->fieldNrToFieldPos(_pChessboard->nTransferredPiece, true),
+                         this->fieldNrToFieldPos(_pChessboard->nTransferredPiece, false)); //nad zbitym polem
     _pDobot->armUpDown(false, 'R');
     _pDobot->gripperOpennedState(true, 'r');
     _pDobot->armUpDown(true, 'R');
-    _pChessboard->nTransferredPiece = 0;
+    _pChessboard->abRemoved[this->fieldNrToFieldPos(_pChessboard->nTransferredPiece, true)]
+            [this->fieldNrToFieldPos(_pChessboard->nTransferredPiece, false)]
+            = _pChessboard->nTransferredPiece; //miejsce na polu zbitych posiada od teraz swoją zbitą bierkę
+    _pChessboard->nTransferredPiece = 0; //ramie nie trzyma już żadnej bierki
+}
+
+void Chess::restorePieceSequence(int nPieceToRestore) //TODO: ogarnąć zgrabnie zgranie z funkcją findBoardPos
+{
+    qDebug() << "Start restore piece sequence";
+    _pDobot->gripperOpennedState(true, 's'); //true == open
+    //TODO: nazewnictwo poniższej funkcji nie pasuje w tym miejscu. tu jest restore
+    _pDobot->removePiece(this->fieldNrToFieldPos(nPieceToRestore, true),
+                         this->fieldNrToFieldPos(nPieceToRestore, false));  //ustaw się nad zbitą bierkę
+    _pDobot->armUpDown(false, 's');
+    _pDobot->gripperOpennedState(false, 's');
+    _pDobot->armUpDown(true, 's');
+    _pChessboard->nTransferredPiece = nPieceToRestore; //pochwycono bierkę
+    _pChessboard->abRemoved[this->fieldNrToFieldPos(nPieceToRestore, true)]
+            [this->fieldNrToFieldPos(nPieceToRestore, false)] = 0; //miejsce na polu zbitych jest już puste
+    _pDobot->pieceFromTo(true, _pChessboard->PieceTo.Letter, _pChessboard->PieceTo.Digit, 's'); //idź na oryginalne pole...
+    //...bierki, by ją odstawić na miejsce.
+    _pDobot->armUpDown(false, 's');
+    _pDobot->gripperOpennedState(true, 's');
+    _pDobot->armUpDown(true, 's');
+    _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceTo.Digit] = nPieceToRestore; //bierka na swoim miejscu
+    _pChessboard->nTransferredPiece = 0; //ramie przeniosło bierkę i już nic nie trzyma
 }
 
 void Chess::castlingMovingSequence()
@@ -180,7 +209,7 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
     {
         _pTCPMsgs->setBlokadaZapytan(true);
         if ((_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
-                !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
+             !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
                 _bServiceTests) //albo jeżeli mamy do czynienia z zapytaniem serwisowym
             //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
         {
@@ -281,4 +310,173 @@ void Chess::EndOfGame(QString QStrMsgFromChenardTcp)
     _pWebsockets->processWebsocketMsg("QsWhoWon");
     _pTCPMsgs->setBlokadaZapytan(false); //chenard przetworzył właśnie wiadomość. uwolnienie blokady zapytań
     QsWhoWon.clear();
+}
+
+void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new game"
+{
+    do //wertuj w kółko planszę przestawiając bierki, dopóki...
+       //...szachownica nie wróci do stanu pierwotnego/startowego.
+    {
+        for (int nCurentlyCheckedField = 1; nCurentlyCheckedField <= 64; nCurentlyCheckedField++) //aktualnie sprawdzane pole szachownicy
+        {
+            int nPiecePos = _pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, ROW)] //bierka na polu sprawdzanym
+                    [this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)];
+            if(nPiecePos > 16) nPiecePos += 32;
+
+            //TODO: ogarnąć co mogę w kodzie pomienić na nPiecePos (bardzo łatwo się zajebać...
+            //...w odróżnianiu nr bierek i nr pól. przemyśleć to dokładnie zanim zacznę podmieniać).
+            if (_pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, ROW)]
+                    [this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)] == 0 //jeżeli na sprawdzanym polu nic nie ma...
+                    && (this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) <= 1  //...a coś tam powinno być
+                        || this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) >= 6)) // (kolumny <= 1 to białe, a >= 6 to czarne)
+            {
+                int nPieceToFind; //zmienna określanąca nr szukanej bierki
+                if (this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) <= 1) //jeżeli to jest piewsza lub druga kolumna szachownicy (białe)
+                    nPieceToFind = _pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, ROW)]
+                            [this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)]; //to nr bierki (białej) której szukamy = nr sprawdzanego pola
+                else nPieceToFind = _pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, ROW)]
+                        [this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)] - 32; //bierki czarne są na polach o nr większych o 32 od tych bierek
+
+                //sprawdź najpierw po numerze bierki czy leży ona na swoim zbitym miejscu na polu zbitych bierek
+                if(_pChessboard->abRemoved[this->fieldNrToFieldPos(nPieceToFind, ROW)]
+                        [this->fieldNrToFieldPos(nPieceToFind, COLUMN)] == nPieceToFind) //jeżeli tam jest
+                {
+                    _pChessboard->findBoardPos(this->fieldNrToFieldPos(nPieceToFind, ROW),
+                                               this->fieldNrToFieldPos(nPieceToFind, COLUMN),
+                                               this->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
+                                               this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
+                    this->restorePieceSequence(nPieceToFind); //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
+                }
+                else //jeżeli nie ma bierki na polu zbitych bierek, to leży ona gdzieś na szachownicy
+                {
+                    for (int nField = 1; nField <= 64; nField++) //przewertuj szachownicę w jej poszukiwaniu
+                    {
+                        if (nField == _pChessboard->anBoard[this->fieldNrToFieldPos(nField, ROW)]
+                                [this->fieldNrToFieldPos(nField, COLUMN)] //jeżeli na tym polu szachownicy jest bierka której szukamy
+                                && nCurentlyCheckedField != nField) //ale nie może to być oryginalna pozycja bierki (musi być na obcym polu startowym)
+                        {
+                            //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
+                            _pChessboard->findBoardPos(this->fieldNrToFieldPos(nField, ROW),
+                                                       this->fieldNrToFieldPos(nField, COLUMN),
+                                                       this->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
+                                                       this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
+                            this->normalPieceMovingSequence();
+                        }
+                    }
+                }
+            }
+            //natomiast jeżeli na sprawdzanym polu jest bierka, która nie znajdowała się tam podczas startu gry...
+            //...to trzeba sprawdzić czy oryginalne pole tej bierki nie jest zajęte i tam ją odstawić
+            else if (_pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, ROW)]
+                     [this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)] != nCurentlyCheckedField
+                     && _pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, ROW)]
+                     [this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)] != 0) //i jakaś bierka na pewno tam jest
+            {
+               /* int nPiecePos = _pChessboard->anBoard[this->fieldNrToFieldPos(nCurentlyCheckedField, true)] //bierka na polu sprawdzanym
+                        [this->fieldNrToFieldPos(nCurentlyCheckedField, false)]; //TODO: dać to na start pętli
+                if(nPiecePos > 16) nPiecePos += 32;*/
+
+                if (_pChessboard->anBoard[this->fieldNrToFieldPos(nPiecePos, ROW)] //czy oryginalne pole bierki (nie będącej na swojej de facto ...
+                        [this->fieldNrToFieldPos(nPiecePos, COLUMN)] == 0) //...pierwonej pozycji) jest puste, by tam można było ją odstawić
+                {
+                    //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
+                    _pChessboard->findBoardPos(this->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
+                                               this->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN),
+                                               this->fieldNrToFieldPos(nPiecePos, ROW),
+                                               this->fieldNrToFieldPos(nPiecePos, COLUMN));
+                    this->normalPieceMovingSequence();
+                }
+                //else: jeżeli oryginalne pole tej bierki też jest zajęte, to niech pętla wykona się jeszcze raz, a...
+                //wtedy jej miejsce może być już wolne
+            }
+            //else: jeśli żadna opcja nie wystąpiła, tzn. że na danym polu leży prawidłowa/startowa bierka...
+            //albo bierki nie da się odstawić, bo zajmuje ją aktualnie inna bierka- to sprawdź kolejne pole
+
+            bool bArraysAreEqual = true;
+            for (int i=0; i<8; i++) //sprawdzanie czy udało się doprowadzić bierki na szachownicy...
+            { //...do stanu początkowego/startowego
+                for (int j=0; j<8; j++)
+                {
+                    //jeżeli którakolwiek bierka nie znajduje się na swoim pierwotnym/oryginalnym polu...
+                    if (_pChessboard->anBoard[i][j] != _pChessboard->anStartBoard[i][j])
+                        bArraysAreEqual = false; //...to stan rozmieszczenia bierek na szachownicy nie jest ostateczny/prawidłowy.
+                }
+            }
+
+            bool isChessboardChanged = false;
+            for (int i=0; i<8; i++) //sprawdzanie czy ustawienie bierek zmieniło się od ostatniego...
+            { //...przejścia przez pętlę przestawiającą bierki.
+                for (int j=0; j<8; j++)
+                {
+                    //jeżeli jest różnica od ostatniego razu, to zapamiętaj że tak jest
+                    if (_pChessboard->anBoard[i][j] != _pChessboard->anTempBoard[i][j])
+                        isChessboardChanged = true;
+                    if (isChessboardChanged = true) break;
+                }
+                if (isChessboardChanged = true) break;
+            }
+
+            if (isChessboardChanged) //jeżeli przewertowane planszy w poszukiwaniu bierek do odstawienia...
+            { //...spowodowało przemieszczenie się jakiejś bierki, to zapamiętaj rozmieszczenie bierek...
+                //...na szachownicy do sprawdzania tego warunku w kolejnym przejściu pętli.
+                for (int i=0; i<8; i++)
+                {
+                    for (int j=0; j<8; j++)
+                    {
+                        //zapisz w pamięci aktualny rozkład bierek na szachownicy, by kontrolować...
+                        //...czy nie zapętliłem się z warunkiem w do-while.
+                        _pChessboard->anTempBoard[i][j] = _pChessboard->anBoard[i][j];
+                        //trzeba sprawdzać z każdą pętlą przestawiającą bierki czy stan szachownicy...
+                        //...zmienił się od ostatniego przewertowania całej szachownicy. jeżeli nic...
+                        //...się nie zmienia, to mogło dojść do sytuacji gdzie 2 bierki stoją na polach...
+                        //...podmienionych względem siebie nawzajem. w takiej sytuacji należy jedną...
+                        //...bierkę odłożyć na pole zbitych, drugą odstawić na miejsce i pierwszą...
+                        //...przywrócić na swoje już puste miejsce na szachownicy.
+                    }
+                }
+            }
+            else //w innym wypadku nastąpił (najprawdopodobniej) żadki przypadek, gdzie 2 bierki zajmują...
+                //...wzajemnie pole "tej drugiej bierki" przez co nie da się ich przestawić. należy pierwszą...
+                //...z brzegu odstawić na pole bierek zbitych, kolejną odstawić na miejsce, by tą pierwszą...
+                //...też móc odstawić na swoje pierwotne miejsce startowe.
+            {
+                //złap pierwszą bierkę z brzegu, która nie jest na swojej pozycji i odstaw ją na...
+                //...obszar bierek zbitych.
+
+                //TODO: no i tutaj znowu trzeba użyć rozległych części kodu z tej metody powyżej.
+                //ogarnąć najpierw kod powyżej by był czytelny, sprawdzić potem które części kodu
+                //będą tutaj przydatne, zapakować je jeszcze czytelniej i wtedy tutaj użyć.
+            }
+        }
+    }
+    while (bArraysAreEqual); //wertuj w kółko planszę przestawiając bierki, dopóki...
+    //...szachownica nie wróci do stanu pierwotnego/startowego.
+}
+
+int Chess::fieldNrToFieldPos(int nfieldNr, bool bRow)
+{
+    if (nfieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika
+    {
+        int nfieldNrColumn, nfieldNrRow; //tablica[nfieldNrRow][nfieldNrColumn];
+
+        if (nfieldNr % 8 != 0) //wszystkie prócz liczb (tj. bierek nr) 8, 16, 24 i 32.
+        {
+            nfieldNrColumn = nfieldNr / 8;
+            nfieldNrRow  = (nfieldNr - 1) - (nfieldNrColumn * 8);
+        }
+        else //dla liczb (tj. bierek nr) 8, 16, 24 i 32.
+        {
+            nfieldNrColumn = (nfieldNr / 8) - 1;
+            nfieldNrRow = 7;
+        }
+
+        if (bRow) return nfieldNrRow ;
+        else return nfieldNrColumn;
+    }
+    else
+    {
+        emit this->addTextToDobotConsole("ERROR. Chess::fieldNrToFieldPos: próba dzielenia przez zero");
+        qDebug() << "ERROR. Chess::fieldNrToFieldPos: proba dzielenia przez zero";
+        return 0; //coś trzeba zwrócić
+    }
 }

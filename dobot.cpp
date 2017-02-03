@@ -203,7 +203,8 @@ void Dobot::PTPvalues(float fPtpCmd_xVal, float fPtpCmd_yVal, float fPtpCmd_zVal
     //ptpCmd.velocity = 100; //niech używa wartości które ma aktualnie
 
     //SetQueuedCmdStartExec(); //TODO: co to robi? było w dobocie po patchu. dokumentacja cienka.
-    SetPTPCmd(&ptpCmd, true, NULL); //kolejkowanie zapytań ustawione na true
+
+    //SetPTPCmd(&ptpCmd, true, NULL); //kolejkowanie zapytań ustawione na true
     //TODO: 3ci parametr zmieniać z indexy po których będzie można sprawdzać czy ruch został ...
     //... wykonany i który ruch aktualnie się wykonuje (więcej w intrukcji do dobota)
 }
@@ -225,10 +226,6 @@ void Dobot::pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chM
     float f_yFromTo = _pChessboard->afChessboardPositions_y[nLetter][nDigit];
     float f_zFromTo = _pChessboard->afChessboardPositions_z[nLetter][nDigit];
     float f_rFromTo = ACTUAL_POS;
-    this->PTPvalues(f_xFromTo, f_yFromTo, f_zFromTo + 45, f_rFromTo);
-
-    _pChessboard->PieceActualPos.Letter = nLetter;
-    _pChessboard->PieceActualPos.Digit = nDigit;
 
     if (chMovementType == 'n') emit this->addTextToDobotConsole("normalPieceMoving: ");
     else if (chMovementType == 's') emit this->addTextToDobotConsole("servicePieceMoving: ");
@@ -238,12 +235,17 @@ void Dobot::pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chM
                                           "Dobot::pieceFromTo(): " +
                                           static_cast<QString>(chMovementType) + "\n");
 
-    if (bIsPieceMovingTo)
-        emit this->addTextToDobotConsole("PieceTo: " + _pChessboard->findPieceLetterPos(_pChessboard->PieceTo.Letter)
-                                         +  (_pChessboard->PieceTo.Digit + 1) + "\n");
-    else
-        emit this->addTextToDobotConsole("PieceFrom: " + _pChessboard->findPieceLetterPos(_pChessboard->PieceFrom.Letter)
-                                         +  (_pChessboard->PieceFrom.Digit + 1) + "\n");
+    QString QsMoveType = "Dobot::pieceFromTo: ";
+    bIsPieceMovingTo ? QsMoveType += "PieceTo: " : QsMoveType += "PieceFrom: ";
+    qDebug() << QsMoveType << "nLetter =" << nLetter << ", nDigit =" << nDigit;
+    emit this->addTextToDobotConsole(QsMoveType + "nLetter =" + QString::number(nLetter)
+                                     + ", nDigit =" + QString::number(nDigit) + "\n");
+    QsMoveType.clear();
+
+    this->PTPvalues(f_xFromTo, f_yFromTo, f_zFromTo + 45, f_rFromTo);
+
+    _pChessboard->PieceActualPos.Letter = nLetter;
+    _pChessboard->PieceActualPos.Digit = nDigit;
 }
 
 void Dobot::gripperOpennedState(bool isGripperOpened, char chMovementType) //open/close
@@ -277,6 +279,8 @@ void Dobot::armUpDown(bool isArmGoingUp, char chMovementType)
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     if (chMovementType == 'R') //pozycje przy usuwaniu bierek
     {
+        qDebug() << "Dobot::armUpDown: nRemovingRowPos =" << _pChessboard->nRemovingRowPos
+                 << ", nRemovingColumnPos =" << _pChessboard->nRemovingColumnPos;
         f_xUpDown = _pChessboard->afRemovedPiecesPositions_x
                 [_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
         f_yUpDown = _pChessboard->afRemovedPiecesPositions_y
@@ -287,15 +291,17 @@ void Dobot::armUpDown(bool isArmGoingUp, char chMovementType)
                 [_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
         f_rUpDown = ACTUAL_POS;
     }
-    else
+    else //pozycje na szachownicy
     {
-        f_xUpDown = _pChessboard->afRemovedPiecesPositions_x
+        qDebug() << "Dobot::armUpDown: PieceActualPos.Letter =" << _pChessboard->PieceActualPos.Letter
+                 << ", PieceActualPos.Digit =" << _pChessboard->PieceActualPos.Digit;
+        f_xUpDown = _pChessboard->afChessboardPositions_x
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_yUpDown = _pChessboard->afRemovedPiecesPositions_y
+        f_yUpDown = _pChessboard->afChessboardPositions_y
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        if (isArmGoingUp) f_zUpDown = 45 + _pChessboard->afRemovedPiecesPositions_z
+        if (isArmGoingUp) f_zUpDown = 45 + _pChessboard->afChessboardPositions_z
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        else f_zUpDown = _pChessboard->afRemovedPiecesPositions_z
+        else f_zUpDown = _pChessboard->afChessboardPositions_z
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
         f_rUpDown = ACTUAL_POS;
     }
@@ -313,36 +319,12 @@ void Dobot::armUpDown(bool isArmGoingUp, char chMovementType)
     else emit this->addTextToDobotConsole("ArmDown\n");
 }
 
-void Dobot::removePiece()
+//TODO: chyba to się niczym nie różni od Dobot::pieceFromTo oprócz szachownicy/usuniętych
+void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
 {
-    //qDebug() << "_pChessboard->nTransferredPiece = " << _pChessboard->nTransferredPiece;
-    //ustalanie pozycji dla bierki na polu bierek zbitych
-    if (_pChessboard->nTransferredPiece != 0)  //zabezpieczenie przed przypadkowym podaniem zera do mianownika
-    {
-        if (_pChessboard->nTransferredPiece % 8 != 0) //nie dla liczb (tj. bierek nr) 8, 16, 24 i 32.
-        {
-            _pChessboard->nRemovingRowPos = _pChessboard->nTransferredPiece / 8;
-            _pChessboard->nRemovingColumnPos = _pChessboard->nTransferredPiece - 1 - (_pChessboard->nRemovingRowPos * 8);
-        }
-        else //dla liczb (tj. bierek nr) 8, 16, 24 i 32.
-        {
-            _pChessboard->nRemovingRowPos = (_pChessboard->nTransferredPiece / 8) - 1;
-            _pChessboard->nRemovingColumnPos = 7;
-        }
-        _pChessboard->abRemoved[_pChessboard->nRemovingRowPos]
-                [_pChessboard->nRemovingColumnPos] = true; //pole zbite danej bierki jest zajęte
-    }
-    else
-    {
-        emit this->addTextToDobotConsole("ERROR. Chess::removePieceSequence(): próba dzielenia przez zero");
-        qDebug() << "ERROR. Dobot::removePiece(): proba dzielenia przez zero";
-    }
-
-    qDebug() << "nRemovingRowPos = " << _pChessboard->nRemovingRowPos;
-    qDebug() << "nRemovingColumnPos = " << _pChessboard->nRemovingColumnPos;
-    float f_xRemove = _pChessboard->afRemovedPiecesPositions_x[_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
-    float f_yRemove = _pChessboard->afRemovedPiecesPositions_y[_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
-    float f_zRemove = _pChessboard->afRemovedPiecesPositions_z[_pChessboard->nRemovingRowPos][_pChessboard->nRemovingColumnPos];
+    float f_xRemove = _pChessboard->afRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
+    float f_yRemove = _pChessboard->afRemovedPiecesPositions_y[nPieceRowPos][nPieceColumnPos];
+    float f_zRemove = _pChessboard->afRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];
     float f_rRemove = ACTUAL_POS;
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
                 f_zRemove + 55 << ", r =" << f_rRemove;
