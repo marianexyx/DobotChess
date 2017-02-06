@@ -25,7 +25,7 @@ Chessboard::Chessboard():
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //anTempBoard = anStartBoard
 
     QsPiecieFromTo = "";
-    nTransferredPiece = 0;
+    nGripperPiece = 0;
 
     bTestEnpassant = false;
 
@@ -34,9 +34,9 @@ Chessboard::Chessboard():
     bPromotionConfirmed = false;
 
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
-    float a8_x = 331.0; float a8_y = 74.3; float a8_z = -0.3;
-    float h1_x = 186.5; float h1_y = -80.7; float h1_z = -4.1;
-    float h8_x = 330.3; float h8_y = -77.6; float h8_z = -1.2;
+    float a8_x = 330.7; float a8_y = 73.1; float a8_z = -0.1;
+    float h1_x = 185.4; float h1_y = -81.6; float h1_z = -3.3;
+    float h8_x = 330.1; float h8_y = -79.5; float h8_z = -0.6;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
     for (int digit = 0; digit <= 7; digit++)
@@ -240,25 +240,39 @@ void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
 {
     if (chMoveType == 's' && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
-        nTransferredPiece = anRemoved[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka z obszaru zbitych
+        nGripperPiece = anRemoved[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka z obszaru zbitych
         anRemoved[nPieceLetter][nPieceDigit] = 0; //miejsce ruszanego pionka jest już puste
     }
     else if (chMoveType == 'r' && !bIsMoveFrom) //jeżeli bierka została przemieszczona na obszar bierek zbitych z szachownicy...
     {
         //...to pole tej bierki na obszarze bierek zbitych jest już przez nią zajęte...
-        anRemoved[nPieceLetter][nPieceDigit] =  nTransferredPiece;
-        nTransferredPiece = 0; //...a chwytak nie trzyma już żadnej bierki
+        anRemoved[nPieceLetter][nPieceDigit] =  nGripperPiece;
+        nGripperPiece = 0; //...a chwytak nie trzyma już żadnej bierki
     }
     else if (bIsMoveFrom) //...a jeżeli bierka została pochwycona z szachownicy (jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
     {
-        nTransferredPiece = anBoard[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka pochwycona z szachownicy...
+        nGripperPiece = anBoard[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka pochwycona z szachownicy...
         anBoard[nPieceLetter][nPieceDigit] = 0; //...a miejsce ruszanego pionka jest już puste.
     }
 
     else if (!bIsMoveFrom)//lecz jeżeli bierka została przemieszczona na szachownicę (jest to każde inne polecenie ruchu w stylu 'pieceTo')...
     {
-        anBoard[nPieceLetter][nPieceDigit] = nTransferredPiece; //...to docelowe pole na szachownicy jest już zajęte...
-        nTransferredPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
+        anBoard[nPieceLetter][nPieceDigit] = nGripperPiece; //...to docelowe pole na szachownicy jest już zajęte...
+        nGripperPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
     }
     else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";
 }
+
+bool Chessboard::compareArrays(int nArray1[][8], int nArray2[][8])
+{
+    for (int i=0; i<8; i++)
+    {
+        for (int j=0; j<8; j++)
+        {
+            if (nArray1[i][j] != nArray2[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+

@@ -59,7 +59,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     //wiadomość pójdzie tylko do tego kto ją przysłał
     if (pClient && QsWsMsgToProcess == "keepConnected") pClient->sendTextMessage("connectionOnline"); //podtrzymanie połączenia
     else if (QsWsMsgToProcess == "new" || QsWsMsgToProcess.left(4) == "move" ||
-             QsWsMsgToProcess.left(10) == "promote_to")
+             QsWsMsgToProcess.left(10) == "promote_to" || QsWsMsgToProcess == "reset")
     {
         qDebug() << "Sending to 'chess' class: " << QsWsMsgToProcess;
         QsWebsocketConsoleMsg = "Sending to 'chess' class: " + QsWsMsgToProcess;

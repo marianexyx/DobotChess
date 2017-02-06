@@ -1,11 +1,12 @@
 #include "dobot.h"
 
-#define ACTUAL_POS  1000;
-
 #define ROW 1
 #define COLUMN 0
 
-Dobot::Dobot(Chessboard *pChessboard)
+Dobot::Dobot(Chessboard *pChessboard):
+    m_nMaxPieceHeight(45),
+    m_nMaxRemovedPieceHeight(55),
+    m_nActualPos(1000)
 {
     _pChessboard = pChessboard;
 
@@ -17,9 +18,6 @@ Dobot::Dobot(Chessboard *pChessboard)
     m_gripperServo2.address = 4;
     m_gripperServo2.frequency = 50.f;
     m_gripperServo2.dutyCycle = 7.5f;
-
-    m_nMaxPieceHeight = 45;
-    m_nMaxRemovedPieceHeight = 55;
 
     //potrzebny jest poniższy timer dla dobota, bo tylko w nim obracane są jego komendy.
     QTimer *periodicTaskTimer = new QTimer(this); //stworzenie zegarka liczącego czas. zegar liczy
@@ -231,20 +229,20 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     //jeżeli bierka jest usuwania na pola zbite(pieceTo) albo przywracania z pól zbitych(pieceFrom)
     if ((chMoveType == 'r' && !bIsPieceMovingFrom) || (chMoveType == 's' && bIsPieceMovingFrom))
     {
-        int nRemPiece = _pChessboard->nTransferredPiece; //bierka z planszy w chwytaku do usunięcia
+        int nRemPiece = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
         int nRemPieceDestLetter = _pChessboard->fieldNrToFieldPos(nRemPiece, ROW);
         int nRemPieceDestDigit = _pChessboard->fieldNrToFieldPos(nRemPiece, COLUMN);
         f_xFromTo = _pChessboard->afRemovedPiecesPositions_x[nRemPieceDestLetter][nRemPieceDestDigit];
         f_yFromTo = _pChessboard->afRemovedPiecesPositions_y[nRemPieceDestLetter][nRemPieceDestDigit];
         f_zFromTo = _pChessboard->afRemovedPiecesPositions_z[nRemPieceDestLetter][nRemPieceDestDigit];
-        f_rFromTo = ACTUAL_POS;
+        f_rFromTo = m_nActualPos;
     }
     else //reszta ruchów: normalne ruchy from/to, łapanie bierki do zbijania, i puszczanie bierki przywróconej.
     {
         f_xFromTo = _pChessboard->afChessboardPositions_x[nLetter][nDigit];
         f_yFromTo = _pChessboard->afChessboardPositions_y[nLetter][nDigit];
         f_zFromTo = _pChessboard->afChessboardPositions_z[nLetter][nDigit];
-        f_rFromTo = ACTUAL_POS;
+        f_rFromTo = m_nActualPos;
     }
 
     //TODO: reszta warunków. i zrobić z tego switch()
@@ -308,21 +306,21 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
     if ((chMoveType == 'r' && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszarze bierek zbitych...
             || (chMoveType == 's' && bIsArmAboveFromSquare)) //...lub pochwycamy bierkę z obszaru bierek zbitych.
     {
-        qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, ROW)
-                 << _pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, COLUMN) << ", isArmGoingUp?:" << isArmGoingUp;
+        qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)
+                 << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN) << ", isArmGoingUp?:" << isArmGoingUp;
         f_xUpDown = _pChessboard->afRemovedPiecesPositions_x    //TODO: ten zapisa działa, ale zmienić jakoś...
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, ROW)] //...nazewnictwo funkcji, bo jest ...
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, COLUMN)]; //...nieadekwatna w tym przypadku.
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)] //...nazewnictwo funkcji, bo jest ...
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)]; //...nieadekwatna w tym przypadku.
         f_yUpDown = _pChessboard->afRemovedPiecesPositions_y
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, ROW)]
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, COLUMN)];
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
         if (isArmGoingUp) f_zUpDown = m_nMaxRemovedPieceHeight + _pChessboard->afRemovedPiecesPositions_z
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, ROW)]
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, COLUMN)];
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
         else f_zUpDown = _pChessboard->afRemovedPiecesPositions_z
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, ROW)]
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nTransferredPiece, COLUMN)];
-        f_rUpDown = ACTUAL_POS;
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
+                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
+        f_rUpDown = m_nActualPos;
     }
     else //pozycje na szachownicy
     {
@@ -336,7 +334,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
         else f_zUpDown = _pChessboard->afChessboardPositions_z
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_rUpDown = ACTUAL_POS;
+        f_rUpDown = m_nActualPos;
     }
     this->PTPvalues(f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
 
@@ -359,7 +357,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
     float f_xRemove = _pChessboard->afRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
     float f_yRemove = _pChessboard->afRemovedPiecesPositions_y[nPieceRowPos][nPieceColumnPos];
     float f_zRemove = _pChessboard->afRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];
-    float f_rRemove = ACTUAL_POS;
+    float f_rRemove = m_nActualPos;
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
                 f_zRemove + m_nMaxRemovedPieceHeight << ", r =" << f_rRemove;
     this->PTPvalues(f_xRemove, f_yRemove, f_zRemove + m_nMaxRemovedPieceHeight, f_rRemove); //z_max = 40 dla x = 275, a najwyższe z na styku z podłogą to z = -16.5

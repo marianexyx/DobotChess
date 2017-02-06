@@ -33,13 +33,14 @@ public:
     void actualPos(int nLetter, int nDigit);
     void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
                            int nPieceDigit, char chMoveType);
+    bool compareArrays(int nArray1[][8], int nArray2[][8]);
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
     ArmPosition PieceFrom, PieceTo, PieceActualPos;
 
     QString QsPiecieFromTo;             // f.e. "e2e4"
-    int nTransferredPiece;              // nr bierki znajdującej się aktualnie w chwytaku
+    int nGripperPiece;              // nr bierki znajdującej się aktualnie w chwytaku
 
     bool bTestEnpassant;                //czy wewnętrzny powierzchowny test na enpassant się powiódł
 
@@ -49,7 +50,7 @@ public:
     bool bPromotionConfirmed;           //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
     //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
 
-    const int anStartBoard[8][8];       //do sprawdzania przy odkładaniu bierek na miejsce czy ...
+    /*const*/ int anStartBoard[8][8];       //do sprawdzania przy odkładaniu bierek na miejsce czy ...
                                         //...szachownica osiągła swoje startowe ułożenie bierek.
     int anBoard[8][8];                  //plansza jako tablica. liczby to zajęte pola.
                                         //każda liczba to inna bierka.

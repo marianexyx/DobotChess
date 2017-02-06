@@ -22,9 +22,10 @@ private:
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM m_gripperServo1;
     IOPWM m_gripperServo2;
-    int m_nMaxPieceHeight; //na jakiej wysokości ma latać ramię by nie przewracać bierek
-    int m_nMaxRemovedPieceHeight; //na jaką dodatkową wysokość może się podnieść...
+    const int m_nMaxPieceHeight; //na jakiej wysokości ma latać ramię by nie przewracać bierek
+    const int m_nMaxRemovedPieceHeight; //na jaką dodatkową wysokość może się podnieść...
     //...ramię nad bierkami zbitymi
+    const int m_nActualPos; //działa jak warunek do sprawdzania czy pozycja ma się zmienić
 
 public:
     Dobot(Chessboard *pChessboard);
