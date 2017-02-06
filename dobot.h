@@ -22,6 +22,9 @@ private:
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM m_gripperServo1;
     IOPWM m_gripperServo2;
+    int m_nMaxPieceHeight; //na jakiej wysokości ma latać ramię by nie przewracać bierek
+    int m_nMaxRemovedPieceHeight; //na jaką dodatkową wysokość może się podnieść...
+    //...ramię nad bierkami zbitymi
 
 public:
     Dobot(Chessboard *pChessboard);
@@ -34,9 +37,9 @@ public:
     void PTPvalues(float fPtpCmd_xVal, float fPtpCmd_yVal, float fPtpCmd_zVal, float fPtpCmd_rVal);
     void gripperAngle(float fDutyCycle1, float fDutyCycle2);
 
-    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMovementType);
+    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMoveType);
     void gripperOpennedState(bool gripperOpened, char chMovementType);
-    void armUpDown(bool isArmGoingUp, char chMovementType);
+    void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMovementType);
     void removePiece(int nPieceRowPos, int nPieceColumnPos);
 
 public slots:

@@ -1,7 +1,8 @@
 #include "chessboard.h"
 
 Chessboard::Chessboard():
-    anStartBoard{{1, 9, 0, 0, 0, 0, 17, 25} ,
+    anStartBoard{
+{1, 9, 0, 0, 0, 0, 17, 25} ,
 {2, 10, 0, 0, 0, 0, 18, 26} ,
 {3, 11, 0, 0, 0, 0, 19, 27} ,
 {4, 12, 0, 0, 0, 0, 20, 28} ,
@@ -10,7 +11,8 @@ Chessboard::Chessboard():
 {7, 15, 0, 0, 0, 0, 23, 31} ,
 {8, 16, 0, 0, 0, 0, 24, 32}},
 
-    abRemoved{{0, 0, 0, 0} ,
+    anRemoved{
+{0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
@@ -30,15 +32,6 @@ Chessboard::Chessboard():
     bTestPromotion = false;
     QsFuturePromote = "";
     bPromotionConfirmed = false;
-
-    /*anStartBoard = {{1, 9, 0, 0, 0, 0, 17, 25} ,
-                    {2, 10, 0, 0, 0, 0, 18, 26} ,
-                    {3, 11, 0, 0, 0, 0, 19, 27} ,
-                    {4, 12, 0, 0, 0, 0, 20, 28} ,
-                    {5, 13, 0, 0, 0, 0, 21, 29} ,
-                    {6, 14, 0, 0, 0, 0, 22, 30} ,
-                    {7, 15, 0, 0, 0, 0, 23, 31} ,
-                    {8, 16, 0, 0, 0, 0, 24, 32}};*/
 
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
     float a8_x = 331.0; float a8_y = 74.3; float a8_z = -0.3;
@@ -87,7 +80,7 @@ Chessboard::Chessboard():
         for (int row = 0; row <= 7; row++)
         {
             afRemovedPiecesPositions_x[row][column] = 100 + row*25;
-            afRemovedPiecesPositions_y[row][column] = 140 + column*30;
+            afRemovedPiecesPositions_y[row][column] = 170 - column*30;
             afRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
         }
     }
@@ -117,7 +110,7 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
 }
 
 void Chessboard::findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit)
-{ //TODO: zrobić z tego strukture
+{ //TODO: zrobić z tego strukture?
     QsPiecieFromTo = this->findPieceLetterPos(nFromLetter) + nFromDiggit +
             this->findPieceLetterPos(nToLetter) + nToDiggit;
     qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
@@ -128,7 +121,6 @@ void Chessboard::findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, i
     PieceTo.Letter = nToLetter;
     PieceTo.Digit = nToDiggit;
 }
-
 
 void Chessboard::actualPos(int nLetter, int nDigit)
 {
@@ -174,6 +166,35 @@ QString Chessboard::findPieceLetterPos(int nLetter)
     return QsLetter;
 }
 
+int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać też dla bierek...
+{ //...zbitych jako PieceToRemoveToRemovedPiecePos
+    if (nfieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika
+    {
+        int nfieldNrColumn, nfieldNrRow; //tablica[nfieldNrRow][nfieldNrColumn];
+
+        if (nfieldNr % 8 != 0) //wszystkie prócz liczb (tj. bierek nr) 8, 16, 24 i 32.
+        {
+            nfieldNrColumn = nfieldNr / 8;
+            nfieldNrRow  = (nfieldNr - 1) - (nfieldNrColumn * 8);
+        }
+        else //dla liczb (tj. bierek nr) 8, 16, 24 i 32.
+        {
+            nfieldNrColumn = (nfieldNr / 8) - 1;
+            nfieldNrRow = 7;
+        }
+
+        if (bRow) return nfieldNrRow ;
+        else return nfieldNrColumn;
+    }
+    else
+    {
+        emit this->addTextToDobotConsole("ERROR. Chess::fieldNrToFieldPos: próba dzielenia przez zero \n");
+        qDebug() << "ERROR. Chess::fieldNrToFieldPos: proba dzielenia przez zero";
+        return 0; //coś trzeba zwrócić
+    }
+}
+
+
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 {
     if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0) // sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
@@ -212,4 +233,32 @@ void Chessboard::castlingFindRookToMove() //ustawiane skąd-dokąd przenoszona b
         PieceFrom.Letter = 7;
         PieceTo.Letter = 5;
     }
+}
+
+void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
+                                    int nPieceDigit, char chMoveType)
+{
+    if (chMoveType == 's' && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
+    {
+        nTransferredPiece = anRemoved[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka z obszaru zbitych
+        anRemoved[nPieceLetter][nPieceDigit] = 0; //miejsce ruszanego pionka jest już puste
+    }
+    else if (chMoveType == 'r' && !bIsMoveFrom) //jeżeli bierka została przemieszczona na obszar bierek zbitych z szachownicy...
+    {
+        //...to pole tej bierki na obszarze bierek zbitych jest już przez nią zajęte...
+        anRemoved[nPieceLetter][nPieceDigit] =  nTransferredPiece;
+        nTransferredPiece = 0; //...a chwytak nie trzyma już żadnej bierki
+    }
+    else if (bIsMoveFrom) //...a jeżeli bierka została pochwycona z szachownicy (jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
+    {
+        nTransferredPiece = anBoard[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka pochwycona z szachownicy...
+        anBoard[nPieceLetter][nPieceDigit] = 0; //...a miejsce ruszanego pionka jest już puste.
+    }
+
+    else if (!bIsMoveFrom)//lecz jeżeli bierka została przemieszczona na szachownicę (jest to każde inne polecenie ruchu w stylu 'pieceTo')...
+    {
+        anBoard[nPieceLetter][nPieceDigit] = nTransferredPiece; //...to docelowe pole na szachownicy jest już zajęte...
+        nTransferredPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
+    }
+    else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";
 }

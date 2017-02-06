@@ -23,8 +23,9 @@ private:
 
     bool _bServiceTests;
 
-    void normalPieceMovingSequence();
-    void removePieceSequence();
+    void pieceMovingSequence(char chMoveType,
+                             int nPieceFromLetter = -1, int nPieceFromDigit = -1,
+                              int nPieceToLetter = -1, int nPieceToDigit = -1);
     void castlingMovingSequence();
     void enpassantMovingSequence();
     bool testEnpassant();
@@ -40,8 +41,6 @@ private:
     void GameInProgress();
     void EndOfGame(QString QStrMsgFromChenardTcp);
     void BadMove(QString QsMsgFromChenardTcp);
-    int fieldNrToFieldPos(int nfieldNr, bool bRow);
-    void restorePieceSequence(int nPieceToRestore);
     void resetPiecePositions();
 
 public:

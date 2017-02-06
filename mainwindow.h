@@ -4,32 +4,17 @@
 #pragma once
 
 #include <QMainWindow>
-/*#include <QSerialPort>
-#include <QSerialPortInfo>*/
-/*#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QByteArray>*/
 #include <QMessageBox>
 #include <QDebug>
 #include <QSignalMapper>
-/*#include <QTimer>*/
 #include <QScrollBar>
 #include <QTcpSocket>
 #include <QAbstractSocket>
-/*#include "QtWebSockets/QWebSocketServer"
-#include "QtWebSockets/QWebSocket"*/
 #include "DobotDll.h"
 #include "DobotType.h"
-//#include "workerThread.h"
-//#include "chessboard.h"
-//#include "tcpmsgs.h"
 #include "websockets.h"
-//#include "webtable.h"
 #include "dobot.h"
 #include "chess.h"
-
-/*QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
-QT_FORWARD_DECLARE_CLASS(QWebSocket)*/
 
 namespace Ui
 {

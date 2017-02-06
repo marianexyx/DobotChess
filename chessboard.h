@@ -26,10 +26,13 @@ public:
     void findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit);
     int findPieceLetterPos(QString QsLetter);
     QString findPieceLetterPos(int nLetter);
+    int fieldNrToFieldPos(int nfieldNr, bool bRow);
     bool removeStatements();
     bool castlingStatements();
     void castlingFindRookToMove();
     void actualPos(int nLetter, int nDigit);
+    void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
+                           int nPieceDigit, char chMoveType);
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
@@ -46,17 +49,13 @@ public:
     bool bPromotionConfirmed;           //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
     //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
 
-    //TODO: wrzucić inicjalizacje tablic do pliku *.cpp
     const int anStartBoard[8][8];       //do sprawdzania przy odkładaniu bierek na miejsce czy ...
                                         //...szachownica osiągła swoje startowe ułożenie bierek.
     int anBoard[8][8];                  //plansza jako tablica. liczby to zajęte pola.
                                         //każda liczba to inna bierka.
     int anTempBoard[8][8];              //pomocnicza tablica do sprawdzania czy udało się przywrócić...
                                         //...bierki na szachownicy do oryginalnego/pierwotnego stanu.
-    bool abRemoved[8][4];               //tablica usuniętych
-
-    int nRemovingRowPos;
-    int nRemovingColumnPos;
+    int anRemoved[8][4];               //tablica usuniętych
 
     float afChessboardPositions_x[8][8];
     float afChessboardPositions_y[8][8];

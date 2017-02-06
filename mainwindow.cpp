@@ -367,10 +367,10 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobotArm->armUpDown(true, 's');
+    _pDobotArm->armUpDown(true, true, 'v');
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobotArm->armUpDown(false, 's');
+    _pDobotArm->armUpDown(false, true, 'v');
 }
