@@ -360,6 +360,7 @@ void MainWindow::on_gripperBtn_clicked()
 
 void MainWindow::on_homeBtn_clicked()
 {
+    _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n");
     HOMECmd HOMEChess;
     HOMEChess.reserved = 1; //? co(ś) ten indeks daje?
     SetHOMECmd(&HOMEChess, true, NULL);

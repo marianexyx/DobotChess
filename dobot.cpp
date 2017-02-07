@@ -229,9 +229,21 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     //jeżeli bierka jest usuwania na pola zbite(pieceTo) albo przywracania z pól zbitych(pieceFrom)
     if ((chMoveType == 'r' && !bIsPieceMovingFrom) || (chMoveType == 's' && bIsPieceMovingFrom))
     {
-        int nRemPiece = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
-        int nRemPieceDestLetter = _pChessboard->fieldNrToFieldPos(nRemPiece, ROW);
-        int nRemPieceDestDigit = _pChessboard->fieldNrToFieldPos(nRemPiece, COLUMN);
+        int nRemPiece, nRemPieceDestLetter, nRemPieceDestDigit;
+        if (chMoveType == 'r') //jako że usuwanie na obszar zbity jest drugim ruchem, to...
+            //...pozycję docelową bierki możemy wywnioskować z bierki trzymanej przez chwytak
+        {
+            nRemPiece = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
+            nRemPieceDestLetter = _pChessboard->fieldNrToFieldPos(nRemPiece, ROW);
+            nRemPieceDestDigit = _pChessboard->fieldNrToFieldPos(nRemPiece, COLUMN);
+        }
+        else if (chMoveType == 's') //dla restore() pozycja pola na obszarze usuniętych musi...
+            //...być podana wprost do pieceFromTo()
+        {
+            //dla 's' wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
+            nRemPieceDestLetter = nLetter;
+            nRemPieceDestDigit = nDigit;
+        }
         f_xFromTo = _pChessboard->afRemovedPiecesPositions_x[nRemPieceDestLetter][nRemPieceDestDigit];
         f_yFromTo = _pChessboard->afRemovedPiecesPositions_y[nRemPieceDestLetter][nRemPieceDestDigit];
         f_zFromTo = _pChessboard->afRemovedPiecesPositions_z[nRemPieceDestLetter][nRemPieceDestDigit];
@@ -300,11 +312,10 @@ void Dobot::gripperOpennedState(bool isGripperOpened, char chMovementType) //ope
 }
 
 void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMoveType)
-{
+{ //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     //pozycje obszaru bierek usuniętych
-    if ((chMoveType == 'r' && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszarze bierek zbitych...
-            || (chMoveType == 's' && bIsArmAboveFromSquare)) //...lub pochwycamy bierkę z obszaru bierek zbitych.
+    if (chMoveType == 'r' && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszarze bierek zbitych...
     {
         qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)
                  << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN) << ", isArmGoingUp?:" << isArmGoingUp;
@@ -320,6 +331,20 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
         else f_zUpDown = _pChessboard->afRemovedPiecesPositions_z
                 [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
                 [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
+        f_rUpDown = m_nActualPos;
+    }
+    else if (chMoveType == 's' && bIsArmAboveFromSquare) //...lub pochwycamy bierkę z obszaru bierek zbitych.
+    {
+        qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->PieceActualPos.Letter
+                 << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << isArmGoingUp;
+        f_xUpDown = _pChessboard->afRemovedPiecesPositions_x
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        f_yUpDown = _pChessboard->afRemovedPiecesPositions_y
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        if (isArmGoingUp) f_zUpDown = m_nMaxPieceHeight + _pChessboard->afRemovedPiecesPositions_z
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+        else f_zUpDown = _pChessboard->afRemovedPiecesPositions_z
+                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
         f_rUpDown = m_nActualPos;
     }
     else //pozycje na szachownicy

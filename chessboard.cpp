@@ -1,5 +1,8 @@
 #include "chessboard.h"
 
+#define ROW 1
+#define COLUMN 0
+
 Chessboard::Chessboard():
     anStartBoard{
 {1, 9, 0, 0, 0, 0, 17, 25} ,
@@ -167,7 +170,7 @@ QString Chessboard::findPieceLetterPos(int nLetter)
 }
 
 int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać też dla bierek...
-{ //...zbitych jako PieceToRemoveToRemovedPiecePos
+{ //...zbitych jako PieceToRemoveToRemovedPiecePos (0-32)
     if (nfieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika
     {
         int nfieldNrColumn, nfieldNrRow; //tablica[nfieldNrRow][nfieldNrColumn];
@@ -240,13 +243,20 @@ void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
 {
     if (chMoveType == 's' && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
-        nGripperPiece = anRemoved[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka z obszaru zbitych
-        anRemoved[nPieceLetter][nPieceDigit] = 0; //miejsce ruszanego pionka jest już puste
+        int nRemPieceDestLetter = this->fieldNrToFieldPos(nGripperPiece, ROW);
+        int nRemPieceDestDigit = this->fieldNrToFieldPos(nGripperPiece, COLUMN);
+
+        nGripperPiece = anRemoved[nRemPieceDestLetter][nRemPieceDestDigit]; //...to w chwytaku jest bierka z obszaru zbitych
+        anRemoved[nRemPieceDestLetter][nRemPieceDestDigit] = 0; //miejsce ruszanego pionka jest już puste
     }
     else if (chMoveType == 'r' && !bIsMoveFrom) //jeżeli bierka została przemieszczona na obszar bierek zbitych z szachownicy...
     {
+        int nRemPieceDestLetter = this->fieldNrToFieldPos(nGripperPiece, ROW);
+        int nRemPieceDestDigit = this->fieldNrToFieldPos(nGripperPiece, COLUMN);
+
         //...to pole tej bierki na obszarze bierek zbitych jest już przez nią zajęte...
-        anRemoved[nPieceLetter][nPieceDigit] =  nGripperPiece;
+        anRemoved[nRemPieceDestLetter][nRemPieceDestDigit] =  nGripperPiece;
+        qDebug() << "Piece (>0) just placed on removed area =" << anRemoved[nRemPieceDestLetter][nRemPieceDestDigit];
         nGripperPiece = 0; //...a chwytak nie trzyma już żadnej bierki
     }
     else if (bIsMoveFrom) //...a jeżeli bierka została pochwycona z szachownicy (jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
