@@ -243,14 +243,16 @@ void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
 {
     if (chMoveType == 's' && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
-        int nRemPieceDestLetter = this->fieldNrToFieldPos(nGripperPiece, ROW);
-        int nRemPieceDestDigit = this->fieldNrToFieldPos(nGripperPiece, COLUMN);
-
-        nGripperPiece = anRemoved[nRemPieceDestLetter][nRemPieceDestDigit]; //...to w chwytaku jest bierka z obszaru zbitych
-        anRemoved[nRemPieceDestLetter][nRemPieceDestDigit] = 0; //miejsce ruszanego pionka jest już puste
+        nGripperPiece = anRemoved[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka z obszaru zbitych
+        anRemoved[nPieceLetter][nPieceDigit] = 0; //miejsce ruszanego pionka jest już puste
+        qDebug() << "Chessboard::pieceStateChanged: restore: removed field value shall now be 0. anRemoved[nPieceLetter][nPieceDigit] = "
+                 << anRemoved[nPieceLetter][nPieceDigit];
     }
     else if (chMoveType == 'r' && !bIsMoveFrom) //jeżeli bierka została przemieszczona na obszar bierek zbitych z szachownicy...
     {
+        //nPieceLetter i nPieceDigit nie moga być podawane jako parametry pozycji bierki na...
+        //...obszarze zbitych, bo są to pozycje na szachownicy. docelowe pozycje na obszarze...
+        //...zbitych trzeba wyznaczyć na podstawie bierki trzymanej w chwytaku
         int nRemPieceDestLetter = this->fieldNrToFieldPos(nGripperPiece, ROW);
         int nRemPieceDestDigit = this->fieldNrToFieldPos(nGripperPiece, COLUMN);
 
