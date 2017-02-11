@@ -26,7 +26,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     connect(ui->sendBtn, SIGNAL(clicked(bool)), this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
-    //dzięki tym connectom (jeśli działają) można wywołać funkcję typu "ui" z innej klasy
+    //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString)));
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
@@ -38,13 +38,15 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     connect(_pDobotArm, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));
     connect(_pTCPmsg, SIGNAL(addTextToTcpConsole(QString)),
-            this, SLOT(writeInTcpConsole(QString))); //ERROR: segmentation fault
+            this, SLOT(writeInTcpConsole(QString)));
     connect(_pChess, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString)));
     connect(_pWebSockets, SIGNAL(addTextToWebsocketConsole(QString)),
             this, SLOT(writeInWebsocketConsole(QString)));
     connect(_pChessboard, SIGNAL(addTextToDobotConsole(QString)),
-            this, SLOT(writeInDobotConsole(QString))); //ERROR: segmentation fault
+            this, SLOT(writeInDobotConsole(QString)));
+    connect(_pDobotArm, SIGNAL(QueueLabels(int,int,int,int)),
+            this, SLOT(setQueueLabels(int,int,int,int)));
 
     //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
@@ -105,6 +107,15 @@ void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
      else if (chAxis == 'y') ui->yLabel->setText(QSAxisLabelText);
      else if (chAxis == 'z') ui->zLabel->setText(QSAxisLabelText);
      else if (chAxis == 'r') ui->rLabel->setText(QSAxisLabelText);
+}
+
+void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft)
+{
+    if (nSpace == 0) nSpace = 1; //to tylko dla zblokowania wyskakującego warninga o unused parameter
+    //ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
+    ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
+    ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
+    ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
 }
 
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
@@ -185,7 +196,7 @@ void MainWindow::onPTPsendBtnClicked()
     int nPtpCmd_y = ui->yPTPEdit->text().toFloat();
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
-    if (nPtpCmd_x != 0) _pDobotArm->PTPvalues(nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+    if (nPtpCmd_x != 0) _pDobotArm->addCmdToList(-1, false, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
     float fServoDutyCycle1 = ui->servo1GripperEdit->text().toFloat();
     float fServoDutyCycle2 = ui->servo2GripperEdit->text().toFloat();
@@ -328,7 +339,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             float fService_x = _pChessboard->afChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
             float fService_y = _pChessboard->afChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
             qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y;
-            _pDobotArm->PTPvalues(fService_x, fService_y, 1000, 1000); //1000 = actual_val
+            _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, ACTUAL_POS, ACTUAL_POS);
             _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
             _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
             if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);

@@ -28,20 +28,9 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPieceFromDigit,
                                 int nPieceToLetter, int nPieceToDigit)
 {
-    QString QsSequenceType;
-    switch (chMoveType)
-    {
-    case 'n': QsSequenceType = "normal"; break; //ruch z szachownicy na szachownicę (zwykły)
-    case 'c': QsSequenceType = "castling(king)"; break; //ruch z szachownicy na szachownicę (roszada królem)
-    case 'o': QsSequenceType = "castling(rook)"; break; //ruch z szachownicy na szachownicę (roszada wieżą)
-    case 'e': QsSequenceType = "enpassant"; break; //ruch z szachownicy na szachownicę (enpassant)
-    case 'p': QsSequenceType = "promotion"; break; //ruch z szachownicy na szachownicę (promocja)
-    case 'r': QsSequenceType = "remove"; break; //ruch z szachownicy na obszar zbitych bierek
-    case 's': QsSequenceType = "restore"; break; //ruch z obszaru zbitych bierek na szachownicę
-    default: QsSequenceType = "ERROR: Chess::pieceMovingSequence: unknown chMoveType"; break;
-    }
-    qDebug() << "Start" << QsSequenceType << "move sequence.";
+    _pDobot->writeMoveTypeInConsole(chMoveType);
 
+    //jeżeli nie podano skąd i/lub dokąd, to jest to ruch z aktualnego pola szachownicy nad którym wisi ramie
     if (nPieceFromLetter == -1) nPieceFromLetter = _pChessboard->PieceFrom.Letter;
     if (nPieceFromDigit == -1) nPieceFromDigit = _pChessboard->PieceFrom.Digit;
     if (nPieceToLetter == -1) nPieceToLetter = _pChessboard->PieceTo.Letter;
@@ -53,16 +42,21 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
         nPieceFromDigit = nPieceToDigit; //...która w każdym innym ruchu jest jako "to"
     }
 
+    qDebug() << "-Start move sequence-";
+    emit this->addTextToDobotConsole("-End of move sequence-\n");
+
     _pDobot->gripperOpennedState(OPEN, chMoveType);
     _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, chMoveType);
     _pDobot->armUpDown(DOWN, FROM, chMoveType);
     _pDobot->gripperOpennedState(CLOSE, chMoveType);
+    _pDobot->wait(300);
     _pDobot->armUpDown(UP, FROM, chMoveType);
     _pChessboard->pieceStateChanged(FROM, nPieceFromLetter, nPieceFromDigit, chMoveType);
 
     _pDobot->pieceFromTo(TO, nPieceToLetter, nPieceToDigit, chMoveType);
     _pDobot->armUpDown(DOWN, TO, chMoveType);
     _pDobot->gripperOpennedState(OPEN, chMoveType);
+    _pDobot->wait(300);
     _pDobot->armUpDown(UP, TO, chMoveType);
     _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, chMoveType);
 
