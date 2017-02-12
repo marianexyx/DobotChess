@@ -55,6 +55,7 @@ private:
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
     ArmPosCrntCmdQIdx m_posIdx; //dane ramienia przypisane do danego indexu dobota  
     QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka zapytań do dobota
+    ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId;
 
 public:
     Dobot(Chessboard *pChessboard);
@@ -99,7 +100,7 @@ signals:
     void RefreshDobotButtonsStates(bool bDobotButtonsStates);
     void deviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
     void DobotErrorMsgBox();
-    void QueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft);
+    void QueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
 
 };
 

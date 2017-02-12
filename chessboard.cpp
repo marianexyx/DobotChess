@@ -55,8 +55,9 @@ Chessboard::Chessboard():
             afChessboardPositions_z[letter][digit] = a1_z +
                     digit*(((a8_z-a1_z)/7)+((letter/14)*(((a1_z-h1_z)/7)-((a8_z-h8_z)/7))))-
                     letter*(((a1_z-h1_z)/7)-((digit/14)*(((h8_z-h1_z)/7)-((a8_z-a1_z)/7))));
-            /*qDebug() << "position " << litery << cyfry << " = " << afChessboardPositions_x[cyfry][litery]
-                        << afChessboardPositions_y[cyfry][litery];*/
+            /*qDebug() << "position " << litery << cyfry << " = "
+             << afChessboardPositions_x[cyfry][litery]
+             << afChessboardPositions_y[cyfry][litery];*/
         }
     }
 
@@ -143,7 +144,8 @@ int Chessboard::findPieceLetterPos(QString QsLetter)
     else if (QsLetter == "f" || QsLetter == "F") {nLetter = 5;}
     else if (QsLetter == "g" || QsLetter == "G") {nLetter = 6;}
     else if (QsLetter == "h" || QsLetter == "H") {nLetter = 7;}
-    else qDebug() << "ERROR: Chessboard::findPieceLetterPos(QString QsLetter): Unknown QsLetter value.";
+    else qDebug() << "ERROR: Chessboard::findPieceLetterPos(QString QsLetter): "
+                     "Unknown QsLetter value.";
 
     return nLetter;
 }
@@ -163,7 +165,9 @@ QString Chessboard::findPieceLetterPos(int nLetter)
     case 5: QsLetter = "f"; break;
     case 6: QsLetter = "g"; break;
     case 7: QsLetter = "h"; break;
-    default: qDebug() << "ERROR: Chessboard::findPieceLetterPos(int nLetter): Unknown nLetter value."; break;
+    default:
+        qDebug() << "ERROR: Chessboard::findPieceLetterPos(int nLetter): Unknown nLetter value.";
+        break;
     }
 
     return QsLetter;
@@ -191,7 +195,8 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
     }
     else
     {
-        emit this->addTextToDobotConsole("ERROR. Chess::fieldNrToFieldPos: próba dzielenia przez zero \n");
+        emit this->addTextToDobotConsole("ERROR. Chess::fieldNrToFieldPos: "
+                                         "próba dzielenia przez zero \n");
         qDebug() << "ERROR. Chess::fieldNrToFieldPos: proba dzielenia przez zero";
         return 0; //coś trzeba zwrócić
     }
@@ -200,7 +205,8 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
 
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 {
-    if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0) // sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
+    if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0)
+        //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
         //TODO: nieprawdziwe dla enpassant!
     {
         //QsPieceToReject = QsPieceTo; //zbijana jest bierka z tego pola na które chcemy iść
@@ -212,7 +218,8 @@ bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 
 bool Chessboard::castlingStatements() // sprawdzanie czy dany ruch jest prośbą o roszadę
 {
-    if (PieceFrom.Letter == 4 && (PieceFrom.Digit == 0 || PieceFrom.Digit == 7) //jeżeli ruszana jest bierka z pozycji króla
+    if (PieceFrom.Letter == 4 && (PieceFrom.Digit == 0 || PieceFrom.Digit == 7)
+            //jeżeli ruszana jest bierka z pozycji króla
             && (PieceTo.Letter == 2 || PieceTo.Letter == 6) // o 2 pola w lewo lub prawo
             && (PieceTo.Digit == 0 || PieceTo.Digit == 7) //na tej samej linii
             && (anBoard[PieceFrom.Letter][PieceFrom.Digit] == 5 //i jest to na pewno król (biały)
@@ -243,12 +250,15 @@ void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
 {
     if (chMoveType == 's' && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
-        nGripperPiece = anRemoved[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka z obszaru zbitych
+        nGripperPiece = anRemoved[nPieceLetter][nPieceDigit];
+        //...to w chwytaku jest bierka z obszaru zbitych
         anRemoved[nPieceLetter][nPieceDigit] = 0; //miejsce ruszanego pionka jest już puste
-        qDebug() << "Chessboard::pieceStateChanged: restore: removed field value shall now be 0. anRemoved[nPieceLetter][nPieceDigit] = "
+        qDebug() << "Chessboard::pieceStateChanged: restore: removed field value shall now be 0. "
+                    "anRemoved[nPieceLetter][nPieceDigit] = "
                  << anRemoved[nPieceLetter][nPieceDigit];
     }
-    else if (chMoveType == 'r' && !bIsMoveFrom) //jeżeli bierka została przemieszczona na obszar bierek zbitych z szachownicy...
+    else if (chMoveType == 'r' && !bIsMoveFrom) //jeżeli bierka została przemieszczona na...
+        //...obszar bierek zbitych z szachownicy...
     {
         //nPieceLetter i nPieceDigit nie moga być podawane jako parametry pozycji bierki na...
         //...obszarze zbitych, bo są to pozycje na szachownicy. docelowe pozycje na obszarze...
@@ -258,18 +268,23 @@ void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
 
         //...to pole tej bierki na obszarze bierek zbitych jest już przez nią zajęte...
         anRemoved[nRemPieceDestLetter][nRemPieceDestDigit] =  nGripperPiece;
-        qDebug() << "Piece (>0) just placed on removed area =" << anRemoved[nRemPieceDestLetter][nRemPieceDestDigit];
+        qDebug() << "Piece (>0) just placed on removed area ="
+                 << anRemoved[nRemPieceDestLetter][nRemPieceDestDigit];
         nGripperPiece = 0; //...a chwytak nie trzyma już żadnej bierki
     }
-    else if (bIsMoveFrom) //...a jeżeli bierka została pochwycona z szachownicy (jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
+    else if (bIsMoveFrom) //...a jeżeli bierka została pochwycona z szachownicy...
+        //...(jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
     {
-        nGripperPiece = anBoard[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka pochwycona z szachownicy...
+        nGripperPiece = anBoard[nPieceLetter][nPieceDigit]; //...to w chwytaku jest bierka...
+        //...pochwycona z szachownicy...
         anBoard[nPieceLetter][nPieceDigit] = 0; //...a miejsce ruszanego pionka jest już puste.
     }
 
-    else if (!bIsMoveFrom)//lecz jeżeli bierka została przemieszczona na szachownicę (jest to każde inne polecenie ruchu w stylu 'pieceTo')...
+    else if (!bIsMoveFrom)//lecz jeżeli bierka została przemieszczona na szachownicę
+        //...(jest to każde inne polecenie ruchu w stylu 'pieceTo')...
     {
-        anBoard[nPieceLetter][nPieceDigit] = nGripperPiece; //...to docelowe pole na szachownicy jest już zajęte...
+        anBoard[nPieceLetter][nPieceDigit] = nGripperPiece; //...to docelowe pole na...
+        //...szachownicy jest już zajęte...
         nGripperPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
     }
     else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";

@@ -121,6 +121,8 @@ public:
     QLabel *label_16;
     QLabel *DobotQueuedCmdLeftSpaceLabel;
     QPushButton *executeDobotComandsBtn;
+    QLabel *label_22;
+    QLabel *CoreNextIdLabel;
     QGroupBox *groupBox_8;
     QGridLayout *gridLayout_7;
     QPlainTextEdit *websocket_debug;
@@ -135,7 +137,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1034, 640);
+        MainWindow->resize(1034, 643);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_4 = new QGridLayout(centralWidget);
@@ -555,7 +557,7 @@ public:
         resetDobotIndexBtn = new QPushButton(groupBox_4);
         resetDobotIndexBtn->setObjectName(QStringLiteral("resetDobotIndexBtn"));
 
-        gridLayout_5->addWidget(resetDobotIndexBtn, 4, 0, 1, 1);
+        gridLayout_5->addWidget(resetDobotIndexBtn, 5, 0, 1, 1);
 
         label_16 = new QLabel(groupBox_4);
         label_16->setObjectName(QStringLiteral("label_16"));
@@ -570,7 +572,17 @@ public:
         executeDobotComandsBtn = new QPushButton(groupBox_4);
         executeDobotComandsBtn->setObjectName(QStringLiteral("executeDobotComandsBtn"));
 
-        gridLayout_5->addWidget(executeDobotComandsBtn, 5, 0, 1, 1);
+        gridLayout_5->addWidget(executeDobotComandsBtn, 6, 0, 1, 1);
+
+        label_22 = new QLabel(groupBox_4);
+        label_22->setObjectName(QStringLiteral("label_22"));
+
+        gridLayout_5->addWidget(label_22, 4, 0, 1, 1);
+
+        CoreNextIdLabel = new QLabel(groupBox_4);
+        CoreNextIdLabel->setObjectName(QStringLiteral("CoreNextIdLabel"));
+
+        gridLayout_5->addWidget(CoreNextIdLabel, 4, 1, 1, 1);
 
 
         gridLayout_9->addWidget(groupBox_4, 2, 0, 1, 1);
@@ -712,6 +724,8 @@ public:
         label_16->setText(QApplication::translate("MainWindow", "CIds", 0));
         DobotQueuedCmdLeftSpaceLabel->setText(QApplication::translate("MainWindow", "-1", 0));
         executeDobotComandsBtn->setText(QApplication::translate("MainWindow", "ExecDtCmds", 0));
+        label_22->setText(QApplication::translate("MainWindow", "CNextId", 0));
+        CoreNextIdLabel->setText(QApplication::translate("MainWindow", "-1", 0));
         groupBox_8->setTitle(QApplication::translate("MainWindow", "WebSockets", 0));
         groupBox_9->setTitle(QApplication::translate("MainWindow", "TCP socket", 0));
     } // retranslateUi

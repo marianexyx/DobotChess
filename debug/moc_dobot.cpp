@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Dobot_t {
-    QByteArrayData data[25];
-    char stringdata0[324];
+    QByteArrayData data[26];
+    char stringdata0[335];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -51,9 +51,10 @@ QT_MOC_LITERAL(18, 235, 6), // "nSpace"
 QT_MOC_LITERAL(19, 242, 8), // "nDobotId"
 QT_MOC_LITERAL(20, 251, 10), // "nCoreMaxId"
 QT_MOC_LITERAL(21, 262, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(22, 274, 14), // "onConnectDobot"
-QT_MOC_LITERAL(23, 289, 19), // "onPeriodicTaskTimer"
-QT_MOC_LITERAL(24, 309, 14) // "onGetPoseTimer"
+QT_MOC_LITERAL(22, 274, 10), // "CoreNextId"
+QT_MOC_LITERAL(23, 285, 14), // "onConnectDobot"
+QT_MOC_LITERAL(24, 300, 19), // "onPeriodicTaskTimer"
+QT_MOC_LITERAL(25, 320, 14) // "onGetPoseTimer"
 
     },
     "Dobot\0addTextToDobotConsole\0\0QS_msg\0"
@@ -63,7 +64,7 @@ QT_MOC_LITERAL(24, 309, 14) // "onGetPoseTimer"
     "deviceLabels\0QSdeviceSN\0QSdeviceName\0"
     "QSdeviceVersion\0DobotErrorMsgBox\0"
     "QueueLabels\0nSpace\0nDobotId\0nCoreMaxId\0"
-    "nCoreIdLeft\0onConnectDobot\0"
+    "nCoreIdLeft\0CoreNextId\0onConnectDobot\0"
     "onPeriodicTaskTimer\0onGetPoseTimer"
 };
 #undef QT_MOC_LITERAL
@@ -88,12 +89,12 @@ static const uint qt_meta_data_Dobot[] = {
       10,    1,   77,    2, 0x06 /* Public */,
       12,    3,   80,    2, 0x06 /* Public */,
       16,    0,   87,    2, 0x06 /* Public */,
-      17,    4,   88,    2, 0x06 /* Public */,
+      17,    5,   88,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      22,    0,   97,    2, 0x0a /* Public */,
-      23,    0,   98,    2, 0x0a /* Public */,
-      24,    0,   99,    2, 0x0a /* Public */,
+      23,    0,   99,    2, 0x0a /* Public */,
+      24,    0,  100,    2, 0x0a /* Public */,
+      25,    0,  101,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -102,7 +103,7 @@ static const uint qt_meta_data_Dobot[] = {
     QMetaType::Void, QMetaType::Bool,   11,
     QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString,   13,   14,   15,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   18,   19,   20,   21,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   18,   19,   20,   21,   22,
 
  // slots: parameters
     QMetaType::Void,
@@ -124,7 +125,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 3: _t->RefreshDobotButtonsStates((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 4: _t->deviceLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3]))); break;
         case 5: _t->DobotErrorMsgBox(); break;
-        case 6: _t->QueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
+        case 6: _t->QueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
         case 7: _t->onConnectDobot(); break;
         case 8: _t->onPeriodicTaskTimer(); break;
         case 9: _t->onGetPoseTimer(); break;
@@ -176,7 +177,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
             }
         }
         {
-            typedef void (Dobot::*_t)(int , int , int , int );
+            typedef void (Dobot::*_t)(int , int , int , int , int );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::QueueLabels)) {
                 *result = 6;
                 return;
@@ -263,9 +264,9 @@ void Dobot::DobotErrorMsgBox()
 }
 
 // SIGNAL 6
-void Dobot::QueueLabels(int _t1, int _t2, int _t3, int _t4)
+void Dobot::QueueLabels(int _t1, int _t2, int _t3, int _t4, int _t5)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)), const_cast<void*>(reinterpret_cast<const void*>(&_t5)) };
     QMetaObject::activate(this, &staticMetaObject, 6, _a);
 }
 QT_END_MOC_NAMESPACE

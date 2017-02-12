@@ -65,7 +65,7 @@ private slots:
     void showDobotErrorMsgBox();
     void on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged);
     void on_sendSimulatedMsgBtn_clicked();
-    void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft);
+    void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
 
     //tcp slots
     void writeInTcpConsole(QString QS_msg);

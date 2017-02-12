@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[40];
-    char stringdata0[668];
+    QByteArrayData data[41];
+    char stringdata0[679];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -60,15 +60,16 @@ QT_MOC_LITERAL(27, 439, 6), // "nSpace"
 QT_MOC_LITERAL(28, 446, 8), // "nDobotId"
 QT_MOC_LITERAL(29, 455, 10), // "nCoreMaxId"
 QT_MOC_LITERAL(30, 466, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(31, 478, 17), // "writeInTcpConsole"
-QT_MOC_LITERAL(32, 496, 6), // "QS_msg"
-QT_MOC_LITERAL(33, 503, 23), // "writeInWebsocketConsole"
-QT_MOC_LITERAL(34, 527, 21), // "on_gripperBtn_clicked"
-QT_MOC_LITERAL(35, 549, 18), // "on_homeBtn_clicked"
-QT_MOC_LITERAL(36, 568, 16), // "on_upBtn_clicked"
-QT_MOC_LITERAL(37, 585, 18), // "on_downBtn_clicked"
-QT_MOC_LITERAL(38, 604, 29), // "on_resetDobotIndexBtn_clicked"
-QT_MOC_LITERAL(39, 634, 33) // "on_executeDobotComandsBtn_cli..."
+QT_MOC_LITERAL(31, 478, 10), // "CoreNextId"
+QT_MOC_LITERAL(32, 489, 17), // "writeInTcpConsole"
+QT_MOC_LITERAL(33, 507, 6), // "QS_msg"
+QT_MOC_LITERAL(34, 514, 23), // "writeInWebsocketConsole"
+QT_MOC_LITERAL(35, 538, 21), // "on_gripperBtn_clicked"
+QT_MOC_LITERAL(36, 560, 18), // "on_homeBtn_clicked"
+QT_MOC_LITERAL(37, 579, 16), // "on_upBtn_clicked"
+QT_MOC_LITERAL(38, 596, 18), // "on_downBtn_clicked"
+QT_MOC_LITERAL(39, 615, 29), // "on_resetDobotIndexBtn_clicked"
+QT_MOC_LITERAL(40, 645, 33) // "on_executeDobotComandsBtn_cli..."
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
@@ -83,11 +84,11 @@ QT_MOC_LITERAL(39, 634, 33) // "on_executeDobotComandsBtn_cli..."
     "on_emulatePlayerMsgLineEdit_textChanged\0"
     "textChanged\0on_sendSimulatedMsgBtn_clicked\0"
     "setQueueLabels\0nSpace\0nDobotId\0"
-    "nCoreMaxId\0nCoreIdLeft\0writeInTcpConsole\0"
-    "QS_msg\0writeInWebsocketConsole\0"
-    "on_gripperBtn_clicked\0on_homeBtn_clicked\0"
-    "on_upBtn_clicked\0on_downBtn_clicked\0"
-    "on_resetDobotIndexBtn_clicked\0"
+    "nCoreMaxId\0nCoreIdLeft\0CoreNextId\0"
+    "writeInTcpConsole\0QS_msg\0"
+    "writeInWebsocketConsole\0on_gripperBtn_clicked\0"
+    "on_homeBtn_clicked\0on_upBtn_clicked\0"
+    "on_downBtn_clicked\0on_resetDobotIndexBtn_clicked\0"
     "on_executeDobotComandsBtn_clicked"
 };
 #undef QT_MOC_LITERAL
@@ -119,15 +120,15 @@ static const uint qt_meta_data_MainWindow[] = {
       22,    0,  154,    2, 0x08 /* Private */,
       23,    1,  155,    2, 0x08 /* Private */,
       25,    0,  158,    2, 0x08 /* Private */,
-      26,    4,  159,    2, 0x08 /* Private */,
-      31,    1,  168,    2, 0x08 /* Private */,
-      33,    1,  171,    2, 0x08 /* Private */,
-      34,    0,  174,    2, 0x08 /* Private */,
-      35,    0,  175,    2, 0x08 /* Private */,
-      36,    0,  176,    2, 0x08 /* Private */,
-      37,    0,  177,    2, 0x08 /* Private */,
-      38,    0,  178,    2, 0x08 /* Private */,
-      39,    0,  179,    2, 0x08 /* Private */,
+      26,    5,  159,    2, 0x08 /* Private */,
+      32,    1,  170,    2, 0x08 /* Private */,
+      34,    1,  173,    2, 0x08 /* Private */,
+      35,    0,  176,    2, 0x08 /* Private */,
+      36,    0,  177,    2, 0x08 /* Private */,
+      37,    0,  178,    2, 0x08 /* Private */,
+      38,    0,  179,    2, 0x08 /* Private */,
+      39,    0,  180,    2, 0x08 /* Private */,
+      40,    0,  181,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -143,8 +144,8 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,   24,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   27,   28,   29,   30,
-    QMetaType::Void, QMetaType::QString,   32,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   27,   28,   29,   30,   31,
+    QMetaType::Void, QMetaType::QString,   33,
     QMetaType::Void, QMetaType::QString,    8,
     QMetaType::Void,
     QMetaType::Void,
@@ -175,7 +176,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 10: _t->showDobotErrorMsgBox(); break;
         case 11: _t->on_emulatePlayerMsgLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 12: _t->on_sendSimulatedMsgBtn_clicked(); break;
-        case 13: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4]))); break;
+        case 13: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
         case 14: _t->writeInTcpConsole((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 15: _t->writeInWebsocketConsole((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 16: _t->on_gripperBtn_clicked(); break;

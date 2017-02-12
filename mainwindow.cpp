@@ -46,8 +46,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(writeInWebsocketConsole(QString)));
     connect(_pChessboard, SIGNAL(addTextToDobotConsole(QString)),
             this, SLOT(writeInDobotConsole(QString)));
-    connect(_pDobotArm, SIGNAL(QueueLabels(int,int,int,int)),
-            this, SLOT(setQueueLabels(int,int,int,int)));
+    connect(_pDobotArm, SIGNAL(QueueLabels(int,int,int,int,int)),
+            this, SLOT(setQueueLabels(int,int,int,int,int)));
 
     //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
@@ -93,13 +93,15 @@ void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
      else if (chAxis == 'r') ui->rLabel->setText(QSAxisLabelText);
 }
 
-void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft)
+void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId,
+                                int nCoreIdLeft, int CoreNextId)
 {
     if (nSpace == 0) nSpace = 1; //to tylko dla zblokowania wyskakującego warninga o unused parameter
 //ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
+    ui->CoreNextIdLabel->setText(QString::number(CoreNextId));
 }
 
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
@@ -377,7 +379,14 @@ void MainWindow::on_homeBtn_clicked()
     _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n");
     HOMECmd HOMEChess;
     HOMEChess.reserved = 1; //? co(ś) ten indeks daje?
-    SetHOMECmd(&HOMEChess, true, NULL);
+    uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
+    int result = SetHOMECmd(&HOMEChess, true, &homeIndex);
+    if (result == DobotCommunicate_NoError)
+    {
+        uint64_t dobotQueue;
+        _pDobotArm->setDobotQueuedCmdIndex(GetQueuedCmdCurrentIndex(&dobotQueue));
+        _pDobotArm->setDobotQueuedCmdIndex(dobotQueue);
+    }
 }
 
 void MainWindow::on_upBtn_clicked()

@@ -35,6 +35,10 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_ullCoreQueuedCmdIndex = 1; //TODO: dobot startuje bodajże z jedynką
     m_uiQueuedCmdLeftSpace = 10000; //jakaś duża liczba, bo mam dalej warunek krytycznego błędu dla zera
 
+    firstPosId.index = 0;
+    lastPosId.index = 0;
+    takenPosId.index = 0;
+
     //to poniżej to w skrócie utrzymywanie ciągłej komunikacji z dobotem
 
     //potrzebny jest poniższy timer dla dobota, bo tylko w nim obracane są jego komendy.
@@ -103,32 +107,29 @@ void Dobot::QueuedIdList()
     }*/
 
     emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
-                           m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size());
+                           m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
+                           firstPosId.index);
 
     if (!QueuedCmdIndexList.isEmpty()) //jeżeli kontener nie jest pusty
     {
         QListIterator<ArmPosCrntCmdQIdx> QueuedCmdIndexIter(QueuedCmdIndexList);
         bool bQueueNextDtCmd = false;
-        ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId;
 
-        ///TODO: powyżej 15 wartości dalej mi nie łapie wykonywania poleceń
+        ///TODO: przemyśleć jeszcze raz dobrze poniższe warunki, bo są na pałę zrobione próbą-błędem
         QueuedCmdIndexIter.toFront(); //najnowszy wpis w kontenerze
         if(QueuedCmdIndexIter.hasNext()) //zabezpieczenie przed segmentation fault
         {
             lastPosId = QueuedCmdIndexIter.next();
-            //jeśli aktualne id na dobocie jest nie mniejsze niż 15 wartości od...
-            //...najstarszego polecenia będącego w kontenerze
-            if (lastPosId.index > m_ullDobotQueuedCmdIndex + 15)
+            if (lastPosId.index - m_ullDobotQueuedCmdIndex < 15)
                 bQueueNextDtCmd = true;
         }
 
         QueuedCmdIndexIter.toBack(); //najstarszy wpis w kontenerze
-        if(QueuedCmdIndexIter.hasPrevious()) //zabezpieczenie przed segmentation fault
+        if(QueuedCmdIndexIter.hasPrevious()  //zabezpieczenie przed segmentation fault
+                && !bQueueNextDtCmd) //nie rób 2 razy praktycznie tego samego
         {
             firstPosId = QueuedCmdIndexIter.previous();
-            //jeżeli różnica między najmłodszym ruchem core'a będącym jeszcze w konenerze, a...
-            //...aktualnym ruchem wykonywanym przez dobota nie jest większa niż 15
-            if (firstPosId.index - m_ullDobotQueuedCmdIndex <= 15)
+            if (firstPosId.index - m_ullDobotQueuedCmdIndex >= 15)
                 bQueueNextDtCmd = true;
         }
 
