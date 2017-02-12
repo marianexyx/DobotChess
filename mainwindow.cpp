@@ -3,8 +3,6 @@
 
 QT_USE_NAMESPACE
 
-//mainwindow odpowiada za UI (przyciski itd. inne klasy odwołują się do niego przez:
-//http://www.qtcentre.org/threads/25075-How-to-access-the-UI-from-another-class?s=d4d369d4d7c12212dd9ba8eacc9f0dce&p=287198#post287198
 MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
                         TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent) :
     QMainWindow(parent),
@@ -21,9 +19,12 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     _pTCPmsg = pTCPmsg;
     _pChess = pChess;
 
-    connect(ui->teachMode, SIGNAL(currentIndexChanged(int)), this, SLOT(onChangedMode())); //endtype change
-    connect(ui->connectBtn, SIGNAL(clicked(bool)), _pDobotArm, SLOT(onConnectDobot())); //connect dobot
-    connect(ui->sendBtn, SIGNAL(clicked(bool)), this, SLOT(onPTPsendBtnClicked())); //send PTP data
+    connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(onChangedMode())); //endtype change
+    connect(ui->connectBtn, SIGNAL(clicked(bool)),
+            _pDobotArm, SLOT(onConnectDobot())); //connect dobot
+    connect(ui->sendBtn, SIGNAL(clicked(bool)),
+            this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
@@ -51,10 +52,10 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
             _pChess, SLOT(checkMsgFromChenard(QString)));  //...na silnk gry.
-    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z websocketów...
-            _pChess, SLOT(checkMsgFromWebsockets(QString))); //...na silnk gry.
-    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z websocketów...
-            _pWebTable, SLOT(checkWebsocketMsg(QString))); //...na stół gry.
+    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z ...
+            _pChess, SLOT(checkMsgFromWebsockets(QString))); //...websocketów na silnk gry.
+    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z ...
+            _pWebTable, SLOT(checkWebsocketMsg(QString))); //...websocketów na stół gry.
 
     //init JOG control
     this->initControl();
@@ -63,23 +64,6 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::writeInDobotConsole(QString QStrMsg)
-{
-    if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
-
-    if(QStrMsg == "/clear") //czy czyścimy okno
-    {
-        ui->dobot_debug->clear();
-        return;
-    }
-
-    ui->dobot_debug->setPlainText(ui->dobot_debug->toPlainText() + QStrMsg);
-
-    //auto scroll
-    QScrollBar *scroll_dobot = ui->dobot_debug->verticalScrollBar();
-    scroll_dobot->setValue(scroll_dobot->maximum());
 }
 
 void MainWindow::setDobotValidators()
@@ -112,7 +96,7 @@ void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
 void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft)
 {
     if (nSpace == 0) nSpace = 1; //to tylko dla zblokowania wyskakującego warninga o unused parameter
-    //ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
+//ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
@@ -183,6 +167,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
     }
 }
 
+//todo: przestało działać
 void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion)
 {
     ui->deviceSNLabel->setText(QSdeviceSN);
@@ -210,17 +195,17 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-void MainWindow::writeInTcpConsole(QString QS_msg)
+void MainWindow::writeInTcpConsole(QString QStrMsg)
 {
-    if(QS_msg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
+    if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
 
-    if(QS_msg == "/clear") //czy czyścimy okno
+    if(QStrMsg == "/clear") //czy czyścimy okno
     {
         ui->tcp_debug->clear();
         return;
     }
-
-    ui->tcp_debug->setPlainText(ui->tcp_debug->toPlainText() + QS_msg);
+    QStrMsg = ">" + QStrMsg;
+    ui->tcp_debug->setPlainText(ui->tcp_debug->toPlainText() + QStrMsg);
 
     //auto scroll
     QScrollBar *scroll_tcp = ui->tcp_debug->verticalScrollBar();
@@ -237,12 +222,29 @@ void MainWindow::writeInWebsocketConsole(QString QStrMsg)
         ui->websocket_debug->clear();
         return;
     }
-
+    QStrMsg = ">" + QStrMsg;
     ui->websocket_debug->setPlainText(ui->websocket_debug->toPlainText() + QStrMsg);
 
     //auto scroll
     QScrollBar *scroll_websct = ui->websocket_debug->verticalScrollBar();
     scroll_websct->setValue(scroll_websct->maximum());
+}
+
+void MainWindow::writeInDobotConsole(QString QStrMsg)
+{
+    if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
+
+    if(QStrMsg == "/clear") //czy czyścimy okno
+    {
+        ui->dobot_debug->clear();
+        return;
+    }
+    QStrMsg = ">" + QStrMsg;
+    ui->dobot_debug->setPlainText(ui->dobot_debug->toPlainText() + QStrMsg);
+
+    //auto scroll
+    QScrollBar *scroll_dobot = ui->dobot_debug->verticalScrollBar();
+    scroll_dobot->setValue(scroll_dobot->maximum());
 }
 
 void MainWindow::initControl() {
@@ -335,7 +337,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             //qDebug() << "QsServiceMsg = " << QsServiceMsg;
             int nServiceLetterPos = _pChessboard->findPieceLetterPos(QsServiceMsg.left(1));
             int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
-            //qDebug() << "nServiceLetterPos = " << nServiceLetterPos << ", nServiceDigitPos = " << nServiceDigitPos;
+            //qDebug() << "nServiceLetterPos = " << nServiceLetterPos
+            //<< ", nServiceDigitPos = " << nServiceDigitPos;
             float fService_x = _pChessboard->afChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
             float fService_y = _pChessboard->afChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
             qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y;
@@ -359,12 +362,12 @@ void MainWindow::on_gripperBtn_clicked()
     qDebug() << "on_gripperBtn_clicked";
     if (ui->gripperBtn->text() == "Open gripper")
     {
-        _pDobotArm->gripperOpennedState(true, 's');
+        _pDobotArm->gripperOpennedState(true, 'v');
         ui->gripperBtn->setText(tr("Close gripper"));
     }
     else if (ui->gripperBtn->text() == "Close gripper")
     {
-        _pDobotArm->gripperOpennedState(false, 's');
+        _pDobotArm->gripperOpennedState(false, 'v');
         ui->gripperBtn->setText(tr("Open gripper"));
     }
 }
@@ -386,3 +389,32 @@ void MainWindow::on_downBtn_clicked()
 {
     _pDobotArm->armUpDown(false, true, 'v');
 }
+
+void MainWindow::on_resetDobotIndexBtn_clicked()
+{
+    int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
+
+    if (result == DobotCommunicate_NoError)
+        _pDobotArm->addTextToDobotConsole("Cleared Dobot Queued Cmds.");
+    else if (result == DobotCommunicate_BufferFull)
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.");
+    else if (result == DobotCommunicate_Timeout)
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.");
+    else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
+                                           "MainWindow::on_resetDobotIndexBtn_clicked().");
+}
+
+void MainWindow::on_executeDobotComandsBtn_clicked()
+{
+    int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
+
+    if (result == DobotCommunicate_NoError)
+        _pDobotArm->addTextToDobotConsole("Start executing dobot queued cmds.");
+    else if (result == DobotCommunicate_BufferFull)
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.");
+    else if (result == DobotCommunicate_Timeout)
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.");
+    else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
+                                           "MainWindow::on_executeDobotComandsBtn_clicked().");
+}
+

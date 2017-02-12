@@ -53,9 +53,7 @@ private:
     unsigned long long m_ullDobotQueuedCmdIndex; //aktualny id kolejki ruchu wykonywany przez dobota
     //Id nigdy się nie resetuje, bo raczej nie dobiję do 18 triliardów ruchów (unsigned long long)
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
-    ArmPosCrntCmdQIdx m_posIdx; //dane ramienia przypisane do danego indexu dobota
-    /*QList<int> Lista;
-    QListIterator<int> Iter(Lista);*/
+    ArmPosCrntCmdQIdx m_posIdx; //dane ramienia przypisane do danego indexu dobota  
     QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka zapytań do dobota
 
 public:

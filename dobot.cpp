@@ -32,8 +32,7 @@ Dobot::Dobot(Chessboard *pChessboard):
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
     //TODO: ptpCmd.velocity = 100; //niech używa wartości które ma aktualnie
 
-    m_ullCoreQueuedCmdIndex = 0;
-    m_ullDobotQueuedCmdIndex = 0;
+    m_ullCoreQueuedCmdIndex = 1; //TODO: dobot startuje bodajże z jedynką
     m_uiQueuedCmdLeftSpace = 10000; //jakaś duża liczba, bo mam dalej warunek krytycznego błędu dla zera
 
     //to poniżej to w skrócie utrzymywanie ciągłej komunikacji z dobotem
@@ -85,62 +84,84 @@ void Dobot::onGetPoseTimer()
     emit AxisLabelText(QString::number(pose.r), 'r');
 
     this->QueuedIdList(); //sprawdzaj w kółko czy można wypchać do zakolejkowania dobotowi kolejny ruch
-    //TODO: czy to tu w tym timerze zadziała? na pewno powoduje to deziorientację będąc w tym miejscu.
+    //TODO: to tu  powoduje to deziorientację będąc w tym miejscu.
 
     getPoseTimer->start();
 }
 
 void Dobot::QueuedIdList()
 {
-    uint64_t currentIndex; //nie czaje tego zapisu, ale tak to wygląda w przykładzie oficjalnym
-    m_ullDobotQueuedCmdIndex = GetQueuedCmdCurrentIndex(&currentIndex); //sprawdź aktualny index dobota
+    GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny index dobota
+
     //m_uiQueuedCmdLeftSpace= GetQueuedCmdLeftSpace; //ile zostało pamięci w dobocie na ruchy. ...
     //... TODO: Póki co nie ma w dobocie tej funkcji. Może z czasem dodadzą.
+    /*if (m_uiQueuedCmdLeftSpace <= 0) //jeżeli pamięć dobota spadła do zera- została przepełniona
+    { //todo: póki dobot nie wklei tego do swojego dll'a to nie mogę tego używać
+        qDebug() << "FATAL ERROR: Dobot queue memory  full. data overflown/lost. Stop arm.";
+        this->addTextToDobotConsole("FATAL ERROR: Dobot queue memory full. Data overflown. Stop arm.\n");
+        SetQueuedCmdForceStopExec(); //zatrzymaj ramię
+    }*/
 
     emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
                            m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size());
 
-    if (m_uiQueuedCmdLeftSpace <= 0) //jeżeli pamięć dobota spadła do zera- została przepełniona
+    if (!QueuedCmdIndexList.isEmpty()) //jeżeli kontener nie jest pusty
     {
-        qDebug() << "FATAL ERROR: Dobot queue memory  full. data overflown/lost. Stop arm.";
-        this->addTextToDobotConsole("FATAL ERROR: Dobot queue memory full. Data overflown. Stop arm.\n");
-        SetQueuedCmdForceStopExec(); //zatrzymaj ramię
-    }
+        QListIterator<ArmPosCrntCmdQIdx> QueuedCmdIndexIter(QueuedCmdIndexList);
+        bool bQueueNextDtCmd = false;
+        ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId;
 
-    ArmPosCrntCmdQIdx firstPosId = QueuedCmdIndexList.last(); //najstarszy wpis w kontenerze (wskaźnik)
-    //TODO: sprawdzić w dokumentacji czy to zadziała, tzn, co zwracane jest
-
-    if (!(QueuedCmdIndexList.isEmpty()) && //jeżeli kontener nie jest pusty i...
-         firstPosId.index - m_ullDobotQueuedCmdIndex <= 15) //...jeżeli różnica między najstarszym...
-        //...zapamiętanym ruchem core'a, a aktualnym ruchem wykonywanym przez dobota nie jest...
-        //... większa niż 15
-    {
-        ArmPosCrntCmdQIdx takenPosId; //najstarszy wpis w kontenerze do wrzucenia na dobota
-        takenPosId = QueuedCmdIndexList.takeFirst(); //wypchnij na dobota kolejny id ruchu
-        switch(takenPosId.type)
+        ///TODO: powyżej 15 wartości dalej mi nie łapie wykonywania poleceń
+        QueuedCmdIndexIter.toFront(); //najnowszy wpis w kontenerze
+        if(QueuedCmdIndexIter.hasNext()) //zabezpieczenie przed segmentation fault
         {
-        case NORMAL:
-            ptpCmd.x = takenPosId.x;
-            ptpCmd.y = takenPosId.y;
-            ptpCmd.z = takenPosId.z;
-            ptpCmd.r = takenPosId.r;
-            SetPTPCmd(&ptpCmd, true, &takenPosId.index);
-            break;
-        case WAIT:
-            SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
-            break;
-        case GRIPPER1:
-            m_gripperServo1.dutyCycle = takenPosId.state ? 3.6f : 3.1f;
-            SetIOPWM(&m_gripperServo1, true, &takenPosId.index);
-            break;
-        case GRIPPER2:
-            m_gripperServo2.dutyCycle = takenPosId.state ? 8.3f : 8.8f;
-            SetIOPWM(&m_gripperServo2, true, &takenPosId.index);
-            break;
-        default:
-            qDebug() << "ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:" << takenPosId.type;
-            this->addTextToDobotConsole("ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:"
-                                        + takenPosId.type);
+            lastPosId = QueuedCmdIndexIter.next();
+            //jeśli aktualne id na dobocie jest nie mniejsze niż 15 wartości od...
+            //...najstarszego polecenia będącego w kontenerze
+            if (lastPosId.index > m_ullDobotQueuedCmdIndex + 15)
+                bQueueNextDtCmd = true;
+        }
+
+        QueuedCmdIndexIter.toBack(); //najstarszy wpis w kontenerze
+        if(QueuedCmdIndexIter.hasPrevious()) //zabezpieczenie przed segmentation fault
+        {
+            firstPosId = QueuedCmdIndexIter.previous();
+            //jeżeli różnica między najmłodszym ruchem core'a będącym jeszcze w konenerze, a...
+            //...aktualnym ruchem wykonywanym przez dobota nie jest większa niż 15
+            if (firstPosId.index - m_ullDobotQueuedCmdIndex <= 15)
+                bQueueNextDtCmd = true;
+        }
+
+        if(bQueueNextDtCmd)
+        {
+            takenPosId = QueuedCmdIndexList.takeFirst(); //wypchnij na dobota kolejny id...
+            //...ruchu z kontenera
+            switch(takenPosId.type)
+            {
+            case NORMAL:
+                ptpCmd.x = takenPosId.x;
+                ptpCmd.y = takenPosId.y;
+                ptpCmd.z = takenPosId.z;
+                ptpCmd.r = takenPosId.r;
+                SetPTPCmd(&ptpCmd, true, &takenPosId.index);
+                break;
+            case WAIT:
+                SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
+                break;
+            case GRIPPER1:
+                m_gripperServo1.dutyCycle = takenPosId.state ? 3.6f : 3.1f;
+                SetIOPWM(&m_gripperServo1, true, &takenPosId.index);
+                break;
+            case GRIPPER2:
+                m_gripperServo2.dutyCycle = takenPosId.state ? 8.3f : 8.8f;
+                SetIOPWM(&m_gripperServo2, true, &takenPosId.index);
+                break;
+            default:
+                qDebug() << "ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:" << takenPosId.type;
+                this->addTextToDobotConsole("ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:"
+                                            + takenPosId.type);
+            }
+            bQueueNextDtCmd = false; //czyścimy
         }
     }
 }
@@ -160,6 +181,10 @@ void Dobot::onConnectDobot()
 
         qDebug() << "Dobot connection success";
         this->addTextToDobotConsole("Dobot connected \n");
+
+        SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
+        GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny index dobota.
+        SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
     }
     else
     {
@@ -292,7 +317,7 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
         f_zFromTo = _pChessboard->afRemovedPiecesPositions_z[nRemPieceDestLetter][nRemPieceDestDigit];
         f_rFromTo = m_nActualPos;
     }
-    //reszta ruchów: normalne ruchy from/to, łapanie bierki do zbijania, i puszczanie bierki przywróconej
+    //reszta ruchów: normalne ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
     else
     {
         f_xFromTo = _pChessboard->afChessboardPositions_x[nLetter][nDigit];
@@ -305,7 +330,8 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
 
     QString QsMoveType = "";
     bIsPieceMovingFrom ? QsMoveType = "PieceFrom: " : QsMoveType = "Pieceto: ";
-    qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter =" << nLetter << ", nDigit =" << nDigit;
+    qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
+             << nLetter << ", nDigit =" << nDigit;
     emit this->addTextToDobotConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
                                      + QString::number(nDigit) + "\n");
 
@@ -334,7 +360,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
 { //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     //pozycje obszaru bierek usuniętych
-    if (chMoveType == 'r' && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszarze bierek zbitych...
+    if (chMoveType == 'r' && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszar zbitych...
     {
         qDebug() << "Dobot::armUpDown: nRemovingRWPos ="
                  << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)
@@ -356,7 +382,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
                 [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
         f_rUpDown = m_nActualPos;
     }
-    else if (chMoveType == 's' && bIsArmAboveFromSquare) //...lub pochwycamy bierkę z obszaru bierek zbitych
+    else if (chMoveType == 's' && bIsArmAboveFromSquare) //...lub pochwycamy bierkę z obszaru zbitych
     {
         qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->PieceActualPos.Letter
                  << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << isArmGoingUp;
@@ -415,8 +441,6 @@ void Dobot::addCmdToList(int nType, bool bState, int x, int y, int z, int r)
                 ", z =" << m_fPtpCmd_zActualVal << ", r =" << m_fPtpCmd_rActualVal; //jeśli to się...
     //...jeszcze ma przydać, to niech wyląduje gdzieś w QueuedIdList.*/
 
-    //SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend. TODO:to tu było (potrzebne?)
-
     m_ullCoreQueuedCmdIndex += 1; //aktualne id ruchu = +1 większe od ostatniego
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
     m_posIdx.type = nType; //wait, gripper1, gripper2
@@ -434,41 +458,32 @@ void Dobot::writeMoveTypeInConsole(char chMoveType, char chMoveState)
     switch(chMoveType)
     {
     case 'n': QsConsoleMsg = "normal"; break; //ruch z szachownicy na szachownicę (zwykły)
-    case 'c': QsConsoleMsg = "castling(king)"; break; //ruch z szachownicy na szachownicę (roszada królem)
-    case 'o': QsConsoleMsg = "castling(rook)"; break; //ruch z szachownicy na szachownicę (roszada wieżą)
+    case 'c': QsConsoleMsg = "castling(king)"; break; //ruch po szachownicy (roszada królem)
+    case 'o': QsConsoleMsg = "castling(rook)"; break; //ruch po szachownicy (roszada wieżą)
     case 'e': QsConsoleMsg = "enpassant"; break; //ruch z szachownicy na szachownicę (enpassant)
     case 'p': QsConsoleMsg = "promotion"; break; //ruch z szachownicy na szachownicę (promocja)
     case 'r': QsConsoleMsg = "remove"; break; //ruch z szachownicy na obszar zbitych bierek
     case 's': QsConsoleMsg = "restore"; break; //ruch z obszaru zbitych bierek na szachownicę
     case 'v': QsConsoleMsg = "service"; break; //ruch serwisowy
-    default: QsConsoleMsg = "ERROR. Wrong movement type: " + static_cast<QString>(chMoveType) + "\n"; break;
+    default: QsConsoleMsg = "ERROR. Wrong movement type: "
+                + static_cast<QString>(chMoveType) + "\n"; break;
     }
-    qDebug() << "Start" << QsConsoleMsg << "move sequence."; //TODO
-    emit this->addTextToDobotConsole(QsConsoleMsg + "PieceMoving");
+    emit this->addTextToDobotConsole(QsConsoleMsg + "PieceMove");
 
     QString QsSecondMsg;
     switch(chMoveState)
     {
-    case 'o':
-        qDebug() << ": Dobot::OpennedSt: GripperOpened";
-        QsSecondMsg = "GripperOpened\n";
-        break;
-    case 'c':
-        qDebug() << ": Dobot::OpennedSt: GripperClosed";
-        QsSecondMsg = "GripperClosed\n";
-        break;
-    case 'u':
-        qDebug() << ": Dobot::ArmUpDown: ArmUp";
-        QsSecondMsg = "ArmUp\n";
-        break;
-    case 'd':
-        qDebug() << ": Dobot::ArmUpDown: ArmDown";
-        QsSecondMsg = "ArmDown\n";
-        break;
+    case 'o': QsSecondMsg = ": GripperOpened\n"; break;
+    case 'c': QsSecondMsg = ": GripperClosed\n"; break;
+    case 'u': QsSecondMsg = ": ArmUp\n"; break;
+    case 'd': QsSecondMsg = ": ArmDown\n"; break;
     case 'x': break; //tak aby default się na to nie łapał
-    default: QsSecondMsg = "ERROR. Wrong movement state: " + static_cast<QString>(chMoveState) + "\n"; break;
+    default: QsSecondMsg = "ERROR. Wrong movement state: "
+                + static_cast<QString>(chMoveState) + "\n"; break;
     }
     if (chMoveState != 'x') emit this->addTextToDobotConsole(QsSecondMsg);
+
+    qDebug() << "Start" << QsConsoleMsg << "move sequence" << QsSecondMsg;
 }
 
 void Dobot::closeEvent(QCloseEvent *)
