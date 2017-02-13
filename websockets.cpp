@@ -7,14 +7,15 @@ Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
     m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
                                               QWebSocketServer::NonSecureMode,
                                               this); //nowy serwer websocket
-    if (m_pWebSocketServer->listen(QHostAddress::Any, port))
+    if (m_pWebSocketServer->listen(QHostAddress::Any, port)) //niech ws serwer nasłuchuje na tym porcie
     {
-        qDebug() << "WebSocket server listening on port" << port;
         connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
-        //connect(m_pWebSocketServer, &QWebSocketServer::closed, this, &Websockets::closed);
+
+        qDebug() << "WebSocket server listening on port" << port;
         emit addTextToWebsocketConsole("WebSocket server listening on port" + port);
     }
+
     _pWebTable = pWebTable;
 }
 
@@ -26,9 +27,9 @@ Websockets::~Websockets()
 
 void Websockets::onNewConnection() //nowe połączenia
 {
-    //!!! zacięcie czasami przy nowymn połączeniu !!! już nie?
     qDebug() << "Websockets::onNewConnection() \n";
-    QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
+    QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection(); //gniazdo do komunikacji...
+    //...z danym klientem (obiekty QWebSocket są właśnie gniazdami)
 
     //jeżeli socket dostanie wiadomość, to odpalamy metody przetwarzająca ją...
     //...sygnał textMessageReceived emituje QStringa do processWebsocketMsg
@@ -38,11 +39,6 @@ void Websockets::onNewConnection() //nowe połączenia
     emit addTextToWebsocketConsole("New connection \n");
 }
 
-//TODO: podzielić funkcje poniższej metody na te które wymagają blokady zapytań tcp i te które tego
-//nie robią. tu rozróżnić 2 opcje- jeżeli natrafmy na wiadomość dla tcp podczas gdy jedną wiadomość
-//już przetwarzamy, to odrzucić tą wiadomość i zapisać error log w pliku oddzielnym do późniejszej
-//analizy. jeżeli wiadomość jest dobra to powinna iść na tcp- docelowo poprzez kolejkę na bazie get-push.
-
 //TODO: *wszystkie wiadomośći które przychodzą ze strony powinny być opatrzone identyfikatorem tego
 //kto je wysyła: gracz biały, czarny, bądź niegracz.
 
@@ -51,13 +47,19 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
 {
     qDebug() << "Websockets::processWebsocketMsg received: " << QsWsMsgToProcess << "/n";
     QString QsWebsocketConsoleMsg; //wiadomość na konsolę
-    //QWebSocket *pSender = qobject_cast<QWebSocket *>(sender()); // !! unused variable !! wykomentować?
+    //QWebSocket *pSender = qobject_cast<QWebSocket *>(sender()); //bodajże (bardzo w skrócie): zestaw...
+    //...(przypisz) aktualnie otrzymaną wiadomość z tcp do tego gniazda (stwórz gniazdo tymczasowe/temp)
+    //for (QWebSocket *pClient : qAsConst(m_clients)) //np. następnie przeleć przez wszystkich...
+    //...aktualnych klientów, czyli wszystkie otwarte stałe gniazda przynależne do użytkownika
+    //if (pClient == pSender) //i wykonaj funkcje tylko pdo warunkiem, gdzie aktualna tymczasowa...
+    //...wiadomość otrzymana websocketami z WWW (gniazdo) jest takie same jak obiekt gniazda...
+    //...stałego; otwartego przynależnego do danego użytkownika strony
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    // if (pClient) //!!! zrozumieć te mechanizmy
-    //if (pClient != pSender) don't echo message back to sender
+
 
     //wiadomość pójdzie tylko do tego kto ją przysłał
-    if (pClient && QsWsMsgToProcess == "keepConnected") pClient->sendTextMessage("connectionOnline"); //podtrzymanie połączenia
+    if (pClient && QsWsMsgToProcess == "keepConnected")
+        pClient->sendTextMessage("connectionOnline"); //podtrzymanie połączenia
     else if (QsWsMsgToProcess == "new" || QsWsMsgToProcess.left(4) == "move" ||
              QsWsMsgToProcess.left(10) == "promote_to" || QsWsMsgToProcess == "reset")
     {
@@ -93,7 +95,8 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     }
     else
     {
-        Q_FOREACH (QWebSocket *pClient, m_clients) //dla każdego klienta wykonaj
+        //Q_FOREACH (QWebSocket *pClient, m_clients) //to jest zapis który wkrótce podobno będzie deprecated
+        for (QWebSocket *pClient : qAsConst(m_clients)) //dla każdego klienta kontenera m_clients wykonaj
             //TODO: gracze dostają komunikatów gracza przeciwnego. naprawić to (przy BAD_MOVE jest dłuższy komentarz)
         {
             if (QsWsMsgToProcess.left(17) == "white_player_name")

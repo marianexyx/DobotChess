@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1034</width>
-    <height>643</height>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -330,19 +330,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <spacer name="verticalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
           <item row="1" column="1">
            <widget class="QPushButton" name="homeBtn">
             <property name="enabled">
@@ -450,6 +437,16 @@
             </property>
             <property name="text">
              <string>J4-</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="startPosBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>StartGmPos</string>
             </property>
            </widget>
           </item>

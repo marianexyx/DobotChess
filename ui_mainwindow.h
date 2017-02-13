@@ -79,7 +79,6 @@ public:
     QFormLayout *formLayout;
     QComboBox *teachMode;
     QPushButton *gripperBtn;
-    QSpacerItem *verticalSpacer_3;
     QPushButton *homeBtn;
     QPushButton *upBtn;
     QPushButton *downBtn;
@@ -91,6 +90,7 @@ public:
     QPushButton *shortArmSubBtn;
     QPushButton *rHeadAddBtn;
     QPushButton *rHeadSubBtn;
+    QPushButton *startPosBtn;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout;
     QLabel *label_4;
@@ -137,7 +137,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1034, 643);
+        MainWindow->resize(1034, 662);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_4 = new QGridLayout(centralWidget);
@@ -354,10 +354,6 @@ public:
 
         formLayout->setWidget(0, QFormLayout::FieldRole, gripperBtn);
 
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        formLayout->setItem(1, QFormLayout::LabelRole, verticalSpacer_3);
-
         homeBtn = new QPushButton(JOGgroupBox);
         homeBtn->setObjectName(QStringLiteral("homeBtn"));
         homeBtn->setEnabled(false);
@@ -423,6 +419,12 @@ public:
         rHeadSubBtn->setEnabled(false);
 
         formLayout->setWidget(7, QFormLayout::FieldRole, rHeadSubBtn);
+
+        startPosBtn = new QPushButton(JOGgroupBox);
+        startPosBtn->setObjectName(QStringLiteral("startPosBtn"));
+        startPosBtn->setEnabled(false);
+
+        formLayout->setWidget(1, QFormLayout::LabelRole, startPosBtn);
 
 
         gridLayout_9->addWidget(JOGgroupBox, 0, 2, 1, 2);
@@ -696,6 +698,7 @@ public:
         shortArmSubBtn->setText(QApplication::translate("MainWindow", "J3-", 0));
         rHeadAddBtn->setText(QApplication::translate("MainWindow", "J4+", 0));
         rHeadSubBtn->setText(QApplication::translate("MainWindow", "J4-", 0));
+        startPosBtn->setText(QApplication::translate("MainWindow", "StartGmPos", 0));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Pose", 0));
         label_4->setText(QApplication::translate("MainWindow", "J3", 0));
         joint2Label->setText(QApplication::translate("MainWindow", "0", 0));

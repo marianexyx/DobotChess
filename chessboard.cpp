@@ -84,7 +84,7 @@ Chessboard::Chessboard():
         for (int row = 0; row <= 7; row++)
         {
             afRemovedPiecesPositions_x[row][column] = 100 + row*25;
-            afRemovedPiecesPositions_y[row][column] = 170 - column*30;
+            afRemovedPiecesPositions_y[row][column] = 170 - column*25;
             afRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
         }
     }
@@ -93,7 +93,7 @@ Chessboard::Chessboard():
         for (int row = 0; row <= 7; row++)
         {
             afRemovedPiecesPositions_x[row][column] = 100 + row*25;
-            afRemovedPiecesPositions_y[row][column] = -155 - ((column-2)*30);
+            afRemovedPiecesPositions_y[row][column] = -160 - ((column-2)*25);
             afRemovedPiecesPositions_z[row][column] = -22.5 - row*((-22.5 + 17)/7);
         }
     }
@@ -114,7 +114,7 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
 }
 
 void Chessboard::findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit)
-{ //TODO: zrobić z tego strukture?
+{ //elseTODO: zrobić z tego strukture?
     QsPiecieFromTo = this->findPieceLetterPos(nFromLetter) + nFromDiggit +
             this->findPieceLetterPos(nToLetter) + nToDiggit;
     qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
@@ -150,7 +150,6 @@ int Chessboard::findPieceLetterPos(QString QsLetter)
     return nLetter;
 }
 
-//TODO: to co robię tutaj poniżej to omijanie czegoś co się zwie template/szablony?
 QString Chessboard::findPieceLetterPos(int nLetter)
 {
     QString QsLetter;
@@ -205,19 +204,15 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
 
 bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
 {
-    if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0)
-        //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
-        //TODO: nieprawdziwe dla enpassant!
-    {
-        //QsPieceToReject = QsPieceTo; //zbijana jest bierka z tego pola na które chcemy iść
-        //!!!TODO: TO JEST NIEAKTUALNE
-        return 1;
-    }
+    //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
+    //w enpassant bierka "PieceTo" jest podmiania na pozycję bierki zbijanej, także ten warunek...
+    //...tam też zadziała
+    if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0) return 1;
     else return 0;
 }
 
 bool Chessboard::castlingStatements() // sprawdzanie czy dany ruch jest prośbą o roszadę
-{
+{    
     if (PieceFrom.Letter == 4 && (PieceFrom.Digit == 0 || PieceFrom.Digit == 7)
             //jeżeli ruszana jest bierka z pozycji króla
             && (PieceTo.Letter == 2 || PieceTo.Letter == 6) // o 2 pola w lewo lub prawo

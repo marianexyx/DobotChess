@@ -5,10 +5,6 @@
 #include "QObject"
 #include "qdebug.h"
 
-//TODO: *klasa chessboard powinna być dzieckiem klasy 'chess', jako że będzie używać wszystkiego stamtąd.
-//jednak nie wiem jak to zrobić, bo później klasa 'chess' używa wskaźnika na klasę 'chessboard' by
-//używać jego operacji, wiec tak się chyba nie da. wymyślić zatem coś podobnego
-
 struct ArmPosition
 {
     int Letter = -1;

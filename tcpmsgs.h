@@ -11,12 +11,11 @@ class TCPMsgs: public QObject
 private:
     QTcpSocket *socket;
 
-    bool _bBlokadaZapytan = false; // nie przyjmuj zapytań,dopóki poprzednie nie jest zrealizowane
     QString _QStrMsgForChenard;
+    QList<QString> TCPMsgsList;
 
 private slots:
-    //tcp
-    void connected(); //sygnał i slot muszą mieć takie same przyjmowane argumenty
+    void connected();
     void disconnected();
     void bytesWritten(qint64 bytes);
     void readyRead();
@@ -24,12 +23,8 @@ private slots:
 public:
     TCPMsgs();
 
+    void queueMsgs(QString msgs);
     void doTcpConnect(QString QStrMsgForChenard);
-
-    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    bool getBlokadaZapytan() const    { return _bBlokadaZapytan; }
-
-    void setBlokadaZapytan(bool bBlokadaZapytan)       { _bBlokadaZapytan = bBlokadaZapytan; }
 
 signals:
     void addTextToTcpConsole(QString);

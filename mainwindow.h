@@ -78,6 +78,7 @@ private slots:
     void on_downBtn_clicked();
     void on_resetDobotIndexBtn_clicked();
     void on_executeDobotComandsBtn_clicked();
+    void on_startPosBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

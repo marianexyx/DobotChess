@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Chess_t {
     QByteArrayData data[8];
-    char stringdata0[123];
+    char stringdata0[100];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -34,14 +34,14 @@ QT_MOC_LITERAL(1, 6, 21), // "addTextToDobotConsole"
 QT_MOC_LITERAL(2, 28, 0), // ""
 QT_MOC_LITERAL(3, 29, 6), // "QS_msg"
 QT_MOC_LITERAL(4, 36, 19), // "checkMsgFromChenard"
-QT_MOC_LITERAL(5, 56, 21), // "QStrMsgFromChenardTcp"
-QT_MOC_LITERAL(6, 78, 22), // "checkMsgFromWebsockets"
-QT_MOC_LITERAL(7, 101, 21) // "QStrMsgFromWebsockets"
+QT_MOC_LITERAL(5, 56, 10), // "tcpRespond"
+QT_MOC_LITERAL(6, 67, 22), // "checkMsgFromWebsockets"
+QT_MOC_LITERAL(7, 90, 9) // "msgFromWs"
 
     },
     "Chess\0addTextToDobotConsole\0\0QS_msg\0"
-    "checkMsgFromChenard\0QStrMsgFromChenardTcp\0"
-    "checkMsgFromWebsockets\0QStrMsgFromWebsockets"
+    "checkMsgFromChenard\0tcpRespond\0"
+    "checkMsgFromWebsockets\0msgFromWs"
 };
 #undef QT_MOC_LITERAL
 

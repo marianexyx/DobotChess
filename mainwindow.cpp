@@ -34,6 +34,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobotArm, SIGNAL(AxisLabelText(QString, char)),
             this, SLOT(setAxisLabelText(QString, char)));
+    connect(_pDobotArm, SIGNAL(deviceLabels(QString,QString,QString)),
+            this, SLOT(setDeviceLabels(QString,QString,QString)));
     connect(_pDobotArm, SIGNAL(RefreshDobotButtonsStates(bool)),
             this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobotArm, SIGNAL(DobotErrorMsgBox()),
@@ -119,6 +121,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->shortArmSubBtn->setEnabled(false);
         ui->rHeadAddBtn->setEnabled(false);
         ui->rHeadSubBtn->setEnabled(false);
+        ui->startPosBtn->setEnabled(false);
 
         ui->sendBtn->setEnabled(false);
         ui->xPTPEdit->setEnabled(false);
@@ -150,6 +153,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->shortArmSubBtn->setEnabled(true);
         ui->rHeadAddBtn->setEnabled(true);
         ui->rHeadSubBtn->setEnabled(true);
+        ui->startPosBtn->setEnabled(true);
 
         ui->sendBtn->setEnabled(true);
         ui->xPTPEdit->setEnabled(true);
@@ -169,7 +173,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
     }
 }
 
-//todo: przestało działać
 void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion)
 {
     ui->deviceSNLabel->setText(QSdeviceSN);
@@ -378,7 +381,7 @@ void MainWindow::on_homeBtn_clicked()
 {
     _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n");
     HOMECmd HOMEChess;
-    HOMEChess.reserved = 1; //? co(ś) ten indeks daje?
+    HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
     uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
     int result = SetHOMECmd(&HOMEChess, true, &homeIndex);
     if (result == DobotCommunicate_NoError)
@@ -427,3 +430,26 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
                                            "MainWindow::on_executeDobotComandsBtn_clicked().");
 }
 
+void MainWindow::on_startPosBtn_clicked()
+{
+    if (ui->startPosBtn->text() == "StartGmPos")
+    {
+        ui->startPosBtn->setText(tr("StartDtPos"));
+        qDebug() << "Placing arm above the chessboard.";
+        _pDobotArm->addTextToDobotConsole("Placing arm above the chessboard.\n");
+        _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
+        _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
+        _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
+        _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
+    }
+    else if (ui->startPosBtn->text() == "StartDtPos")
+    {
+        ui->startPosBtn->setText(tr("StartGmPos"));
+        qDebug() << "Returning safely to the HOME positions.";
+        _pDobotArm->addTextToDobotConsole("Returning safely to the HOME positions.\n");
+        _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
+        _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
+        _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
+        _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
+    }
+}

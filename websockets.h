@@ -20,7 +20,7 @@ public:
     Websockets(WebTable *pWebTable, quint16 port, QObject *parent = Q_NULLPTR);
 
     QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients;
+    QList<QWebSocket *> m_clients; //kontener z aktywnymi połączeniami websocketowymi
 
     ~Websockets();
 

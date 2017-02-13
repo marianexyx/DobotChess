@@ -53,9 +53,8 @@ public:
     void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
 
 public slots:
-    void checkMsgFromChenard(QString QStrMsgFromChenardTcp);
-    void checkMsgFromWebsockets(QString QStrMsgFromWebsockets); //TODO: podpiąć wszędzie w ...
-    //...klasie websocketów. TODO2: wyzwalać tutaj pojemnik na komendy do tcp.
+    void checkMsgFromChenard(QString tcpRespond);
+    void checkMsgFromWebsockets(QString msgFromWs);
 
 signals:
     void addTextToDobotConsole(QString QS_msg); //dodawanie komunikatu do konsoli dobota
