@@ -407,13 +407,13 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
     int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToDobotConsole("Cleared Dobot Queued Cmds.");
+        _pDobotArm->addTextToDobotConsole("Cleared Dobot Queued Cmds.\n");
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n");
     else if (result == DobotCommunicate_Timeout)
         _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.");
     else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
-                                           "MainWindow::on_resetDobotIndexBtn_clicked().");
+                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n");
 }
 
 void MainWindow::on_executeDobotComandsBtn_clicked()
@@ -421,13 +421,13 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
     int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToDobotConsole("Start executing dobot queued cmds.");
+        _pDobotArm->addTextToDobotConsole("Start executing dobot queued cmds.\n");
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n");
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.\n");
     else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
-                                           "MainWindow::on_executeDobotComandsBtn_clicked().");
+                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n");
 }
 
 void MainWindow::on_startPosBtn_clicked()

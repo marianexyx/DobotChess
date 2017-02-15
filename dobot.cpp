@@ -12,10 +12,11 @@
 //...usb i zakłada że ruch się wykonał bez sprawdzania tego.
 
 Dobot::Dobot(Chessboard *pChessboard):
-    m_nMaxPieceHeight(45),
-    m_nMaxRemPieceH(44.5),
+    m_nMaxPieceHeight(45), //max. wys. króla to równo 43 mm. Dla pola h8 max wysokość bierki to 46...
+    //..., powyżej tych wartości ramię traci zakres ruchu od góry/dołu. TODO: zmienna chessboardu
+    m_nMaxRemPieceH(44.5), //TODO: zmienna chessboardu
     m_nActualPos(1000),
-    m_fPtpCmd_xActualVal(200),
+    m_fPtpCmd_xActualVal(200), //TODO: zmienne chessboardu?
     m_fPtpCmd_yActualVal(0),
     m_fPtpCmd_zActualVal(25),
     m_fPtpCmd_rActualVal(0)
@@ -415,7 +416,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
 {
     float f_xRemove = _pChessboard->afRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
     float f_yRemove = _pChessboard->afRemovedPiecesPositions_y[nPieceRowPos][nPieceColumnPos];
-    float f_zRemove = _pChessboard->afRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];
+    //float f_zRemove = _pChessboard->afRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];//unused
     float f_rRemove = m_nActualPos;
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
                 m_nMaxRemPieceH << ", r =" << f_rRemove;

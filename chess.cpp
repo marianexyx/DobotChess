@@ -144,7 +144,7 @@ bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
 
 void Chess::checkMsgFromChenard(QString tcpRespond)
 {
-    //ruchy z MoveOk i TestOk wykonywać w jednej funkcji dla porządku kodu
+    //TODO: ruchy z MoveOk i TestOk wykonywać w jednej funkcji dla porządku kodu
     qDebug() << "Chess::checkMsgFromChenard: " << tcpRespond;
     if (tcpRespond == "OK 1\n") this->MoveOk();
     else if (tcpRespond == "OK\n") this->GameStarted();
@@ -254,7 +254,11 @@ void Chess::TestOk()
     }
     else if (_pChessboard->bTestEnpassant)
         this->enpassantMovingSequence(); //jeżeli test na enpassant się powiódł, to rozpocznij ten ruch
-    else qDebug() << "Error: Chess::TestOk: None test is true.";
+    else
+    {
+        qDebug() << "Error: Chess::TestOk: None test is true.";
+        emit this->addTextToDobotConsole("Error: Chess::TestOk: None test is true.\n");
+    }
 }
 
 void Chess::BadMove(QString QsMsgFromChenardTcp)

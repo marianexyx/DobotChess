@@ -52,12 +52,10 @@ Chessboard::Chessboard():
             afChessboardPositions_y[letter][digit] = a1_y +
                     digit*(((a8_y-a1_y)/7)+((letter/14)*(((a1_y-h1_y)/7)-((a8_y-h8_y)/7))))-
                     letter*(((a1_y-h1_y)/7)-((digit/14)*(((h8_y-h1_y)/7)-((a8_y-a1_y)/7))));
-            afChessboardPositions_z[letter][digit] = a1_z +
+            afChessboardPositions_z[letter][digit] = -22 + a1_z +
                     digit*(((a8_z-a1_z)/7)+((letter/14)*(((a1_z-h1_z)/7)-((a8_z-h8_z)/7))))-
                     letter*(((a1_z-h1_z)/7)-((digit/14)*(((h8_z-h1_z)/7)-((a8_z-a1_z)/7))));
-            /*qDebug() << "position " << litery << cyfry << " = "
-             << afChessboardPositions_x[cyfry][litery]
-             << afChessboardPositions_y[cyfry][litery];*/
+            //z testów wysokości wysokość 'z' ustawiona na poprawkę o: -22.
         }
     }
 
