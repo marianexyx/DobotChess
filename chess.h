@@ -22,6 +22,7 @@ private:
     WebTable *_pWebTable;
 
     bool _bServiceTests;
+    bool m_bAI;
 
     void pieceMovingSequence(char chMoveType,
                              int nPieceFromLetter = -1, int nPieceFromDigit = -1,
@@ -33,7 +34,6 @@ private:
 
     void TestMove(QString QStrMsgFromWebsockets);
     void MovePiece(QString QStrMsgFromWebsockets);
-    void NewGame();
     void MoveOk();
     void Promote(QString QStrMsgFromWs);
     void GameStarted();
@@ -41,16 +41,20 @@ private:
     void GameInProgress();
     void EndOfGame(QString QStrMsgFromChenardTcp);
     void BadMove(QString QsMsgFromChenardTcp);
-    void resetPiecePositions();
 
 public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
           Websockets *pWebsockets, WebTable *pWebTable);
 
+    void NewGame(); //TODO: przy tych 2 funkcjach mam problem z dostępem z poziomu mainwindow...
+    void resetPiecePositions(); //...do nich. Były one jako prywatne i tam w sumie winny zostać jakoś.
+
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     bool getServiceTests() const                { return _bServiceTests; }
+    bool getAI() const                          { return m_bAI; }
 
     void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
+    void setAI(bool bAI)    { m_bAI = bAI; }
 
 public slots:
     void checkMsgFromChenard(QString tcpRespond);

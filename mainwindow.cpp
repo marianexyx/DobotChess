@@ -134,6 +134,9 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->serviceCheckBox->setEnabled(false);
         ui->upBtn->setEnabled(false);
         ui->downBtn->setEnabled(false);
+        ui->botOffRadioBtn->setEnabled(false);
+        ui->botOnRadioBtn->setEnabled(false);
+        ui->AIBtn->setEnabled(false);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
@@ -166,6 +169,9 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->serviceCheckBox->setEnabled(true);
         ui->upBtn->setEnabled(true);
         ui->downBtn->setEnabled(true);
+        ui->botOffRadioBtn->setEnabled(true);
+        ui->botOnRadioBtn->setEnabled(true);
+        ui->AIBtn->setEnabled(true);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
 
@@ -452,4 +458,20 @@ void MainWindow::on_startPosBtn_clicked()
         _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
         _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
     }
+}
+
+void MainWindow::on_AIBtn_clicked()
+{
+    if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
+    {
+        _pChess->setAI(false);
+    }
+    else if (ui->botOnRadioBtn->isChecked())
+    {
+        _pChess->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
+        //...wtedy ruszy z ruchem swoim
+    }
+    _pChess->resetPiecePositions();
+    _pChess->NewGame();
+
 }

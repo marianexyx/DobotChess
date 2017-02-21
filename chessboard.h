@@ -36,7 +36,9 @@ public:
     ArmPosition PieceFrom, PieceTo, PieceActualPos;
 
     QString QsPiecieFromTo;             // f.e. "e2e4"
-    int nGripperPiece;              // nr bierki znajdującej się aktualnie w chwytaku
+    QString QsAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
+
+    int nGripperPiece;                  // nr bierki znajdującej się aktualnie w chwytaku
 
     bool bTestEnpassant;                //czy wewnętrzny powierzchowny test na enpassant się powiódł
 

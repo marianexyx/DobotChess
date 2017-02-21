@@ -36,6 +36,17 @@ Chessboard::Chessboard():
     QsFuturePromote = "";
     bPromotionConfirmed = false;
 
+    /*float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
+    float a8_x = 330.7; float a8_y = 73.1; float a8_z = -0.1;
+    float h1_x = 185.4; float h1_y = -81.6; float h1_z = -3.3;
+    float h8_x = 330.1; float h8_y = -79.5; float h8_z = -0.6;
+    //                                      "z" to pozycje na styku chwytaka z szachownicą
+
+    //testowo w pamięci przybliż szachownicę o 1cm w stronę dobota
+    int nM = - 10;
+    a1_x += nM; a8_x += nM; h1_x += nM; h8_x += nM;*/
+
+    //testy wyimaginowanej większej szachownicy
     float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
     float a8_x = 330.7; float a8_y = 73.1; float a8_z = -0.1;
     float h1_x = 185.4; float h1_y = -81.6; float h1_z = -3.3;

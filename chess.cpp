@@ -22,6 +22,7 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
     _pWebTable = pWebTable;
 
     _bServiceTests = false;
+    m_bAI = false;
 }
 
 void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPieceFromDigit,
@@ -142,20 +143,26 @@ bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
     else return 0;
 }
 
-void Chess::checkMsgFromChenard(QString tcpRespond)
+void Chess::checkMsgFromChenard(QString QsTcpRespond)
 {
     //TODO: ruchy z MoveOk i TestOk wykonywać w jednej funkcji dla porządku kodu
-    qDebug() << "Chess::checkMsgFromChenard: " << tcpRespond;
-    if (tcpRespond == "OK 1\n") this->MoveOk();
-    else if (tcpRespond == "OK\n") this->GameStarted();
-    else if (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1")
-        this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
-    else if (tcpRespond.left(7) == "ILLEGAL") this->MovePiece(_pChessboard->QsPiecieFromTo); //jednak to będzie zwykły ruch
-    else if (tcpRespond.left(8) == "BAD_MOVE") this->BadMove(tcpRespond);
-    else if (tcpRespond.left(1) == "*") this->GameInProgress();
-    else if (tcpRespond.left(3) == "1-0" || tcpRespond.left(3) == "0-1" ||
-             tcpRespond.left(7) == "1/2-1/2") this->EndOfGame(tcpRespond);
-    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromChenard: " << tcpRespond;
+    qDebug() << "Chess::checkMsgFromChenard: " << QsTcpRespond;
+    if (QsTcpRespond == "OK 1\n") this->MoveOk();
+    else if (QsTcpRespond == "OK\n") this->GameStarted();
+    else if (QsTcpRespond.left(3) == "OK " && QsTcpRespond.left(4) != "OK 1")
+    {
+        if (m_bAI) //jeżeli mamy doczynienia z botem, który wymyślił ruch
+            //to zapisz ten ruch w pamięci i czekaj, aż człowiek wywoła ten ruch chęcią zaczęcia gry
+            _pChessboard->QsAIPiecieFromTo = QsTcpRespond;
+        else
+            this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
+    }
+    else if (QsTcpRespond.left(7) == "ILLEGAL") this->MovePiece(_pChessboard->QsPiecieFromTo); //jednak to będzie zwykły ruch
+    else if (QsTcpRespond.left(8) == "BAD_MOVE") this->BadMove(QsTcpRespond);
+    else if (QsTcpRespond.left(1) == "*") this->GameInProgress();
+    else if (QsTcpRespond.left(3) == "1-0" || QsTcpRespond.left(3) == "0-1" ||
+             QsTcpRespond.left(7) == "1/2-1/2") this->EndOfGame(QsTcpRespond);
+    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromChenard: " << QsTcpRespond;
 }
 
 void Chess::checkMsgFromWebsockets(QString msgFromWs)
@@ -168,7 +175,7 @@ void Chess::checkMsgFromWebsockets(QString msgFromWs)
     else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromWebsockets: " << msgFromWs;
 }
 
-void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o stan gry
+void Chess::MoveOk() //ruch w pamięci sie powiódł.
 {
     qDebug() << "-Begin move sequence-";
     emit this->addTextToDobotConsole("-Begin move sequence-\n");
@@ -182,7 +189,7 @@ void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o sta
         this->pieceMovingSequence('r'); //... to rozpocznij zbijanie ...
         this->pieceMovingSequence('n'); //... a potem wykonaj normalny ruch
     }
-    else if (_pChessboard->bPromotionConfirmed) //jeżeli tcp potwierdził wykonanie promocji to rozpocznij promocję 
+    else if (_pChessboard->bPromotionConfirmed) //jeżeli tcp potwierdził wykonanie promocji to rozpocznij promocję
     {
         if (_pChessboard->removeStatements()) //jeżeli przy promocji następuje bicie
             this->pieceMovingSequence('r'); //to najpierw zbijamy
@@ -190,7 +197,7 @@ void Chess::MoveOk() //ruch sie powiódł. wykonaj ruch i zapytaj się tcp o sta
         _pChessboard->bTestPromotion = false; //czyszczenie zmiennych
         _pChessboard->bPromotionConfirmed = false;
 
-    }    
+    }
     else this->pieceMovingSequence('n'); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
 
     //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
@@ -203,7 +210,7 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
 {
     if ((_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
          !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
-            _bServiceTests) //albo jeżeli mamy do czynienia z zapytaniem serwisowym
+            _bServiceTests || m_bAI) //albo mamy do czynienia z zapytaniem serwisowym albo botem
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
         _pWebsockets->addTextToWebsocketConsole("Sending 'new' game command to tcp. \n");
@@ -212,11 +219,18 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
     else _pWebsockets->addTextToWebsocketConsole("Error09! Wrong players names.\n");
 }
 
-void Chess::GameStarted() //prześlij info na stronę o tym że gra wystartowała
+void Chess::GameStarted() //zareaguj na to że gra wystartowała
 {
-    _pWebsockets->addTextToWebsocketConsole("new_game");
-    qDebug() << "Sending 'new_game' to site";
-    if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
+    if (m_bAI) //jeżeli mamy do czynienia z grą z botem
+    {
+        _pTCPMsgs->doTcpConnect("think 5000"); //wymyśl pierwszy ruch bota białego
+    }
+    else //prześlij info na stronę o tym że gra wystartowała
+    {
+        _pWebsockets->addTextToWebsocketConsole("new_game");
+        qDebug() << "Sending 'new_game' to site";
+        if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
+    }
 }
 
 void Chess::TestMove(QString QStrMsgFromWebsockets)
