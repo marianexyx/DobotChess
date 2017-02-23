@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1023</width>
-    <height>701</height>
+    <height>784</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,7 +64,7 @@
        <string>Dobot Arm</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_9">
-       <item row="7" column="2">
+       <item row="8" column="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Device</string>
@@ -137,7 +137,7 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="2" rowspan="5">
+       <item row="1" column="2" rowspan="5">
         <widget class="QGroupBox" name="JOGgroupBox">
          <property name="title">
           <string>JOG</string>
@@ -243,7 +243,7 @@
          </layout>
         </widget>
        </item>
-       <item row="8" column="2">
+       <item row="9" column="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string>Queue</string>
@@ -342,7 +342,7 @@
          </layout>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Pose</string>
@@ -469,7 +469,7 @@
          </layout>
         </widget>
        </item>
-       <item row="6" column="2">
+       <item row="7" column="2">
         <widget class="QGroupBox" name="groupBox_11">
          <property name="title">
           <string>Dobot Movements</string>
@@ -533,7 +533,7 @@
          <zorder>downBtn</zorder>
         </widget>
        </item>
-       <item row="0" column="0" rowspan="5">
+       <item row="1" column="0" rowspan="5">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>Service PTP</string>
@@ -636,7 +636,7 @@
          </layout>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QGroupBox" name="groupBox_6">
          <property name="title">
           <string>Simulate player msg </string>
@@ -678,7 +678,7 @@
          </layout>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QGroupBox" name="groupBox_10">
          <property name="title">
           <string>AI</string>
@@ -790,6 +790,35 @@
            <widget class="QLabel" name="AIEnDgtToLbl">
             <property name="text">
              <string>-</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_12">
+         <property name="title">
+          <string>Arduino Usb</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_13">
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="commandLine"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QComboBox" name="port"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="enterButton">
+            <property name="text">
+             <string>Enter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="visual">
+            <property name="text">
+             <string>Visualize</string>
             </property>
            </widget>
           </item>

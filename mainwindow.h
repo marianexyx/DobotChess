@@ -14,6 +14,7 @@
 #include "DobotType.h"
 #include "websockets.h"
 #include "dobot.h"
+#include "arduinousb.h"
 #include "chess.h"
 
 namespace Ui
@@ -27,7 +28,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
-                        TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent = 0);
+                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm, Chess *pChess,
+                        QWidget *parent = 0);
 
     virtual ~MainWindow(); //tutaj virtual?
 
@@ -42,6 +44,7 @@ private:
     Websockets *_pWebSockets;
     Chessboard *_pChessboard;
     TCPMsgs *_pTCPmsg;
+    ArduinoUsb *_pArduinoUsb;
     Chess *_pChess;
 
     void refreshBtn();

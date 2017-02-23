@@ -3,10 +3,12 @@
 
 QT_USE_NAMESPACE
 
+//TODO: wszystkie log okien wrzucić do jednego okna z typem komunikatu
+
 MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
-                       TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent) :
+                       TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm, Chess *pChess,
+                       QWidget *parent) :
     QMainWindow(parent),
-    /*_pDobotArm(new Dobot()),*/
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this); //bodajże wskazuje że UI dziedziczy to tej (this) klasie, przez co zostanie...
@@ -17,8 +19,10 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     _pWebSockets = pWebSockets;
     _pChessboard = pChessboard;
     _pTCPmsg = pTCPmsg;
+    _pArduinoUsb = pArduinoUsb;
     _pChess = pChess;
 
+    //TODO: to pewnie dałoby się wrzucić do klasy dobota
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),

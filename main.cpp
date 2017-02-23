@@ -11,10 +11,11 @@ int main(int argc, char *argv[])
     Websockets Websockety(&WebTable001, 1234); // 1234- na którym porcie websockety mają nasłuchiwać
     //TODO: odpalać server websocket po konstruktorze mainwindow
     TCPMsgs TCPCommunication;
+    ArduinoUsb ArduinoUsbEnemysUI;
     Chess ChessCore(&DobotArm001, &ChessboardDobot001, &TCPCommunication, &Websockety, &WebTable001);
 
     MainWindow mainwindow(&WebTable001, &Websockety, &ChessboardDobot001,
-                      &TCPCommunication, &DobotArm001, &ChessCore);
+                      &TCPCommunication, &ArduinoUsbEnemysUI, &DobotArm001, &ChessCore);
     mainwindow.show();
 
     return a.exec();
