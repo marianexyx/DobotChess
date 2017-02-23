@@ -22,6 +22,8 @@ public:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients; //kontener z aktywnymi połączeniami websocketowymi
 
+    void sendToChess(QString QsMsgForChessClass);
+
     ~Websockets();
 
 public Q_SLOTS:

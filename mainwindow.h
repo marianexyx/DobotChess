@@ -80,6 +80,8 @@ private slots:
     void on_executeDobotComandsBtn_clicked();
     void on_startPosBtn_clicked();
     void on_AIBtn_clicked();
+    void on_AIEnemyStartBtn_clicked();
+    void on_AIEnemySendBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

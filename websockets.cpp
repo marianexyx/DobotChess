@@ -63,9 +63,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     else if (QsWsMsgToProcess == "new" || QsWsMsgToProcess.left(4) == "move" ||
              QsWsMsgToProcess.left(10) == "promote_to" || QsWsMsgToProcess == "reset")
     {
-        qDebug() << "Sending to 'chess' class: " << QsWsMsgToProcess;
-        QsWebsocketConsoleMsg = "Sending to 'chess' class: " + QsWsMsgToProcess;
-        emit MsgFromWebsocketsToChess(QsWsMsgToProcess);
+        this->sendToChess(QsWsMsgToProcess);
     }
     else if (QsWsMsgToProcess.left(5) == "check")
     {
@@ -247,6 +245,13 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     if (!QsWebsocketConsoleMsg.isEmpty())
         emit addTextToWebsocketConsole(QsWebsocketConsoleMsg + "\n");
     QsWebsocketConsoleMsg.clear();
+}
+
+void Websockets::sendToChess(QString QsMsgForChessClass)
+{
+    qDebug() << "Sending to 'chess' class: " << QsMsgForChessClass;
+    QsWebsocketConsoleMsg = "Sending to 'chess' class: " + QsMsgForChessClass;
+    emit MsgFromWebsocketsToChess(QsMsgForChessClass);
 }
 
 

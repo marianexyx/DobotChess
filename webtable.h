@@ -8,6 +8,9 @@
 //TODO: cała ta klasa praktycznie powinna się znaleźć na MySQL, a wszystkie zmienne powinny być tam...
 //... zmienianie z poziomu tego serwera, tak bym dwustronny mechanizm websocketów nadal działał.
 
+//TODO: każde zapytanie o ruch powinno by opatrzene identyfikatorem przynajmniej koloru gracza by...
+//...kontrolować czy nie robimy ruchu za gracza przeciwnego
+
 class WebTable: public QObject
 {
     Q_OBJECT

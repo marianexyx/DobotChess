@@ -4,7 +4,7 @@
 QT_USE_NAMESPACE
 
 MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
-                        TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent) :
+                       TCPMsgs *pTCPmsg, Dobot *pDobotArm, Chess *pChess, QWidget *parent) :
     QMainWindow(parent),
     /*_pDobotArm(new Dobot()),*/
     ui(new Ui::MainWindow)
@@ -89,17 +89,17 @@ void MainWindow::setJointLabelText(QString QSJointLabelText, short sJoint)
 
 void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
 {
-     if (chAxis == 'x') ui->xLabel->setText(QSAxisLabelText);
-     else if (chAxis == 'y') ui->yLabel->setText(QSAxisLabelText);
-     else if (chAxis == 'z') ui->zLabel->setText(QSAxisLabelText);
-     else if (chAxis == 'r') ui->rLabel->setText(QSAxisLabelText);
+    if (chAxis == 'x') ui->xLabel->setText(QSAxisLabelText);
+    else if (chAxis == 'y') ui->yLabel->setText(QSAxisLabelText);
+    else if (chAxis == 'z') ui->zLabel->setText(QSAxisLabelText);
+    else if (chAxis == 'r') ui->rLabel->setText(QSAxisLabelText);
 }
 
 void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId,
                                 int nCoreIdLeft, int CoreNextId)
 {
     if (nSpace == 0) nSpace = 1; //to tylko dla zblokowania wyskakującego warninga o unused parameter
-//ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
+    //ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
@@ -137,6 +137,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->botOffRadioBtn->setEnabled(false);
         ui->botOnRadioBtn->setEnabled(false);
         ui->AIBtn->setEnabled(false);
+        ui->AIEnemyStartBtn->setEnabled(false);
+        ui->AIEnemySendBtn->setEnabled(false);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
@@ -465,13 +467,75 @@ void MainWindow::on_AIBtn_clicked()
     if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
     {
         _pChess->setAI(false);
+        ui->AIEnemyStartBtn->setEnabled(false);
+        ui->AIEnemySendBtn->setEnabled(false);
     }
     else if (ui->botOnRadioBtn->isChecked())
     {
         _pChess->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
         //...wtedy ruszy z ruchem swoim
+        ui->AIEnemyStartBtn->setEnabled(true);
+        ui->AIEnemySendBtn->setEnabled(true);
     }
     _pChess->resetPiecePositions();
     _pChess->NewGame();
 
+}
+
+void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
+{
+    if (_pChess->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
+        //...nieaktywny jeżeli AI nie jest włączone
+    {
+        _pChess->resetPiecePositions(); //przywróć bierki na pierwotne pozycje
+        _pChess->NewGame(); //zacznij w pamięci chenardu nową grę
+        //pierwszy ruch bota nigdy nie będzie specjalny, zatem można go od razu normalnie wykonać
+        _pChessboard->findBoardPos("move " + _pChessboard->QsAIPiecieFromTo);
+        _pChess->pieceMovingSequence('n');
+    }
+    else
+    {
+        this->writeInDobotConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
+                                  " function with _pChess->getAI() as false value\n");
+        qDebug() << "ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
+                    " function with _pChess->getAI() as false value";
+    }
+}
+
+void MainWindow::on_AIEnemySendBtn_clicked()
+{ //TODO: wyrzucić wykonywanie tych funkcji do klasy 'chess'
+    if (_pChess->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
+        //...nieaktywny jeżeli AI nie jest włączone
+    {
+        QString QsEnLF = ui->AIEnLtrFromLbl->text(); //enemy's from letter
+        int nEnDF = ui->AIEnDgtFromLbl->text().toInt(); //enemy's from digit
+        QString QsEnLT = ui->AIEnLtrToLbl->text(); //enemy's to letter
+        int nEnDT = ui->AIEnDgtToLbl->text().toInt(); //enemy's to digit
+        QString QsEnemyMove;
+        //TODO: nie ogarniam wyrażeń regularnych:
+        if (nEnDF >= 1 && nEnDF <= 8 &&
+                (QsEnLF == "a" || QsEnLF == "b" || QsEnLF == "c" || QsEnLF == "d" ||
+                 QsEnLF == "e" || QsEnLF == "f" || QsEnLF == "g" || QsEnLF == "h") &&
+                nEnDT >= 1 && nEnDT <= 8 &&
+                (QsEnLT == "a" || QsEnLT == "b" || QsEnLT == "c" || QsEnLT == "d" ||
+                 QsEnLT == "e" || QsEnLT == "f" || QsEnLT == "g" || QsEnLT == "h"))
+        {
+            QsEnemyMove = "move " + QsEnLF + QString::number(nEnDF)
+                     + QsEnLT + QString::number(nEnDT); //sklej wiadomość w np.: "move e2e4"
+            _pWebSockets->sendToChess(QsEnemyMove); //wyślij zapytanie o ruch tak, jakby...
+            //...szło ono ze strony
+        }
+        else
+        {
+            this->writeInDobotConsole("ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions\n");
+            qDebug() << "ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions";
+        }
+    }
+    else
+    {
+        this->writeInDobotConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
+                                  " function with _pChess->getAI() as false value\n");
+        qDebug() << "ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
+                    " function with _pChess->getAI() as false value";
+    }
 }

@@ -177,6 +177,7 @@ void Chess::checkMsgFromWebsockets(QString msgFromWs)
 
 void Chess::MoveOk() //ruch w pamięci sie powiódł.
 {
+    //TODO: mylna jest nazwa funkcji z której możnaby wnioskować, że ruch już się wykonał
     qDebug() << "-Begin move sequence-";
     emit this->addTextToDobotConsole("-Begin move sequence-\n");
 
@@ -244,7 +245,8 @@ void Chess::TestMove(QString QStrMsgFromWebsockets)
 }
 
 void Chess::MovePiece(QString QStrMsgFromWebsockets) // rządzanie ruchu- przemieszczenie bierki.
-{ //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
+{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
+    //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
     _pWebsockets->addTextToWebsocketConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n");
     qDebug() << "Sending normal move to tcp: " << QStrMsgFromWebsockets;
     _pTCPMsgs->queueMsgs(QStrMsgFromWebsockets); //zapytaj się tcp o poprawność prośby o ruch
