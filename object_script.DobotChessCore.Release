@@ -13,6 +13,7 @@ INPUT(
 ./release\moc_tcpmsgs.o
 ./release\moc_chessboard.o
 ./release\moc_dobot.o
+./release\moc_arduinousb.o
 ./release\moc_chess.o
 ./release\moc_mainwindow.o
 );

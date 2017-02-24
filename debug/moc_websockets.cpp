@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Websockets_t {
-    QByteArrayData data[11];
-    char stringdata0[196];
+    QByteArrayData data[10];
+    char stringdata0[181];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -30,21 +30,20 @@ struct qt_meta_stringdata_Websockets_t {
 static const qt_meta_stringdata_Websockets_t qt_meta_stringdata_Websockets = {
     {
 QT_MOC_LITERAL(0, 0, 10), // "Websockets"
-QT_MOC_LITERAL(1, 11, 25), // "addTextToWebsocketConsole"
-QT_MOC_LITERAL(2, 37, 0), // ""
-QT_MOC_LITERAL(3, 38, 7), // "QStrMsg"
-QT_MOC_LITERAL(4, 46, 24), // "MsgFromWebsocketsToChess"
-QT_MOC_LITERAL(5, 71, 21), // "QStrMsgFromWebsockets"
-QT_MOC_LITERAL(6, 93, 27), // "MsgFromWebsocketsToWebtable"
-QT_MOC_LITERAL(7, 121, 19), // "processWebsocketMsg"
-QT_MOC_LITERAL(8, 141, 19), // "QS_WbstMsgToProcess"
-QT_MOC_LITERAL(9, 161, 15), // "onNewConnection"
-QT_MOC_LITERAL(10, 177, 18) // "socketDisconnected"
+QT_MOC_LITERAL(1, 11, 18), // "addTextToWsConsole"
+QT_MOC_LITERAL(2, 30, 0), // ""
+QT_MOC_LITERAL(3, 31, 24), // "MsgFromWebsocketsToChess"
+QT_MOC_LITERAL(4, 56, 21), // "QStrMsgFromWebsockets"
+QT_MOC_LITERAL(5, 78, 27), // "MsgFromWebsocketsToWebtable"
+QT_MOC_LITERAL(6, 106, 19), // "processWebsocketMsg"
+QT_MOC_LITERAL(7, 126, 19), // "QS_WbstMsgToProcess"
+QT_MOC_LITERAL(8, 146, 15), // "onNewConnection"
+QT_MOC_LITERAL(9, 162, 18) // "socketDisconnected"
 
     },
-    "Websockets\0addTextToWebsocketConsole\0"
-    "\0QStrMsg\0MsgFromWebsocketsToChess\0"
-    "QStrMsgFromWebsockets\0MsgFromWebsocketsToWebtable\0"
+    "Websockets\0addTextToWsConsole\0\0"
+    "MsgFromWebsocketsToChess\0QStrMsgFromWebsockets\0"
+    "MsgFromWebsocketsToWebtable\0"
     "processWebsocketMsg\0QS_WbstMsgToProcess\0"
     "onNewConnection\0socketDisconnected"
 };
@@ -64,22 +63,22 @@ static const uint qt_meta_data_Websockets[] = {
        3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   44,    2, 0x06 /* Public */,
-       4,    1,   47,    2, 0x06 /* Public */,
-       6,    1,   50,    2, 0x06 /* Public */,
+       1,    2,   44,    2, 0x06 /* Public */,
+       3,    1,   49,    2, 0x06 /* Public */,
+       5,    1,   52,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    1,   53,    2, 0x0a /* Public */,
-       9,    0,   56,    2, 0x0a /* Public */,
-      10,    0,   57,    2, 0x08 /* Private */,
+       6,    1,   55,    2, 0x0a /* Public */,
+       8,    0,   58,    2, 0x0a /* Public */,
+       9,    0,   59,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void, QMetaType::QString,    3,
-    QMetaType::Void, QMetaType::QString,    5,
-    QMetaType::Void, QMetaType::QString,    5,
+    QMetaType::Void, QMetaType::QString, QMetaType::Char,    2,    2,
+    QMetaType::Void, QMetaType::QString,    4,
+    QMetaType::Void, QMetaType::QString,    4,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString,    7,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -92,7 +91,7 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Websockets *_t = static_cast<Websockets *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->addTextToWebsocketConsole((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 0: _t->addTextToWsConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
         case 1: _t->MsgFromWebsocketsToChess((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 2: _t->MsgFromWebsocketsToWebtable((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 3: _t->processWebsocketMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
@@ -104,8 +103,8 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (Websockets::*_t)(QString );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Websockets::addTextToWebsocketConsole)) {
+            typedef void (Websockets::*_t)(QString , char );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Websockets::addTextToWsConsole)) {
                 *result = 0;
                 return;
             }
@@ -164,9 +163,9 @@ int Websockets::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void Websockets::addTextToWebsocketConsole(QString _t1)
+void Websockets::addTextToWsConsole(QString _t1, char _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 

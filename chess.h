@@ -24,9 +24,9 @@ private:
     bool _bServiceTests;
     bool m_bAI;
 
-    void pieceMovingSequence(char chMoveType,
+    /*void pieceMovingSequence(char chMoveType,
                              int nPieceFromLetter = -1, int nPieceFromDigit = -1,
-                              int nPieceToLetter = -1, int nPieceToDigit = -1);
+                              int nPieceToLetter = -1, int nPieceToDigit = -1);*/ //tymczasowy public
     void castlingMovingSequence();
     void enpassantMovingSequence();
     bool testEnpassant();
@@ -48,6 +48,9 @@ public:
 
     void NewGame(); //TODO: przy tych 2 funkcjach mam problem z dostępem z poziomu mainwindow...
     void resetPiecePositions(); //...do nich. Były one jako prywatne i tam w sumie winny zostać jakoś.
+    void pieceMovingSequence(char chMoveType,
+                                 int nPieceFromLetter = -1, int nPieceFromDigit = -1,
+                                  int nPieceToLetter = -1, int nPieceToDigit = -1);
 
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     bool getServiceTests() const                { return _bServiceTests; }
@@ -61,7 +64,8 @@ public slots:
     void checkMsgFromWebsockets(QString msgFromWs);
 
 signals:
-    void addTextToDobotConsole(QString QS_msg); //dodawanie komunikatu do konsoli dobota
+    void addTextToDobotConsole(QString, char); //dodawanie komunikatu do konsoli dobota
+    void addTextToCoreConsole(QString,char); //TODO: może się przydać jak upiekszę kod
 
 };
 

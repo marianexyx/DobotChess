@@ -22,8 +22,6 @@ SOURCES += main.cpp\
     chess.cpp \
     dobot.cpp \
     tcpmsgs.cpp \
-    #debug/moc_mainwindow.cpp \
-    #debug/moc_Thread.cpp \
     webtable.cpp \
     chessboard.cpp \
     websockets.cpp \
@@ -34,12 +32,13 @@ HEADERS  +=  webtable.h \
     tcpmsgs.h \
     chessboard.h \
     dobot.h \
+    arduinousb.h \
     chess.h \
     DobotDll/DobotDll.h \
     DobotDll/DobotType.h \
     mainwindow.h \
-    ui_mainwindow.h \
-    arduinousb.h
+    ui_mainwindow.h
+
 
 
 FORMS    += mainwindow.ui

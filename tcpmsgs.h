@@ -27,7 +27,7 @@ public:
     void doTcpConnect(QString QStrMsgForChenard);
 
 signals:
-    void addTextToTcpConsole(QString);
+    void addTextToTcpConsole(QString, char);
     void MsgFromChenard(QString);
 };
 

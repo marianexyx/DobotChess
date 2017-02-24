@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1023</width>
-    <height>784</height>
+    <width>1035</width>
+    <height>874</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,38 +15,14 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="4">
-     <widget class="QGroupBox" name="groupBox_8">
-      <property name="title">
-       <string>WebSockets</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_7">
-       <item row="0" column="0">
-        <widget class="QPlainTextEdit" name="websocket_debug"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="5">
-     <widget class="QGroupBox" name="groupBox_9">
-      <property name="title">
-       <string>TCP socket</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_8">
-       <item row="0" column="0">
-        <widget class="QPlainTextEdit" name="tcp_debug"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="0" column="3">
      <widget class="QGroupBox" name="groupBox_7">
       <property name="title">
-       <string>Arm log</string>
+       <string>Log</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QPlainTextEdit" name="dobot_debug">
+        <widget class="QPlainTextEdit" name="debug_log">
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -63,81 +39,111 @@
       <property name="title">
        <string>Dobot Arm</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_9">
-       <item row="8" column="2">
-        <widget class="QGroupBox" name="groupBox">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>Device</string>
+          <string>Service PTP</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_11">
+         <layout class="QFormLayout" name="formLayout_2">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_9">
+           <widget class="QLabel" name="label_17">
             <property name="text">
-             <string>SN</string>
+             <string>X</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="deviceSNLabel">
-            <property name="frameShape">
-             <enum>QFrame::Panel</enum>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="DeviceNameLabel">
-            <property name="frameShape">
-             <enum>QFrame::Panel</enum>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::AutoText</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Info</string>
+           <widget class="QLineEdit" name="xPTPEdit">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="DeviceInfoLabel">
-            <property name="frameShape">
-             <enum>QFrame::Panel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="text">
-             <string/>
+           <widget class="QLineEdit" name="yPTPEdit">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QPushButton" name="connectBtn">
+           <widget class="QLabel" name="label_19">
             <property name="text">
-             <string>Connect</string>
+             <string>Z</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="zPTPEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="rPTPEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>s1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="servo1GripperEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="QLineEdit" name="servo2GripperEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QPushButton" name="sendBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Send</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>s2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>R</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Y</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="1" column="2" rowspan="5">
+       <item row="1" column="1">
         <widget class="QGroupBox" name="JOGgroupBox">
          <property name="title">
           <string>JOG</string>
@@ -243,106 +249,125 @@
          </layout>
         </widget>
        </item>
-       <item row="9" column="2">
-        <widget class="QGroupBox" name="groupBox_4">
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupBox_10">
          <property name="title">
-          <string>Queue</string>
+          <string>AI</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="3" column="1">
-           <widget class="QLabel" name="CoreIndexAmountlabel">
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_25">
             <property name="text">
-             <string>-1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>DIndex</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_21">
-            <property name="text">
-             <string>DLeftSpc</string>
+             <string>EnDgtF</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_15">
+           <widget class="QLabel" name="label_23">
             <property name="text">
-             <string>CMaxIdx</string>
+             <string>EnLtrF</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="CoreMaxQueuedIndexLabel">
+           <widget class="QLabel" name="AIEnLtrFromLbl">
             <property name="text">
-             <string>-1</string>
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QPushButton" name="AIEnemyStartBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>PlayerStart</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="botOffRadioBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Off</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="DobotQueuedIndexLabel">
+           <widget class="QRadioButton" name="botOnRadioBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>-1</string>
+             <string>On</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_16">
+          <item row="1" column="3">
+           <widget class="QLabel" name="AIEnDgtFromLbl">
             <property name="text">
-             <string>CIds</string>
+             <string>-</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="2">
+           <widget class="QPushButton" name="AIBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Set</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" colspan="2">
+           <widget class="QPushButton" name="AIEnemySendBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>PlayerSend</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>EnLtrT</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="DobotQueuedCmdLeftSpaceLabel">
+           <widget class="QLabel" name="AIEnLtrToLbl">
             <property name="text">
-             <string>-1</string>
+             <string>-</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_22">
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_27">
             <property name="text">
-             <string>CNextId</string>
+             <string>EnDgtT</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QLabel" name="CoreNextIdLabel">
+          <item row="2" column="3">
+           <widget class="QLabel" name="AIEnDgtToLbl">
             <property name="text">
-             <string>-1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QPushButton" name="executeDobotComandsBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>ExecDtCmds</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QPushButton" name="resetDobotIndexBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>ResDtId</string>
+             <string>-</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="4" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
           <string>Pose</string>
@@ -469,7 +494,148 @@
          </layout>
         </widget>
        </item>
-       <item row="7" column="2">
+       <item row="4" column="1">
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Queue</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="3" column="1">
+           <widget class="QLabel" name="CoreIndexAmountlabel">
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>DIndex</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>DLeftSpc</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>CMaxIdx</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="CoreMaxQueuedIndexLabel">
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="DobotQueuedIndexLabel">
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>CIds</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="DobotQueuedCmdLeftSpaceLabel">
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>CNextId</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="CoreNextIdLabel">
+            <property name="text">
+             <string>-1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QPushButton" name="executeDobotComandsBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>ExecDtCmds</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QPushButton" name="resetDobotIndexBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>ResDtId</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QGroupBox" name="groupBox_6">
+         <property name="title">
+          <string>Simulate player msg </string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="serviceCheckBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>servMsg</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLineEdit" name="emulatePlayerMsgLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="sendSimulatedMsgBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Send</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
+            </property>
+            <property name="default">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
         <widget class="QGroupBox" name="groupBox_11">
          <property name="title">
           <string>Dobot Movements</string>
@@ -533,263 +699,73 @@
          <zorder>downBtn</zorder>
         </widget>
        </item>
-       <item row="1" column="0" rowspan="5">
-        <widget class="QGroupBox" name="groupBox_3">
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Service PTP</string>
+          <string>Device</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>s1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_19">
-            <property name="text">
-             <string>Z</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QGridLayout" name="gridLayout_11">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_17">
+           <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>X</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_20">
-            <property name="text">
-             <string>R</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Y</string>
+             <string>SN</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="xPTPEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>s2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="yPTPEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="zPTPEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="servo1GripperEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1" colspan="3">
-           <widget class="QPushButton" name="sendBtn">
-            <property name="enabled">
-             <bool>false</bool>
+           <widget class="QLabel" name="deviceSNLabel">
+            <property name="frameShape">
+             <enum>QFrame::Panel</enum>
             </property>
             <property name="text">
-             <string>Send</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLineEdit" name="rPTPEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLineEdit" name="servo2GripperEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QGroupBox" name="groupBox_6">
-         <property name="title">
-          <string>Simulate player msg </string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="serviceCheckBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>servMsg</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLineEdit" name="emulatePlayerMsgLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="sendSimulatedMsgBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Send</string>
-            </property>
-            <property name="autoDefault">
-             <bool>true</bool>
-            </property>
-            <property name="default">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QGroupBox" name="groupBox_10">
-         <property name="title">
-          <string>AI</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_25">
-            <property name="text">
-             <string>EnDgtF</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_23">
+           <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>EnLtrF</string>
+             <string>Name</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="AIEnLtrFromLbl">
-            <property name="text">
-             <string>-</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QPushButton" name="AIEnemyStartBtn">
-            <property name="enabled">
-             <bool>false</bool>
+           <widget class="QLabel" name="DeviceNameLabel">
+            <property name="frameShape">
+             <enum>QFrame::Panel</enum>
             </property>
             <property name="text">
-             <string>PlayerStart</string>
+             <string/>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QRadioButton" name="botOffRadioBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Off</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QRadioButton" name="botOnRadioBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>On</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLabel" name="AIEnDgtFromLbl">
-            <property name="text">
-             <string>-</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" colspan="2">
-           <widget class="QPushButton" name="AIBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Send</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2" colspan="2">
-           <widget class="QPushButton" name="AIEnemySendBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>PlayerSend</string>
+            <property name="textFormat">
+             <enum>Qt::AutoText</enum>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_24">
+           <widget class="QLabel" name="label_11">
             <property name="text">
-             <string>EnLtrT</string>
+             <string>Info</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="AIEnLtrToLbl">
+           <widget class="QLabel" name="DeviceInfoLabel">
+            <property name="frameShape">
+             <enum>QFrame::Panel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
             <property name="text">
-             <string>-</string>
+             <string/>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label_27">
+          <item row="3" column="0">
+           <widget class="QPushButton" name="connectBtn">
             <property name="text">
-             <string>EnDgtT</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="AIEnDgtToLbl">
-            <property name="text">
-             <string>-</string>
+             <string>Connect</string>
             </property>
            </widget>
           </item>
@@ -802,23 +778,23 @@
           <string>Arduino Usb</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_13">
+          <item row="1" column="0">
+           <widget class="QComboBox" name="portsComboBox"/>
+          </item>
           <item row="0" column="0">
            <widget class="QLineEdit" name="commandLine"/>
           </item>
-          <item row="1" column="0">
-           <widget class="QComboBox" name="port"/>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="reloadPortsBtn">
+            <property name="text">
+             <string>Reload</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="1">
            <widget class="QPushButton" name="enterButton">
             <property name="text">
              <string>Enter</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="visual">
-            <property name="text">
-             <string>Visualize</string>
             </property>
            </widget>
           </item>
@@ -831,15 +807,13 @@
    </layout>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_7</zorder>
-   <zorder>groupBox_8</zorder>
-   <zorder>groupBox_9</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1023</width>
+     <width>1035</width>
      <height>18</height>
     </rect>
    </property>
@@ -860,7 +834,6 @@
   <tabstop>zPTPEdit</tabstop>
   <tabstop>sendBtn</tabstop>
   <tabstop>connectBtn</tabstop>
-  <tabstop>websocket_debug</tabstop>
  </tabstops>
  <resources/>
  <connections/>

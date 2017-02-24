@@ -43,7 +43,7 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     }
 
     qDebug() << "-Start move sequence-";
-    emit this->addTextToDobotConsole("-End of move sequence-\n");
+    emit this->addTextToDobotConsole("-Start move sequence-\n", 'd');
 
     _pDobot->gripperOpennedState(OPEN, chMoveType);
     _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, chMoveType);
@@ -61,7 +61,7 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, chMoveType);
 
     qDebug() << "-End of move sequence-";
-    emit this->addTextToDobotConsole("-End of move sequence-\n");
+    emit this->addTextToDobotConsole("-End of move sequence-\n", 'd');
 }
 
 void Chess::castlingMovingSequence()
@@ -84,7 +84,7 @@ void Chess::enpassantMovingSequence()
     else
     {
         emit _pDobot->addTextToDobotConsole("Error03!: Wrong turn in enpassant statement: "
-                                            + _pWebTable->getWhoseTurn() + "/n");
+                                            + _pWebTable->getWhoseTurn() + "/n", 'd');
         qDebug() << "Error03!: Chess::enpassantMovingSequence(): Unknown turn type: "
                  << _pWebTable->getWhoseTurn() << "/n";
         return;
@@ -179,7 +179,7 @@ void Chess::MoveOk() //ruch w pamięci sie powiódł.
 {
     //TODO: mylna jest nazwa funkcji z której możnaby wnioskować, że ruch już się wykonał
     qDebug() << "-Begin move sequence-";
-    emit this->addTextToDobotConsole("-Begin move sequence-\n");
+    emit this->addTextToDobotConsole("-Begin move sequence-\n", 'd');
 
     if (_pChessboard->castlingStatements()) //jeżeli warunki dla roszady spełnione...
         this->castlingMovingSequence(); //...to rozpocznij roszadę
@@ -202,7 +202,7 @@ void Chess::MoveOk() //ruch w pamięci sie powiódł.
     else this->pieceMovingSequence('n'); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
 
     //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
-    _pWebsockets->addTextToWebsocketConsole("Sending 'status' command to tcp. \n");
+    _pWebsockets->addTextToWsConsole("Sending 'status' command to tcp. \n", 'w');
     qDebug() << "Sending 'status' command to tcp";
     _pTCPMsgs->queueMsgs("status");
 }
@@ -214,10 +214,10 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
             _bServiceTests || m_bAI) //albo mamy do czynienia z zapytaniem serwisowym albo botem
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
-        _pWebsockets->addTextToWebsocketConsole("Sending 'new' game command to tcp. \n");
+        _pWebsockets->addTextToWsConsole("Sending 'new' game command to tcp. \n", 'w');
         _pTCPMsgs->queueMsgs("new");
     }
-    else _pWebsockets->addTextToWebsocketConsole("Error09! Wrong players names.\n");
+    else _pWebsockets->addTextToWsConsole("Error09! Wrong players names.\n", 'w');
 }
 
 void Chess::GameStarted() //zareaguj na to że gra wystartowała
@@ -228,7 +228,7 @@ void Chess::GameStarted() //zareaguj na to że gra wystartowała
     }
     else //prześlij info na stronę o tym że gra wystartowała
     {
-        _pWebsockets->addTextToWebsocketConsole("new_game");
+        _pWebsockets->addTextToWsConsole("new_game", 'w');
         qDebug() << "Sending 'new_game' to site";
         if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
     }
@@ -247,7 +247,7 @@ void Chess::TestMove(QString QStrMsgFromWebsockets)
 void Chess::MovePiece(QString QStrMsgFromWebsockets) // rządzanie ruchu- przemieszczenie bierki.
 { //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    _pWebsockets->addTextToWebsocketConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n");
+    _pWebsockets->addTextToWsConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n", 'w');
     qDebug() << "Sending normal move to tcp: " << QStrMsgFromWebsockets;
     _pTCPMsgs->queueMsgs(QStrMsgFromWebsockets); //zapytaj się tcp o poprawność prośby o ruch
 }
@@ -273,7 +273,7 @@ void Chess::TestOk()
     else
     {
         qDebug() << "Error: Chess::TestOk: None test is true.";
-        emit this->addTextToDobotConsole("Error: Chess::TestOk: None test is true.\n");
+        emit this->addTextToDobotConsole("Error: Chess::TestOk: None test is true.\n", 'w');
     }
 }
 

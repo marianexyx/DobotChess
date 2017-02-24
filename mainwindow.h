@@ -58,8 +58,9 @@ private slots:
     void onPTPsendBtnClicked();
 
     /*---sloty do używania GUI MainWindow---*/
+    void writeInConsole(QString QStrMsg, char chLogType);
+
     //dobot slots
-    void writeInDobotConsole(QString QStrMsg);
     void setDobotValidators();
     void setJointLabelText(QString QSJointLabelText, short sJoint);
     void setAxisLabelText(QString QSAxisLabelText, char chAxis);
@@ -70,11 +71,7 @@ private slots:
     void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
 
-    //tcp slots
-    void writeInTcpConsole(QString QS_msg);
-
     //websocket slots
-    void writeInWebsocketConsole(QString QStrMsg);
     void on_gripperBtn_clicked();
     void on_homeBtn_clicked();
     void on_upBtn_clicked();
@@ -85,6 +82,12 @@ private slots:
     void on_AIBtn_clicked();
     void on_AIEnemyStartBtn_clicked();
     void on_AIEnemySendBtn_clicked();
+
+    //arduino usb slots
+    void updatePortsComboBox(int nUsbPorst);
+    void on_commandLine_returnPressed(); //reakcja na wciśnięcie entera w programie
+    void on_portsComboBox_currentIndexChanged(int index);
+    void on_reloadPortsBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

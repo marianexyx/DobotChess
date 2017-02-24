@@ -32,8 +32,17 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
-    connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString)),
-            this, SLOT(writeInDobotConsole(QString)));
+    connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString,char)),
+            this, SLOT(writeInConsole(QString,char)));
+    connect(_pTCPmsg, SIGNAL(addTextToTcpConsole(QString,char)),
+            this, SLOT(writeInConsole(QString,char)));
+    connect(_pWebSockets, SIGNAL(addTextToWsConsole(QString,char)),
+            this, SLOT(writeInConsole(QString,char)));
+    connect(_pChess, SIGNAL(addTextToCoreConsole(QString,char)),
+            this, SLOT(writeInConsole(QString,char)));
+    connect(_pArduinoUsb, SIGNAL(addTextToUsbConsole(QString,char)),
+            this, SLOT(writeInConsole(QString,char)));
+
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobotArm, SIGNAL(AxisLabelText(QString, char)),
@@ -44,14 +53,6 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobotArm, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));
-    connect(_pTCPmsg, SIGNAL(addTextToTcpConsole(QString)),
-            this, SLOT(writeInTcpConsole(QString)));
-    connect(_pChess, SIGNAL(addTextToDobotConsole(QString)),
-            this, SLOT(writeInDobotConsole(QString)));
-    connect(_pWebSockets, SIGNAL(addTextToWebsocketConsole(QString)),
-            this, SLOT(writeInWebsocketConsole(QString)));
-    connect(_pChessboard, SIGNAL(addTextToDobotConsole(QString)),
-            this, SLOT(writeInDobotConsole(QString)));
     connect(_pDobotArm, SIGNAL(QueueLabels(int,int,int,int,int)),
             this, SLOT(setQueueLabels(int,int,int,int,int)));
 
@@ -103,7 +104,8 @@ void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId,
                                 int nCoreIdLeft, int CoreNextId)
 {
     if (nSpace == 0) nSpace = 1; //to tylko dla zblokowania wyskakującego warninga o unused parameter
-    //ui->DobotQueuedCmdLeftSpaceLabel->setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
+    //ui->DobotQueuedCmdLeftSpaceLabel->
+    //  setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
@@ -212,56 +214,34 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-void MainWindow::writeInTcpConsole(QString QStrMsg)
+void MainWindow::writeInConsole(QString QStrMsg, char chLogType = '0')
 {
+    QString QsLogType;
+    switch(chLogType)
+    {
+    case '0': QsLogType.clear(); break;
+    case 'd': QsLogType = "<Dobot>: "; break;
+    case 't': QsLogType = "<TCP>: "; break;
+    case 'w': QsLogType = "<Websockets>: "; break;
+    case 'm': QsLogType = "<mainwindow>: "; break;
+    case 'a': QsLogType = "<ArduinoUsb>: "; break;
+    default: QsLogType = "<ERROR: Wrong log type>: "; break;
+    }
+
+    //qDebug() << "MainWindow::writeInConsole received: " << QStrMsg;
     if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
 
     if(QStrMsg == "/clear") //czy czyścimy okno
     {
-        ui->tcp_debug->clear();
+        ui->debug_log->clear();
         return;
     }
-    QStrMsg = ">" + QStrMsg;
-    ui->tcp_debug->setPlainText(ui->tcp_debug->toPlainText() + QStrMsg);
+    QStrMsg = QsLogType + QStrMsg;
+    ui->debug_log->setPlainText(ui->debug_log->toPlainText() + QStrMsg);
 
     //auto scroll
-    QScrollBar *scroll_tcp = ui->tcp_debug->verticalScrollBar();
-    scroll_tcp->setValue(scroll_tcp->maximum());
-}
-
-void MainWindow::writeInWebsocketConsole(QString QStrMsg)
-{
-    //qDebug() << "MainWindow::writeInWebsocketConsole received: " << QStrMsg;
-    if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
-
-    if(QStrMsg == "/clear") //czy czyścimy okno
-    {
-        ui->websocket_debug->clear();
-        return;
-    }
-    QStrMsg = ">" + QStrMsg;
-    ui->websocket_debug->setPlainText(ui->websocket_debug->toPlainText() + QStrMsg);
-
-    //auto scroll
-    QScrollBar *scroll_websct = ui->websocket_debug->verticalScrollBar();
-    scroll_websct->setValue(scroll_websct->maximum());
-}
-
-void MainWindow::writeInDobotConsole(QString QStrMsg)
-{
-    if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
-
-    if(QStrMsg == "/clear") //czy czyścimy okno
-    {
-        ui->dobot_debug->clear();
-        return;
-    }
-    QStrMsg = ">" + QStrMsg;
-    ui->dobot_debug->setPlainText(ui->dobot_debug->toPlainText() + QStrMsg);
-
-    //auto scroll
-    QScrollBar *scroll_dobot = ui->dobot_debug->verticalScrollBar();
-    scroll_dobot->setValue(scroll_dobot->maximum());
+    QScrollBar *scroll_debug_log = ui->debug_log->verticalScrollBar();
+    scroll_debug_log->setValue(scroll_debug_log->maximum());
 }
 
 void MainWindow::initControl() {
@@ -391,7 +371,7 @@ void MainWindow::on_gripperBtn_clicked()
 
 void MainWindow::on_homeBtn_clicked()
 {
-    _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n");
+    _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n", 'd');
     HOMECmd HOMEChess;
     HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
     uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
@@ -419,13 +399,13 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
     int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToDobotConsole("Cleared Dobot Queued Cmds.\n");
+        _pDobotArm->addTextToDobotConsole("Cleared Dobot Queued Cmds.\n", 'd');
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n", 'd');
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.", 'd');
     else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
-                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n");
+                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n", 'd');
 }
 
 void MainWindow::on_executeDobotComandsBtn_clicked()
@@ -433,13 +413,13 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
     int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToDobotConsole("Start executing dobot queued cmds.\n");
+        _pDobotArm->addTextToDobotConsole("Start executing dobot queued cmds.\n", 'd');
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n", 'd');
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.\n");
+        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.\n", 'd');
     else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
-                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n");
+                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n", 'd');
 }
 
 void MainWindow::on_startPosBtn_clicked()
@@ -448,7 +428,7 @@ void MainWindow::on_startPosBtn_clicked()
     {
         ui->startPosBtn->setText(tr("StartDtPos"));
         qDebug() << "Placing arm above the chessboard.";
-        _pDobotArm->addTextToDobotConsole("Placing arm above the chessboard.\n");
+        _pDobotArm->addTextToDobotConsole("Placing arm above the chessboard.\n", 'd');
         _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
         _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
         _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
@@ -458,7 +438,7 @@ void MainWindow::on_startPosBtn_clicked()
     {
         ui->startPosBtn->setText(tr("StartGmPos"));
         qDebug() << "Returning safely to the HOME positions.";
-        _pDobotArm->addTextToDobotConsole("Returning safely to the HOME positions.\n");
+        _pDobotArm->addTextToDobotConsole("Returning safely to the HOME positions.\n", 'd');
         _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
         _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
         _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
@@ -486,6 +466,7 @@ void MainWindow::on_AIBtn_clicked()
 
 }
 
+//TODO: większość tego kodu wrzucić wrzucić do adekwantnych klas
 void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
 {
     if (_pChess->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
@@ -499,8 +480,8 @@ void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to ni
     }
     else
     {
-        this->writeInDobotConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
-                                  " function with _pChess->getAI() as false value\n");
+        this->writeInConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
+                                  " function with _pChess->getAI() as false value\n", 'm');
         qDebug() << "ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
                     " function with _pChess->getAI() as false value";
     }
@@ -531,15 +512,60 @@ void MainWindow::on_AIEnemySendBtn_clicked()
         }
         else
         {
-            this->writeInDobotConsole("ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions\n");
+            this->writeInConsole("ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions\n", 'm');
             qDebug() << "ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions";
         }
     }
     else
     {
-        this->writeInDobotConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
-                                  " function with _pChess->getAI() as false value\n");
+        this->writeInConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
+                                  " function with _pChess->getAI() as false value\n", 'm');
         qDebug() << "ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
                     " function with _pChess->getAI() as false value";
     }
+}
+
+void MainWindow::updatePortsComboBox(int nUsbPorst)
+{
+    QString message = QString::number(nUsbPorst)
+            + (nUsbPorst == 1 ? " port is ready to use" : " ports are ready to use");
+
+    // wyświetlamy wiadomość z informacją ile znaleźliwśmy urządzeń gotowych do pracy
+    //ui->statusBar->showMessage(message, 3000); //w stopce okna
+    this->writeInConsole(message, 'u');
+
+    // aktualizujemy
+    ui->portsComboBox->clear();
+    ui->portsComboBox->addItem("NULL");
+    for(int i=0; i<nUsbPorst; i++)
+    {
+        //wypełnianie combo boxa portami
+        ui->portsComboBox->addItem(_pArduinoUsb->availablePort.at(i).portName());
+    }
+}
+
+void MainWindow::on_commandLine_returnPressed() //wciśnięcie przycisku entera
+{
+    // jeżeli nie wybrano żadnego urządzenia nie wysyłamy
+    if(_pArduinoUsb->usbInfo == NULL)
+    {
+        this->writeInConsole("Not port selected", 'u');
+       // ui->statusBar->showMessage("Not port selected", 3000);
+        return;
+    }
+
+    //odczytaj wiadomość z pola textowego i wyślij na usb
+    _pArduinoUsb->sendDataToUsb(ui->commandLine->text());
+    ui->commandLine->clear(); // wyczyść pole textowe
+}
+
+void MainWindow::on_portsComboBox_currentIndexChanged(int index)
+{
+    _pArduinoUsb->portIndexChanged(index);
+}
+
+
+void MainWindow::on_reloadPortsBtn_clicked()
+{
+    _pArduinoUsb->searchDevices();
 }

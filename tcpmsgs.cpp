@@ -29,28 +29,28 @@ void TCPMsgs::doTcpConnect(QString QStrMsgForChenard)
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
 
-    emit addTextToTcpConsole("connecting...\n");
+    emit addTextToTcpConsole("connecting...\n", 't');
 
     // this is not blocking call
     socket->connectToHost("localhost", 22222); //docelowo emituje sygnał connected (tcp)
 
     if(!socket->waitForConnected(5000)) //czkemy na połączenie 5 sekund
     {
-        emit addTextToTcpConsole("Error12:" + socket->errorString() + "\n");
+        emit addTextToTcpConsole("Error12:" + socket->errorString() + "\n", 't');
     }
 }
 
 void TCPMsgs::connected()
 {
-    emit addTextToTcpConsole("connected...\n");
-    emit addTextToTcpConsole("msg from websocket: " + _QStrMsgForChenard + "\n");
+    emit addTextToTcpConsole("connected...\n", 't');
+    emit addTextToTcpConsole("msg from websocket: " + _QStrMsgForChenard + "\n", 't');
 
     QByteArray QabMsgArrayed;
     QabMsgArrayed.append(_QStrMsgForChenard); //przetworzenie parametru dla funkcji write()
     // send msg to tcp from web. chenard rozumie koniec wiadomości poprzez "\n"
     socket->write(QabMsgArrayed + "\n"); //write wysyła wiadomość (w bajtach) na server przez tcp
 
-    emit addTextToTcpConsole("wrote to TCP: " + QabMsgArrayed + "\n");
+    emit addTextToTcpConsole("wrote to TCP: " + QabMsgArrayed + "\n", 't');
 }
 
 void TCPMsgs::disconnected()
@@ -58,22 +58,22 @@ void TCPMsgs::disconnected()
     //TODO: Gdy dwa polecenie na tcp są wykonywane jedne po drugim, to tcp nie zdąży disconnectować...
     //...pierwszej podczas gdy zaczyna od razu wykonywać drugą. Nie widzę na tą chwilę by to w czymś...
     //...przeszkadzało, aczkolwiek wygląda to średnio.
-    emit addTextToTcpConsole("disconnected...\n\n");
+    emit addTextToTcpConsole("disconnected...\n\n", 't');
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
 {
-    emit addTextToTcpConsole(QString::number(bytes) + " bytes written...\n");
+    emit addTextToTcpConsole(QString::number(bytes) + " bytes written...\n", 't');
 }
 
 void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej wysłanej wiadmoności
 {
-    emit addTextToTcpConsole("reading...\n");
+    emit addTextToTcpConsole("reading...\n", 't');
 
     // read the data from the socket
     QString QStrMsgFromChenard = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
     emit addTextToTcpConsole("tcp answer: "
-                             + QStrMsgFromChenard); //pokaż ją w consoli tcp. \n dodaje się sam
+                             + QStrMsgFromChenard, 't'); //pokaż ją w consoli tcp. \n dodaje się sam
     qDebug() << "tcp answer: " << QStrMsgFromChenard;
     _QStrMsgForChenard.clear();
     emit MsgFromChenard(QStrMsgFromChenard); //core niech odbierze tą wiadomość i zdecyduje do dalej
