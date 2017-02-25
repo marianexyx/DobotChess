@@ -69,21 +69,6 @@ public:
     QPushButton *rHeadSubBtn;
     QPushButton *longArmSubBtn;
     QComboBox *teachMode;
-    QGroupBox *groupBox_10;
-    QGridLayout *gridLayout_2;
-    QLabel *label_25;
-    QLabel *label_23;
-    QLabel *AIEnLtrFromLbl;
-    QPushButton *AIEnemyStartBtn;
-    QRadioButton *botOffRadioBtn;
-    QRadioButton *botOnRadioBtn;
-    QLabel *AIEnDgtFromLbl;
-    QPushButton *AIBtn;
-    QPushButton *AIEnemySendBtn;
-    QLabel *label_24;
-    QLabel *AIEnLtrToLbl;
-    QLabel *label_27;
-    QLabel *AIEnDgtToLbl;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout;
     QLabel *label_4;
@@ -116,18 +101,12 @@ public:
     QLabel *CoreNextIdLabel;
     QPushButton *executeDobotComandsBtn;
     QPushButton *resetDobotIndexBtn;
-    QGroupBox *groupBox_6;
-    QGridLayout *gridLayout_6;
-    QCheckBox *serviceCheckBox;
-    QLineEdit *emulatePlayerMsgLineEdit;
-    QPushButton *sendSimulatedMsgBtn;
-    QGroupBox *groupBox_11;
-    QGridLayout *gridLayout_12;
-    QPushButton *startPosBtn;
-    QPushButton *homeBtn;
-    QPushButton *gripperBtn;
-    QPushButton *upBtn;
-    QPushButton *downBtn;
+    QGroupBox *groupBox_12;
+    QGridLayout *gridLayout_13;
+    QComboBox *portsComboBox;
+    QLineEdit *usbCmdLine;
+    QPushButton *reloadPortsBtn;
+    QPushButton *sendUsbBtn;
     QGroupBox *groupBox;
     QGridLayout *gridLayout_11;
     QLabel *label_9;
@@ -137,12 +116,33 @@ public:
     QLabel *label_11;
     QLabel *DeviceInfoLabel;
     QPushButton *connectBtn;
-    QGroupBox *groupBox_12;
-    QGridLayout *gridLayout_13;
-    QComboBox *portsComboBox;
-    QLineEdit *commandLine;
-    QPushButton *reloadPortsBtn;
-    QPushButton *enterButton;
+    QGroupBox *groupBox_6;
+    QGridLayout *gridLayout_6;
+    QCheckBox *serviceCheckBox;
+    QLineEdit *emulatePlayerMsgLineEdit;
+    QPushButton *sendSimulatedMsgBtn;
+    QGroupBox *groupBox_10;
+    QGridLayout *gridLayout_2;
+    QLabel *label_25;
+    QLabel *label_23;
+    QLabel *AIEnLtrFromLbl;
+    QPushButton *AIEnemyStartBtn;
+    QRadioButton *botOffRadioBtn;
+    QRadioButton *botOnRadioBtn;
+    QLabel *AIEnDgtFromLbl;
+    QPushButton *AIBtn;
+    QPushButton *AIEnemySendBtn;
+    QLabel *label_24;
+    QLabel *AIEnLtrToLbl;
+    QLabel *label_27;
+    QLabel *AIEnDgtToLbl;
+    QGroupBox *groupBox_11;
+    QGridLayout *gridLayout_12;
+    QPushButton *startPosBtn;
+    QPushButton *homeBtn;
+    QPushButton *gripperBtn;
+    QPushButton *upBtn;
+    QPushButton *downBtn;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -151,7 +151,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1035, 874);
+        MainWindow->resize(1035, 840);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_4 = new QGridLayout(centralWidget);
@@ -259,7 +259,7 @@ public:
         formLayout_2->setWidget(2, QFormLayout::LabelRole, label_18);
 
 
-        gridLayout_3->addWidget(groupBox_3, 1, 0, 1, 1);
+        gridLayout_3->addWidget(groupBox_3, 2, 0, 1, 1);
 
         JOGgroupBox = new QGroupBox(groupBox_5);
         JOGgroupBox->setObjectName(QStringLiteral("JOGgroupBox"));
@@ -322,87 +322,7 @@ public:
         gridLayout_10->addWidget(teachMode, 0, 0, 1, 2);
 
 
-        gridLayout_3->addWidget(JOGgroupBox, 1, 1, 1, 1);
-
-        groupBox_10 = new QGroupBox(groupBox_5);
-        groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
-        gridLayout_2 = new QGridLayout(groupBox_10);
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setContentsMargins(11, 11, 11, 11);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        label_25 = new QLabel(groupBox_10);
-        label_25->setObjectName(QStringLiteral("label_25"));
-
-        gridLayout_2->addWidget(label_25, 1, 2, 1, 1);
-
-        label_23 = new QLabel(groupBox_10);
-        label_23->setObjectName(QStringLiteral("label_23"));
-
-        gridLayout_2->addWidget(label_23, 1, 0, 1, 1);
-
-        AIEnLtrFromLbl = new QLabel(groupBox_10);
-        AIEnLtrFromLbl->setObjectName(QStringLiteral("AIEnLtrFromLbl"));
-
-        gridLayout_2->addWidget(AIEnLtrFromLbl, 1, 1, 1, 1);
-
-        AIEnemyStartBtn = new QPushButton(groupBox_10);
-        AIEnemyStartBtn->setObjectName(QStringLiteral("AIEnemyStartBtn"));
-        AIEnemyStartBtn->setEnabled(false);
-
-        gridLayout_2->addWidget(AIEnemyStartBtn, 3, 0, 1, 2);
-
-        botOffRadioBtn = new QRadioButton(groupBox_10);
-        botOffRadioBtn->setObjectName(QStringLiteral("botOffRadioBtn"));
-        botOffRadioBtn->setEnabled(false);
-        botOffRadioBtn->setChecked(true);
-
-        gridLayout_2->addWidget(botOffRadioBtn, 0, 0, 1, 1);
-
-        botOnRadioBtn = new QRadioButton(groupBox_10);
-        botOnRadioBtn->setObjectName(QStringLiteral("botOnRadioBtn"));
-        botOnRadioBtn->setEnabled(false);
-
-        gridLayout_2->addWidget(botOnRadioBtn, 0, 1, 1, 1);
-
-        AIEnDgtFromLbl = new QLabel(groupBox_10);
-        AIEnDgtFromLbl->setObjectName(QStringLiteral("AIEnDgtFromLbl"));
-
-        gridLayout_2->addWidget(AIEnDgtFromLbl, 1, 3, 1, 1);
-
-        AIBtn = new QPushButton(groupBox_10);
-        AIBtn->setObjectName(QStringLiteral("AIBtn"));
-        AIBtn->setEnabled(false);
-
-        gridLayout_2->addWidget(AIBtn, 0, 2, 1, 2);
-
-        AIEnemySendBtn = new QPushButton(groupBox_10);
-        AIEnemySendBtn->setObjectName(QStringLiteral("AIEnemySendBtn"));
-        AIEnemySendBtn->setEnabled(false);
-
-        gridLayout_2->addWidget(AIEnemySendBtn, 3, 2, 1, 2);
-
-        label_24 = new QLabel(groupBox_10);
-        label_24->setObjectName(QStringLiteral("label_24"));
-
-        gridLayout_2->addWidget(label_24, 2, 0, 1, 1);
-
-        AIEnLtrToLbl = new QLabel(groupBox_10);
-        AIEnLtrToLbl->setObjectName(QStringLiteral("AIEnLtrToLbl"));
-
-        gridLayout_2->addWidget(AIEnLtrToLbl, 2, 1, 1, 1);
-
-        label_27 = new QLabel(groupBox_10);
-        label_27->setObjectName(QStringLiteral("label_27"));
-
-        gridLayout_2->addWidget(label_27, 2, 2, 1, 1);
-
-        AIEnDgtToLbl = new QLabel(groupBox_10);
-        AIEnDgtToLbl->setObjectName(QStringLiteral("AIEnDgtToLbl"));
-
-        gridLayout_2->addWidget(AIEnDgtToLbl, 2, 3, 1, 1);
-
-
-        gridLayout_3->addWidget(groupBox_10, 3, 0, 1, 1);
+        gridLayout_3->addWidget(JOGgroupBox, 2, 1, 1, 1);
 
         groupBox_2 = new QGroupBox(groupBox_5);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
@@ -493,7 +413,7 @@ public:
         gridLayout->addWidget(xLabel, 2, 1, 1, 1);
 
 
-        gridLayout_3->addWidget(groupBox_2, 4, 0, 1, 1);
+        gridLayout_3->addWidget(groupBox_2, 5, 0, 1, 1);
 
         groupBox_4 = new QGroupBox(groupBox_5);
         groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
@@ -564,79 +484,38 @@ public:
         gridLayout_5->addWidget(resetDobotIndexBtn, 5, 0, 1, 1);
 
 
-        gridLayout_3->addWidget(groupBox_4, 4, 1, 1, 1);
+        gridLayout_3->addWidget(groupBox_4, 5, 1, 1, 1);
 
-        groupBox_6 = new QGroupBox(groupBox_5);
-        groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        gridLayout_6 = new QGridLayout(groupBox_6);
-        gridLayout_6->setSpacing(6);
-        gridLayout_6->setContentsMargins(11, 11, 11, 11);
-        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
-        serviceCheckBox = new QCheckBox(groupBox_6);
-        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
-        serviceCheckBox->setEnabled(false);
+        groupBox_12 = new QGroupBox(groupBox_5);
+        groupBox_12->setObjectName(QStringLiteral("groupBox_12"));
+        gridLayout_13 = new QGridLayout(groupBox_12);
+        gridLayout_13->setSpacing(6);
+        gridLayout_13->setContentsMargins(11, 11, 11, 11);
+        gridLayout_13->setObjectName(QStringLiteral("gridLayout_13"));
+        portsComboBox = new QComboBox(groupBox_12);
+        portsComboBox->setObjectName(QStringLiteral("portsComboBox"));
+        portsComboBox->setEnabled(false);
 
-        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
+        gridLayout_13->addWidget(portsComboBox, 1, 0, 1, 1);
 
-        emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
-        emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
-        emulatePlayerMsgLineEdit->setEnabled(false);
+        usbCmdLine = new QLineEdit(groupBox_12);
+        usbCmdLine->setObjectName(QStringLiteral("usbCmdLine"));
+        usbCmdLine->setEnabled(false);
 
-        gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 2);
+        gridLayout_13->addWidget(usbCmdLine, 0, 0, 1, 1);
 
-        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
-        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
-        sendSimulatedMsgBtn->setEnabled(false);
-        sendSimulatedMsgBtn->setAutoDefault(true);
+        reloadPortsBtn = new QPushButton(groupBox_12);
+        reloadPortsBtn->setObjectName(QStringLiteral("reloadPortsBtn"));
 
-        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
+        gridLayout_13->addWidget(reloadPortsBtn, 1, 1, 1, 1);
+
+        sendUsbBtn = new QPushButton(groupBox_12);
+        sendUsbBtn->setObjectName(QStringLiteral("sendUsbBtn"));
+
+        gridLayout_13->addWidget(sendUsbBtn, 0, 1, 1, 1);
 
 
-        gridLayout_3->addWidget(groupBox_6, 3, 1, 1, 1);
-
-        groupBox_11 = new QGroupBox(groupBox_5);
-        groupBox_11->setObjectName(QStringLiteral("groupBox_11"));
-        gridLayout_12 = new QGridLayout(groupBox_11);
-        gridLayout_12->setSpacing(6);
-        gridLayout_12->setContentsMargins(11, 11, 11, 11);
-        gridLayout_12->setObjectName(QStringLiteral("gridLayout_12"));
-        startPosBtn = new QPushButton(groupBox_11);
-        startPosBtn->setObjectName(QStringLiteral("startPosBtn"));
-        startPosBtn->setEnabled(false);
-
-        gridLayout_12->addWidget(startPosBtn, 1, 1, 1, 1);
-
-        homeBtn = new QPushButton(groupBox_11);
-        homeBtn->setObjectName(QStringLiteral("homeBtn"));
-        homeBtn->setEnabled(false);
-
-        gridLayout_12->addWidget(homeBtn, 0, 1, 1, 1);
-
-        gripperBtn = new QPushButton(groupBox_11);
-        gripperBtn->setObjectName(QStringLiteral("gripperBtn"));
-        gripperBtn->setEnabled(false);
-
-        gridLayout_12->addWidget(gripperBtn, 1, 0, 1, 1);
-
-        upBtn = new QPushButton(groupBox_11);
-        upBtn->setObjectName(QStringLiteral("upBtn"));
-        upBtn->setEnabled(false);
-
-        gridLayout_12->addWidget(upBtn, 2, 0, 1, 1);
-
-        downBtn = new QPushButton(groupBox_11);
-        downBtn->setObjectName(QStringLiteral("downBtn"));
-        downBtn->setEnabled(false);
-
-        gridLayout_12->addWidget(downBtn, 2, 1, 1, 1);
-
-        gripperBtn->raise();
-        startPosBtn->raise();
-        homeBtn->raise();
-        upBtn->raise();
-        downBtn->raise();
-
-        gridLayout_3->addWidget(groupBox_11, 2, 0, 1, 1);
+        gridLayout_3->addWidget(groupBox_12, 0, 0, 1, 1);
 
         groupBox = new QGroupBox(groupBox_5);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -685,36 +564,159 @@ public:
         gridLayout_11->addWidget(connectBtn, 3, 0, 1, 1);
 
 
-        gridLayout_3->addWidget(groupBox, 0, 1, 1, 1);
+        gridLayout_3->addWidget(groupBox, 1, 1, 1, 1);
 
-        groupBox_12 = new QGroupBox(groupBox_5);
-        groupBox_12->setObjectName(QStringLiteral("groupBox_12"));
-        gridLayout_13 = new QGridLayout(groupBox_12);
-        gridLayout_13->setSpacing(6);
-        gridLayout_13->setContentsMargins(11, 11, 11, 11);
-        gridLayout_13->setObjectName(QStringLiteral("gridLayout_13"));
-        portsComboBox = new QComboBox(groupBox_12);
-        portsComboBox->setObjectName(QStringLiteral("portsComboBox"));
+        groupBox_6 = new QGroupBox(groupBox_5);
+        groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
+        gridLayout_6 = new QGridLayout(groupBox_6);
+        gridLayout_6->setSpacing(6);
+        gridLayout_6->setContentsMargins(11, 11, 11, 11);
+        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        serviceCheckBox = new QCheckBox(groupBox_6);
+        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
+        serviceCheckBox->setEnabled(false);
 
-        gridLayout_13->addWidget(portsComboBox, 1, 0, 1, 1);
+        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
 
-        commandLine = new QLineEdit(groupBox_12);
-        commandLine->setObjectName(QStringLiteral("commandLine"));
+        emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
+        emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
+        emulatePlayerMsgLineEdit->setEnabled(false);
 
-        gridLayout_13->addWidget(commandLine, 0, 0, 1, 1);
+        gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 2);
 
-        reloadPortsBtn = new QPushButton(groupBox_12);
-        reloadPortsBtn->setObjectName(QStringLiteral("reloadPortsBtn"));
+        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
+        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
+        sendSimulatedMsgBtn->setEnabled(false);
+        sendSimulatedMsgBtn->setAutoDefault(true);
 
-        gridLayout_13->addWidget(reloadPortsBtn, 1, 1, 1, 1);
-
-        enterButton = new QPushButton(groupBox_12);
-        enterButton->setObjectName(QStringLiteral("enterButton"));
-
-        gridLayout_13->addWidget(enterButton, 0, 1, 1, 1);
+        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
 
 
-        gridLayout_3->addWidget(groupBox_12, 0, 0, 1, 1);
+        gridLayout_3->addWidget(groupBox_6, 0, 1, 1, 1);
+
+        groupBox_10 = new QGroupBox(groupBox_5);
+        groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
+        gridLayout_2 = new QGridLayout(groupBox_10);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        label_25 = new QLabel(groupBox_10);
+        label_25->setObjectName(QStringLiteral("label_25"));
+
+        gridLayout_2->addWidget(label_25, 1, 2, 1, 1);
+
+        label_23 = new QLabel(groupBox_10);
+        label_23->setObjectName(QStringLiteral("label_23"));
+
+        gridLayout_2->addWidget(label_23, 1, 0, 1, 1);
+
+        AIEnLtrFromLbl = new QLabel(groupBox_10);
+        AIEnLtrFromLbl->setObjectName(QStringLiteral("AIEnLtrFromLbl"));
+
+        gridLayout_2->addWidget(AIEnLtrFromLbl, 1, 1, 1, 1);
+
+        AIEnemyStartBtn = new QPushButton(groupBox_10);
+        AIEnemyStartBtn->setObjectName(QStringLiteral("AIEnemyStartBtn"));
+        AIEnemyStartBtn->setEnabled(false);
+
+        gridLayout_2->addWidget(AIEnemyStartBtn, 3, 0, 1, 2);
+
+        botOffRadioBtn = new QRadioButton(groupBox_10);
+        botOffRadioBtn->setObjectName(QStringLiteral("botOffRadioBtn"));
+        botOffRadioBtn->setEnabled(false);
+        botOffRadioBtn->setChecked(true);
+
+        gridLayout_2->addWidget(botOffRadioBtn, 0, 0, 1, 1);
+
+        botOnRadioBtn = new QRadioButton(groupBox_10);
+        botOnRadioBtn->setObjectName(QStringLiteral("botOnRadioBtn"));
+        botOnRadioBtn->setEnabled(false);
+
+        gridLayout_2->addWidget(botOnRadioBtn, 0, 1, 1, 1);
+
+        AIEnDgtFromLbl = new QLabel(groupBox_10);
+        AIEnDgtFromLbl->setObjectName(QStringLiteral("AIEnDgtFromLbl"));
+
+        gridLayout_2->addWidget(AIEnDgtFromLbl, 1, 3, 1, 1);
+
+        AIBtn = new QPushButton(groupBox_10);
+        AIBtn->setObjectName(QStringLiteral("AIBtn"));
+        AIBtn->setEnabled(false);
+
+        gridLayout_2->addWidget(AIBtn, 0, 2, 1, 2);
+
+        AIEnemySendBtn = new QPushButton(groupBox_10);
+        AIEnemySendBtn->setObjectName(QStringLiteral("AIEnemySendBtn"));
+        AIEnemySendBtn->setEnabled(false);
+
+        gridLayout_2->addWidget(AIEnemySendBtn, 3, 2, 1, 2);
+
+        label_24 = new QLabel(groupBox_10);
+        label_24->setObjectName(QStringLiteral("label_24"));
+
+        gridLayout_2->addWidget(label_24, 2, 0, 1, 1);
+
+        AIEnLtrToLbl = new QLabel(groupBox_10);
+        AIEnLtrToLbl->setObjectName(QStringLiteral("AIEnLtrToLbl"));
+
+        gridLayout_2->addWidget(AIEnLtrToLbl, 2, 1, 1, 1);
+
+        label_27 = new QLabel(groupBox_10);
+        label_27->setObjectName(QStringLiteral("label_27"));
+
+        gridLayout_2->addWidget(label_27, 2, 2, 1, 1);
+
+        AIEnDgtToLbl = new QLabel(groupBox_10);
+        AIEnDgtToLbl->setObjectName(QStringLiteral("AIEnDgtToLbl"));
+
+        gridLayout_2->addWidget(AIEnDgtToLbl, 2, 3, 1, 1);
+
+
+        gridLayout_3->addWidget(groupBox_10, 1, 0, 1, 1);
+
+        groupBox_11 = new QGroupBox(groupBox_5);
+        groupBox_11->setObjectName(QStringLiteral("groupBox_11"));
+        gridLayout_12 = new QGridLayout(groupBox_11);
+        gridLayout_12->setSpacing(6);
+        gridLayout_12->setContentsMargins(11, 11, 11, 11);
+        gridLayout_12->setObjectName(QStringLiteral("gridLayout_12"));
+        startPosBtn = new QPushButton(groupBox_11);
+        startPosBtn->setObjectName(QStringLiteral("startPosBtn"));
+        startPosBtn->setEnabled(false);
+
+        gridLayout_12->addWidget(startPosBtn, 1, 1, 1, 1);
+
+        homeBtn = new QPushButton(groupBox_11);
+        homeBtn->setObjectName(QStringLiteral("homeBtn"));
+        homeBtn->setEnabled(false);
+
+        gridLayout_12->addWidget(homeBtn, 0, 1, 1, 1);
+
+        gripperBtn = new QPushButton(groupBox_11);
+        gripperBtn->setObjectName(QStringLiteral("gripperBtn"));
+        gripperBtn->setEnabled(false);
+
+        gridLayout_12->addWidget(gripperBtn, 1, 0, 1, 1);
+
+        upBtn = new QPushButton(groupBox_11);
+        upBtn->setObjectName(QStringLiteral("upBtn"));
+        upBtn->setEnabled(false);
+
+        gridLayout_12->addWidget(upBtn, 2, 0, 1, 1);
+
+        downBtn = new QPushButton(groupBox_11);
+        downBtn->setObjectName(QStringLiteral("downBtn"));
+        downBtn->setEnabled(false);
+
+        gridLayout_12->addWidget(downBtn, 2, 1, 1, 1);
+
+        gripperBtn->raise();
+        startPosBtn->raise();
+        homeBtn->raise();
+        upBtn->raise();
+        downBtn->raise();
+
+        gridLayout_3->addWidget(groupBox_11, 3, 1, 1, 1);
 
 
         gridLayout_4->addWidget(groupBox_5, 0, 0, 1, 2);
@@ -771,20 +773,6 @@ public:
          << QApplication::translate("MainWindow", "Joint", 0)
          << QApplication::translate("MainWindow", "Axis", 0)
         );
-        groupBox_10->setTitle(QApplication::translate("MainWindow", "AI", 0));
-        label_25->setText(QApplication::translate("MainWindow", "EnDgtF", 0));
-        label_23->setText(QApplication::translate("MainWindow", "EnLtrF", 0));
-        AIEnLtrFromLbl->setText(QApplication::translate("MainWindow", "-", 0));
-        AIEnemyStartBtn->setText(QApplication::translate("MainWindow", "PlayerStart", 0));
-        botOffRadioBtn->setText(QApplication::translate("MainWindow", "Off", 0));
-        botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));
-        AIEnDgtFromLbl->setText(QApplication::translate("MainWindow", "-", 0));
-        AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
-        AIEnemySendBtn->setText(QApplication::translate("MainWindow", "PlayerSend", 0));
-        label_24->setText(QApplication::translate("MainWindow", "EnLtrT", 0));
-        AIEnLtrToLbl->setText(QApplication::translate("MainWindow", "-", 0));
-        label_27->setText(QApplication::translate("MainWindow", "EnDgtT", 0));
-        AIEnDgtToLbl->setText(QApplication::translate("MainWindow", "-", 0));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Pose", 0));
         label_4->setText(QApplication::translate("MainWindow", "J3", 0));
         joint2Label->setText(QApplication::translate("MainWindow", "0", 0));
@@ -815,15 +803,9 @@ public:
         CoreNextIdLabel->setText(QApplication::translate("MainWindow", "-1", 0));
         executeDobotComandsBtn->setText(QApplication::translate("MainWindow", "ExecDtCmds", 0));
         resetDobotIndexBtn->setText(QApplication::translate("MainWindow", "ResDtId", 0));
-        groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
-        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
-        sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "Send", 0));
-        groupBox_11->setTitle(QApplication::translate("MainWindow", "Dobot Movements", 0));
-        startPosBtn->setText(QApplication::translate("MainWindow", "StartGmPos", 0));
-        homeBtn->setText(QApplication::translate("MainWindow", "HOME", 0));
-        gripperBtn->setText(QApplication::translate("MainWindow", "Open gripper", 0));
-        upBtn->setText(QApplication::translate("MainWindow", "Up", 0));
-        downBtn->setText(QApplication::translate("MainWindow", "Down", 0));
+        groupBox_12->setTitle(QApplication::translate("MainWindow", "Arduino Usb", 0));
+        reloadPortsBtn->setText(QApplication::translate("MainWindow", "Reload", 0));
+        sendUsbBtn->setText(QApplication::translate("MainWindow", "Send", 0));
         groupBox->setTitle(QApplication::translate("MainWindow", "Device", 0));
         label_9->setText(QApplication::translate("MainWindow", "SN", 0));
         deviceSNLabel->setText(QString());
@@ -832,9 +814,29 @@ public:
         label_11->setText(QApplication::translate("MainWindow", "Info", 0));
         DeviceInfoLabel->setText(QString());
         connectBtn->setText(QApplication::translate("MainWindow", "Connect", 0));
-        groupBox_12->setTitle(QApplication::translate("MainWindow", "Arduino Usb", 0));
-        reloadPortsBtn->setText(QApplication::translate("MainWindow", "Reload", 0));
-        enterButton->setText(QApplication::translate("MainWindow", "Enter", 0));
+        groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
+        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
+        sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "Send", 0));
+        groupBox_10->setTitle(QApplication::translate("MainWindow", "AI", 0));
+        label_25->setText(QApplication::translate("MainWindow", "EnDgtF", 0));
+        label_23->setText(QApplication::translate("MainWindow", "EnLtrF", 0));
+        AIEnLtrFromLbl->setText(QApplication::translate("MainWindow", "-", 0));
+        AIEnemyStartBtn->setText(QApplication::translate("MainWindow", "PlayerStart", 0));
+        botOffRadioBtn->setText(QApplication::translate("MainWindow", "Off", 0));
+        botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));
+        AIEnDgtFromLbl->setText(QApplication::translate("MainWindow", "-", 0));
+        AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
+        AIEnemySendBtn->setText(QApplication::translate("MainWindow", "PlayerSend", 0));
+        label_24->setText(QApplication::translate("MainWindow", "EnLtrT", 0));
+        AIEnLtrToLbl->setText(QApplication::translate("MainWindow", "-", 0));
+        label_27->setText(QApplication::translate("MainWindow", "EnDgtT", 0));
+        AIEnDgtToLbl->setText(QApplication::translate("MainWindow", "-", 0));
+        groupBox_11->setTitle(QApplication::translate("MainWindow", "Dobot Movements", 0));
+        startPosBtn->setText(QApplication::translate("MainWindow", "StartGmPos", 0));
+        homeBtn->setText(QApplication::translate("MainWindow", "HOME", 0));
+        gripperBtn->setText(QApplication::translate("MainWindow", "Open gripper", 0));
+        upBtn->setText(QApplication::translate("MainWindow", "Up", 0));
+        downBtn->setText(QApplication::translate("MainWindow", "Down", 0));
     } // retranslateUi
 
 };

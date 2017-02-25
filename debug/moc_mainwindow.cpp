@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[48];
-    char stringdata0[850];
+    char stringdata0[843];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -74,9 +74,9 @@ QT_MOC_LITERAL(41, 675, 26), // "on_AIEnemyStartBtn_clicked"
 QT_MOC_LITERAL(42, 702, 25), // "on_AIEnemySendBtn_clicked"
 QT_MOC_LITERAL(43, 728, 19), // "updatePortsComboBox"
 QT_MOC_LITERAL(44, 748, 9), // "nUsbPorst"
-QT_MOC_LITERAL(45, 758, 28), // "on_commandLine_returnPressed"
-QT_MOC_LITERAL(46, 787, 36), // "on_portsComboBox_currentIndex..."
-QT_MOC_LITERAL(47, 824, 25) // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(45, 758, 36), // "on_portsComboBox_currentIndex..."
+QT_MOC_LITERAL(46, 795, 25), // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(47, 821, 21) // "on_sendUsbBtn_clicked"
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
@@ -100,9 +100,9 @@ QT_MOC_LITERAL(47, 824, 25) // "on_reloadPortsBtn_clicked"
     "on_startPosBtn_clicked\0on_AIBtn_clicked\0"
     "on_AIEnemyStartBtn_clicked\0"
     "on_AIEnemySendBtn_clicked\0updatePortsComboBox\0"
-    "nUsbPorst\0on_commandLine_returnPressed\0"
-    "on_portsComboBox_currentIndexChanged\0"
-    "on_reloadPortsBtn_clicked"
+    "nUsbPorst\0on_portsComboBox_currentIndexChanged\0"
+    "on_reloadPortsBtn_clicked\0"
+    "on_sendUsbBtn_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -145,8 +145,8 @@ static const uint qt_meta_data_MainWindow[] = {
       41,    0,  210,    2, 0x08 /* Private */,
       42,    0,  211,    2, 0x08 /* Private */,
       43,    1,  212,    2, 0x08 /* Private */,
-      45,    0,  215,    2, 0x08 /* Private */,
-      46,    1,  216,    2, 0x08 /* Private */,
+      45,    1,  215,    2, 0x08 /* Private */,
+      46,    0,  218,    2, 0x08 /* Private */,
       47,    0,  219,    2, 0x08 /* Private */,
 
  // slots: parameters
@@ -175,8 +175,8 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   44,
-    QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    4,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -213,9 +213,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 22: _t->on_AIEnemyStartBtn_clicked(); break;
         case 23: _t->on_AIEnemySendBtn_clicked(); break;
         case 24: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 25: _t->on_commandLine_returnPressed(); break;
-        case 26: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 27: _t->on_reloadPortsBtn_clicked(); break;
+        case 25: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 26: _t->on_reloadPortsBtn_clicked(); break;
+        case 27: _t->on_sendUsbBtn_clicked(); break;
         default: ;
         }
     }

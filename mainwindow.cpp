@@ -55,6 +55,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(showDobotErrorMsgBox()));
     connect(_pDobotArm, SIGNAL(QueueLabels(int,int,int,int,int)),
             this, SLOT(setQueueLabels(int,int,int,int,int)));
+    connect(_pArduinoUsb, SIGNAL(updatePortsComboBox(int)),
+            this, SLOT(updatePortsComboBox(int)));
 
     //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
@@ -224,8 +226,13 @@ void MainWindow::writeInConsole(QString QStrMsg, char chLogType = '0')
     case 't': QsLogType = "<TCP>: "; break;
     case 'w': QsLogType = "<Websockets>: "; break;
     case 'm': QsLogType = "<mainwindow>: "; break;
-    case 'a': QsLogType = "<ArduinoUsb>: "; break;
-    default: QsLogType = "<ERROR: Wrong log type>: "; break;
+    case 'u': QsLogType = "<USB>: "; break;
+    case 'a': QsLogType = "<USB> Sent: "; break;
+    case 'r': QsLogType = "<USB> Received: "; break;
+    default:
+        QString QsChar = QChar(chLogType);
+        QsLogType = "<ERROR: Wrong log type>: " + QsChar + ": ";
+        break;
     }
 
     //qDebug() << "MainWindow::writeInConsole received: " << QStrMsg;
@@ -446,6 +453,7 @@ void MainWindow::on_startPosBtn_clicked()
     }
 }
 
+//TODO: cieniektóry poniższe funkcje wrzucić do adekwantnych im klas
 void MainWindow::on_AIBtn_clicked()
 {
     if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
@@ -463,10 +471,8 @@ void MainWindow::on_AIBtn_clicked()
     }
     _pChess->resetPiecePositions();
     _pChess->NewGame();
-
 }
 
-//TODO: większość tego kodu wrzucić wrzucić do adekwantnych klas
 void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
 {
     if (_pChess->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
@@ -528,35 +534,14 @@ void MainWindow::on_AIEnemySendBtn_clicked()
 void MainWindow::updatePortsComboBox(int nUsbPorst)
 {
     QString message = QString::number(nUsbPorst)
-            + (nUsbPorst == 1 ? " port is ready to use" : " ports are ready to use");
+            + (nUsbPorst == 1 ? " port is ready to use\n" : " ports are ready to use\n");
+    this->writeInConsole(message, 'u'); //pokaż ile znaleziono portów
 
-    // wyświetlamy wiadomość z informacją ile znaleźliwśmy urządzeń gotowych do pracy
-    //ui->statusBar->showMessage(message, 3000); //w stopce okna
-    this->writeInConsole(message, 'u');
-
-    // aktualizujemy
+    //aktualizacja listy portów
     ui->portsComboBox->clear();
     ui->portsComboBox->addItem("NULL");
-    for(int i=0; i<nUsbPorst; i++)
-    {
-        //wypełnianie combo boxa portami
+    for(int i=0; i<nUsbPorst; i++) //wypełnianie combo boxa portami
         ui->portsComboBox->addItem(_pArduinoUsb->availablePort.at(i).portName());
-    }
-}
-
-void MainWindow::on_commandLine_returnPressed() //wciśnięcie przycisku entera
-{
-    // jeżeli nie wybrano żadnego urządzenia nie wysyłamy
-    if(_pArduinoUsb->usbInfo == NULL)
-    {
-        this->writeInConsole("Not port selected", 'u');
-       // ui->statusBar->showMessage("Not port selected", 3000);
-        return;
-    }
-
-    //odczytaj wiadomość z pola textowego i wyślij na usb
-    _pArduinoUsb->sendDataToUsb(ui->commandLine->text());
-    ui->commandLine->clear(); // wyczyść pole textowe
 }
 
 void MainWindow::on_portsComboBox_currentIndexChanged(int index)
@@ -564,8 +549,20 @@ void MainWindow::on_portsComboBox_currentIndexChanged(int index)
     _pArduinoUsb->portIndexChanged(index);
 }
 
-
 void MainWindow::on_reloadPortsBtn_clicked()
 {
+    ui->usbCmdLine->setEnabled(true);
+    ui->portsComboBox->setEnabled(true);
     _pArduinoUsb->searchDevices();
+}
+
+void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
+{
+    if(_pArduinoUsb->usbInfo == NULL) //by coś wysyłać musi istnieć wybrany jakiś port
+        this->writeInConsole("None port selected\n", 'u');
+    else
+    {
+        _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text()); //wyślij na usb wiadomość z pola textowego
+        ui->usbCmdLine->clear(); // wyczyść pole textowe
+    }
 }

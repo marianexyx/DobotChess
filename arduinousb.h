@@ -1,7 +1,8 @@
 #ifndef ARDUINOUSB_H
 #define ARDUINOUSB_H
 
-#include "QObject"
+#include <QObject>
+#include <QDebug>
 #include <QSerialPort> //obsługa portu
 #include <QSerialPortInfo> //dostarczanie informacji o porcie
 
@@ -18,6 +19,8 @@ public:
 
     QList <QSerialPortInfo> availablePort;     // lista portów pod którymi są urządzenia
     const QSerialPortInfo *usbInfo;                // obecnie wybrany serial port
+    QSerialPort *usbPort;                        // obecnie otwarty port
+    QString QsFullSerialMsg;
     void sendDataToUsb(QString QsMsg); //wysyłanie wiadomośći na usb
     void searchDevices();
 
@@ -25,8 +28,9 @@ private:
     //QList <QSerialPortInfo> availablePort;     // lista portów pod którymi są urządzenia
     //const QSerialPortInfo *usbInfo;                // obecnie wybrany serial port
     //QSerialPort usbPort;                       // obecnie otwarty port //todo: ???
-    QSerialPort *usbPort;                        // obecnie otwarty port
+    //QSerialPort *usbPort;                        // obecnie otwarty port. test as public
     //void sendDataToUsb(QString QsMsg, bool sender=false); //wysyłanie wiadomośći na usb
+    QByteArray QByteA_data; // tablica niezorganizowanych danych przypływających z usb
     void receive(); //odbieranie wiadomości z usb
 
 public slots:

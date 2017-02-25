@@ -85,9 +85,9 @@ private slots:
 
     //arduino usb slots
     void updatePortsComboBox(int nUsbPorst);
-    void on_commandLine_returnPressed(); //reakcja na wciśnięcie entera w programie
     void on_portsComboBox_currentIndexChanged(int index);
     void on_reloadPortsBtn_clicked();
+    void on_sendUsbBtn_clicked();
 };
 
 #endif // MAINWINDOW_H
