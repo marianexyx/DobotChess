@@ -32,6 +32,7 @@ private:
     //void sendDataToUsb(QString QsMsg, bool sender=false); //wysyłanie wiadomośći na usb
     QByteArray QByteA_data; // tablica niezorganizowanych danych przypływających z usb
     void receive(); //odbieranie wiadomości z usb
+    void ManageMsgFromUsb(QString QsUsbMsg);
 
 public slots:
    void portIndexChanged(int index); //zmiana/wybór portu
@@ -43,6 +44,9 @@ private slots:
 signals:
     void addTextToUsbConsole(QString, char);
     void updatePortsComboBox(int);
+    void AIEnemyStart();
+    void AIEnemySend(QString);
+    void AIFirstIgorMove(); //wykonaj pierwszy ruch igora z pamięci
 };
 
 #endif // ARDUINOUSB_H

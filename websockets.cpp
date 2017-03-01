@@ -93,8 +93,8 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
     }
     else
     {
-        //Q_FOREACH (QWebSocket *pClient, m_clients) //to jest zapis który wkrótce podobno będzie deprecated
-        for (QWebSocket *pClient : qAsConst(m_clients)) //dla każdego klienta kontenera m_clients wykonaj
+        Q_FOREACH (QWebSocket *pClient, m_clients) //to jest zapis który wkrótce podobno będzie deprecated
+        //for (QWebSocket *pClient : qAsConst(m_clients)) //dla każdego klienta kontenera m_clients wykonaj
             //TODO: gracze dostają komunikatów gracza przeciwnego. naprawić to (przy BAD_MOVE jest dłuższy komentarz)
         {
             if (QsWsMsgToProcess.left(17) == "white_player_name")
@@ -250,8 +250,8 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
 void Websockets::sendToChess(QString QsMsgForChessClass)
 {
     qDebug() << "Sending to 'chess' class: " << QsMsgForChessClass;
-    QsMsgForChessClass = "Sending to 'chess' class: " + QsMsgForChessClass;
-    emit MsgFromWebsocketsToChess(QsMsgForChessClass);
+    emit this->addTextToWsConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", 'w');
+    emit this->MsgFromWebsocketsToChess(QsMsgForChessClass);
 }
 
 void Websockets::socketDisconnected() //rozłączanie websocketa

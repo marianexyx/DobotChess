@@ -8,7 +8,7 @@
 #include "chessboard.h"
 #include "websockets.h"
 #include "tcpmsgs.h"
-//#include "webtable.h"
+#include "arduinousb.h"
 
 class Chess: public QObject
 {
@@ -20,6 +20,7 @@ private:
     Chessboard *_pChessboard;
     Websockets *_pWebsockets;
     WebTable *_pWebTable;
+    ArduinoUsb *_pArduinoUsb;
 
     bool _bServiceTests;
     bool m_bAI;
@@ -44,7 +45,7 @@ private:
 
 public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-          Websockets *pWebsockets, WebTable *pWebTable);
+          Websockets *pWebsockets, WebTable *pWebTable, ArduinoUsb *pArduinoUsb);
 
     void NewGame(); //TODO: przy tych 2 funkcjach mam problem z dostępem z poziomu mainwindow...
     void resetPiecePositions(); //...do nich. Były one jako prywatne i tam w sumie winny zostać jakoś.
@@ -62,6 +63,9 @@ public:
 public slots:
     void checkMsgFromChenard(QString tcpRespond);
     void checkMsgFromWebsockets(QString msgFromWs);
+    void AIEnemyStart();
+    QString AIEnemySend(QString QsFT); //move from to
+    void AIFirstIgorMove();
 
 signals:
     void addTextToDobotConsole(QString, char); //dodawanie komunikatu do konsoli dobota

@@ -32,7 +32,7 @@ void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
         //funkcja setPort() dziedziczy wszystkie atrybuty portu typu BaudRate, DataBits, Parity itd.
         usbPort->setPort(availablePort.at(nPortIndex-1)); //todo: czy tu ju jest port otwarty/polaczony?
         if(!usbPort->open(QIODevice::ReadWrite)) //jezeli port nie jest otwarty
-            this->addTextToUsbConsole("ERROR: Unable to open port", 'u');
+            this->addTextToUsbConsole("ERROR: Unable to open port\n", 'u');
     }
     else usbInfo = NULL; //wskaźnik czyszczony, by nie wyświetlało wcześniejszych informacji
 
@@ -57,9 +57,9 @@ void ArduinoUsb::readUsbData()
 {
     QByteA_data = usbPort->readAll(); //zapisz w tablicy wszystko co przyszło z usb
 
-    qDebug() << "QByteA_data = usbPort->readAll();" << QByteA_data;
-    QString QsQByteA(QByteA_data);
-    QsFullSerialMsg += QsQByteA;
+    qDebug() << "QByteA_data = usbPort->readAll():" << QByteA_data;
+    QString QsQByteA(QByteA_data); //stwórz stringa z listy stringów z usb (musi być z dekalracją)
+    QsFullSerialMsg += QsQByteA; //sklejaj to w pozafunkcyjnym stringu, póki nie trafimy na '$'
 
     if(QsFullSerialMsg.at(0) == '@' && //jeżeli pierwszy znak wiadomosci to @...
             QsFullSerialMsg.at(QsFullSerialMsg.size()-1) == '$') //...a ostatni to $...
@@ -68,9 +68,27 @@ void ArduinoUsb::readUsbData()
         QsFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
 
         emit this->addTextToUsbConsole(QsFullSerialMsg + "\n", 'r');
+        this->ManageMsgFromUsb(QsFullSerialMsg);
 
         QByteA_data.clear();
         QsFullSerialMsg.clear();
+    }
+}
+
+void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
+{
+    if (QsUsbMsg == "start") emit this->AIEnemyStart();
+    else if (QsUsbMsg == "doFirstIgorMove") emit this->AIFirstIgorMove();
+    else if (QsUsbMsg.left(9) == "send move")
+        emit this->AIEnemySend(QsUsbMsg.mid(5,4)); // mid(5,4) = np. e2e4
+    else if (QsUsbMsg.left(9) == "promoteTo")
+             QsUsbMsg.left(10); //TODO: nie ogarnieta jest wogle promocja
+    else
+    {
+        emit this->addTextToUsbConsole("ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
+                                       " command from usb:" + QsUsbMsg + "\n", 'r');
+        qDebug() << "ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
+                    " command from usb:" << QsUsbMsg;
     }
 }
 

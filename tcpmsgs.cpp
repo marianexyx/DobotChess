@@ -58,7 +58,7 @@ void TCPMsgs::disconnected()
     //TODO: Gdy dwa polecenie na tcp są wykonywane jedne po drugim, to tcp nie zdąży disconnectować...
     //...pierwszej podczas gdy zaczyna od razu wykonywać drugą. Nie widzę na tą chwilę by to w czymś...
     //...przeszkadzało, aczkolwiek wygląda to średnio.
-    emit addTextToTcpConsole("disconnected...\n\n", 't');
+    emit addTextToTcpConsole("disconnected...\n", 't');
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp

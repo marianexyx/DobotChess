@@ -13,13 +13,14 @@
 #define DOWN 0
 
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-             Websockets *pWebsockets, WebTable *pWebTable): _bServiceTests(false)
+             Websockets *pWebsockets, WebTable *pWebTable, ArduinoUsb *pArduinoUsb): _bServiceTests(false)
 {
     _pTCPMsgs = pTCPMsgs;
     _pDobot = pDobot;
     _pChessboard = pChessboard;
     _pWebsockets = pWebsockets;
     _pWebTable = pWebTable;
+    _pArduinoUsb = pArduinoUsb;
 
     _bServiceTests = false;
     m_bAI = false;
@@ -131,8 +132,8 @@ bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
                      && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] <= 16)) //...biały pionek...)
                 || (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 3
                     && _pChessboard->PieceTo.Digit == 2  //... lub czarny bije z pola 4 na 3...
-                && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter]
-                [_pChessboard->PieceFrom.Digit] > 48)) //...i jeśli jest to czarny pionek...
+                    && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter]
+                    [_pChessboard->PieceFrom.Digit] > 48)) //...i jeśli jest to czarny pionek...
             //... i pole na które idzie pionek nie jest zajete (inaczej byłoby to zwykłe bicie, a nie bicie w przelocie)
             && _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == 0)
     {
@@ -153,7 +154,12 @@ void Chess::checkMsgFromChenard(QString QsTcpRespond)
     {
         if (m_bAI) //jeżeli mamy doczynienia z botem, który wymyślił ruch
             //to zapisz ten ruch w pamięci i czekaj, aż człowiek wywoła ten ruch chęcią zaczęcia gry
-            _pChessboard->QsAIPiecieFromTo = QsTcpRespond;
+        {
+            _pChessboard->QsAIPiecieFromTo = QsTcpRespond.mid(3,4);
+            emit this->addTextToCoreConsole("AI is ready to start first move\n",'c');
+            qDebug() << "AI is ready to start first move";
+            _pArduinoUsb->sendDataToUsb("started");
+        }
         else
             this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
     }
@@ -214,10 +220,10 @@ void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
             _bServiceTests || m_bAI) //albo mamy do czynienia z zapytaniem serwisowym albo botem
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
-        _pWebsockets->addTextToWsConsole("Sending 'new' game command to tcp. \n", 'w');
+        _pWebsockets->addTextToWsConsole("Sending 'new' game command to tcp \n", 'w');
         _pTCPMsgs->queueMsgs("new");
     }
-    else _pWebsockets->addTextToWsConsole("Error09! Wrong players names.\n", 'w');
+    else _pWebsockets->addTextToWsConsole("ERROR: Chess::NewGame(): Wrong players names\n", 'w');
 }
 
 void Chess::GameStarted() //zareaguj na to że gra wystartowała
@@ -236,6 +242,7 @@ void Chess::GameStarted() //zareaguj na to że gra wystartowała
 
 void Chess::TestMove(QString QStrMsgFromWebsockets)
 {
+    qDebug() << "Chess::TestMove(QString QStrMsgFromWebsockets)";
     _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
 
     //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
@@ -480,10 +487,66 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
             }
             else qDebug() << "Chess::resetPiecePositions(): pieces are on start positions. end of loop";
         }
-         //wertuj w kółko planszę przestawiając bierki, dopóki
+        //wertuj w kółko planszę przestawiając bierki, dopóki
         //...szachownica nie wróci do stanu pierwotnego/startowego.
         while (!bArraysEqual); //wykonuj pętlę dopóki warunek jest prawdziwy
 
         qDebug() << "End of: Chess::resetPiecePositions()";
     }
+}
+
+void Chess::AIEnemyStart()
+{
+    if (this->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
+        //...nieaktywny jeżeli AI nie jest włączone
+    {
+        this->resetPiecePositions(); //przywróć bierki na pierwotne pozycje
+        this->NewGame(); //zacznij w pamięci chenardu nową grę
+    }
+    else
+    {
+        this->addTextToCoreConsole("ERROR: somehow initiated Chess::AIEnemyStart()"
+                                   " function with _pChess->getAI() as false value\n", '0');
+        qDebug() << "ERROR: somehow initiated Chess::AIEnemyStart()"
+                    " function with _pChess->getAI() as false value";
+    }
+}
+
+QString Chess::AIEnemySend(QString QsFT)
+{
+    QString QsRespond;
+    if (this->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
+        //...nieaktywny jeżeli AI nie jest włączone
+    {
+        if (QsFT.length() == 4)
+        {
+            //TODO: nie ogarniam wyrażeń regularnych:
+            if ((QsFT.at(0) == 'a' || QsFT.at(0) == 'b' || QsFT.at(0) == 'c' || QsFT.at(0) == 'd' ||
+                 QsFT.at(0) == 'e' || QsFT.at(0) == 'f' || QsFT.at(0) == 'g' || QsFT.at(0) == 'h') &&
+                    (QsFT.at(1) == '1' || QsFT.at(1) == '2' || QsFT.at(1) == '3' || QsFT.at(1) == '4' ||
+                     QsFT.at(1) == '5' || QsFT.at(1) == '6' || QsFT.at(1) == '7' || QsFT.at(1) == '8') &&
+                    (QsFT.at(2) == 'a' || QsFT.at(2) == 'b' || QsFT.at(2) == 'c' || QsFT.at(2) == 'd' ||
+                     QsFT.at(2) == 'e' || QsFT.at(2) == 'f' || QsFT.at(2) == 'g' || QsFT.at(2) == 'h') &&
+                    (QsFT.at(3) == '1' || QsFT.at(3) == '2' || QsFT.at(3) == '3' || QsFT.at(3) == '4' ||
+                     QsFT.at(3) == '5' || QsFT.at(3) == '6' || QsFT.at(3) == '7' || QsFT.at(3) == '8'))
+            {
+                QsRespond = "move " + QsFT;
+                _pWebsockets->sendToChess(QsRespond); //wyślij zapytanie o ruch tak, jakby...
+                //...szło ono ze strony
+            }
+            else QsRespond = "ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions\n";
+        }
+        else QsRespond = "ERROR: on_AIEnemySendBtn_clicked(): Wrong lenght of move cmd\n";
+    }
+    else QsRespond ="ERROR: somehow initiated Chess::AIEnemySend()"
+                    " function with _pChess->getAI() as false value\n";
+
+    return QsRespond;
+}
+
+void Chess::AIFirstIgorMove()
+{
+    //pierwszy ruch bota nigdy nie będzie specjalny (nie ma jak), zatem można go od razu normalnie wykonać
+    _pChessboard->findBoardPos("move " + _pChessboard->QsAIPiecieFromTo);
+    this->pieceMovingSequence('n');
 }

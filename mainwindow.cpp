@@ -22,7 +22,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     _pArduinoUsb = pArduinoUsb;
     _pChess = pChess;
 
-    //TODO: to pewnie dałoby się wrzucić do klasy dobota
+    //TODO: to pewnie dałoby się wrzucić do odpwoiednich klas
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),
@@ -30,6 +30,10 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     connect(ui->sendBtn, SIGNAL(clicked(bool)),
             this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
+
+    connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pChess, SLOT(AIEnemyStart()));
+    connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pChess, SLOT(AIEnemySend(QString)));
+    connect(_pArduinoUsb, SIGNAL(AIFirstIgorMove()), _pChess, SLOT(AIFirstIgorMove()));
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString,char)),
@@ -216,12 +220,16 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
+//TODO: ogarnąć sygnały wywołujące tą metodę- niech wszystkie się nazywają przed wrostków typu: dobot, tcp itd.
+//TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich qDebug, by nie robić tego wszędzie.
+//TODO3: dodać przed każdą komendą czas jej wywołania
 void MainWindow::writeInConsole(QString QStrMsg, char chLogType = '0')
 {
     QString QsLogType;
     switch(chLogType)
     {
     case '0': QsLogType.clear(); break;
+    case 'c': QsLogType = "<Core>: "; break;
     case 'd': QsLogType = "<Dobot>: "; break;
     case 't': QsLogType = "<TCP>: "; break;
     case 'w': QsLogType = "<Websockets>: "; break;
@@ -453,89 +461,46 @@ void MainWindow::on_startPosBtn_clicked()
     }
 }
 
-//TODO: cieniektóry poniższe funkcje wrzucić do adekwantnych im klas
 void MainWindow::on_AIBtn_clicked()
 {
     if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
     {
         _pChess->setAI(false);
+        this->writeInConsole("Turned off Igors AI\n",'m');
         ui->AIEnemyStartBtn->setEnabled(false);
         ui->AIEnemySendBtn->setEnabled(false);
+        ui->AIEnemyLineEdit->setEnabled(false);
     }
     else if (ui->botOnRadioBtn->isChecked())
     {
         _pChess->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
         //...wtedy ruszy z ruchem swoim
+        this->writeInConsole("Turned on Igors AI\n",'m');
         ui->AIEnemyStartBtn->setEnabled(true);
         ui->AIEnemySendBtn->setEnabled(true);
+        ui->AIEnemyLineEdit->setEnabled(true);
     }
-    _pChess->resetPiecePositions();
-    _pChess->NewGame();
+
+    _pChess->AIEnemyStart();
 }
 
 void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
 {
-    if (_pChess->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
-        //...nieaktywny jeżeli AI nie jest włączone
-    {
-        _pChess->resetPiecePositions(); //przywróć bierki na pierwotne pozycje
-        _pChess->NewGame(); //zacznij w pamięci chenardu nową grę
-        //pierwszy ruch bota nigdy nie będzie specjalny, zatem można go od razu normalnie wykonać
-        _pChessboard->findBoardPos("move " + _pChessboard->QsAIPiecieFromTo);
-        _pChess->pieceMovingSequence('n');
-    }
-    else
-    {
-        this->writeInConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
-                                  " function with _pChess->getAI() as false value\n", 'm');
-        qDebug() << "ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
-                    " function with _pChess->getAI() as false value";
-    }
+    _pChess->AIEnemyStart();
 }
 
 void MainWindow::on_AIEnemySendBtn_clicked()
-{ //TODO: wyrzucić wykonywanie tych funkcji do klasy 'chess'
-    if (_pChess->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
-        //...nieaktywny jeżeli AI nie jest włączone
-    {
-        QString QsEnLF = ui->AIEnLtrFromLbl->text(); //enemy's from letter
-        int nEnDF = ui->AIEnDgtFromLbl->text().toInt(); //enemy's from digit
-        QString QsEnLT = ui->AIEnLtrToLbl->text(); //enemy's to letter
-        int nEnDT = ui->AIEnDgtToLbl->text().toInt(); //enemy's to digit
-        QString QsEnemyMove;
-        //TODO: nie ogarniam wyrażeń regularnych:
-        if (nEnDF >= 1 && nEnDF <= 8 &&
-                (QsEnLF == "a" || QsEnLF == "b" || QsEnLF == "c" || QsEnLF == "d" ||
-                 QsEnLF == "e" || QsEnLF == "f" || QsEnLF == "g" || QsEnLF == "h") &&
-                nEnDT >= 1 && nEnDT <= 8 &&
-                (QsEnLT == "a" || QsEnLT == "b" || QsEnLT == "c" || QsEnLT == "d" ||
-                 QsEnLT == "e" || QsEnLT == "f" || QsEnLT == "g" || QsEnLT == "h"))
-        {
-            QsEnemyMove = "move " + QsEnLF + QString::number(nEnDF)
-                     + QsEnLT + QString::number(nEnDT); //sklej wiadomość w np.: "move e2e4"
-            _pWebSockets->sendToChess(QsEnemyMove); //wyślij zapytanie o ruch tak, jakby...
-            //...szło ono ze strony
-        }
-        else
-        {
-            this->writeInConsole("ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions\n", 'm');
-            qDebug() << "ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions";
-        }
-    }
-    else
-    {
-        this->writeInConsole("ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
-                                  " function with _pChess->getAI() as false value\n", 'm');
-        qDebug() << "ERROR: somehow initiated MainWindow::on_AIEnemyStartBtn_clicked()"
-                    " function with _pChess->getAI() as false value";
-    }
+{
+    QString QsAIEnemySend = _pChess->AIEnemySend(ui->AIEnemyLineEdit->text());
+    this->writeInConsole(QsAIEnemySend, 'm');
+    qDebug() << QsAIEnemySend;
 }
 
 void MainWindow::updatePortsComboBox(int nUsbPorst)
 {
-    QString message = QString::number(nUsbPorst)
+    QString QSUsbPorst = QString::number(nUsbPorst)
             + (nUsbPorst == 1 ? " port is ready to use\n" : " ports are ready to use\n");
-    this->writeInConsole(message, 'u'); //pokaż ile znaleziono portów
+    this->writeInConsole(QSUsbPorst, 'u'); //pokaż ile znaleziono portów
 
     //aktualizacja listy portów
     ui->portsComboBox->clear();

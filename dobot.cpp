@@ -328,11 +328,11 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     this->writeMoveTypeInConsole(chMoveType);
     
     QString QsMoveType = "";
-    bIsPieceMovingFrom ? QsMoveType = "PieceFrom: " : QsMoveType = "Pieceto: ";
+    bIsPieceMovingFrom ? QsMoveType = ": PieceFrom: " : QsMoveType = ": Pieceto: ";
     qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
              << nLetter << ", nDigit =" << nDigit;
     emit this->addTextToDobotConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
-                                     + QString::number(nDigit) + "\n", 'd');
+                                     + QString::number(nDigit) + "\n", '0');
     
     this->addCmdToList(NORMAL, false, f_xFromTo, f_yFromTo, f_zFromTo + m_nMaxPieceHeight, f_rFromTo);
     
@@ -478,9 +478,7 @@ void Dobot::writeMoveTypeInConsole(char chMoveType, char chMoveState)
     default: QsSecondMsg = "ERROR. Wrong movement state: "
                 + static_cast<QString>(chMoveState) + "\n"; break;
     }
-    if (chMoveState != 'x') emit this->addTextToDobotConsole(QsSecondMsg, 'd');
-    
-    qDebug() << "Start" << QsConsoleMsg << "move sequence" << QsSecondMsg;
+    if (chMoveState != 'x') emit this->addTextToDobotConsole(QsSecondMsg, '0');
 }
 
 void Dobot::closeEvent(QCloseEvent *)

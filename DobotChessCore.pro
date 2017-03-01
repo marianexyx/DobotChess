@@ -34,10 +34,11 @@ HEADERS  +=  webtable.h \
     dobot.h \
     arduinousb.h \
     chess.h \
+    ui_mainwindow.h \
     DobotDll/DobotDll.h \
     DobotDll/DobotType.h \
     mainwindow.h \
-    ui_mainwindow.h
+
 
 
 
