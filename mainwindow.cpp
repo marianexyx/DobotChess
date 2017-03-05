@@ -133,7 +133,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->shortArmSubBtn->setEnabled(false);
         ui->rHeadAddBtn->setEnabled(false);
         ui->rHeadSubBtn->setEnabled(false);
-        ui->startPosBtn->setEnabled(false);
+        ui->startGmPosBtn->setEnabled(false);
+        ui->startDtPosBtn->setEnabled(false);
 
         ui->sendBtn->setEnabled(false);
         ui->xPTPEdit->setEnabled(false);
@@ -155,7 +156,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
 
-        ui->gripperBtn->setEnabled(false);
+        ui->openGripperBtn->setEnabled(false);
+        ui->closeGripperBtn->setEnabled(false);
     }
     else
     {
@@ -170,7 +172,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->shortArmSubBtn->setEnabled(true);
         ui->rHeadAddBtn->setEnabled(true);
         ui->rHeadSubBtn->setEnabled(true);
-        ui->startPosBtn->setEnabled(true);
+        ui->startGmPosBtn->setEnabled(true);
+        ui->startDtPosBtn->setEnabled(true);
 
         ui->sendBtn->setEnabled(true);
         ui->xPTPEdit->setEnabled(true);
@@ -189,7 +192,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
 
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
 
-        ui->gripperBtn->setEnabled(true);
+        ui->openGripperBtn->setEnabled(true);
+        ui->closeGripperBtn->setEnabled(true);
     }
 }
 
@@ -200,18 +204,22 @@ void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QStri
     ui->DeviceInfoLabel->setText(QSdeviceVersion);
 }
 
+//TODO: dodać tu kod actual_state
 void MainWindow::onPTPsendBtnClicked()
 {
     int nPtpCmd_x = ui->xPTPEdit->text().toFloat();
     int nPtpCmd_y = ui->yPTPEdit->text().toFloat();
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
-    if (nPtpCmd_x != 0) _pDobotArm->addCmdToList(-1, false, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+    if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0)
+        _pDobotArm->addCmdToList(-1, false, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
     float fServoDutyCycle1 = ui->servo1GripperEdit->text().toFloat();
     float fServoDutyCycle2 = ui->servo2GripperEdit->text().toFloat();
     if (fServoDutyCycle1 !=0 && fServoDutyCycle2 !=0)
         _pDobotArm->gripperAngle(fServoDutyCycle1, fServoDutyCycle2);
+
+    //this->addCmdToList(GRIPPER1, isGripperOpened);
 }
 
 void MainWindow::showDobotErrorMsgBox()
@@ -220,8 +228,10 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-//TODO: ogarnąć sygnały wywołujące tą metodę- niech wszystkie się nazywają przed wrostków typu: dobot, tcp itd.
-//TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich qDebug, by nie robić tego wszędzie.
+//TODO: ogarnąć sygnały wywołujące tą metodę- niech wszystkie się...
+//...nazywają przed wrostków typu: dobot, tcp itd.
+//TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich...
+//...qDebug, by nie robić tego wszędzie.
 //TODO3: dodać przed każdą komendą czas jej wywołania
 void MainWindow::writeInConsole(QString QStrMsg, char chLogType = '0')
 {
@@ -369,21 +379,6 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     }
 }
 
-void MainWindow::on_gripperBtn_clicked()
-{
-    qDebug() << "on_gripperBtn_clicked";
-    if (ui->gripperBtn->text() == "Open gripper")
-    {
-        _pDobotArm->gripperOpennedState(true, 'v');
-        ui->gripperBtn->setText(tr("Close gripper"));
-    }
-    else if (ui->gripperBtn->text() == "Close gripper")
-    {
-        _pDobotArm->gripperOpennedState(false, 'v');
-        ui->gripperBtn->setText(tr("Open gripper"));
-    }
-}
-
 void MainWindow::on_homeBtn_clicked()
 {
     _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n", 'd');
@@ -435,30 +430,6 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
         _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.\n", 'd');
     else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
                                            "MainWindow::on_executeDobotComandsBtn_clicked().\n", 'd');
-}
-
-void MainWindow::on_startPosBtn_clicked()
-{
-    if (ui->startPosBtn->text() == "StartGmPos")
-    {
-        ui->startPosBtn->setText(tr("StartDtPos"));
-        qDebug() << "Placing arm above the chessboard.";
-        _pDobotArm->addTextToDobotConsole("Placing arm above the chessboard.\n", 'd');
-        _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
-        _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
-        _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
-        _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
-    }
-    else if (ui->startPosBtn->text() == "StartDtPos")
-    {
-        ui->startPosBtn->setText(tr("StartGmPos"));
-        qDebug() << "Returning safely to the HOME positions.";
-        _pDobotArm->addTextToDobotConsole("Returning safely to the HOME positions.\n", 'd');
-        _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
-        _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
-        _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
-        _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
-    }
 }
 
 void MainWindow::on_AIBtn_clicked()
@@ -530,4 +501,36 @@ void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
         _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text()); //wyślij na usb wiadomość z pola textowego
         ui->usbCmdLine->clear(); // wyczyść pole textowe
     }
+}
+
+void MainWindow::on_openGripperBtn_clicked()
+{
+    _pDobotArm->gripperOpennedState(true, 'v');
+}
+
+
+void MainWindow::on_closeGripperBtn_clicked()
+{
+    _pDobotArm->gripperOpennedState(false, 'v');
+}
+
+
+void MainWindow::on_startGmPosBtn_clicked()
+{
+    qDebug() << "Placing arm above the chessboard.";
+    _pDobotArm->addTextToDobotConsole("Placing arm above the chessboard.\n", 'd');
+    _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
+    _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
+    _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
+    _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
+}
+
+void MainWindow::on_startDtPosBtn_clicked()
+{
+    qDebug() << "Returning safely to the HOME positions.";
+    _pDobotArm->addTextToDobotConsole("Returning safely to the HOME positions.\n", 'd');
+    _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
+    _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
+    _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
+    _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
 }

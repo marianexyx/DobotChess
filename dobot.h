@@ -36,6 +36,7 @@ private:
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM m_gripperServo1;
     IOPWM m_gripperServo2;
+    const float m_fGrip1Opened, m_fGrip1Closed, m_fGrip2Opened, m_fGrip2Closed;
     const int m_nMaxPieceHeight; //na jakiej wysokości ma latać ramię by nie przewracać bierek
     const int m_nMaxRemPieceH; //na jaką dodatkową wysokość może się podnieść...
     //...ramię nad bierkami zbitymi

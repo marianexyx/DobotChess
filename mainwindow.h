@@ -72,13 +72,11 @@ private slots:
     void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
 
     //websocket slots
-    void on_gripperBtn_clicked();
     void on_homeBtn_clicked();
     void on_upBtn_clicked();
     void on_downBtn_clicked();
     void on_resetDobotIndexBtn_clicked();
     void on_executeDobotComandsBtn_clicked();
-    void on_startPosBtn_clicked();
     void on_AIBtn_clicked();
     void on_AIEnemyStartBtn_clicked();
     void on_AIEnemySendBtn_clicked();
@@ -88,6 +86,10 @@ private slots:
     void on_portsComboBox_currentIndexChanged(int index);
     void on_reloadPortsBtn_clicked();
     void on_sendUsbBtn_clicked();
+    void on_openGripperBtn_clicked();
+    void on_closeGripperBtn_clicked();
+    void on_startGmPosBtn_clicked();
+    void on_startDtPosBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

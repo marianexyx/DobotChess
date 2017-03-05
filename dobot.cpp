@@ -19,7 +19,12 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_fPtpCmd_xActualVal(200), //TODO: zmienne chessboardu?
     m_fPtpCmd_yActualVal(0),
     m_fPtpCmd_zActualVal(25),
-    m_fPtpCmd_rActualVal(0)
+    m_fPtpCmd_rActualVal(0),
+    m_fGrip1Opened(3.6f), //m_fGrip1Opened(3.6f),
+    m_fGrip1Closed(3.1f), //m_fGrip1Closed(3.1f),
+    m_fGrip2Opened(8.3f), //m_fGrip2Opened(8.3f),
+    m_fGrip2Closed(8.8f) //m_fGrip2Closed(8.8f)
+  //testy: s1= 9.5, s2= 4.5
 {
     _pChessboard = pChessboard;
     
@@ -148,11 +153,11 @@ void Dobot::QueuedIdList()
                     SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
                     break;
                 case GRIPPER1:
-                    m_gripperServo1.dutyCycle = takenPosId.state ? 3.6f : 3.1f;
+                    m_gripperServo1.dutyCycle = takenPosId.state ? m_fGrip1Opened : m_fGrip1Closed;
                     SetIOPWM(&m_gripperServo1, true, &takenPosId.index);
                     break;
                 case GRIPPER2:
-                    m_gripperServo2.dutyCycle = takenPosId.state ? 8.3f : 8.8f;
+                    m_gripperServo2.dutyCycle = takenPosId.state ? m_fGrip2Opened : m_fGrip2Closed;
                     SetIOPWM(&m_gripperServo2, true, &takenPosId.index);
                     break;
                 default:
@@ -279,14 +284,16 @@ void Dobot::initDobot()
     SetHOMEParams(&HomeChess, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
+//TODO: tu nie zadziała to
 void Dobot::gripperAngle(float fDutyCycle1, float fDutyCycle2)
 {
+    //uwaga: wykonuje się to polecenie bez kolejki
     if (fDutyCycle1 != 0) m_gripperServo1.dutyCycle = fDutyCycle1;
     if (fDutyCycle2 != 0) m_gripperServo2.dutyCycle = fDutyCycle2;
     qDebug() << "m_gripperServo1.dutyCycle = " << fDutyCycle1;
     qDebug() << "m_gripperServo2.dutyCycle = " << fDutyCycle2;
-    SetIOPWM(&m_gripperServo1, true, NULL);
-    SetIOPWM(&m_gripperServo2, true, NULL);
+    SetIOPWM(&m_gripperServo1, false, NULL);
+    SetIOPWM(&m_gripperServo2, false, NULL);
 }
 
 ///TYPY RUCHÓW PO PLANSZY
@@ -433,11 +440,7 @@ void Dobot::addCmdToList(int nType, bool bState, int x, int y, int z, int r)
     if (y != m_nActualPos) m_fPtpCmd_yActualVal = y;
     if (z != m_nActualPos) m_fPtpCmd_zActualVal = z;
     if (r != m_nActualPos) m_fPtpCmd_rActualVal = r;
-    
-    /*qDebug() << "x =" << m_fPtpCmd_xActualVal << ", y =" << m_fPtpCmd_yActualVal <<
-                ", z =" << m_fPtpCmd_zActualVal << ", r =" << m_fPtpCmd_rActualVal; //jeśli to się...
-    //...jeszcze ma przydać, to niech wyląduje gdzieś w QueuedIdList.*/
-    
+        
     m_ullCoreQueuedCmdIndex += 1; //aktualne id ruchu = +1 większe od ostatniego
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
     m_posIdx.type = nType; //wait, gripper1, gripper2

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.2)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.7.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,15 +12,15 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'mainwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.2. It"
+#error "This file was generated using the moc from 5.7.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[48];
-    char stringdata0[843];
+    QByteArrayData data[50];
+    char stringdata0[901];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -62,21 +62,23 @@ QT_MOC_LITERAL(29, 451, 8), // "nDobotId"
 QT_MOC_LITERAL(30, 460, 10), // "nCoreMaxId"
 QT_MOC_LITERAL(31, 471, 11), // "nCoreIdLeft"
 QT_MOC_LITERAL(32, 483, 10), // "CoreNextId"
-QT_MOC_LITERAL(33, 494, 21), // "on_gripperBtn_clicked"
-QT_MOC_LITERAL(34, 516, 18), // "on_homeBtn_clicked"
-QT_MOC_LITERAL(35, 535, 16), // "on_upBtn_clicked"
-QT_MOC_LITERAL(36, 552, 18), // "on_downBtn_clicked"
-QT_MOC_LITERAL(37, 571, 29), // "on_resetDobotIndexBtn_clicked"
-QT_MOC_LITERAL(38, 601, 33), // "on_executeDobotComandsBtn_cli..."
-QT_MOC_LITERAL(39, 635, 22), // "on_startPosBtn_clicked"
-QT_MOC_LITERAL(40, 658, 16), // "on_AIBtn_clicked"
-QT_MOC_LITERAL(41, 675, 26), // "on_AIEnemyStartBtn_clicked"
-QT_MOC_LITERAL(42, 702, 25), // "on_AIEnemySendBtn_clicked"
-QT_MOC_LITERAL(43, 728, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(44, 748, 9), // "nUsbPorst"
-QT_MOC_LITERAL(45, 758, 36), // "on_portsComboBox_currentIndex..."
-QT_MOC_LITERAL(46, 795, 25), // "on_reloadPortsBtn_clicked"
-QT_MOC_LITERAL(47, 821, 21) // "on_sendUsbBtn_clicked"
+QT_MOC_LITERAL(33, 494, 18), // "on_homeBtn_clicked"
+QT_MOC_LITERAL(34, 513, 16), // "on_upBtn_clicked"
+QT_MOC_LITERAL(35, 530, 18), // "on_downBtn_clicked"
+QT_MOC_LITERAL(36, 549, 29), // "on_resetDobotIndexBtn_clicked"
+QT_MOC_LITERAL(37, 579, 33), // "on_executeDobotComandsBtn_cli..."
+QT_MOC_LITERAL(38, 613, 16), // "on_AIBtn_clicked"
+QT_MOC_LITERAL(39, 630, 26), // "on_AIEnemyStartBtn_clicked"
+QT_MOC_LITERAL(40, 657, 25), // "on_AIEnemySendBtn_clicked"
+QT_MOC_LITERAL(41, 683, 19), // "updatePortsComboBox"
+QT_MOC_LITERAL(42, 703, 9), // "nUsbPorst"
+QT_MOC_LITERAL(43, 713, 36), // "on_portsComboBox_currentIndex..."
+QT_MOC_LITERAL(44, 750, 25), // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(45, 776, 21), // "on_sendUsbBtn_clicked"
+QT_MOC_LITERAL(46, 798, 25), // "on_openGripperBtn_clicked"
+QT_MOC_LITERAL(47, 824, 26), // "on_closeGripperBtn_clicked"
+QT_MOC_LITERAL(48, 851, 24), // "on_startGmPosBtn_clicked"
+QT_MOC_LITERAL(49, 876, 24) // "on_startDtPosBtn_clicked"
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
@@ -93,16 +95,17 @@ QT_MOC_LITERAL(47, 821, 21) // "on_sendUsbBtn_clicked"
     "textChanged\0on_sendSimulatedMsgBtn_clicked\0"
     "setQueueLabels\0nSpace\0nDobotId\0"
     "nCoreMaxId\0nCoreIdLeft\0CoreNextId\0"
-    "on_gripperBtn_clicked\0on_homeBtn_clicked\0"
-    "on_upBtn_clicked\0on_downBtn_clicked\0"
-    "on_resetDobotIndexBtn_clicked\0"
+    "on_homeBtn_clicked\0on_upBtn_clicked\0"
+    "on_downBtn_clicked\0on_resetDobotIndexBtn_clicked\0"
     "on_executeDobotComandsBtn_clicked\0"
-    "on_startPosBtn_clicked\0on_AIBtn_clicked\0"
-    "on_AIEnemyStartBtn_clicked\0"
+    "on_AIBtn_clicked\0on_AIEnemyStartBtn_clicked\0"
     "on_AIEnemySendBtn_clicked\0updatePortsComboBox\0"
     "nUsbPorst\0on_portsComboBox_currentIndexChanged\0"
     "on_reloadPortsBtn_clicked\0"
-    "on_sendUsbBtn_clicked"
+    "on_sendUsbBtn_clicked\0on_openGripperBtn_clicked\0"
+    "on_closeGripperBtn_clicked\0"
+    "on_startGmPosBtn_clicked\0"
+    "on_startDtPosBtn_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -112,7 +115,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      28,   14, // methods
+      30,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -120,34 +123,36 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  154,    2, 0x08 /* Private */,
-       3,    1,  155,    2, 0x08 /* Private */,
-       5,    0,  158,    2, 0x08 /* Private */,
-       6,    0,  159,    2, 0x08 /* Private */,
-       7,    2,  160,    2, 0x08 /* Private */,
-      10,    0,  165,    2, 0x08 /* Private */,
-      11,    2,  166,    2, 0x08 /* Private */,
-      14,    2,  171,    2, 0x08 /* Private */,
-      17,    1,  176,    2, 0x08 /* Private */,
-      19,    3,  179,    2, 0x08 /* Private */,
-      23,    0,  186,    2, 0x08 /* Private */,
-      24,    1,  187,    2, 0x08 /* Private */,
-      26,    0,  190,    2, 0x08 /* Private */,
-      27,    5,  191,    2, 0x08 /* Private */,
-      33,    0,  202,    2, 0x08 /* Private */,
-      34,    0,  203,    2, 0x08 /* Private */,
-      35,    0,  204,    2, 0x08 /* Private */,
-      36,    0,  205,    2, 0x08 /* Private */,
-      37,    0,  206,    2, 0x08 /* Private */,
-      38,    0,  207,    2, 0x08 /* Private */,
-      39,    0,  208,    2, 0x08 /* Private */,
-      40,    0,  209,    2, 0x08 /* Private */,
-      41,    0,  210,    2, 0x08 /* Private */,
-      42,    0,  211,    2, 0x08 /* Private */,
-      43,    1,  212,    2, 0x08 /* Private */,
-      45,    1,  215,    2, 0x08 /* Private */,
-      46,    0,  218,    2, 0x08 /* Private */,
-      47,    0,  219,    2, 0x08 /* Private */,
+       1,    0,  164,    2, 0x08 /* Private */,
+       3,    1,  165,    2, 0x08 /* Private */,
+       5,    0,  168,    2, 0x08 /* Private */,
+       6,    0,  169,    2, 0x08 /* Private */,
+       7,    2,  170,    2, 0x08 /* Private */,
+      10,    0,  175,    2, 0x08 /* Private */,
+      11,    2,  176,    2, 0x08 /* Private */,
+      14,    2,  181,    2, 0x08 /* Private */,
+      17,    1,  186,    2, 0x08 /* Private */,
+      19,    3,  189,    2, 0x08 /* Private */,
+      23,    0,  196,    2, 0x08 /* Private */,
+      24,    1,  197,    2, 0x08 /* Private */,
+      26,    0,  200,    2, 0x08 /* Private */,
+      27,    5,  201,    2, 0x08 /* Private */,
+      33,    0,  212,    2, 0x08 /* Private */,
+      34,    0,  213,    2, 0x08 /* Private */,
+      35,    0,  214,    2, 0x08 /* Private */,
+      36,    0,  215,    2, 0x08 /* Private */,
+      37,    0,  216,    2, 0x08 /* Private */,
+      38,    0,  217,    2, 0x08 /* Private */,
+      39,    0,  218,    2, 0x08 /* Private */,
+      40,    0,  219,    2, 0x08 /* Private */,
+      41,    1,  220,    2, 0x08 /* Private */,
+      43,    1,  223,    2, 0x08 /* Private */,
+      44,    0,  226,    2, 0x08 /* Private */,
+      45,    0,  227,    2, 0x08 /* Private */,
+      46,    0,  228,    2, 0x08 /* Private */,
+      47,    0,  229,    2, 0x08 /* Private */,
+      48,    0,  230,    2, 0x08 /* Private */,
+      49,    0,  231,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -172,10 +177,12 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   44,
+    QMetaType::Void, QMetaType::Int,   42,
     QMetaType::Void, QMetaType::Int,    4,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -202,20 +209,22 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 11: _t->on_emulatePlayerMsgLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 12: _t->on_sendSimulatedMsgBtn_clicked(); break;
         case 13: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
-        case 14: _t->on_gripperBtn_clicked(); break;
-        case 15: _t->on_homeBtn_clicked(); break;
-        case 16: _t->on_upBtn_clicked(); break;
-        case 17: _t->on_downBtn_clicked(); break;
-        case 18: _t->on_resetDobotIndexBtn_clicked(); break;
-        case 19: _t->on_executeDobotComandsBtn_clicked(); break;
-        case 20: _t->on_startPosBtn_clicked(); break;
-        case 21: _t->on_AIBtn_clicked(); break;
-        case 22: _t->on_AIEnemyStartBtn_clicked(); break;
-        case 23: _t->on_AIEnemySendBtn_clicked(); break;
-        case 24: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 25: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 26: _t->on_reloadPortsBtn_clicked(); break;
-        case 27: _t->on_sendUsbBtn_clicked(); break;
+        case 14: _t->on_homeBtn_clicked(); break;
+        case 15: _t->on_upBtn_clicked(); break;
+        case 16: _t->on_downBtn_clicked(); break;
+        case 17: _t->on_resetDobotIndexBtn_clicked(); break;
+        case 18: _t->on_executeDobotComandsBtn_clicked(); break;
+        case 19: _t->on_AIBtn_clicked(); break;
+        case 20: _t->on_AIEnemyStartBtn_clicked(); break;
+        case 21: _t->on_AIEnemySendBtn_clicked(); break;
+        case 22: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 23: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 24: _t->on_reloadPortsBtn_clicked(); break;
+        case 25: _t->on_sendUsbBtn_clicked(); break;
+        case 26: _t->on_openGripperBtn_clicked(); break;
+        case 27: _t->on_closeGripperBtn_clicked(); break;
+        case 28: _t->on_startGmPosBtn_clicked(); break;
+        case 29: _t->on_startDtPosBtn_clicked(); break;
         default: ;
         }
     }
@@ -246,13 +255,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 28)
+        if (_id < 30)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 28;
+        _id -= 30;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 28)
+        if (_id < 30)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 28;
+        _id -= 30;
     }
     return _id;
 }
