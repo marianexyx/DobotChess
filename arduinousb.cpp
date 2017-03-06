@@ -37,7 +37,10 @@ void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
     else usbInfo = NULL; //wskaźnik czyszczony, by nie wyświetlało wcześniejszych informacji
 
     if (QsPortName != "NULL") //nie pokazuj próby podłączania do pustego portu
+    {
         this->addTextToUsbConsole("Connected to port: " + QsPortName + "\n", 'u');
+        this->sendDataToUsb("connected");
+    }
 }
 
 void ArduinoUsb::sendDataToUsb(QString QsMsg) //wyslij wiadomość na serial port
@@ -85,8 +88,7 @@ void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
              QsUsbMsg.left(10); //TODO: nie ogarnieta jest wogle promocja
     else
     {
-        emit this->addTextToUsbConsole("ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
-                                       " command from usb:" + QsUsbMsg + "\n", 'r');
+        emit this->addTextToUsbConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", 'r');
         qDebug() << "ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
                     " command from usb:" << QsUsbMsg;
     }

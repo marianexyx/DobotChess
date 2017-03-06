@@ -24,7 +24,8 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_fGrip1Closed(3.1f), //m_fGrip1Closed(3.1f),
     m_fGrip2Opened(8.3f), //m_fGrip2Opened(8.3f),
     m_fGrip2Closed(8.8f) //m_fGrip2Closed(8.8f)
-  //testy: s1= 9.5, s2= 4.5
+  //testy: close 3.1 9.7 - za huja coś nie chce łapać drugie serwo dobrze
+  //open 3.4  9.4
 {
     _pChessboard = pChessboard;
     

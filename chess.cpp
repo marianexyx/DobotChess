@@ -44,7 +44,7 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     }
 
     qDebug() << "-Start move sequence-";
-    emit this->addTextToDobotConsole("-Start move sequence-\n", 'd');
+    emit this->addTextToDobotConsole("-Start move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
 
     _pDobot->gripperOpennedState(OPEN, chMoveType);
     _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, chMoveType);
@@ -62,7 +62,7 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, chMoveType);
 
     qDebug() << "-End of move sequence-";
-    emit this->addTextToDobotConsole("-End of move sequence-\n", 'd');
+    emit this->addTextToDobotConsole("-End of move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
 }
 
 void Chess::castlingMovingSequence()
@@ -234,7 +234,7 @@ void Chess::GameStarted() //zareaguj na to że gra wystartowała
     }
     else //prześlij info na stronę o tym że gra wystartowała
     {
-        _pWebsockets->addTextToWsConsole("new_game", 'w');
+        _pWebsockets->addTextToWsConsole("new_game\n", 'w');
         qDebug() << "Sending 'new_game' to site";
         if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
     }
@@ -549,4 +549,5 @@ void Chess::AIFirstIgorMove()
     //pierwszy ruch bota nigdy nie będzie specjalny (nie ma jak), zatem można go od razu normalnie wykonać
     _pChessboard->findBoardPos("move " + _pChessboard->QsAIPiecieFromTo);
     this->pieceMovingSequence('n');
+    _pArduinoUsb->sendDataToUsb("IgorHasEndedMove");
 }

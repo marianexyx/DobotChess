@@ -214,12 +214,11 @@ void MainWindow::onPTPsendBtnClicked()
     if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0)
         _pDobotArm->addCmdToList(-1, false, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
+    //TODO: serwisowe watrości skaczą jak pojebane, a wydaje się że inne nie
     float fServoDutyCycle1 = ui->servo1GripperEdit->text().toFloat();
     float fServoDutyCycle2 = ui->servo2GripperEdit->text().toFloat();
     if (fServoDutyCycle1 !=0 && fServoDutyCycle2 !=0)
         _pDobotArm->gripperAngle(fServoDutyCycle1, fServoDutyCycle2);
-
-    //this->addCmdToList(GRIPPER1, isGripperOpened);
 }
 
 void MainWindow::showDobotErrorMsgBox()

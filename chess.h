@@ -69,7 +69,7 @@ public slots:
 
 signals:
     void addTextToDobotConsole(QString, char); //dodawanie komunikatu do konsoli dobota
-    void addTextToCoreConsole(QString,char); //TODO: może się przydać jak upiekszę kod
+    void addTextToCoreConsole(QString, char);
 
 };
 
