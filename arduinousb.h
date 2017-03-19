@@ -21,8 +21,10 @@ public:
     const QSerialPortInfo *usbInfo;                // obecnie wybrany serial port
     QSerialPort *usbPort;                        // obecnie otwarty port
     QString QsFullSerialMsg;
+
     void sendDataToUsb(QString QsMsg); //wysyłanie wiadomośći na usb
     void searchDevices();
+
 
 private:
     //QList <QSerialPortInfo> availablePort;     // lista portów pod którymi są urządzenia
@@ -31,6 +33,7 @@ private:
     //QSerialPort *usbPort;                        // obecnie otwarty port. test as public
     //void sendDataToUsb(QString QsMsg, bool sender=false); //wysyłanie wiadomośći na usb
     QByteArray QByteA_data; // tablica niezorganizowanych danych przypływających z usb
+
     void receive(); //odbieranie wiadomości z usb
     void ManageMsgFromUsb(QString QsUsbMsg);
 
@@ -41,12 +44,14 @@ private slots:
     //void portIndexChanged(int index); //zmiana/wybór portu
     void readUsbData(); //sczytywanie danych lecących asynchronicznie z usb
 
+    //TODO: te sygnały to rympał w ogarnianiu kodu. działają na klasy pod którymi nie są, co...
+    //...powoduje chaos w ogarnianiu co skąd i kiedy leci
 signals:
     void addTextToUsbConsole(QString, char);
     void updatePortsComboBox(int);
     void AIEnemyStart();
     void AIEnemySend(QString);
-    void AIFirstIgorMove(); //wykonaj pierwszy ruch igora z pamięci
+    void TcpQueueMsg(QString); //zakolejkuj żądanie do wykonania na tcp
 };
 
 #endif // ARDUINOUSB_H

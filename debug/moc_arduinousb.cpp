@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'arduinousb.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.7.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,7 +12,7 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'arduinousb.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.7.0. It"
+#error "This file was generated using the moc from 5.6.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ArduinoUsb_t {
     QByteArrayData data[10];
-    char stringdata0[128];
+    char stringdata0[124];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,16 +35,16 @@ QT_MOC_LITERAL(2, 31, 0), // ""
 QT_MOC_LITERAL(3, 32, 19), // "updatePortsComboBox"
 QT_MOC_LITERAL(4, 52, 12), // "AIEnemyStart"
 QT_MOC_LITERAL(5, 65, 11), // "AIEnemySend"
-QT_MOC_LITERAL(6, 77, 15), // "AIFirstIgorMove"
-QT_MOC_LITERAL(7, 93, 16), // "portIndexChanged"
-QT_MOC_LITERAL(8, 110, 5), // "index"
-QT_MOC_LITERAL(9, 116, 11) // "readUsbData"
+QT_MOC_LITERAL(6, 77, 11), // "TcpQueueMsg"
+QT_MOC_LITERAL(7, 89, 16), // "portIndexChanged"
+QT_MOC_LITERAL(8, 106, 5), // "index"
+QT_MOC_LITERAL(9, 112, 11) // "readUsbData"
 
     },
     "ArduinoUsb\0addTextToUsbConsole\0\0"
     "updatePortsComboBox\0AIEnemyStart\0"
-    "AIEnemySend\0AIFirstIgorMove\0"
-    "portIndexChanged\0index\0readUsbData"
+    "AIEnemySend\0TcpQueueMsg\0portIndexChanged\0"
+    "index\0readUsbData"
 };
 #undef QT_MOC_LITERAL
 
@@ -66,18 +66,18 @@ static const uint qt_meta_data_ArduinoUsb[] = {
        3,    1,   54,    2, 0x06 /* Public */,
        4,    0,   57,    2, 0x06 /* Public */,
        5,    1,   58,    2, 0x06 /* Public */,
-       6,    0,   61,    2, 0x06 /* Public */,
+       6,    1,   61,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    1,   62,    2, 0x0a /* Public */,
-       9,    0,   65,    2, 0x08 /* Private */,
+       7,    1,   64,    2, 0x0a /* Public */,
+       9,    0,   67,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, QMetaType::Char,    2,    2,
     QMetaType::Void, QMetaType::Int,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    2,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    2,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Int,    8,
@@ -96,7 +96,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 2: _t->AIEnemyStart(); break;
         case 3: _t->AIEnemySend((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 4: _t->AIFirstIgorMove(); break;
+        case 4: _t->TcpQueueMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 5: _t->portIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 6: _t->readUsbData(); break;
         default: ;
@@ -133,8 +133,8 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
-            typedef void (ArduinoUsb::*_t)();
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ArduinoUsb::AIFirstIgorMove)) {
+            typedef void (ArduinoUsb::*_t)(QString );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ArduinoUsb::TcpQueueMsg)) {
                 *result = 4;
                 return;
             }
@@ -206,8 +206,9 @@ void ArduinoUsb::AIEnemySend(QString _t1)
 }
 
 // SIGNAL 4
-void ArduinoUsb::AIFirstIgorMove()
+void ArduinoUsb::TcpQueueMsg(QString _t1)
 {
-    QMetaObject::activate(this, &staticMetaObject, 4, Q_NULLPTR);
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 QT_END_MOC_NAMESPACE

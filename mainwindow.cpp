@@ -33,7 +33,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 
     connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pChess, SLOT(AIEnemyStart()));
     connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pChess, SLOT(AIEnemySend(QString)));
-    connect(_pArduinoUsb, SIGNAL(AIFirstIgorMove()), _pChess, SLOT(AIFirstIgorMove()));
+    connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(QString)), _pTCPmsg, SLOT(TcpQueueMsg(QString)));
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString,char)),
@@ -111,7 +111,7 @@ void MainWindow::setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId,
 {
     if (nSpace == 0) nSpace = 1; //to tylko dla zblokowania wyskakującego warninga o unused parameter
     //ui->DobotQueuedCmdLeftSpaceLabel->
-    //  setText(QString::number(nSpace)); //dobot.cc nie zrobił tego jeszcze
+    //  setText(QString::number(nSpace)); //TODO: dobot.cc nie zrobił tego jeszcze
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));

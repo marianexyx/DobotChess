@@ -65,7 +65,6 @@ public slots:
     void checkMsgFromWebsockets(QString msgFromWs);
     void AIEnemyStart();
     QString AIEnemySend(QString QsFT); //move from to
-    void AIFirstIgorMove();
 
 signals:
     void addTextToDobotConsole(QString, char); //dodawanie komunikatu do konsoli dobota

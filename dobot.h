@@ -48,14 +48,15 @@ private:
     int m_fPtpCmd_rActualVal;
 
     PTPCmd ptpCmd;
-    WAITCmd gripperMoveDelay;
+    WAITCmd gripperMoveDelay; //komenda mówiąca dobotowi, że ma nic nie robić przez chwilę...
+    //...podczas gdy musi się do końca wykonać komenda zamykania chwytaka zanim ruszy dalej
 
     unsigned long long m_ullCoreQueuedCmdIndex; //aktualny index kolejki w pamięci systemu
     unsigned long long m_ullDobotQueuedCmdIndex; //aktualny id kolejki ruchu wykonywany przez dobota
     //Id nigdy się nie resetuje, bo raczej nie dobiję do 18 triliardów ruchów (unsigned long long)
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
     ArmPosCrntCmdQIdx m_posIdx; //dane ramienia przypisane do danego indexu dobota  
-    QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka zapytań do dobota
+    QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
     ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId;
 
 public:

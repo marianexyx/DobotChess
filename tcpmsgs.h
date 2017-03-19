@@ -14,6 +14,8 @@ private:
     QString _QStrMsgForChenard;
     QList<QString> TCPMsgsList;
 
+    void doTcpConnect(QString QStrMsgForChenard);
+
 private slots:
     void connected();
     void disconnected();
@@ -24,7 +26,11 @@ public:
     TCPMsgs();
 
     void queueMsgs(QString msgs);
-    void doTcpConnect(QString QStrMsgForChenard);
+
+    bool bUndo; //TODO: do usunięcia na przyszłość po zmianie działania TCP
+
+public slots:
+    void TcpQueueMsg(QString msg);
 
 signals:
     void addTextToTcpConsole(QString, char);

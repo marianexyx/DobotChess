@@ -39,7 +39,7 @@ void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
     if (QsPortName != "NULL") //nie pokazuj próby podłączania do pustego portu
     {
         this->addTextToUsbConsole("Connected to port: " + QsPortName + "\n", 'u');
-        this->sendDataToUsb("connected");
+        qDebug() << "Connected to port: " << QsPortName;
     }
 }
 
@@ -81,11 +81,13 @@ void ArduinoUsb::readUsbData()
 void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
 {
     if (QsUsbMsg == "start") emit this->AIEnemyStart();
-    else if (QsUsbMsg == "doFirstIgorMove") emit this->AIFirstIgorMove();
-    else if (QsUsbMsg.left(9) == "send move")
+    else if (QsUsbMsg == "doFirstIgorMove") emit this->TcpQueueMsg("think 5000");
+    else if (QsUsbMsg.left(4) == "move")
+        //funkcja obslugującą dzieje się w klasie 'chess', dlatego sygnał leci przez mainwindow,...
+        //...bo inaczej ta klasa musiałaby być na równi z tamtą
         emit this->AIEnemySend(QsUsbMsg.mid(5,4)); // mid(5,4) = np. e2e4
     else if (QsUsbMsg.left(9) == "promoteTo")
-             QsUsbMsg.left(10); //TODO: nie ogarnieta jest wogle promocja
+        QsUsbMsg.left(10); //TODO: nie ogarnieta jest promocja
     else
     {
         emit this->addTextToUsbConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", 'r');

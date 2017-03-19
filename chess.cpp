@@ -65,6 +65,158 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     emit this->addTextToDobotConsole("-End of move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
 }
 
+void Chess::checkMsgFromChenard(QString QsTcpRespond)
+{
+    //TODO: ruchy z MoveOk i TestOk wykonywać w jednej funkcji dla porządku kodu
+    qDebug() << "Chess::checkMsgFromChenard: " << QsTcpRespond;
+    if (QsTcpRespond == "OK 1\n" || QsTcpRespond == "OK 1") //zdarza się, że z jakiegoś powodu tcp utnie końcówkę
+        this->MoveOk();
+    else if (QsTcpRespond == "OK\n")
+    {
+        if (_pTCPMsgs->bUndo) //gdy odpowiedź OK dotyczyła cofania ruchu Igora
+        {
+            //niech się wykona cały ruch Igora, łącznie ze sprawdzeniem wszystkich dziwnych ruchów...
+            //...tak aby też wykonał się dobrze mechanicznie
+            this->checkMsgFromWebsockets("move " + _pChessboard->QsAIPiecieFromTo);
+        }
+        else this->GameStarted();
+    }
+    else if (QsTcpRespond.left(3) == "OK " && QsTcpRespond.left(4) != "OK 1")
+    {
+        if (m_bAI) //jeżeli mamy doczynienia z botem, który wymyślił ruch ...
+        {
+            _pChessboard->QsAIPiecieFromTo = QsTcpRespond.mid(3,4); //...to zapisz ten ruch w pamięci
+            _pTCPMsgs->bUndo = true; //w odpowiedzi na "undo 1" z tcp "OK\n" trzeba wiedzieć, że to nie nowa gra, tylko undo
+            _pTCPMsgs->queueMsgs("undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go przez cały...
+            //...kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach
+
+            emit this->addTextToCoreConsole("AI is ready to start move\n",'c');
+            qDebug() << "AI is ready to start move";
+        }
+        else this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
+    }
+    else if (QsTcpRespond.left(7) == "ILLEGAL") this->MovePiece(_pChessboard->QsPiecieFromTo); //jednak to będzie zwykły ruch
+    else if (QsTcpRespond.left(8) == "BAD_MOVE")
+    {
+        if (m_bAI) //zły ruch wprowadzony na arduino
+        {
+            emit this->addTextToCoreConsole("BAD_MOVE request from Arduino\n",'c');
+            qDebug() << "BAD_MOVE request from Arduino";
+            _pArduinoUsb->sendDataToUsb(QsTcpRespond); //np. BAD_MOVE e2e4
+        }
+        else this->BadMove(QsTcpRespond);
+    }
+    else if (QsTcpRespond.left(1) == "*") //ruch wykonany poprawnie. gra w toku
+    {
+        if (m_bAI) //znajdź kolejny ruch Igora
+        {
+            if (!_pTCPMsgs->bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku...
+                _pTCPMsgs->queueMsgs("think 5000"); //...to wymyśl kolejny ruch bota białego Igora...
+            else  //...a jeżeli po wykonaniu ruchu Igora gra jest dalej w toku...
+            {
+                _pTCPMsgs->bUndo = false;
+                _pArduinoUsb->sendDataToUsb("IgorHasEndedMove"); //...to niech gracz wykonuje swój kolejny ruch.
+            }
+        }
+        else this->GameInProgress();
+    }
+    else if (QsTcpRespond.left(3) == "1-0" || QsTcpRespond.left(3) == "0-1" ||
+             QsTcpRespond.left(7) == "1/2-1/2") this->EndOfGame(QsTcpRespond);
+    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromChenard: " << QsTcpRespond;
+}
+
+void Chess::checkMsgFromWebsockets(QString msgFromWs) //TODO: mylne nazewnictwo. nie zawsze to przychodzi z websocketów
+{
+    qDebug() << "Chess::checkMsgFromWebsockets: received: " << msgFromWs;
+    if (msgFromWs == "new") this->NewGame();
+    else if (msgFromWs.left(4) == "move") this->TestMove(msgFromWs); //sprawdź najpierw czy nie występują ruchy specjalne
+    else if (msgFromWs.left(10) == "promote_to") this->Promote(msgFromWs); //odp. z WWW odnośnie tego na co promujemy
+    else if (msgFromWs.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
+    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromWebsockets: " << msgFromWs;
+}
+
+void Chess::MoveOk() //ruch w pamięci sie powiódł. wykonaj fizyczny ruch na ramieniu
+{
+    //TODO: mylna jest nazwa funkcji z której możnaby wnioskować, że ruch już się wykonał
+    qDebug() << "-Begin move sequence-";
+    emit this->addTextToDobotConsole("-Begin move sequence-\n", 'd');
+
+    if (_pChessboard->castlingStatements()) //jeżeli warunki dla roszady spełnione...
+        this->castlingMovingSequence(); //...to rozpocznij roszadę
+    //enpassant wykonuje się w testach
+    else if (_pChessboard->removeStatements()  //jeżeli warunki dla bicia są spełnione...
+             && !_pChessboard->bPromotionConfirmed) //..., ale nie są spełnione dla promocji...
+    {
+        this->pieceMovingSequence('r'); //... to rozpocznij zbijanie ...
+        this->pieceMovingSequence('n'); //... a potem wykonaj normalny ruch
+    }
+    else if (_pChessboard->bPromotionConfirmed) //jeżeli tcp potwierdził wykonanie promocji to rozpocznij promocję
+    {
+        if (_pChessboard->removeStatements()) //jeżeli przy promocji następuje bicie
+            this->pieceMovingSequence('r'); //to najpierw zbijamy
+        this->pieceMovingSequence('p'); //promocja bez podmiany bierek na inne to póki co zwykły ruch
+        _pChessboard->bTestPromotion = false; //czyszczenie zmiennych
+        _pChessboard->bPromotionConfirmed = false;
+
+    }
+    else this->pieceMovingSequence('n'); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
+
+    //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
+    _pWebsockets->addTextToWsConsole("Sending 'status' command to tcp. \n", 'w');
+    qDebug() << "Sending 'status' command to tcp";
+    _pTCPMsgs->queueMsgs("status");
+}
+
+void Chess::MovePiece(QString QStrMsgFromWebsockets) // żądzanie ruchu- przemieszczenie bierki.
+{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
+    //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
+    _pWebsockets->addTextToWsConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n", 'w');
+    qDebug() << "Sending normal move to tcp: " << QStrMsgFromWebsockets;
+    _pTCPMsgs->queueMsgs(QStrMsgFromWebsockets); //zapytaj się tcp o poprawność prośby o ruch
+}
+
+void Chess::NewGame() //przesyłanie prośby o nową grę na TCP
+{
+    if ((_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
+         !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
+            _bServiceTests || m_bAI) //albo mamy do czynienia z zapytaniem serwisowym albo botem
+        //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
+    {
+        _pWebsockets->addTextToWsConsole("Sending 'new' game command to tcp \n", 'w');
+        _pTCPMsgs->queueMsgs("new");
+    }
+    else _pWebsockets->addTextToWsConsole("ERROR: Chess::NewGame(): Wrong players names\n", 'w');
+}
+
+void Chess::GameStarted() //zareaguj na to że gra wystartowała
+{
+    if (m_bAI) //jeżeli mamy do czynienia z grą z botem
+    {
+        //_pTCPMsgs->doTcpConnect("think 5000"); //wymyśl pierwszy ruch bota białego //przeniosione do ArduinoUsb jako...
+        //...reakcja na kliknięcie START w arduino
+        _pArduinoUsb->sendDataToUsb("started"); //na arduino daj możliwość już wciśnięcua start. nawet...
+        //...jeżeli gracz wciśnie start zanim chenard skończy myśleć nad ruchem, to nic się nie powinno...
+        //...stać (kolejne te wciśnięcie startu powinno dopiero zacząć grę poprzez ruch ramieniem)
+    }
+    else //prześlij info na stronę o tym że gra wystartowała
+    {
+        _pWebsockets->addTextToWsConsole("new_game\n", 'w');
+        qDebug() << "Sending 'new_game' to site";
+        if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
+    }
+}
+
+void Chess::TestMove(QString QStrMsgFromWebsockets)
+{
+    qDebug() << "Chess::TestMove(QString QStrMsgFromWebsockets)";
+    _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
+
+    //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
+    if(this->testPromotion()) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
+    else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i przerwij jeśli test się powiódł.
+    else MovePiece(QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
+}
+
 void Chess::castlingMovingSequence()
 {
     this->pieceMovingSequence('c'); //wykonaj przemieszczenie królem
@@ -99,6 +251,7 @@ void Chess::enpassantMovingSequence()
     _pChessboard->bTestEnpassant = false; //wyłączenie, by nie zapętlać testów w odpowiedzi tcp.
 }
 
+//TODO: zamiast testować mogę to zestawiać z listą legalnych ruchów (zapytanie do chenard: "legal")
 bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
 {
     //poniżym warunkiem eliminuję jak największą ilość przypadkowych zapytań testowych do tcp o promocję
@@ -122,6 +275,7 @@ bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
     else return 0;
 }
 
+//TODO: zamiast testować mogę to zestawiać z listą legalnych ruchów (zapytanie do chenard: "legal")
 bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
 {
     //sprawdzamy czy zapytanie/ruch może być biciem w przelocie
@@ -142,121 +296,6 @@ bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
         return 1; //możemy mieć do czynienia z enpassant
     }
     else return 0;
-}
-
-void Chess::checkMsgFromChenard(QString QsTcpRespond)
-{
-    //TODO: ruchy z MoveOk i TestOk wykonywać w jednej funkcji dla porządku kodu
-    qDebug() << "Chess::checkMsgFromChenard: " << QsTcpRespond;
-    if (QsTcpRespond == "OK 1\n") this->MoveOk();
-    else if (QsTcpRespond == "OK\n") this->GameStarted();
-    else if (QsTcpRespond.left(3) == "OK " && QsTcpRespond.left(4) != "OK 1")
-    {
-        if (m_bAI) //jeżeli mamy doczynienia z botem, który wymyślił ruch
-            //to zapisz ten ruch w pamięci i czekaj, aż człowiek wywoła ten ruch chęcią zaczęcia gry
-        {
-            _pChessboard->QsAIPiecieFromTo = QsTcpRespond.mid(3,4);
-            emit this->addTextToCoreConsole("AI is ready to start first move\n",'c');
-            qDebug() << "AI is ready to start first move";
-            _pArduinoUsb->sendDataToUsb("started");
-        }
-        else
-            this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
-    }
-    else if (QsTcpRespond.left(7) == "ILLEGAL") this->MovePiece(_pChessboard->QsPiecieFromTo); //jednak to będzie zwykły ruch
-    else if (QsTcpRespond.left(8) == "BAD_MOVE") this->BadMove(QsTcpRespond);
-    else if (QsTcpRespond.left(1) == "*") this->GameInProgress();
-    else if (QsTcpRespond.left(3) == "1-0" || QsTcpRespond.left(3) == "0-1" ||
-             QsTcpRespond.left(7) == "1/2-1/2") this->EndOfGame(QsTcpRespond);
-    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromChenard: " << QsTcpRespond;
-}
-
-void Chess::checkMsgFromWebsockets(QString msgFromWs)
-{
-    qDebug() << "Chess::checkMsgFromWebsockets: received: " << msgFromWs;
-    if (msgFromWs == "new") this->NewGame();
-    else if (msgFromWs.left(4) == "move") this->TestMove(msgFromWs); //sprawdź najpierw czy nie występują ruchy specjalne
-    else if (msgFromWs.left(10) == "promote_to") this->Promote(msgFromWs); //odp. z WWW odnośnie tego na co promujemy
-    else if (msgFromWs.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
-    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgFromWebsockets: " << msgFromWs;
-}
-
-void Chess::MoveOk() //ruch w pamięci sie powiódł.
-{
-    //TODO: mylna jest nazwa funkcji z której możnaby wnioskować, że ruch już się wykonał
-    qDebug() << "-Begin move sequence-";
-    emit this->addTextToDobotConsole("-Begin move sequence-\n", 'd');
-
-    if (_pChessboard->castlingStatements()) //jeżeli warunki dla roszady spełnione...
-        this->castlingMovingSequence(); //...to rozpocznij roszadę
-    //enpassant wykonuje się w testach
-    else if (_pChessboard->removeStatements()  //jeżeli warunki dla bicia są spełnione...
-             && !_pChessboard->bPromotionConfirmed) //..., ale nie są spełnione dla promocji...
-    {
-        this->pieceMovingSequence('r'); //... to rozpocznij zbijanie ...
-        this->pieceMovingSequence('n'); //... a potem wykonaj normalny ruch
-    }
-    else if (_pChessboard->bPromotionConfirmed) //jeżeli tcp potwierdził wykonanie promocji to rozpocznij promocję
-    {
-        if (_pChessboard->removeStatements()) //jeżeli przy promocji następuje bicie
-            this->pieceMovingSequence('r'); //to najpierw zbijamy
-        this->pieceMovingSequence('p'); //promocja bez podmiany bierek na inne to póki co zwykły ruch
-        _pChessboard->bTestPromotion = false; //czyszczenie zmiennych
-        _pChessboard->bPromotionConfirmed = false;
-
-    }
-    else this->pieceMovingSequence('n'); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
-
-    //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
-    _pWebsockets->addTextToWsConsole("Sending 'status' command to tcp. \n", 'w');
-    qDebug() << "Sending 'status' command to tcp";
-    _pTCPMsgs->queueMsgs("status");
-}
-
-void Chess::NewGame() //przesyłanie prośby z WWW o nową grę na TCP
-{
-    if ((_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
-         !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
-            _bServiceTests || m_bAI) //albo mamy do czynienia z zapytaniem serwisowym albo botem
-        //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
-    {
-        _pWebsockets->addTextToWsConsole("Sending 'new' game command to tcp \n", 'w');
-        _pTCPMsgs->queueMsgs("new");
-    }
-    else _pWebsockets->addTextToWsConsole("ERROR: Chess::NewGame(): Wrong players names\n", 'w');
-}
-
-void Chess::GameStarted() //zareaguj na to że gra wystartowała
-{
-    if (m_bAI) //jeżeli mamy do czynienia z grą z botem
-    {
-        _pTCPMsgs->doTcpConnect("think 5000"); //wymyśl pierwszy ruch bota białego
-    }
-    else //prześlij info na stronę o tym że gra wystartowała
-    {
-        _pWebsockets->addTextToWsConsole("new_game\n", 'w');
-        qDebug() << "Sending 'new_game' to site";
-        if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
-    }
-}
-
-void Chess::TestMove(QString QStrMsgFromWebsockets)
-{
-    qDebug() << "Chess::TestMove(QString QStrMsgFromWebsockets)";
-    _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
-
-    //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
-    if(this->testPromotion()) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
-    else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i przerwij jeśli test się powiódł.
-    else MovePiece(QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
-}
-
-void Chess::MovePiece(QString QStrMsgFromWebsockets) // rządzanie ruchu- przemieszczenie bierki.
-{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
-    //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    _pWebsockets->addTextToWsConsole("Sending normal move to tcp: " + QStrMsgFromWebsockets + "\n", 'w');
-    qDebug() << "Sending normal move to tcp: " << QStrMsgFromWebsockets;
-    _pTCPMsgs->queueMsgs(QStrMsgFromWebsockets); //zapytaj się tcp o poprawność prośby o ruch
 }
 
 void Chess::Promote(QString QStrMsgFromWs)
@@ -304,12 +343,19 @@ void Chess::EndOfGame(QString QStrMsgFromChenardTcp)
     if (QStrMsgFromChenardTcp.left(3) == "1-0") QsWhoWon = "white_won";
     else if (QStrMsgFromChenardTcp.left(3) == "0-1") QsWhoWon = "black_won";
     else if (QStrMsgFromChenardTcp.left(7) == "1/2-1/2") QsWhoWon = "draw";
-    qDebug() << "Sending '" << QsWhoWon << "' to websockets";
-    _pWebsockets->processWebsocketMsg(QsWhoWon);
+    if (m_bAI) //bot AI igor
+    {
+        _pArduinoUsb->sendDataToUsb("GameOver: " + QsWhoWon);
+    }
+    else
+    {
+        qDebug() << "Sending '" << QsWhoWon << "' to websockets";
+        _pWebsockets->processWebsocketMsg(QsWhoWon);
+    }
     QsWhoWon.clear();
 
     this->resetPiecePositions(); //przywróć wszystkie bierki do stanu początkowego
-    //TODO: zablokować możliwość robienia czegokolwiek na stronie aż to się nie zakończy
+    //TODO: zablokować możliwość robienia czegokolwiek na stronie/arduino aż to się nie zakończy
 }
 
 void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new game"
@@ -518,7 +564,7 @@ QString Chess::AIEnemySend(QString QsFT)
     if (this->getAI()) //dodatkowe zabezpieczenie. przycisk powinien być...
         //...nieaktywny jeżeli AI nie jest włączone
     {
-        if (QsFT.length() == 4)
+        if (QsFT.length() == 4) //np. 'e2e4'
         {
             //TODO: nie ogarniam wyrażeń regularnych:
             if ((QsFT.at(0) == 'a' || QsFT.at(0) == 'b' || QsFT.at(0) == 'c' || QsFT.at(0) == 'd' ||
@@ -534,20 +580,12 @@ QString Chess::AIEnemySend(QString QsFT)
                 _pWebsockets->sendToChess(QsRespond); //wyślij zapytanie o ruch tak, jakby...
                 //...szło ono ze strony
             }
-            else QsRespond = "ERROR: on_AIEnemySendBtn_clicked(): Wrong square positions\n";
+            else QsRespond = "ERROR: Chess::AIEnemySend(: Wrong square positions\n";
         }
-        else QsRespond = "ERROR: on_AIEnemySendBtn_clicked(): Wrong lenght of move cmd\n";
+        else QsRespond = "ERROR: Chess::AIEnemySend(: Wrong lenght of move cmd\n";
     }
     else QsRespond ="ERROR: somehow initiated Chess::AIEnemySend()"
                     " function with _pChess->getAI() as false value\n";
 
     return QsRespond;
-}
-
-void Chess::AIFirstIgorMove()
-{
-    //pierwszy ruch bota nigdy nie będzie specjalny (nie ma jak), zatem można go od razu normalnie wykonać
-    _pChessboard->findBoardPos("move " + _pChessboard->QsAIPiecieFromTo);
-    this->pieceMovingSequence('n');
-    _pArduinoUsb->sendDataToUsb("IgorHasEndedMove");
 }

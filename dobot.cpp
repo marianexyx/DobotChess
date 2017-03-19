@@ -31,7 +31,7 @@ Dobot::Dobot(Chessboard *pChessboard):
     
     connectStatus = false;
     
-    m_gripperServo1.address = 6;
+    m_gripperServo1.address = 8;
     m_gripperServo1.frequency = 50.f;
     m_gripperServo1.dutyCycle = 7.5f;
     m_gripperServo2.address = 4;
@@ -117,6 +117,7 @@ void Dobot::QueuedIdList()
 
     GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny index dobota
 
+
     emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
                            m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
                            firstPosId.index);
@@ -187,9 +188,21 @@ void Dobot::onConnectDobot()
         qDebug() << "Dobot connection success";
         this->addTextToDobotConsole("Dobot connected \n", 'd');
         
-        SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
-        GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny index dobota.
-        SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
+        int result = GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny id i zapisz w zmiennej
+        if (result == DobotCommunicate_NoError)
+        {
+            emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
+                                   m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
+                                   firstPosId.index); //TODO: w zasadzie potrzebuje tylko zaaktualizować...
+                                   //...m_ullDobotQueuedCmdIndex, i to możę nie warto tutaj nawet. bardziej...
+                                   //...są to testy czy to się dzieje
+        }
+        else
+        {
+            qDebug() << "ERROR: Dobot::onConnectDobot(): GetQueuedCmdCurrentIndex gone wrong";
+            this->addTextToDobotConsole("ERROR: Dobot::onConnectDobot(): "
+                                        "GetQueuedCmdCurrentIndex gone wrong \n", 'd');
+        }
     }
     else
     {
@@ -203,7 +216,6 @@ void Dobot::refreshBtn() //niby button, ale używamy póki co tylko jako funkcja
 {
     if(connectStatus) emit RefreshDobotButtonsStates(false);
     else emit RefreshDobotButtonsStates(true);
-    
 }
 
 void Dobot::initDobot()
@@ -435,6 +447,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
 }
 /// END OF: TYPY RUCHÓW PO PLANSZY
 
+//TODO: przy włączeniu programu pierwszy ID ustawiać jako ten który jest aktualnie na dobocie
 void Dobot::addCmdToList(int nType, bool bState, int x, int y, int z, int r)
 {
     if (x != m_nActualPos) m_fPtpCmd_xActualVal = x;
