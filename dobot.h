@@ -57,7 +57,7 @@ private:
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
     ArmPosCrntCmdQIdx m_posIdx; //dane ramienia przypisane do danego indexu dobota  
     QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
-    ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId;
+    ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId; //TODO: sprawdzić to
 
 public:
     Dobot(Chessboard *pChessboard);

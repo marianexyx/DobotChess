@@ -7,7 +7,7 @@ QT_USE_NAMESPACE
 
 MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm, Chess *pChess,
-                       QWidget *parent) :
+                       IgorBot *pIgorBot, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -21,6 +21,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     _pTCPmsg = pTCPmsg;
     _pArduinoUsb = pArduinoUsb;
     _pChess = pChess;
+    _pIgorBot = pIgorBot;
 
     //TODO: to pewnie dałoby się wrzucić do odpwoiednich klas
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
@@ -31,6 +32,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
+    //TODO: naprawić sygnały
     connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pChess, SLOT(AIEnemyStart()));
     connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pChess, SLOT(AIEnemySend(QString)));
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(QString)), _pTCPmsg, SLOT(TcpQueueMsg(QString)));
@@ -63,8 +65,10 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(updatePortsComboBox(int)));
 
     //connecty komunikujące klasy z sobą
-    connect(_pTCPmsg, SIGNAL(MsgFromChenard(QString)), //przesyłanie odpowiedzi z chenard...
-            _pChess, SLOT(checkMsgFromChenard(QString)));  //...na silnk gry.
+    connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)), //przesyłanie odpowiedzi z chenard...
+            _pChess, SLOT(checkMsgFromChenard(QString, QString)));  //...na WWW przez silnk gry.
+    connect(_pTCPmsg, SIGNAL(msgFromTcpToArd(QString, QString)), //przesyłanie odpowiedzi z chenard...
+            _pIgorBot, SLOT(checkMsgFromChenard(QString, QString)));  //...na Arduino przez klasę SI.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z ...
             _pChess, SLOT(checkMsgFromWebsockets(QString))); //...websocketów na silnk gry.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z ...
@@ -435,7 +439,7 @@ void MainWindow::on_AIBtn_clicked()
 {
     if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
     {
-        _pChess->setAI(false);
+        _pIgorBot->setAI(false);
         this->writeInConsole("Turned off Igors AI\n",'m');
         ui->AIEnemyStartBtn->setEnabled(false);
         ui->AIEnemySendBtn->setEnabled(false);
@@ -443,7 +447,7 @@ void MainWindow::on_AIBtn_clicked()
     }
     else if (ui->botOnRadioBtn->isChecked())
     {
-        _pChess->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
+        _pIgorBot->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
         //...wtedy ruszy z ruchem swoim
         this->writeInConsole("Turned on Igors AI\n",'m');
         ui->AIEnemyStartBtn->setEnabled(true);
@@ -451,17 +455,17 @@ void MainWindow::on_AIBtn_clicked()
         ui->AIEnemyLineEdit->setEnabled(true);
     }
 
-    _pChess->AIEnemyStart();
+    _pIgorBot->enemyStart();
 }
 
 void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
 {
-    _pChess->AIEnemyStart();
+    _pIgorBot->enemyStart();
 }
 
 void MainWindow::on_AIEnemySendBtn_clicked()
 {
-    QString QsAIEnemySend = _pChess->AIEnemySend(ui->AIEnemyLineEdit->text());
+    QString QsAIEnemySend = _pIgorBot->enemySend(ui->AIEnemyLineEdit->text());
     this->writeInConsole(QsAIEnemySend, 'm');
     qDebug() << QsAIEnemySend;
 }

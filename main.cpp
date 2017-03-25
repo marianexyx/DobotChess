@@ -15,8 +15,9 @@ int main(int argc, char *argv[])
     Chess ChessCore(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
                     &Websockety, &WebTable001, &ArduinoUsbEnemysUI);
 
+    IgorBot IgorBotAI(&ChessboardDobot001, &TCPCommunication, &ArduinoUsbEnemysUI, &ChessCore);
     MainWindow mainwindow(&WebTable001, &Websockety, &ChessboardDobot001, &TCPCommunication,
-                      &ArduinoUsbEnemysUI, &DobotArm001, &ChessCore);
+                      &ArduinoUsbEnemysUI, &DobotArm001, &ChessCore, &IgorBotAI);
     mainwindow.show();
 
     return a.exec();

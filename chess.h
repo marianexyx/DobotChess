@@ -23,7 +23,7 @@ private:
     ArduinoUsb *_pArduinoUsb;
 
     bool _bServiceTests;
-    bool m_bAI;
+    //bool m_bAI;
 
     /*void pieceMovingSequence(char chMoveType,
                              int nPieceFromLetter = -1, int nPieceFromDigit = -1,
@@ -34,14 +34,15 @@ private:
     bool testPromotion();
 
     void TestMove(QString QStrMsgFromWebsockets);
-    void MovePiece(QString QStrMsgFromWebsockets);
-    void MoveOk();
+    void MovePiece(int sender, QString QStrMsgFromWebsockets);
+    void MoveOk(int nSender);
     void Promote(QString QStrMsgFromWs);
     void GameStarted();
     void TestOk();
     void GameInProgress();
     void EndOfGame(QString QStrMsgFromChenardTcp);
     void BadMove(QString QsMsgFromChenardTcp);
+    void wrongTcpAnswer(QString msgType, QString respond);
 
 public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
@@ -55,16 +56,14 @@ public:
 
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     bool getServiceTests() const                { return _bServiceTests; }
-    bool getAI() const                          { return m_bAI; }
 
     void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
-    void setAI(bool bAI)    { m_bAI = bAI; }
 
 public slots:
-    void checkMsgFromChenard(QString tcpRespond);
+    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
     void checkMsgFromWebsockets(QString msgFromWs);
-    void AIEnemyStart();
-    QString AIEnemySend(QString QsFT); //move from to
+    //void AIEnemyStart();
+    //QString AIEnemySend(QString QsFT); //move from to
 
 signals:
     void addTextToDobotConsole(QString, char); //dodawanie komunikatu do konsoli dobota

@@ -1,40 +1,68 @@
 #include "tcpmsgs.h"
 
+/*Jak działa ta klasa:
+-jakiś inny obiekt odpala metode tcp->queueMsgs. argumenty wpadające to KTO wysyła i CO wysyła
+-argumenty wpadająca zapisywane są od razu do jako struktura do listy (kolejki zapytań)
+-jeżeli są jakieś dane w liście do przetworzenia przez chenard, to rozpoczynam sekwencje rozmowy z tcp
+-pytam tcp czy żyje. jeżeli jest włączony to odpowiada mi on, że tak- odpala się metoda (slot) connected
+-po połączeniu wysyłamy do tcp wiadomość z najstarszej struktury danych przychodzacych (bez usuwania jej z listy)
+-wykonują i pokazują się pośrednie wiadomości połączenia tcp
+-dostajemy odpowiedź z tcp w metodzie readyRead (sygnałem)
+-odczytujemy ponownie najstarszą strukturę z listy (tak to jest zrobione, by nie było żadnych innych zmiennych,
+    które mogłyby być przesłonione gdyby do obiektu w listę wpadło kolejne polecenie do chenard)
+-na podstawie danych z tej najstarszej struktury sprawdzamy kto wysyłał nam dane (by jemu coś odesłać)
+-odsyłamy dane temu kto nam je wysłał (odsyłamy tą wiadomość którą nam przysłał i odpowiedź chenardu na tą
+    wiadomość. robimy to, bo odpowiedzi chenardu same z siebie są bardzo enigmatyczne)
+-usuwamy najstarszą strukturę danych tcp z listy (jest już przetworzona)
+-jeżeli w międzyczasie wpadły jakieś dane do listy to wykonaj kolejne zapytanie
+*/
+
+//TODO: jakaś normalizacja i odpowiednie miejsce na constanty
+const int WEBSITE = 1;
+const int ARDUINO = 2;
 
 //TODO: odpowiedzi na zapytania do TCP są niejednoznaczne. niech tcp oprócz zwracanej odpowiedzi zwraca...
 //...też informację o tym jakie zapytanie było wrzucane do TCP, jako że TCP działa tylko na zasadzie...
 //... zapytanie-odpowiedź.
+
 TCPMsgs::TCPMsgs()
 {
-    bUndo = false; //TODO: do usunięcia na przyszłość po zmianie działania TCP
+
 }
 
-void TCPMsgs::queueMsgs(QString msg)
+void TCPMsgs::queueMsgs(int nSender, QString msg)
 {
     qDebug() << "TCPMsgs::queueMsgs received msg: " << msg;
-    TCPMsgsList << msg; //wrzuć do kontenera wiadomość
+
+    TcpMsgMetadata QStrReceivedData;
+    QStrReceivedData.nSender = nSender;
+    QStrReceivedData.QStrMsgForTcp = msg;
+    TCPMsgsList << QStrReceivedData; //wrzuć do kontenera wiadomość
     if (!TCPMsgsList.isEmpty()) //jeżeli kontener nie jest pusty
     {
-        this->doTcpConnect(TCPMsgsList.takeLast()); //to wykonaj najstarszą wiadomość z kontenera.
+        this->doTcpConnect(); //to wykonaj najstarszą wiadomość z kontenera.
         //TODO: To działa w założeniu, że kolejny ruch nie wykona się nigdy dopóki nie dostaniemy ...
         //...informacji o tym jaki jest status gry (tzn. ruch się w pełni wykonał). To czy inne...
         //...znikome wyjątki zamiany kolejności zapytań tutaj wystąpią może być niezwykle rzadkie i...
         //...wymaga głębszej analizy "nie na teraz" o tym czy to wystapi i w jakich warunkach.
+        //TODO2: nie wiem czy to się nie gryzie z drugą taką samą funkcją w tej klasie, tj. czy...
+        //...nie będzie przypadku, że zaczniemy wykonywać drugi raz tą funkcję, podczas gdy cykl...
+        //...życia zapytania-odpowiedzi jednego polecenia tcp się jeszcze nie zakończył, i czy to...
+        //...cokolwike zmienia.
     }
 }
 
-void TCPMsgs::TcpQueueMsg(QString msg)
+void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
 {
-    this->queueMsgs(msg);
+    this->queueMsgs(nSender, msg);
 }
 
 //rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
-void TCPMsgs::doTcpConnect(QString QStrMsgForChenard)
+void TCPMsgs::doTcpConnect()
 {
-    //TODO: o co chodziło z tym, że mam 2 praktycznie takie same zmienne?
-    _QStrMsgForChenard = QStrMsgForChenard;
     socket = new QTcpSocket(this);
 
+    //TODO: przesunąć sygnały do np. konstruktora? (tam chyba giną po zakończeniu jego inicjalizacji)
     connect(socket, SIGNAL(connected()),this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
@@ -52,16 +80,18 @@ void TCPMsgs::doTcpConnect(QString QStrMsgForChenard)
     }
 }
 
-void TCPMsgs::connected()
+void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
 {
+    TcpMsgMetadata QStrData = TCPMsgsList.last();
+
     //emit addTextToTcpConsole("connected...\n", 't');
-    //emit addTextToTcpConsole("msg from websocket: " + _QStrMsgForChenard + "\n", 't');
+    //emit addTextToTcpConsole("msg from websocket: " + QStrData.QStrMsgForTcp + "\n", 't');
     qDebug() << "TCPMsgs: connected...";
-    qDebug() << "TCPMsgs: msg from websocket" << _QStrMsgForChenard;
+    qDebug() << "TCPMsgs: msg from sender" << QStrData.QStrMsgForTcp;
 
     QByteArray QabMsgArrayed;
-    QabMsgArrayed.append(_QStrMsgForChenard); //przetworzenie parametru dla funkcji write()
-    // send msg to tcp from web. chenard rozumie koniec wiadomości poprzez "\n"
+    QabMsgArrayed.append(QStrData.QStrMsgForTcp); //przetworzenie parametru dla funkcji write()
+    // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
     socket->write(QabMsgArrayed + "\n"); //write wysyła wiadomość (w bajtach) na server przez tcp
 
     emit addTextToTcpConsole("wrote to TCP: " + QabMsgArrayed + "\n", 't');
@@ -73,6 +103,7 @@ void TCPMsgs::disconnected()
     //...pierwszej podczas gdy zaczyna od razu wykonywać drugą. Nie widzę na tą chwilę by to w czymś...
     //...przeszkadzało, aczkolwiek wygląda to średnio.
     //emit addTextToTcpConsole("disconnected...\n", 't');
+    qDebug() << "disconnected...";
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
@@ -87,21 +118,42 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     qDebug() << "TCPMsgs: reading...";
 
     // read the data from the socket
-    QString QStrMsgFromChenard = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
-    emit addTextToTcpConsole("tcp answer: "
-                             + QStrMsgFromChenard, 't'); //pokaż ją w consoli tcp. \n dodaje się sam
-    qDebug() << "tcp answer: " << QStrMsgFromChenard;
-    _QStrMsgForChenard.clear();
+    QString QStrMsgFromTcp = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
+    //pokaż ją w consoli tcp. \n dodaje się sam
+    emit addTextToTcpConsole("tcp answer: " + QStrMsgFromTcp, 't');
+    qDebug() << "tcp answer: " << QStrMsgFromTcp;
 
     //TODO: dlaczego czasem dostaję 2 rozklejone wiadomości "OK 1" i "\n" zamiast 1 poprawnej "OK 1\n"?
-    if (!QStrMsgFromChenard.isEmpty() && QStrMsgFromChenard != "\n") //jeżeli nei jest to końcówka/syf
-        emit MsgFromChenard(QStrMsgFromChenard); //core niech odbierze tą wiadomość i zdecyduje do dalej
+    if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp!= "\n") //jeżeli nie jest to końcówka/syf
+    {
+        TcpMsgMetadata QStrData = TCPMsgsList.last();
+
+        if (QStrData.nSender == WEBSITE) //inna klasa powinna o tym decydowac?
+        {
+            //core niech odbierze tą wiadomość i zdecyduje do dalej
+            emit this->msgFromTcpToWeb(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
+        }
+        else if (QStrData.nSender == ARDUINO)
+        {
+            emit this->msgFromTcpToArd(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
+        }
+        else qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData.nSender value =" <<
+                         QStrData.nSender;
+    }
+    else qDebug() << "ERROR: TCPMsgs::readyRead() received empty or '\n' msg. Repair it. Msg =" <<
+                     QStrData.QStrMsgForTcp;
+
+    TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je
 
     if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
     {
-        this->doTcpConnect(TCPMsgsList.takeLast()); //to je wykonaj
+        this->doTcpConnect(); //to je wykonaj
         //TODO: Nie wiem czy to tu nie przyczyni się kiedyś do jakiegoś błędu. Mółgbym ten warunek...
         //...przesunąć do funkcji w core odpowiadającej wykonywaniu odpowiedzi na "status" z tcp...
         //..., ale to też wymaga analizy.
+        //TODO2: nie wiem czy to się nie gryzie z drugą taką samą funkcją w tej klasie, tj. czy...
+        //...nie będzie przypadku, że zaczniemy wykonywać drugi raz tą funkcję, podczas gdy cykl...
+        //...życia zapytania-odpowiedzi jednego polecenia tcp się jeszcze nie zakończył, i czy to...
+        //...cokolwike zmienia.
     }
 }
