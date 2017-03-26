@@ -31,7 +31,7 @@ public Q_SLOTS:
     void onNewConnection();
 
 signals:
-    void addTextToWsConsole(QString, char);
+    void addTextToConsole(QString, char);
     void MsgFromWebsocketsToChess(QString QStrMsgFromWebsockets);
     void MsgFromWebsocketsToWebtable(QString QStrMsgFromWebsockets);
 

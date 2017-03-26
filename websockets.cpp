@@ -13,7 +13,7 @@ Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
                 this, &Websockets::onNewConnection);
 
         qDebug() << "WebSocket server listening on port" << port;
-        emit addTextToWsConsole("WebSocket server listening on port" + port, 'w');
+        emit addTextToConsole("WebSocket server listening on port" + port, 'w');
     }
 
     _pWebTable = pWebTable;
@@ -36,7 +36,7 @@ void Websockets::onNewConnection() //nowe połączenia
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::processWebsocketMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected); //a jak disconnect, to disconnect
     m_clients << pSocket;
-    emit addTextToWsConsole("New connection \n", 'w');
+    emit addTextToConsole("New connection \n", 'w');
 }
 
 //TODO: *wszystkie wiadomośći które przychodzą ze strony powinny być opatrzone identyfikatorem tego
@@ -171,8 +171,8 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
         }
         /* if (pClient == pSender) //jeżeli wiadomośc wpadła od klienta (tj.z sieci)
             {
-            addTextToWsConsole("pClient == pSender\n");
-            addTextToWsConsole("Received from web: " + QsWsMsgToProcess + "\n");
+            addTextToConsole("pClient == pSender\n");
+            addTextToConsole("Received from web: " + QsWsMsgToProcess + "\n");
 
             if(QsWsMsgToProcess == "new" || QsWsMsgToProcess.left(4) == "move") //jeżeli są to wiadomości dla tcp
             {
@@ -185,30 +185,30 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
             {
             QS_nameWhite = QsWsMsgToProcess.mid(18);
             pClient->sendTextMessage("new_white " + QS_nameWhite); //wyślij do websocketowców nową nazwę białego
-            addTextToWsConsole("Send to web: new_white " + QS_nameWhite + "\n");
+            addTextToConsole("Send to web: new_white " + QS_nameWhite + "\n");
             }
             else if (QsWsMsgToProcess.left(17) == "black_player_name")
             {
             QS_nameBlack = QsWsMsgToProcess.mid(18);
             pClient->sendTextMessage("new_black " +QS_nameBlack); //wyślij do websocketowców nową nazwę czarnego
-            addTextToWsConsole("Send to web: new_black " + QS_nameBlack + "\n");
+            addTextToConsole("Send to web: new_black " + QS_nameBlack + "\n");
             }
-            else addTextToWsConsole("ERROR UNKNOW MESSAGE!\n");
+            else addTextToConsole("ERROR UNKNOW MESSAGE!\n");
             }
             }
 
             if (pClient != pSender) //jeżeli wiadomość jest wygenerowana przez serwer i leci na stronę
             {
-            addTextToWsConsole("pClient != pSender\n");
+            addTextToConsole("pClient != pSender\n");
             if (QsWsMsgToProcess == "OK\n") //jeżeli chenard zaczął nową grę
             {
             pClient->sendTextMessage("new_game");// wyślij websocketem odpowiedź z tcp na stronę
-            addTextToWsConsole("Send to web: new_game\n");
+            addTextToConsole("Send to web: new_game\n");
             }
             else if (QsWsMsgToProcess == "OK 1\n") //jeżeli chenard wykonał ruch prawidłowo
             {
             QS_chenardQuestion = "status"; //zapytaj się tcp o stan gry
-            addTextToWsConsole("Send to tcp: status\n");
+            addTextToConsole("Send to tcp: status\n");
             doTcpConnect(); //wykonaj drugie zapytanie tcp
             }
             else
@@ -216,41 +216,41 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
             if (QsWsMsgToProcess.left(1) == "*") //gra w toku
             {
             pClient->sendTextMessage("game_in_progress");
-            addTextToWsConsole("Send to web: game_in_progress\n\n");
+            addTextToConsole("Send to web: game_in_progress\n\n");
             }
             else if (QsWsMsgToProcess.left(3) == "1-0") //biały wygrał
             {
             pClient->sendTextMessage("white_won");
-            addTextToWsConsole("Send to web: white_won\n\n");
+            addTextToConsole("Send to web: white_won\n\n");
             }
             else if (QsWsMsgToProcess.left(3) == "0-1") //czarny wygrał
             {
             pClient->sendTextMessage("black_won");
-            addTextToWsConsole("Send to web: black_won\n\n");
+            addTextToConsole("Send to web: black_won\n\n");
             }
             else if (QsWsMsgToProcess.left(7) == "1/2-1/2") //remis
             {
             pClient->sendTextMessage("draw");
-            addTextToWsConsole("Send to web: draw\n\n");
+            addTextToConsole("Send to web: draw\n\n");
             }
             else //jeżeli chenard da inną odpowiedź
             {
             pClient->sendTextMessage("error");
-            addTextToWsConsole("Send to web: error\n\n");
+            addTextToConsole("Send to web: error\n\n");
             }// wszystko to powyżej da się ładnie zapakować w 2 funkcje
             }
             }
         }*/
     }
     if (!QsWebsocketConsoleMsg.isEmpty())
-        emit addTextToWsConsole(QsWebsocketConsoleMsg + "\n", 'w');
+        emit addTextToConsole(QsWebsocketConsoleMsg + "\n", 'w');
     QsWebsocketConsoleMsg.clear();
 }
 
 void Websockets::sendToChess(QString QsMsgForChessClass)
 {
     qDebug() << "Sending to 'chess' class: " << QsMsgForChessClass;
-    emit this->addTextToWsConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", 'w');
+    emit this->addTextToConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", 'w');
     emit this->MsgFromWebsocketsToChess(QsMsgForChessClass);
 }
 
@@ -261,6 +261,6 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
     {
         m_clients.removeAll(pClient);
         pClient->deleteLater();
-        emit addTextToWsConsole("Disconnected\n", 'w');
+        emit addTextToConsole("Disconnected\n", 'w');
     }
 }

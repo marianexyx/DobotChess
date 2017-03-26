@@ -110,7 +110,7 @@ void Dobot::QueuedIdList()
     /*if (m_uiQueuedCmdLeftSpace <= 0) //jeżeli pamięć dobota spadła do zera- została przepełniona
     { //elseTODO: póki dobot nie wklei tego do swojego dll'a to nie mogę tego używać
         qDebug() << "FATAL ERROR: Dobot queue memory  full. data overflown/lost. Stop arm.";
-        this->addTextToDobotConsole("FATAL ERROR: Dobot queue memory full."
+        this->addTextToConsole("FATAL ERROR: Dobot queue memory full."
             "Data leak. Stop arm.\n", 'd');
         SetQueuedCmdForceStopExec(); //zatrzymaj ramię
     }*/
@@ -164,7 +164,7 @@ void Dobot::QueuedIdList()
                     break;
                 default:
                     qDebug() << "ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:" << takenPosId.type;
-                    this->addTextToDobotConsole("ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:"
+                    this->addTextToConsole("ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:"
                                                 + takenPosId.type, 'd');
                 }
             }
@@ -186,7 +186,7 @@ void Dobot::onConnectDobot()
         getPoseTimer->start(200);
         
         qDebug() << "Dobot connection success";
-        this->addTextToDobotConsole("Dobot connected \n", 'd');
+        this->addTextToConsole("Dobot connected \n", 'd');
         
         int result = GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny id i zapisz w zmiennej
         if (result == DobotCommunicate_NoError)
@@ -200,7 +200,7 @@ void Dobot::onConnectDobot()
         else
         {
             qDebug() << "ERROR: Dobot::onConnectDobot(): GetQueuedCmdCurrentIndex gone wrong";
-            this->addTextToDobotConsole("ERROR: Dobot::onConnectDobot(): "
+            this->addTextToConsole("ERROR: Dobot::onConnectDobot(): "
                                         "GetQueuedCmdCurrentIndex gone wrong \n", 'd');
         }
     }
@@ -351,7 +351,7 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     bIsPieceMovingFrom ? QsMoveType = ": PieceFrom: " : QsMoveType = ": Pieceto: ";
     qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
              << nLetter << ", nDigit =" << nDigit;
-    emit this->addTextToDobotConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
+    emit this->addTextToConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
                                      + QString::number(nDigit) + "\n", '0');
     
     this->addCmdToList(NORMAL, false, f_xFromTo, f_yFromTo, f_zFromTo + m_nMaxPieceHeight, f_rFromTo);
@@ -482,7 +482,7 @@ void Dobot::writeMoveTypeInConsole(char chMoveType, char chMoveState)
     default: QsConsoleMsg = "ERROR. Wrong movement type: "
                 + static_cast<QString>(chMoveType) + "\n"; break;
     }
-    emit this->addTextToDobotConsole(QsConsoleMsg + "PieceMove", 'd');
+    emit this->addTextToConsole(QsConsoleMsg + "PieceMove", 'd');
     
     QString QsSecondMsg;
     switch(chMoveState)
@@ -495,7 +495,7 @@ void Dobot::writeMoveTypeInConsole(char chMoveType, char chMoveState)
     default: QsSecondMsg = "ERROR. Wrong movement state: "
                 + static_cast<QString>(chMoveState) + "\n"; break;
     }
-    if (chMoveState != 'x') emit this->addTextToDobotConsole(QsSecondMsg, '0');
+    if (chMoveState != 'x') emit this->addTextToConsole(QsSecondMsg, '0');
 }
 
 void Dobot::closeEvent(QCloseEvent *)

@@ -47,7 +47,7 @@ private slots:
     //TODO: te sygnały to rympał w ogarnianiu kodu. działają na klasy pod którymi nie są, co...
     //...powoduje chaos w ogarnianiu co skąd i kiedy leci
 signals:
-    void addTextToUsbConsole(QString, char);
+    void addTextToConsole(QString, char);
     void updatePortsComboBox(int);
     void AIEnemyStart();
     void AIEnemySend(QString);

@@ -12,12 +12,14 @@ int main(int argc, char *argv[])
     //TODO: odpalać server websocket po konstruktorze mainwindow
     TCPMsgs TCPCommunication;
     ArduinoUsb ArduinoUsbEnemysUI;
-    Chess ChessCore(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
-                    &Websockety, &WebTable001, &ArduinoUsbEnemysUI);
-
-    IgorBot IgorBotAI(&ChessboardDobot001, &TCPCommunication, &ArduinoUsbEnemysUI, &ChessCore);
+    /*Chess ChessCore(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
+                    &Websockety, &WebTable001, &ArduinoUsbEnemysUI);*/
+    IgorBot IgorBotAI(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
+                       &WebTable001, &ArduinoUsbEnemysUI);
+    WebChess WebChess001(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
+                         &WebTable001, &Websockety);
     MainWindow mainwindow(&WebTable001, &Websockety, &ChessboardDobot001, &TCPCommunication,
-                      &ArduinoUsbEnemysUI, &DobotArm001, &ChessCore, &IgorBotAI);
+                      &ArduinoUsbEnemysUI, &DobotArm001, &IgorBotAI, &WebChess001);
     mainwindow.show();
 
     return a.exec();

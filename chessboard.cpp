@@ -196,7 +196,7 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
     }
     else
     {
-        emit this->addTextToDobotConsole("ERROR. Chess::fieldNrToFieldPos: "
+        emit this->addTextToConsole("ERROR. Chess::fieldNrToFieldPos: "
                                          "próba dzielenia przez zero \n");
         qDebug() << "ERROR. Chess::fieldNrToFieldPos: proba dzielenia przez zero";
         return 0; //coś trzeba zwrócić

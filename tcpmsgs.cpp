@@ -68,7 +68,7 @@ void TCPMsgs::doTcpConnect()
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
 
-    //emit addTextToTcpConsole("connecting...\n", 't');
+    //emit addTextToConsole("connecting...\n", 't');
     qDebug() << "TCPMsgs: connecting...";
 
     // this is not blocking call
@@ -76,7 +76,7 @@ void TCPMsgs::doTcpConnect()
 
     if(!socket->waitForConnected(5000)) //czkemy na połączenie 5 sekund
     {
-        emit addTextToTcpConsole("Error12:" + socket->errorString() + "\n", 't');
+        emit addTextToConsole("Error12:" + socket->errorString() + "\n", 't');
     }
 }
 
@@ -84,8 +84,8 @@ void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
 {
     TcpMsgMetadata QStrData = TCPMsgsList.last();
 
-    //emit addTextToTcpConsole("connected...\n", 't');
-    //emit addTextToTcpConsole("msg from websocket: " + QStrData.QStrMsgForTcp + "\n", 't');
+    //emit addTextToConsole("connected...\n", 't');
+    //emit addTextToConsole("msg from websocket: " + QStrData.QStrMsgForTcp + "\n", 't');
     qDebug() << "TCPMsgs: connected...";
     qDebug() << "TCPMsgs: msg from sender" << QStrData.QStrMsgForTcp;
 
@@ -94,7 +94,7 @@ void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
     // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
     socket->write(QabMsgArrayed + "\n"); //write wysyła wiadomość (w bajtach) na server przez tcp
 
-    emit addTextToTcpConsole("wrote to TCP: " + QabMsgArrayed + "\n", 't');
+    emit addTextToConsole("wrote to TCP: " + QabMsgArrayed + "\n", 't');
 }
 
 void TCPMsgs::disconnected()
@@ -102,25 +102,25 @@ void TCPMsgs::disconnected()
     //TODO: Gdy dwa polecenie na tcp są wykonywane jedne po drugim, to tcp nie zdąży disconnectować...
     //...pierwszej podczas gdy zaczyna od razu wykonywać drugą. Nie widzę na tą chwilę by to w czymś...
     //...przeszkadzało, aczkolwiek wygląda to średnio.
-    //emit addTextToTcpConsole("disconnected...\n", 't');
+    //emit addTextToConsole("disconnected...\n", 't');
     qDebug() << "disconnected...";
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
 {
-    //emit addTextToTcpConsole(QString::number(bytes) + " bytes written...\n", 't');
+    //emit addTextToConsole(QString::number(bytes) + " bytes written...\n", 't');
     qDebug() << "TCPMsgs: " << QString::number(bytes) << " bytes written...";
 }
 
 void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej wysłanej wiadmoności
 {
-    //emit addTextToTcpConsole("reading...\n", 't');
+    //emit addTextToConsole("reading...\n", 't');
     qDebug() << "TCPMsgs: reading...";
 
     // read the data from the socket
     QString QStrMsgFromTcp = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
     //pokaż ją w consoli tcp. \n dodaje się sam
-    emit addTextToTcpConsole("tcp answer: " + QStrMsgFromTcp, 't');
+    emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
     qDebug() << "tcp answer: " << QStrMsgFromTcp;
 
     //TODO: dlaczego czasem dostaję 2 rozklejone wiadomości "OK 1" i "\n" zamiast 1 poprawnej "OK 1\n"?
@@ -141,7 +141,7 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
                          QStrData.nSender;
     }
     else qDebug() << "ERROR: TCPMsgs::readyRead() received empty or '\n' msg. Repair it. Msg =" <<
-                     QStrData.QStrMsgForTcp;
+                     QStrMsgFromTcp;
 
     TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je
 

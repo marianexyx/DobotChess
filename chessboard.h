@@ -65,7 +65,7 @@ public:
     float afRemovedPiecesPositions_z[8][4];
 
 signals:
-    void addTextToDobotConsole(QString);
+    void addTextToConsole(QString);
 };
 
 #endif // CHESSBOARD_H

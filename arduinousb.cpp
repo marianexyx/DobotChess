@@ -32,13 +32,13 @@ void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
         //funkcja setPort() dziedziczy wszystkie atrybuty portu typu BaudRate, DataBits, Parity itd.
         usbPort->setPort(availablePort.at(nPortIndex-1)); //todo: czy tu ju jest port otwarty/polaczony?
         if(!usbPort->open(QIODevice::ReadWrite)) //jezeli port nie jest otwarty
-            this->addTextToUsbConsole("ERROR: Unable to open port\n", 'u');
+            this->addTextToConsole("ERROR: Unable to open port\n", 'u');
     }
     else usbInfo = NULL; //wskaźnik czyszczony, by nie wyświetlało wcześniejszych informacji
 
     if (QsPortName != "NULL") //nie pokazuj próby podłączania do pustego portu
     {
-        this->addTextToUsbConsole("Connected to port: " + QsPortName + "\n", 'u');
+        this->addTextToConsole("Connected to port: " + QsPortName + "\n", 'u');
         qDebug() << "Connected to port: " << QsPortName;
     }
 }
@@ -47,13 +47,13 @@ void ArduinoUsb::sendDataToUsb(QString QsMsg) //wyslij wiadomość na serial por
 {
     if(usbPort->isOpen())
     {
-        emit this->addTextToUsbConsole(QsMsg + "\n", 'a');
+        emit this->addTextToConsole(QsMsg + "\n", 'a');
         QsMsg += "$"; //wiadomości przez arduino odczytywane są póki nie natrafimy na znak '$'
 
         usbPort->write(QsMsg.toStdString().c_str());
         usbPort->waitForBytesWritten(-1); //TODO: czekaj w nieskonczonosć? co to jest
     }
-    else emit this->addTextToUsbConsole("ERROR: USB port is closed\n", 'u');
+    else emit this->addTextToConsole("ERROR: USB port is closed\n", 'u');
 }
 
 void ArduinoUsb::readUsbData()
@@ -70,7 +70,7 @@ void ArduinoUsb::readUsbData()
         QsFullSerialMsg.remove('$'); //...to jest to cała wiadomość...
         QsFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
 
-        emit this->addTextToUsbConsole(QsFullSerialMsg + "\n", 'r');
+        emit this->addTextToConsole(QsFullSerialMsg + "\n", 'r');
         this->ManageMsgFromUsb(QsFullSerialMsg);
 
         QByteA_data.clear();
@@ -81,16 +81,15 @@ void ArduinoUsb::readUsbData()
 void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
 {
     if (QsUsbMsg == "start") emit this->AIEnemyStart();
-    else if (QsUsbMsg == "doFirstIgorMove") emit this->TcpQueueMsg("think 5000");
+    else if (QsUsbMsg == "doFirstIgorMove") emit this->TcpQueueMsg("think 5000"); //TODO: przepuścić przez
     else if (QsUsbMsg.left(4) == "move")
         //funkcja obslugującą dzieje się w klasie 'chess', dlatego sygnał leci przez mainwindow,...
         //...bo inaczej ta klasa musiałaby być na równi z tamtą
         emit this->AIEnemySend(QsUsbMsg.mid(5,4)); // mid(5,4) = np. e2e4
-    else if (QsUsbMsg.left(9) == "promoteTo")
-        QsUsbMsg.left(10); //TODO: nie ogarnieta jest promocja
+    else if (QsUsbMsg.left(9) == "promoteTo") QsUsbMsg.left(10);
     else
     {
-        emit this->addTextToUsbConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", 'r');
+        emit this->addTextToConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", 'r');
         qDebug() << "ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
                     " command from usb:" << QsUsbMsg;
     }

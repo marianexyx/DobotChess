@@ -9,6 +9,7 @@ INPUT(
 ./debug\websockets.o
 ./debug\arduinousb.o
 ./debug\igorbot.o
+./debug\webchess.o
 ./debug\moc_webtable.o
 ./debug\moc_websockets.o
 ./debug\moc_tcpmsgs.o
@@ -17,5 +18,4 @@ INPUT(
 ./debug\moc_arduinousb.o
 ./debug\moc_chess.o
 ./debug\moc_mainwindow.o
-./debug\moc_igorbot.o
 );

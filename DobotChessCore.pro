@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     chessboard.cpp \
     websockets.cpp \
     arduinousb.cpp \
-    igorbot.cpp
+    igorbot.cpp \
+    webchess.cpp
 
 HEADERS  +=  webtable.h \
     websockets.h \
@@ -39,7 +40,8 @@ HEADERS  +=  webtable.h \
     DobotDll/DobotDll.h \
     DobotDll/DobotType.h \
     mainwindow.h \
-    igorbot.h
+    igorbot.h \
+    webchess.h
 
 
 

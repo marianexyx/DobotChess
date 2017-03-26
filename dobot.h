@@ -96,7 +96,7 @@ public slots:
 
 signals:
     //sygnały do używania GUI MainWindow
-    void addTextToDobotConsole(QString QS_msg, char chLogType); //dodawanie komunikatu do konsoli
+    void addTextToConsole(QString QS_msg, char chLogType); //dodawanie komunikatu do konsoli
     void JointLabelText(QString QSLabelText, short sJoint);
     void AxisLabelText(QString QSAxisLabelText, char chAxis);
     void RefreshDobotButtonsStates(bool bDobotButtonsStates);

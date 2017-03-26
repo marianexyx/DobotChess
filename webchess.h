@@ -1,50 +1,36 @@
-#ifndef IGORBOT_H
-#define IGORBOT_H
+#ifndef WEBCHESS_H
+#define WEBCHESS_H
 
-#include "arduinousb.h"
+#include "websockets.h"
 #include "chess.h"
 
-class IgorBot: public Chess
+class WebChess : public Chess
 {
-
-private:
+ private:
     Dobot *_pDobot;
     Chessboard *_pChessboard;
     TCPMsgs *_pTCPMsgs;
     WebTable *_pWebTable;
-    ArduinoUsb *_pArduinoUsb;
+    Websockets *_pWebsockets;
 
-    bool m_bAI;
-    bool m_bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
-    //...na 'status' z tcp dotyczy wykonanego ruchu gracza lub igora
     const int _nCommunicationType;
 
-    void wrongTcpAnswer(QString msgType, QString respond);
-    void checkAI();
-
 public:
-    IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-            WebTable *pWebTable, ArduinoUsb *pArduinoUsb);
+    WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
+             WebTable *pWebTable, Websockets *pWebsockets);
 
-    //----------KOMUNIKACJA Z ARDUINO----------//
+    //----------KOMUNIKACJA Z WWW----------//
     void GameStarted();
-    void BadMove(QString QsMsgFromTcp);
+    void BadMove(QString msg);
     void GameInProgress();
     void EndOfGame(QString msg);
     void PromoteToWhat();
 
-    //----------KOMUNIKACJA Z CHENARD----------//
+    //--------KOMUNIKACJA Z CHENARD--------//
+    void Promote(QString msg);
     void NewGame();
     void MoveTcpPiece(QString msg);
-    void Promote(QString msg);
     void Status();
-    void Think5000();
-    void UndoOk();
-    void ThinkOk(QString msg);
-
-    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    void setAI(bool bAI)    { m_bAI = bAI; }
-    bool getAI()            {return m_bAI; }
 
     /*---------------DZIEDZICZONE Z CHESS---------------//
     //---------------STEROWANIE RAMIENIEM---------------//
@@ -67,8 +53,7 @@ signals:
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
-    void checkMsgForChenard(QString msg);
-    void EnemyStart(); //ogólna funkcja sterująca
+    void checkMsgForChenard(QString msgFromWs);
 };
 
-#endif // IGORBOT_H
+#endif // WEBCHESS_H

@@ -6,8 +6,8 @@ QT_USE_NAMESPACE
 //TODO: wszystkie log okien wrzucić do jednego okna z typem komunikatu
 
 MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
-                       TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm, Chess *pChess,
-                       IgorBot *pIgorBot, QWidget *parent) :
+                       TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
+                       IgorBot *pIgorBot, WebChess *pWebChess, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -20,8 +20,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     _pChessboard = pChessboard;
     _pTCPmsg = pTCPmsg;
     _pArduinoUsb = pArduinoUsb;
-    _pChess = pChess;
     _pIgorBot = pIgorBot;
+    _pWebChess = pWebChess;
 
     //TODO: to pewnie dałoby się wrzucić do odpwoiednich klas
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
@@ -33,20 +33,20 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
     //TODO: naprawić sygnały
-    connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pChess, SLOT(AIEnemyStart()));
-    connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pChess, SLOT(AIEnemySend(QString)));
+    connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pIgorBot, SLOT(EnemyStart()));
+    connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgForChenard(QString)));
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(QString)), _pTCPmsg, SLOT(TcpQueueMsg(QString)));
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
-    connect(_pDobotArm, SIGNAL(addTextToDobotConsole(QString,char)),
+    connect(_pDobotArm, SIGNAL(addTextToConsole(QString,char)),
             this, SLOT(writeInConsole(QString,char)));
-    connect(_pTCPmsg, SIGNAL(addTextToTcpConsole(QString,char)),
+    connect(_pTCPmsg, SIGNAL(addTextToConsole(QString,char)),
             this, SLOT(writeInConsole(QString,char)));
-    connect(_pWebSockets, SIGNAL(addTextToWsConsole(QString,char)),
+    connect(_pWebSockets, SIGNAL(addTextToConsole(QString,char)),
             this, SLOT(writeInConsole(QString,char)));
-    connect(_pChess, SIGNAL(addTextToCoreConsole(QString,char)),
+    connect(_pWebChess, SIGNAL(addTextToConsole(QString,char)),
             this, SLOT(writeInConsole(QString,char)));
-    connect(_pArduinoUsb, SIGNAL(addTextToUsbConsole(QString,char)),
+    connect(_pArduinoUsb, SIGNAL(addTextToConsole(QString,char)),
             this, SLOT(writeInConsole(QString,char)));
 
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
@@ -66,11 +66,11 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 
     //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)), //przesyłanie odpowiedzi z chenard...
-            _pChess, SLOT(checkMsgFromChenard(QString, QString)));  //...na WWW przez silnk gry.
+            _pWebChess, SLOT(checkMsgFromChenard(QString, QString)));  //...na WWW przez silnk gry.
     connect(_pTCPmsg, SIGNAL(msgFromTcpToArd(QString, QString)), //przesyłanie odpowiedzi z chenard...
             _pIgorBot, SLOT(checkMsgFromChenard(QString, QString)));  //...na Arduino przez klasę SI.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z ...
-            _pChess, SLOT(checkMsgFromWebsockets(QString))); //...websocketów na silnk gry.
+            _pWebChess, SLOT(checkMsgFromWebsockets(QString))); //...websocketów na silnk gry.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z ...
             _pWebTable, SLOT(checkWebsocketMsg(QString))); //...websocketów na stół gry.
 
@@ -373,18 +373,18 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);
         }
         else
-        {
-            _pChess->setServiceTests(true);
+        { //dotyczy tylko gracza z WWW
+            _pWebChess->setServiceTests(true);
             _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
             ui->emulatePlayerMsgLineEdit->clear();
-            _pChess->setServiceTests(false);
+            _pWebChess->setServiceTests(false);
         }
     }
 }
 
 void MainWindow::on_homeBtn_clicked()
 {
-    _pDobotArm->addTextToDobotConsole("HomeCmd: recalibrating arm...\n", 'd');
+    _pDobotArm->addTextToConsole("HomeCmd: recalibrating arm...\n", 'd');
     HOMECmd HOMEChess;
     HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
     uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
@@ -412,12 +412,12 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
     int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToDobotConsole("Cleared Dobot Queued Cmds.\n", 'd');
+        _pDobotArm->addTextToConsole("Cleared Dobot Queued Cmds.\n", 'd');
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n", 'd');
+        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", 'd');
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.", 'd');
-    else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
+        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.", 'd');
+    else _pDobotArm->addTextToConsole("ERROR: wrong result in "
                                            "MainWindow::on_resetDobotIndexBtn_clicked().\n", 'd');
 }
 
@@ -426,12 +426,12 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
     int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToDobotConsole("Start executing dobot queued cmds.\n", 'd');
+        _pDobotArm->addTextToConsole("Start executing dobot queued cmds.\n", 'd');
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot buffer is full.\n", 'd');
+        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", 'd');
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToDobotConsole("ERROR: Dobot communicate timeout.\n", 'd');
-    else _pDobotArm->addTextToDobotConsole("ERROR: wrong result in "
+        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.\n", 'd');
+    else _pDobotArm->addTextToConsole("ERROR: wrong result in "
                                            "MainWindow::on_executeDobotComandsBtn_clicked().\n", 'd');
 }
 
@@ -455,19 +455,44 @@ void MainWindow::on_AIBtn_clicked()
         ui->AIEnemyLineEdit->setEnabled(true);
     }
 
-    _pIgorBot->enemyStart();
+    _pIgorBot->EnemyStart();
 }
 
 void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
 {
-    _pIgorBot->enemyStart();
+    _pIgorBot->EnemyStart();
 }
 
 void MainWindow::on_AIEnemySendBtn_clicked()
 {
-    QString QsAIEnemySend = _pIgorBot->enemySend(ui->AIEnemyLineEdit->text());
+    QString QsAIEnemySend = this->checkMoveForTcp(ui->AIEnemyLineEdit->text());
     this->writeInConsole(QsAIEnemySend, 'm');
     qDebug() << QsAIEnemySend;
+}
+
+QString MainWindow::checkMoveForTcp(QString QsFT)
+{
+    QString QsRespond;
+    if (QsFT.length() == 4) //np. 'e2e4'
+    {
+        //TODO: nie ogarniam wyrażeń regularnych:
+        if ((QsFT.at(0) == 'a' || QsFT.at(0) == 'b' || QsFT.at(0) == 'c' || QsFT.at(0) == 'd' ||
+             QsFT.at(0) == 'e' || QsFT.at(0) == 'f' || QsFT.at(0) == 'g' || QsFT.at(0) == 'h') &&
+                (QsFT.at(1) == '1' || QsFT.at(1) == '2' || QsFT.at(1) == '3' || QsFT.at(1) == '4' ||
+                 QsFT.at(1) == '5' || QsFT.at(1) == '6' || QsFT.at(1) == '7' || QsFT.at(1) == '8') &&
+                (QsFT.at(2) == 'a' || QsFT.at(2) == 'b' || QsFT.at(2) == 'c' || QsFT.at(2) == 'd' ||
+                 QsFT.at(2) == 'e' || QsFT.at(2) == 'f' || QsFT.at(2) == 'g' || QsFT.at(2) == 'h') &&
+                (QsFT.at(3) == '1' || QsFT.at(3) == '2' || QsFT.at(3) == '3' || QsFT.at(3) == '4' ||
+                 QsFT.at(3) == '5' || QsFT.at(3) == '6' || QsFT.at(3) == '7' || QsFT.at(3) == '8'))
+        {
+            QsRespond = "move " + QsFT;
+            _pIgorBot->checkMsgForChenard(QsRespond); //wyślij zapytanie o ruch jak z arduino
+        }
+        else QsRespond = "ERROR: Chess::AIEnemySend(: Wrong square positions\n";
+    }
+    else QsRespond = "ERROR: Chess::AIEnemySend(: Wrong lenght of move cmd\n";
+
+    return QsRespond;
 }
 
 void MainWindow::updatePortsComboBox(int nUsbPorst)
@@ -521,7 +546,7 @@ void MainWindow::on_closeGripperBtn_clicked()
 void MainWindow::on_startGmPosBtn_clicked()
 {
     qDebug() << "Placing arm above the chessboard.";
-    _pDobotArm->addTextToDobotConsole("Placing arm above the chessboard.\n", 'd');
+    _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", 'd');
     _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
     _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
     _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
@@ -531,7 +556,7 @@ void MainWindow::on_startGmPosBtn_clicked()
 void MainWindow::on_startDtPosBtn_clicked()
 {
     qDebug() << "Returning safely to the HOME positions.";
-    _pDobotArm->addTextToDobotConsole("Returning safely to the HOME positions.\n", 'd');
+    _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", 'd');
     _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
     _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
     _pDobotArm->addCmdToList(-1, false, 144, -103, 10);

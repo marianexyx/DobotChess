@@ -9,6 +9,7 @@ INPUT(
 ./release\websockets.o
 ./release\arduinousb.o
 ./release\igorbot.o
+./release\webchess.o
 ./release\moc_webtable.o
 ./release\moc_websockets.o
 ./release\moc_tcpmsgs.o
@@ -17,5 +18,4 @@ INPUT(
 ./release\moc_arduinousb.o
 ./release\moc_chess.o
 ./release\moc_mainwindow.o
-./release\moc_igorbot.o
 );

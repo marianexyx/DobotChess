@@ -36,7 +36,7 @@ public slots:
     void TcpQueueMsg(int nSender, QString msg);
 
 signals:
-    void addTextToTcpConsole(QString, char);
+    void addTextToConsole(QString, char);
     void msgFromTcpToWeb(QString, QString);
     void msgFromTcpToArd(QString, QString);
 };

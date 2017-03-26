@@ -17,6 +17,7 @@
 //#include "arduinousb.h"
 //#include "chess.h"
 #include "igorbot.h"
+#include "webchess.h"
 
 namespace Ui
 {
@@ -29,8 +30,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
-                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm, Chess *pChess,
-                        IgorBot *pIgorBot, QWidget *parent = 0);
+                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
+                        IgorBot *pIgorBot, WebChess *pWebChess, QWidget *parent = 0);
 
     virtual ~MainWindow(); //tutaj virtual?
 
@@ -46,12 +47,13 @@ private:
     Chessboard *_pChessboard;
     TCPMsgs *_pTCPmsg;
     ArduinoUsb *_pArduinoUsb;
-    Chess *_pChess;
     IgorBot *_pIgorBot;
+    WebChess *_pWebChess;
 
     void refreshBtn();
     void initDobot();
     void initControl();
+    QString checkMoveForTcp(QString QsFT); //sprawdź czy w line edicie jest wpisany ruch w poprawnym formacie
 
 private slots:
     void onChangedMode();

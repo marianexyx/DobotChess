@@ -6,9 +6,8 @@
 #include <QDebug>
 #include "dobot.h"
 #include "chessboard.h"
-#include "websockets.h"
 #include "tcpmsgs.h"
-#include "arduinousb.h"
+#include "webtable.h"
 
 class Chess: public QObject
 {
@@ -18,57 +17,57 @@ private:
     TCPMsgs *_pTCPMsgs;
     Dobot *_pDobot;
     Chessboard *_pChessboard;
-    Websockets *_pWebsockets;
     WebTable *_pWebTable;
-    ArduinoUsb *_pArduinoUsb;
+
+protected: //TODO: olać to przesłanianie wogle?
 
     bool _bServiceTests;
-    //bool m_bAI;
+    const int _nCommunicationType;
 
-    /*void pieceMovingSequence(char chMoveType,
-                             int nPieceFromLetter = -1, int nPieceFromDigit = -1,
-                              int nPieceToLetter = -1, int nPieceToDigit = -1);*/ //tymczasowy public
+    //----------------KOMUNIKACJA Z GRACZEM-------------//
+    virtual void GameStarted();
+    virtual void BadMove(QString QsMsgFromChenardTcp);
+    virtual void GameInProgress();
+    virtual void EndOfGame(QString QStrMsgFromChenardTcp);
+    virtual void PromoteToWhat();
+
+    //--------------KOMUNIKACJA Z CHENARD--------------//
+    virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond); //protected slot?
+    virtual void Promote(QString QStrMsgFromWs);
+    virtual void checkMsgForChenard(QString msgFromWs); //protected slot?
+    virtual void NewGame();
+    virtual void MoveTcpPiece(int sender, QString msg);
+    virtual void Status(int sender);
+
+    //---------------STEROWANIE RAMIENIEM---------------//
+    void TestOk();
+    void MoveOk(int nSender);
     void castlingMovingSequence();
     void enpassantMovingSequence();
+
+    //-----------------FUNKCJE SZACHOWE-----------------//
     bool testEnpassant();
     bool testPromotion();
-
     void TestMove(QString QStrMsgFromWebsockets);
-    void MovePiece(int sender, QString QStrMsgFromWebsockets);
-    void MoveOk(int nSender);
-    void Promote(QString QStrMsgFromWs);
-    void GameStarted();
-    void TestOk();
-    void GameInProgress();
-    void EndOfGame(QString QStrMsgFromChenardTcp);
-    void BadMove(QString QsMsgFromChenardTcp);
+
+    //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);
 
 public:
-    Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-          Websockets *pWebsockets, WebTable *pWebTable, ArduinoUsb *pArduinoUsb);
+    Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
 
-    void NewGame(); //TODO: przy tych 2 funkcjach mam problem z dostępem z poziomu mainwindow...
-    void resetPiecePositions(); //...do nich. Były one jako prywatne i tam w sumie winny zostać jakoś.
+    //--------STEROWANIE RAMIENIEM--------//
+    void resetPiecePositions();
     void pieceMovingSequence(char chMoveType,
                                  int nPieceFromLetter = -1, int nPieceFromDigit = -1,
                                   int nPieceToLetter = -1, int nPieceToDigit = -1);
 
-    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
+    //------METODY DOSTĘPOWE DO PÓL------//
     bool getServiceTests() const                { return _bServiceTests; }
-
     void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
 
-public slots:
-    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
-    void checkMsgFromWebsockets(QString msgFromWs);
-    //void AIEnemyStart();
-    //QString AIEnemySend(QString QsFT); //move from to
-
 signals:
-    void addTextToDobotConsole(QString, char); //dodawanie komunikatu do konsoli dobota
-    void addTextToCoreConsole(QString, char);
-
+    void addTextToConsole(QString, char);
 };
 
 #endif // CHESS_H
