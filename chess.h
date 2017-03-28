@@ -24,7 +24,7 @@ protected: //TODO: olać to przesłanianie wogle?
     bool _bServiceTests;
     const int _nCommunicationType;
 
-    //----------------KOMUNIKACJA Z GRACZEM-------------//
+   /* //----------------KOMUNIKACJA Z GRACZEM-------------//
     virtual void GameStarted();
     virtual void BadMove(QString QsMsgFromChenardTcp);
     virtual void GameInProgress();
@@ -37,7 +37,22 @@ protected: //TODO: olać to przesłanianie wogle?
     virtual void checkMsgForChenard(QString msgFromWs); //protected slot?
     virtual void NewGame();
     virtual void MoveTcpPiece(int sender, QString msg);
-    virtual void Status(int sender);
+    virtual void Status(int sender);*/
+
+    //----------------KOMUNIKACJA Z GRACZEM-------------//
+        virtual void GameStarted() = 0;
+        virtual void BadMove(QString QsMsgFromChenardTcp) = 0;
+        virtual void GameInProgress() = 0;
+        virtual void EndOfGame(QString QStrMsgFromChenardTcp) = 0;
+        virtual void PromoteToWhat() = 0;
+
+        //--------------KOMUNIKACJA Z CHENARD--------------//
+        virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0; //protected slot?
+        virtual void Promote(QString QStrMsgFromWs) = 0;
+        virtual void checkMsgForChenard(QString msgFromWs) = 0; //protected slot?
+        virtual void NewGame() = 0;
+        virtual void MoveTcpPiece(int sender, QString msg) = 0;
+        virtual void Status(int sender) = 0;
 
     //---------------STEROWANIE RAMIENIEM---------------//
     void TestOk();
@@ -54,6 +69,7 @@ protected: //TODO: olać to przesłanianie wogle?
     void wrongTcpAnswer(QString msgType, QString respond);
 
 public:
+    Chess();
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
 
     //--------STEROWANIE RAMIENIEM--------//

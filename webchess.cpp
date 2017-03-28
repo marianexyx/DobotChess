@@ -106,7 +106,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
         if (QsTcpRespond.left(3) == "OK " && QsTcpRespond.left(4) != "OK 1")
             this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
         else if (QsTcpRespond == "ILLEGAL") //jeżeli test na ruch specjalny się nie powiódł...
-            this->MovePiece(WEBSITE, _pChessboard->QsPiecieFromTo); //...to wykonaj zwykły ruch
+            this->MoveTcpPiece(_pChessboard->QsPiecieFromTo); //...to wykonaj zwykły ruch
         else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
     }
     else qDebug() << "ERROR: Chess::checkMsgFromChenard() received unknown tcpMsgType: " << tcpMsgType;
@@ -116,9 +116,9 @@ void WebChess::Promote(QString msg)
 {
     _pChessboard->bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu...
     //...promocja, by sprawdzić czy nie ma dodatkowo bicia
-    _pTCPMsgs->queueMsgs(WEBSITE, "move " + _pChessboard->QsFuturePromote + QStrMsgFromWs.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
+    _pTCPMsgs->queueMsgs(WEBSITE, "move " + _pChessboard->QsFuturePromote + msg.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
     //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to ruch może się odbywać jako normalne przemieszczenie
-    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << QStrMsgFromWs.mid(11,1);
+    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << msg.mid(11,1);
 }
 
 void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
@@ -146,5 +146,5 @@ void WebChess::Status()
 {
     _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", 'w');
     qDebug() << "Sending 'status' command to tcp";
-    _pTCPMsgs->queueMsgs(nSender, "status");
+    _pTCPMsgs->queueMsgs(WEBSITE, "status");
 }

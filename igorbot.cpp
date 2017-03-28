@@ -23,7 +23,7 @@ IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 
 void IgorBot::GameStarted() //zareaguj na to że gra wystartowała
 {
-    this->addTextToConsole("new_game\n", 'a');
+    emit this->addTextToConsole("new_game\n", 'a');
     qDebug() << "Sending to USB: new_game";
     _pArduinoUsb->sendDataToUsb("started"); //na arduino daj możliwość już wciśnięcua start
 }
@@ -41,7 +41,7 @@ void IgorBot::GameInProgress() //gra w toku
     //podaj na stronę info o tym że ruch został wykonany
     qDebug() << "Chess::GameInProgress(): Sending to Websockets: game_in_progress "
              << _pChessboard->QsPiecieFromTo;
-    this->addTextToConsole("game_in_progress " + _pChessboard->QsPiecieFromTo, 'c');
+    emit this->addTextToConsole("game_in_progress " + _pChessboard->QsPiecieFromTo, 'c');
 
     if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku...
         this->Think5000(); //...to wymyśl kolejny ruch bota białego Igora...
@@ -79,7 +79,7 @@ void IgorBot::PromoteToWhat() //inicjalizowane w TestOk()
 void IgorBot::NewGame()
 {
     qDebug() << "Sending to tcp: new";
-    this->addTextToConsole("Sending to tcp: new\n", 'c');
+    emit this->addTextToConsole("Sending to tcp: new\n", 'c');
     _pTCPMsgs->queueMsgs(ARDUINO, "new");
 }
 
@@ -87,7 +87,7 @@ void IgorBot::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bier
 { //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
     qDebug() << "Sending move to tcp: " << msg;
-    this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
+    emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
     _pTCPMsgs->queueMsgs(ARDUINO, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
