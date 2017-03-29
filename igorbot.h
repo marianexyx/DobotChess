@@ -6,6 +6,7 @@
 
 class IgorBot: public Chess
 {
+    Q_OBJECT
 
 private:
     Dobot *_pDobot;
@@ -28,16 +29,17 @@ public:
 
     //----------KOMUNIKACJA Z ARDUINO----------//
     void GameStarted();
-    void BadMove(QString QsMsgFromTcp);
+    void BadMove(QString msg);
     void GameInProgress();
     void EndOfGame(QString msg);
     void PromoteToWhat();
 
     //----------KOMUNIKACJA Z CHENARD----------//
     void NewGame();
-    void MoveTcpPiece(QString msg);
+    void MoveTcpPiece(int type, QString msg);
+    void Status(int sender);
     void Promote(QString msg);
-    void Status();
+
     void Think5000();
     void UndoOk();
     void ThinkOk(QString msg);
@@ -62,7 +64,7 @@ public:
     void wrongTcpAnswer(QString msgType, QString respond);*/
 
 signals:
-    void addTextToConsole(QString, char);
+    //void addTextToConsole(QString, char); //jest dziedziczone?
 
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//

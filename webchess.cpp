@@ -106,7 +106,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
         if (QsTcpRespond.left(3) == "OK " && QsTcpRespond.left(4) != "OK 1")
             this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
         else if (QsTcpRespond == "ILLEGAL") //jeżeli test na ruch specjalny się nie powiódł...
-            this->MoveTcpPiece(_pChessboard->QsPiecieFromTo); //...to wykonaj zwykły ruch
+            this->MoveTcpPiece(WEBSITE, _pChessboard->QsPiecieFromTo); //...to wykonaj zwykły ruch
         else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
     }
     else qDebug() << "ERROR: Chess::checkMsgFromChenard() received unknown tcpMsgType: " << tcpMsgType;
@@ -134,17 +134,17 @@ void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
     else _pWebsockets->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", 'w');
 }
 
-void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
+void WebChess::MoveTcpPiece(int type, QString msg) // żądanie ruchu- przemieszczenie bierki.
 { //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
     _pWebsockets->addTextToConsole("Sending normal move to tcp: " + msg + "\n", 'w');
     qDebug() << "Sending normal move to tcp: " << msg;
-    _pTCPMsgs->queueMsgs(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
+    _pTCPMsgs->queueMsgs(type, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
-void WebChess::Status()
+void WebChess::Status(int sender)
 {
     _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", 'w');
     qDebug() << "Sending 'status' command to tcp";
-    _pTCPMsgs->queueMsgs(WEBSITE, "status");
+    _pTCPMsgs->queueMsgs(sender, "status");
 }

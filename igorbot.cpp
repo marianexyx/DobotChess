@@ -28,12 +28,12 @@ void IgorBot::GameStarted() //zareaguj na to że gra wystartowała
     _pArduinoUsb->sendDataToUsb("started"); //na arduino daj możliwość już wciśnięcua start
 }
 
-void IgorBot::BadMove(QString QsMsgFromTcp)
+void IgorBot::BadMove(QString msg)
 {
-    qDebug() << "Sending to USB:" << QsMsgFromTcp;
-    emit this->addTextToConsole("Sending to USB: " + QsMsgFromTcp + "\n", 'c');
+    qDebug() << "Sending to USB:" << msg;
+    emit this->addTextToConsole("Sending to USB: " + msg + "\n", 'c');
 
-    _pArduinoUsb->sendDataToUsb(QsMsgFromTcp.simplified()); //np. "BAD_MOVE e2e4"
+    _pArduinoUsb->sendDataToUsb(msg.simplified()); //np. "BAD_MOVE e2e4"
 }
 
 void IgorBot::GameInProgress() //gra w toku
@@ -76,58 +76,12 @@ void IgorBot::PromoteToWhat() //inicjalizowane w TestOk()
 //----------------------------KOMUNIKACJA Z CHENARD------------------------------//
 //-------------------------------------------------------------------------------//
 
-void IgorBot::NewGame()
-{
-    qDebug() << "Sending to tcp: new";
-    emit this->addTextToConsole("Sending to tcp: new\n", 'c');
-    _pTCPMsgs->queueMsgs(ARDUINO, "new");
-}
-
-void IgorBot::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
-{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
-    //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    qDebug() << "Sending move to tcp: " << msg;
-    emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
-    _pTCPMsgs->queueMsgs(ARDUINO, msg); //zapytaj się tcp o poprawność prośby o ruch
-}
-
-void IgorBot::Promote(QString msg)
-{
-    _pChessboard->bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu...
-    //...promocja, by sprawdzić czy nie ma dodatkowo bicia
-    _pTCPMsgs->queueMsgs(ARDUINO, "move " + _pChessboard->QsFuturePromote + msg.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
-    //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to ruch może się odbywać jako normalne przemieszczenie
-    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << msg.mid(11,1);
-}
-
-void IgorBot::Status()
-{
-    this->addTextToConsole("Sending to tcp: status\n", 'w');
-    qDebug() << "Sending to tcp: status";
-    _pTCPMsgs->queueMsgs(ARDUINO, "status");
-}
-
 void IgorBot::EnemyStart()
 {
     this->checkAI();
 
     this->resetPiecePositions(); //przywróć bierki na pierwotne pozycje
     this->NewGame(); //zacznij w pamięci chenardu nową grę
-}
-
-void IgorBot::checkMsgForChenard(QString msg)
-{
-    qDebug() << "Chess::checkMsgFromWebsockets: received: " << msg;
-    if (msg == "new") this->NewGame();
-    else if (msg.left(4) == "move") this->TestMove(msg); //sprawdź najpierw czy nie występują ruchy specjalne
-    else if (msg.left(10) == "promote_to") this->Promote(msg); //odp. z WWW odnośnie tego na co promujemy
-    else if (msg.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
-    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgForChenard: " << msg;
-}
-
-void IgorBot::Think5000()
-{
-    _pTCPMsgs->queueMsgs(ARDUINO, "think 5000");
 }
 
 void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
@@ -149,7 +103,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     else if (tcpMsgType.left(4) == "test") //dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
     {
         if (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1") this->TestOk();
-        else if (tcpRespond == "ILLEGAL") this->MoveTcpPiece(_pChessboard->QsPiecieFromTo);
+        else if (tcpRespond == "ILLEGAL") this->MoveTcpPiece(ARDUINO, _pChessboard->QsPiecieFromTo);
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
     else if (tcpMsgType == "status")
@@ -169,6 +123,54 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         if (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1") this->ThinkOk(tcpRespond); //"OK d1h5 Qh5#"
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
+}
+
+void IgorBot::checkMsgForChenard(QString msg)
+{
+    qDebug() << "Chess::checkMsgFromWebsockets: received: " << msg;
+    if (msg == "new") this->NewGame();
+    else if (msg.left(4) == "move") this->TestMove(msg); //sprawdź najpierw czy nie występują ruchy specjalne
+    else if (msg.left(10) == "promote_to") this->Promote(msg); //odp. z WWW odnośnie tego na co promujemy
+    else if (msg.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
+    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgForChenard: " << msg;
+}
+
+void IgorBot::NewGame()
+{
+    qDebug() << "Sending to tcp: new";
+    emit this->addTextToConsole("Sending to tcp: new\n", 'c');
+    _pTCPMsgs->queueMsgs(ARDUINO, "new");
+}
+
+void IgorBot::MoveTcpPiece(int type, QString msg) // żądanie ruchu- przemieszczenie bierki.
+{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
+    //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
+    qDebug() << "Sending move to tcp: " << msg;
+    emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
+    _pTCPMsgs->queueMsgs(type, msg); //zapytaj się tcp o poprawność prośby o ruch
+}
+
+void IgorBot::Status(int sender)
+{
+    this->addTextToConsole("Sending to tcp: status\n", 'w');
+    qDebug() << "Sending to tcp: status";
+    _pTCPMsgs->queueMsgs(sender, "status");
+}
+
+void IgorBot::Promote(QString msg)
+{
+    _pChessboard->bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu...
+    //...promocja, by sprawdzić czy nie ma dodatkowo bicia
+    _pTCPMsgs->queueMsgs(ARDUINO, "move " + _pChessboard->QsFuturePromote +
+                         msg.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
+    //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to...
+    //...ruch może się odbywać jako normalne przemieszczenie
+    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << msg.mid(11,1);
+}
+
+void IgorBot::Think5000()
+{
+    _pTCPMsgs->queueMsgs(ARDUINO, "think 5000");
 }
 
 void IgorBot::UndoOk()

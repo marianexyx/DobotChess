@@ -18,4 +18,6 @@ INPUT(
 ./debug\moc_arduinousb.o
 ./debug\moc_chess.o
 ./debug\moc_mainwindow.o
+./debug\moc_igorbot.o
+./debug\moc_webchess.o
 );

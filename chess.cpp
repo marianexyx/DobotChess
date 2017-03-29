@@ -15,6 +15,12 @@
 #define WEBSITE 1
 #define ARDUINO 2
 
+Chess::Chess() //czysto wirtualne klasy muszą być także zainicjalizowane
+    :_nCommunicationType(0) //i muszą mieć zadeklarowane wszystkie używane stałe
+{
+
+}
+
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable)
     :_nCommunicationType(0)
 {

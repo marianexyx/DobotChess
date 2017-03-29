@@ -24,35 +24,18 @@ protected: //TODO: olać to przesłanianie wogle?
     bool _bServiceTests;
     const int _nCommunicationType;
 
-   /* //----------------KOMUNIKACJA Z GRACZEM-------------//
-    virtual void GameStarted();
-    virtual void BadMove(QString QsMsgFromChenardTcp);
-    virtual void GameInProgress();
-    virtual void EndOfGame(QString QStrMsgFromChenardTcp);
-    virtual void PromoteToWhat();
+    //----------------KOMUNIKACJA Z GRACZEM-------------//
+    virtual void GameStarted() = 0;
+    virtual void BadMove(QString msg) = 0;
+    virtual void GameInProgress() = 0;
+    virtual void EndOfGame(QString msg) = 0;
+    virtual void PromoteToWhat() = 0;
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
-    virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond); //protected slot?
-    virtual void Promote(QString QStrMsgFromWs);
-    virtual void checkMsgForChenard(QString msgFromWs); //protected slot?
-    virtual void NewGame();
-    virtual void MoveTcpPiece(int sender, QString msg);
-    virtual void Status(int sender);*/
-
-    //----------------KOMUNIKACJA Z GRACZEM-------------//
-        virtual void GameStarted() = 0;
-        virtual void BadMove(QString QsMsgFromChenardTcp) = 0;
-        virtual void GameInProgress() = 0;
-        virtual void EndOfGame(QString QStrMsgFromChenardTcp) = 0;
-        virtual void PromoteToWhat() = 0;
-
-        //--------------KOMUNIKACJA Z CHENARD--------------//
-        virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0; //protected slot?
-        virtual void Promote(QString QStrMsgFromWs) = 0;
-        virtual void checkMsgForChenard(QString msgFromWs) = 0; //protected slot?
-        virtual void NewGame() = 0;
-        virtual void MoveTcpPiece(int sender, QString msg) = 0;
-        virtual void Status(int sender) = 0;
+    virtual void NewGame() = 0;
+    virtual void MoveTcpPiece(int type, QString msg) = 0;
+    virtual void Status(int sender) = 0;
+    virtual void Promote(QString msg) = 0;
 
     //---------------STEROWANIE RAMIENIEM---------------//
     void TestOk();
@@ -68,17 +51,23 @@ protected: //TODO: olać to przesłanianie wogle?
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);
 
+public slots:
+    //--------------KOMUNIKACJA Z CHENARD--------------//
+    virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0; //protected slot?
+    virtual void checkMsgForChenard(QString msg) = 0; //protected slot?
+
 public:
-    Chess();
+    Chess(); //czysto wirtualne klasy muszą mieć pusty konstruktor
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
 
-    //--------STEROWANIE RAMIENIEM--------//
+
+    //---------------STEROWANIE RAMIENIEM--------------//
     void resetPiecePositions();
     void pieceMovingSequence(char chMoveType,
-                                 int nPieceFromLetter = -1, int nPieceFromDigit = -1,
-                                  int nPieceToLetter = -1, int nPieceToDigit = -1);
+                             int nPieceFromLetter = -1, int nPieceFromDigit = -1,
+                             int nPieceToLetter = -1, int nPieceToDigit = -1);
 
-    //------METODY DOSTĘPOWE DO PÓL------//
+    //-------------METODY DOSTĘPOWE DO PÓL-------------//
     bool getServiceTests() const                { return _bServiceTests; }
     void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
 

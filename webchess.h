@@ -6,6 +6,8 @@
 
 class WebChess : public Chess
 {
+    Q_OBJECT
+
  private:
     Dobot *_pDobot;
     Chessboard *_pChessboard;
@@ -27,10 +29,10 @@ public:
     void PromoteToWhat();
 
     //--------KOMUNIKACJA Z CHENARD--------//
-    void Promote(QString msg);
     void NewGame();
-    void MoveTcpPiece(QString msg);
-    void Status();
+    void MoveTcpPiece(int type, QString msg);
+    void Status(int sender);
+    void Promote(QString msg);
 
     /*---------------DZIEDZICZONE Z CHESS---------------//
     //---------------STEROWANIE RAMIENIEM---------------//

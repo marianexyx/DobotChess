@@ -18,4 +18,6 @@ INPUT(
 ./release\moc_arduinousb.o
 ./release\moc_chess.o
 ./release\moc_mainwindow.o
+./release\moc_igorbot.o
+./release\moc_webchess.o
 );
