@@ -161,16 +161,13 @@
           <string>AI</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QRadioButton" name="botOffRadioBtn">
+          <item row="0" column="2">
+           <widget class="QPushButton" name="AIBtn">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Off</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Set</string>
             </property>
            </widget>
           </item>
@@ -181,26 +178,6 @@
             </property>
             <property name="text">
              <string>On</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="AIEnemyStartBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>PlayerStart</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="AIBtn">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Set</string>
             </property>
            </widget>
           </item>
@@ -221,6 +198,29 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="botOffRadioBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Off</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="AIEnemyStartBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>PlayerStart</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -230,14 +230,21 @@
           <string>Arduino Usb</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_13">
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QComboBox" name="portsComboBox">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
+          <item row="2" column="1">
+           <widget class="QPushButton" name="reloadPortsBtn">
+            <property name="text">
+             <string>Reload</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
            <widget class="QLineEdit" name="usbCmdLine">
             <property name="enabled">
              <bool>false</bool>
@@ -245,16 +252,29 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="reloadPortsBtn">
+           <widget class="QPushButton" name="sendUsbBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>Reload</string>
+             <string>SendToUSB</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QPushButton" name="sendUsbBtn">
+           <widget class="QPushButton" name="SimulateFromUsbBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>SendUSB</string>
+             <string>SimFromUSB</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="SimulateFromUsbLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -788,7 +808,7 @@
      <x>0</x>
      <y>0</y>
      <width>790</width>
-     <height>21</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>

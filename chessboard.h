@@ -15,18 +15,19 @@ class Chessboard: public QObject
 {
     Q_OBJECT
 
+private:
+
+
 public:
     Chessboard();
 
     void findBoardPos(QString QsPiecePositions);
-    void findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit);
     int findPieceLetterPos(QString QsLetter);
     QString findPieceLetterPos(int nLetter);
     int fieldNrToFieldPos(int nfieldNr, bool bRow);
     bool removeStatements();
     bool castlingStatements();
     void castlingFindRookToMove();
-    void actualPos(int nLetter, int nDigit);
     void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
                            int nPieceDigit, char chMoveType);
     bool compareArrays(int nArray1[][8], int nArray2[][8]);

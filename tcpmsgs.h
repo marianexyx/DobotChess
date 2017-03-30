@@ -6,6 +6,7 @@
 
 struct TcpMsgMetadata
 {
+    unsigned long long ullTcpID;
     int nSender;
     QString QStrMsgForTcp;
 };
@@ -19,6 +20,10 @@ private:
     QTcpSocket *socket;
     QList<TcpMsgMetadata> TCPMsgsList;
 
+    bool m_bWaitingForReadyRead; //flaga dzięki której zablokujemy możliwość wykonywania od razu...
+    //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
+    //...na którego odpowiedź(przetworzenie) z TCP czekamy
+    unsigned long long m_ullID; //nr zapytania do tcp
     void doTcpConnect();
 
 private slots:

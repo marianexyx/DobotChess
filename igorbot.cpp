@@ -1,7 +1,19 @@
 #include "igorbot.h"
 
-#define ARDUINO 1
-#define WEBSITE 2
+#define ROW 1
+#define COLUMN 0
+
+#define OPEN 1
+#define CLOSE 0
+
+#define FROM 1
+#define TO 0
+
+#define UP 1
+#define DOWN 0
+
+#define WEBSITE 1
+#define ARDUINO 2
 
 IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
                  WebTable *pWebTable, ArduinoUsb *pArduinoUsb)
@@ -96,7 +108,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     else if (tcpMsgType.left(4) == "move")
     {
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego 2 warunki
-        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->MoveOk(ARDUINO);
+        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->TcpMoveOk(ARDUINO);
         else if (tcpRespond.left(8) == "BAD_MOVE") this->BadMove(tcpRespond);
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
@@ -127,12 +139,12 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 
 void IgorBot::checkMsgForChenard(QString msg)
 {
-    qDebug() << "Chess::checkMsgFromWebsockets: received: " << msg;
+    qDebug() << "IgorBot::checkMsgFromWebsockets: received: " << msg;
     if (msg == "new") this->NewGame();
     else if (msg.left(4) == "move") this->TestMove(msg); //sprawdź najpierw czy nie występują ruchy specjalne
     else if (msg.left(10) == "promote_to") this->Promote(msg); //odp. z WWW odnośnie tego na co promujemy
     else if (msg.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
-    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgForChenard: " << msg;
+    else qDebug() << "ERROR: received not recognized msg in IgorBot::checkMsgForChenard: " << msg;
 }
 
 void IgorBot::NewGame()
@@ -175,7 +187,7 @@ void IgorBot::Think5000()
 
 void IgorBot::UndoOk()
 {
-    m_bUndo = true;
+    m_bUndo = true; //zapamiętaj że cofnięcie ruchu miało miejsce
     //niech się wykona cały ruch Igora, łącznie ze sprawdzeniem wszystkich...
     //...dziwnych ruchów tak aby też wykonał się dobrze mechanicznie
     this->checkMsgForChenard("move " + _pChessboard->QsAIPiecieFromTo);
@@ -183,12 +195,12 @@ void IgorBot::UndoOk()
 
 void IgorBot::ThinkOk(QString msg)
 {
-    _pChessboard->QsAIPiecieFromTo = msg.mid(3,4); //...to zapisz ten ruch w pamięci...
-    _pTCPMsgs->queueMsgs(ARDUINO, "undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
-    //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
-
     emit this->addTextToConsole("AI is ready to start move\n", 'c');
     qDebug() << "AI is ready to start move";
+
+    _pChessboard->QsAIPiecieFromTo = msg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
+    _pTCPMsgs->queueMsgs(ARDUINO, "undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
+    //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }
 
 void IgorBot::wrongTcpAnswer(QString msgType, QString respond)

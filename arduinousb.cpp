@@ -1,5 +1,7 @@
 #include "arduinousb.h"
 
+#define ARDUINO 2
+
 ArduinoUsb::ArduinoUsb()
 {
     usbPort = new QSerialPort(this);
@@ -21,7 +23,7 @@ void ArduinoUsb::searchDevices()
 //Slot jest aktywowany po zmianie wartości przez użytkownika w combo box’ie. Ustawia on wskaźnik
 //na nowy obiekt (lub nic) i wyświetla odpowiednią informację w pasku statusu
 void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
-{ //bodajze jest ustawianie połączenie z portem automatycznie jak tylko zostanie on wybrany
+{ //połączenie z portem jest ustawianie automatycznie jak tylko zostanie on wybrany
     if(usbPort->isOpen()) usbPort->close();
     QString QsPortName = "NULL";
     if (nPortIndex > 0)
@@ -30,7 +32,7 @@ void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
         QsPortName = usbInfo->portName();
 
         //funkcja setPort() dziedziczy wszystkie atrybuty portu typu BaudRate, DataBits, Parity itd.
-        usbPort->setPort(availablePort.at(nPortIndex-1)); //todo: czy tu ju jest port otwarty/polaczony?
+        usbPort->setPort(availablePort.at(nPortIndex-1)); //połącz z wybranym portem
         if(!usbPort->open(QIODevice::ReadWrite)) //jezeli port nie jest otwarty
             this->addTextToConsole("ERROR: Unable to open port\n", 'u');
     }
@@ -51,7 +53,7 @@ void ArduinoUsb::sendDataToUsb(QString QsMsg) //wyslij wiadomość na serial por
         QsMsg += "$"; //wiadomości przez arduino odczytywane są póki nie natrafimy na znak '$'
 
         usbPort->write(QsMsg.toStdString().c_str());
-        usbPort->waitForBytesWritten(-1); //TODO: czekaj w nieskonczonosć? co to jest
+        usbPort->waitForBytesWritten(-1); //czekaj aż przyjdą wszystkie dane
     }
     else emit this->addTextToConsole("ERROR: USB port is closed\n", 'u');
 }
@@ -80,12 +82,9 @@ void ArduinoUsb::readUsbData()
 
 void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
 {
-    if (QsUsbMsg == "start") emit this->AIEnemyStart();
-    else if (QsUsbMsg == "doFirstIgorMove") emit this->TcpQueueMsg("think 5000"); //TODO: przepuścić przez
-    else if (QsUsbMsg.left(4) == "move")
-        //funkcja obslugującą dzieje się w klasie 'chess', dlatego sygnał leci przez mainwindow,...
-        //...bo inaczej ta klasa musiałaby być na równi z tamtą
-        emit this->AIEnemySend(QsUsbMsg.mid(5,4)); // mid(5,4) = np. e2e4
+    if (QsUsbMsg == "start") emit this->AIEnemyStart(); //zresetuj szachownicę i rozpocznij nową grę
+    else if (QsUsbMsg == "doFirstIgorMove") emit this->TcpQueueMsg(ARDUINO, "think 5000"); //think->save move -> undo
+    else if (QsUsbMsg.left(4) == "move") emit this->AIEnemySend(QsUsbMsg.mid(5,4)); // mid(5,4) = np. e2e4
     else if (QsUsbMsg.left(9) == "promoteTo") QsUsbMsg.left(10);
     else
     {

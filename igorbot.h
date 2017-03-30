@@ -9,11 +9,7 @@ class IgorBot: public Chess
     Q_OBJECT
 
 private:
-    Dobot *_pDobot;
-    Chessboard *_pChessboard;
-    TCPMsgs *_pTCPMsgs;
-    WebTable *_pWebTable;
-    ArduinoUsb *_pArduinoUsb;
+    ArduinoUsb *_pArduinoUsb; //reszta wskaznikow dziedziczona
 
     bool m_bAI;
     bool m_bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...

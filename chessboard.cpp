@@ -115,25 +115,6 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
     qDebug() << "Chessboard::findBoardPos: PieceTo.Digit =" << PieceTo.Digit;
 }
 
-void Chessboard::findBoardPos(int nFromLetter, int nFromDiggit, int nToLetter, int nToDiggit)
-{ //elseTODO: zrobić z tego strukture?
-    QsPiecieFromTo = this->findPieceLetterPos(nFromLetter) + nFromDiggit +
-            this->findPieceLetterPos(nToLetter) + nToDiggit;
-    qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
-
-    PieceFrom.Letter = nFromLetter;
-    PieceFrom.Digit = nFromDiggit;
-
-    PieceTo.Letter = nToLetter;
-    PieceTo.Digit = nToDiggit;
-}
-
-void Chessboard::actualPos(int nLetter, int nDigit)
-{
-    PieceActualPos.Letter = nLetter;
-    PieceActualPos.Digit = nDigit;
-}
-
 int Chessboard::findPieceLetterPos(QString QsLetter)
 {
     int nLetter;

@@ -66,18 +66,18 @@ static const uint qt_meta_data_ArduinoUsb[] = {
        3,    1,   54,    2, 0x06 /* Public */,
        4,    0,   57,    2, 0x06 /* Public */,
        5,    1,   58,    2, 0x06 /* Public */,
-       6,    1,   61,    2, 0x06 /* Public */,
+       6,    2,   61,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    1,   64,    2, 0x0a /* Public */,
-       9,    0,   67,    2, 0x08 /* Private */,
+       7,    1,   66,    2, 0x0a /* Public */,
+       9,    0,   69,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, QMetaType::Char,    2,    2,
     QMetaType::Void, QMetaType::Int,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    2,
-    QMetaType::Void, QMetaType::QString,    2,
+    QMetaType::Void, QMetaType::Int, QMetaType::QString,    2,    2,
 
  // slots: parameters
     QMetaType::Void, QMetaType::Int,    8,
@@ -96,7 +96,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 2: _t->AIEnemyStart(); break;
         case 3: _t->AIEnemySend((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 4: _t->TcpQueueMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 4: _t->TcpQueueMsg((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 5: _t->portIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 6: _t->readUsbData(); break;
         default: ;
@@ -133,7 +133,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
-            typedef void (ArduinoUsb::*_t)(QString );
+            typedef void (ArduinoUsb::*_t)(int , QString );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ArduinoUsb::TcpQueueMsg)) {
                 *result = 4;
                 return;
@@ -206,9 +206,9 @@ void ArduinoUsb::AIEnemySend(QString _t1)
 }
 
 // SIGNAL 4
-void ArduinoUsb::TcpQueueMsg(QString _t1)
+void ArduinoUsb::TcpQueueMsg(int _t1, QString _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 QT_END_MOC_NAMESPACE

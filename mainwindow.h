@@ -94,6 +94,7 @@ private slots:
     void on_closeGripperBtn_clicked();
     void on_startGmPosBtn_clicked();
     void on_startDtPosBtn_clicked();
+    void on_SimulateFromUsbBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

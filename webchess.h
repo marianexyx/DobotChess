@@ -9,11 +9,7 @@ class WebChess : public Chess
     Q_OBJECT
 
  private:
-    Dobot *_pDobot;
-    Chessboard *_pChessboard;
-    TCPMsgs *_pTCPMsgs;
-    WebTable *_pWebTable;
-    Websockets *_pWebsockets;
+    Websockets *_pWebsockets; //reszta wskaznikow dziedziczona
 
     const int _nCommunicationType;
 
@@ -50,7 +46,7 @@ public:
     void wrongTcpAnswer(QString msgType, QString respond);*/
 
 signals:
-    void addTextToConsole(QString, char);
+    //void addTextToConsole(QString, char); //sygnał będę miał z klasy bazowej?
 
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//

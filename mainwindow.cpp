@@ -35,7 +35,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     //TODO: naprawić sygnały
     connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pIgorBot, SLOT(EnemyStart()));
     connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgForChenard(QString)));
-    connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(QString)), _pTCPmsg, SLOT(TcpQueueMsg(QString)));
+    connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(int, QString)), _pTCPmsg, SLOT(TcpQueueMsg(int, QString)));
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToConsole(QString,char)),
@@ -70,7 +70,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     connect(_pTCPmsg, SIGNAL(msgFromTcpToArd(QString, QString)), //przesyłanie odpowiedzi z chenard...
             _pIgorBot, SLOT(checkMsgFromChenard(QString, QString)));  //...na Arduino przez klasę SI.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z ...
-            _pWebChess, SLOT(checkMsgFromWebsockets(QString))); //...websocketów na silnk gry.
+            _pWebChess, SLOT(checkMsgForChenard(QString))); //...websocketów na silnk gry.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToWebtable(QString)), //przesyłanie wiadomości z ...
             _pWebTable, SLOT(checkWebsocketMsg(QString))); //...websocketów na stół gry.
 
@@ -372,8 +372,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
             if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);
         }
-        else
-        { //dotyczy tylko gracza z WWW
+        else //dotyczy tylko gracza z WWW
+        {
             _pWebChess->setServiceTests(true);
             _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
             ui->emulatePlayerMsgLineEdit->clear();
@@ -517,6 +517,8 @@ void MainWindow::on_reloadPortsBtn_clicked()
 {
     ui->usbCmdLine->setEnabled(true);
     ui->portsComboBox->setEnabled(true);
+    ui->SimulateFromUsbBtn->setEnabled(true);
+    ui->SimulateFromUsbLineEdit->setEnabled(true);
     _pArduinoUsb->searchDevices();
 }
 
@@ -561,4 +563,13 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
     _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
     _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
+}
+
+void MainWindow::on_SimulateFromUsbBtn_clicked()
+{
+    if (!ui->SimulateFromUsbLineEdit->text().isEmpty()) //coś jest wpisane w lineEdit
+    {
+        _pArduinoUsb->ManageMsgFromUsb(ui->SimulateFromUsbLineEdit->text());
+        ui->emulatePlayerMsgLineEdit->clear(); //czyść lineEdit
+    }
 }

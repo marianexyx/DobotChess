@@ -59,18 +59,20 @@ public:
     QPushButton *sendSimulatedMsgBtn;
     QGroupBox *chenardAI;
     QGridLayout *gridLayout_2;
-    QRadioButton *botOffRadioBtn;
-    QRadioButton *botOnRadioBtn;
-    QPushButton *AIEnemyStartBtn;
     QPushButton *AIBtn;
+    QRadioButton *botOnRadioBtn;
     QPushButton *AIEnemySendBtn;
     QLineEdit *AIEnemyLineEdit;
+    QRadioButton *botOffRadioBtn;
+    QPushButton *AIEnemyStartBtn;
     QGroupBox *ArduinoUsbPanel;
     QGridLayout *gridLayout_13;
     QComboBox *portsComboBox;
-    QLineEdit *usbCmdLine;
     QPushButton *reloadPortsBtn;
+    QLineEdit *usbCmdLine;
     QPushButton *sendUsbBtn;
+    QPushButton *SimulateFromUsbBtn;
+    QLineEdit *SimulateFromUsbLineEdit;
     QGroupBox *JOGgroupBox;
     QGridLayout *gridLayout_10;
     QPushButton *rHeadAddBtn;
@@ -258,30 +260,17 @@ public:
         gridLayout_2->setSpacing(6);
         gridLayout_2->setContentsMargins(11, 11, 11, 11);
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        botOffRadioBtn = new QRadioButton(chenardAI);
-        botOffRadioBtn->setObjectName(QStringLiteral("botOffRadioBtn"));
-        botOffRadioBtn->setEnabled(false);
-        botOffRadioBtn->setChecked(true);
+        AIBtn = new QPushButton(chenardAI);
+        AIBtn->setObjectName(QStringLiteral("AIBtn"));
+        AIBtn->setEnabled(false);
 
-        gridLayout_2->addWidget(botOffRadioBtn, 0, 0, 1, 1);
+        gridLayout_2->addWidget(AIBtn, 0, 2, 1, 1);
 
         botOnRadioBtn = new QRadioButton(chenardAI);
         botOnRadioBtn->setObjectName(QStringLiteral("botOnRadioBtn"));
         botOnRadioBtn->setEnabled(false);
 
         gridLayout_2->addWidget(botOnRadioBtn, 0, 1, 1, 1);
-
-        AIEnemyStartBtn = new QPushButton(chenardAI);
-        AIEnemyStartBtn->setObjectName(QStringLiteral("AIEnemyStartBtn"));
-        AIEnemyStartBtn->setEnabled(false);
-
-        gridLayout_2->addWidget(AIEnemyStartBtn, 1, 2, 1, 1);
-
-        AIBtn = new QPushButton(chenardAI);
-        AIBtn->setObjectName(QStringLiteral("AIBtn"));
-        AIBtn->setEnabled(false);
-
-        gridLayout_2->addWidget(AIBtn, 0, 2, 1, 1);
 
         AIEnemySendBtn = new QPushButton(chenardAI);
         AIEnemySendBtn->setObjectName(QStringLiteral("AIEnemySendBtn"));
@@ -294,6 +283,19 @@ public:
         AIEnemyLineEdit->setEnabled(false);
 
         gridLayout_2->addWidget(AIEnemyLineEdit, 2, 0, 1, 2);
+
+        botOffRadioBtn = new QRadioButton(chenardAI);
+        botOffRadioBtn->setObjectName(QStringLiteral("botOffRadioBtn"));
+        botOffRadioBtn->setEnabled(false);
+        botOffRadioBtn->setChecked(true);
+
+        gridLayout_2->addWidget(botOffRadioBtn, 0, 0, 1, 1);
+
+        AIEnemyStartBtn = new QPushButton(chenardAI);
+        AIEnemyStartBtn->setObjectName(QStringLiteral("AIEnemyStartBtn"));
+        AIEnemyStartBtn->setEnabled(false);
+
+        gridLayout_2->addWidget(AIEnemyStartBtn, 1, 2, 1, 1);
 
 
         gridLayout_3->addWidget(chenardAI, 1, 0, 1, 2);
@@ -308,23 +310,36 @@ public:
         portsComboBox->setObjectName(QStringLiteral("portsComboBox"));
         portsComboBox->setEnabled(false);
 
-        gridLayout_13->addWidget(portsComboBox, 1, 0, 1, 1);
+        gridLayout_13->addWidget(portsComboBox, 2, 0, 1, 1);
+
+        reloadPortsBtn = new QPushButton(ArduinoUsbPanel);
+        reloadPortsBtn->setObjectName(QStringLiteral("reloadPortsBtn"));
+
+        gridLayout_13->addWidget(reloadPortsBtn, 2, 1, 1, 1);
 
         usbCmdLine = new QLineEdit(ArduinoUsbPanel);
         usbCmdLine->setObjectName(QStringLiteral("usbCmdLine"));
         usbCmdLine->setEnabled(false);
 
-        gridLayout_13->addWidget(usbCmdLine, 0, 0, 1, 1);
-
-        reloadPortsBtn = new QPushButton(ArduinoUsbPanel);
-        reloadPortsBtn->setObjectName(QStringLiteral("reloadPortsBtn"));
-
-        gridLayout_13->addWidget(reloadPortsBtn, 1, 1, 1, 1);
+        gridLayout_13->addWidget(usbCmdLine, 1, 0, 1, 1);
 
         sendUsbBtn = new QPushButton(ArduinoUsbPanel);
         sendUsbBtn->setObjectName(QStringLiteral("sendUsbBtn"));
+        sendUsbBtn->setEnabled(false);
 
-        gridLayout_13->addWidget(sendUsbBtn, 0, 1, 1, 1);
+        gridLayout_13->addWidget(sendUsbBtn, 1, 1, 1, 1);
+
+        SimulateFromUsbBtn = new QPushButton(ArduinoUsbPanel);
+        SimulateFromUsbBtn->setObjectName(QStringLiteral("SimulateFromUsbBtn"));
+        SimulateFromUsbBtn->setEnabled(false);
+
+        gridLayout_13->addWidget(SimulateFromUsbBtn, 0, 1, 1, 1);
+
+        SimulateFromUsbLineEdit = new QLineEdit(ArduinoUsbPanel);
+        SimulateFromUsbLineEdit->setObjectName(QStringLiteral("SimulateFromUsbLineEdit"));
+        SimulateFromUsbLineEdit->setEnabled(false);
+
+        gridLayout_13->addWidget(SimulateFromUsbLineEdit, 0, 0, 1, 1);
 
 
         gridLayout_3->addWidget(ArduinoUsbPanel, 0, 0, 1, 2);
@@ -694,7 +709,7 @@ public:
         log->raise();
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 790, 21));
+        menuBar->setGeometry(QRect(0, 0, 790, 18));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -730,14 +745,15 @@ public:
         serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
         sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "SendWS", 0));
         chenardAI->setTitle(QApplication::translate("MainWindow", "AI", 0));
-        botOffRadioBtn->setText(QApplication::translate("MainWindow", "Off", 0));
-        botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));
-        AIEnemyStartBtn->setText(QApplication::translate("MainWindow", "PlayerStart", 0));
         AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
+        botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));
         AIEnemySendBtn->setText(QApplication::translate("MainWindow", "PlayerSend", 0));
+        botOffRadioBtn->setText(QApplication::translate("MainWindow", "Off", 0));
+        AIEnemyStartBtn->setText(QApplication::translate("MainWindow", "PlayerStart", 0));
         ArduinoUsbPanel->setTitle(QApplication::translate("MainWindow", "Arduino Usb", 0));
         reloadPortsBtn->setText(QApplication::translate("MainWindow", "Reload", 0));
-        sendUsbBtn->setText(QApplication::translate("MainWindow", "SendUSB", 0));
+        sendUsbBtn->setText(QApplication::translate("MainWindow", "SendToUSB", 0));
+        SimulateFromUsbBtn->setText(QApplication::translate("MainWindow", "SimFromUSB", 0));
         JOGgroupBox->setTitle(QApplication::translate("MainWindow", "JOG", 0));
         rHeadAddBtn->setText(QApplication::translate("MainWindow", "J4+", 0));
         baseAngleSubBtn->setText(QApplication::translate("MainWindow", "J1-", 0));

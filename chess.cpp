@@ -15,11 +15,8 @@
 #define WEBSITE 1
 #define ARDUINO 2
 
-Chess::Chess() //czysto wirtualne klasy muszą być także zainicjalizowane
-    :_nCommunicationType(0) //i muszą mieć zadeklarowane wszystkie używane stałe
-{
-
-}
+//czysto wirtualne klasy muszą mieć pusty konstruktor i muszą mieć zadeklarowane wszystkie używane stałe
+Chess::Chess() :_nCommunicationType(0){}
 
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable)
     :_nCommunicationType(0)
@@ -80,9 +77,8 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
 }
 
 
-void Chess::MoveOk(int nSender) //ruch w pamięci sie powiódł. wykonaj fizyczny ruch na ramieniu
+void Chess::TcpMoveOk(int nSender) //ruch w pamięci sie powiódł. wykonaj fizyczny ruch na ramieniu
 {
-    //TODO: mylna jest nazwa funkcji z której możnaby wnioskować, że ruch już się wykonał
     qDebug() << "-Begin move sequence-";
     emit this->addTextToConsole("-Begin move sequence-\n", 'd');
 
@@ -116,8 +112,10 @@ void Chess::TestMove(QString QStrMsgFromWebsockets)
 
     //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
     if(this->testPromotion()) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
-    else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i przerwij jeśli test się powiódł.
-    else this->MoveTcpPiece(_nCommunicationType, QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
+    else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i...
+    //...przerwij jeśli test się powiódł.
+    else this->MoveTcpPiece(_nCommunicationType, QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi...
+    //...ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
 }
 
 void Chess::castlingMovingSequence()
@@ -171,8 +169,8 @@ bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
     {
         _pChessboard->bTestPromotion = true;
         _pChessboard->QsFuturePromote = _pChessboard->QsPiecieFromTo; //póki nie wiadomo na co promujemy to zapamiętaj zapytanie o ten ruch
-        //TODO: to poniżej też rozdzielic na 2 klasy (+arduino)
-        _pTCPMsgs->queueMsgs(_nCommunicationType, "test " + _pChessboard->QsPiecieFromTo + "q"); //test awansu na cokolwiek (królową), który pójdzie na chenard
+        _pTCPMsgs->queueMsgs(_nCommunicationType, "test " +
+                             _pChessboard->QsPiecieFromTo + "q"); //test awansu na cokolwiek (królową), który pójdzie na chenard
         //odpowiedź z tcp będzie miała formę: "Ok e2e4 (...)" lub "ILLEGAL"
         return 1;
     }
@@ -183,7 +181,8 @@ bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
 bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
 {
     //sprawdzamy czy zapytanie/ruch może być biciem w przelocie
-    if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1  //jeżeli pionek nie idzie po prostej (tj. po ukosie o 1 pole)...
+    if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1  //jeżeli pionek nie idzie po prostej...
+            //...(tj. po ukosie o 1 pole)...
             && ((_pWebTable->getWhoseTurn() == "white_turn" && _pChessboard->PieceFrom.Digit == 4
                  && _pChessboard->PieceTo.Digit == 5  //... i jeżeli bije biały z pola 5 na 6
                  && (_pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] > 8 //...i jeżeli ruszany to...
@@ -228,12 +227,19 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
         do //wertuj w kółko planszę przestawiając bierki, dopóki...
             //...szachownica nie wróci do stanu pierwotnego/startowego.
         {
-            for (int nCurentlyCheckedField = 1; nCurentlyCheckedField <= 64; nCurentlyCheckedField++) //aktualnie sprawdzane pole szachownicy
+            //aktualnie sprawdzane pole szachownicy
+            for (int nCurentlyCheckedField = 1; nCurentlyCheckedField <= 64; nCurentlyCheckedField++)
             {
                 //nr bierki która jest na aktualnie sprawdzanym polu (1-32)
                 int nPieceTypeOnCheckedField = _pChessboard->anBoard
                         [_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)]
                         [_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)];
+                qDebug() << "nCurentlyCheckedField =" << nCurentlyCheckedField;
+                qDebug() << "ROW =" << ROW << ", COLUMN =" << COLUMN;
+                qDebug() << "_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW) ="
+                         << _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW);
+                qDebug() << "_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) ="
+                         << _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN);
                 qDebug() << "nPieceTypeOnCheckedField =" << nPieceTypeOnCheckedField;
 
                 //nr bierki która POWINNA BYĆ na aktualnie sprawdzanym polu (1-32)
@@ -265,7 +271,8 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
 
                 if (nPieceTypeOnCheckedField == 0 //jeżeli na sprawdzanym polu nie ma żadnej bierki...
                         && (_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) <= 1  //...a coś tam powinno być
-                            || _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) >= 6)) // (kolumny <= 1 to białe, a >= 6 to czarne)
+                            //(kolumny <= 1 to białe, a >= 6 to czarne)
+                            || _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN) >= 6))
                 {
                     qDebug() << "Chess::resetPiecePositions(): checked field is empty.";
                     //sprawdź najpierw po numerze bierki czy leży ona na swoim zbitym miejscu na polu zbitych bierek

@@ -13,13 +13,11 @@ class Chess: public QObject
 {
     Q_OBJECT
 
-private:
+protected:
     TCPMsgs *_pTCPMsgs;
     Dobot *_pDobot;
     Chessboard *_pChessboard;
     WebTable *_pWebTable;
-
-protected: //TODO: olać to przesłanianie wogle?
 
     bool _bServiceTests;
     const int _nCommunicationType;
@@ -39,7 +37,7 @@ protected: //TODO: olać to przesłanianie wogle?
 
     //---------------STEROWANIE RAMIENIEM---------------//
     void TestOk();
-    void MoveOk(int nSender);
+    void TcpMoveOk(int nSender);
     void castlingMovingSequence();
     void enpassantMovingSequence();
 
@@ -59,7 +57,6 @@ public slots:
 public:
     Chess(); //czysto wirtualne klasy muszą mieć pusty konstruktor
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
-
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void resetPiecePositions();

@@ -21,34 +21,30 @@
 const int WEBSITE = 1;
 const int ARDUINO = 2;
 
-//TODO: odpowiedzi na zapytania do TCP są niejednoznaczne. niech tcp oprócz zwracanej odpowiedzi zwraca...
-//...też informację o tym jakie zapytanie było wrzucane do TCP, jako że TCP działa tylko na zasadzie...
-//... zapytanie-odpowiedź.
-
 TCPMsgs::TCPMsgs()
 {
-
+    m_bWaitingForReadyRead = false;
+    m_ullID = 0;
 }
 
 void TCPMsgs::queueMsgs(int nSender, QString msg)
 {
-    qDebug() << "TCPMsgs::queueMsgs received msg: " << msg;
+    qDebug() << "TCPMsgs::queueMsgs received msg: " << msg << ", sender = " << nSender;
 
     TcpMsgMetadata QStrReceivedData;
+    QStrReceivedData.ullTcpID = ++m_ullID;
     QStrReceivedData.nSender = nSender;
     QStrReceivedData.QStrMsgForTcp = msg;
     TCPMsgsList << QStrReceivedData; //wrzuć do kontenera wiadomość
     if (!TCPMsgsList.isEmpty()) //jeżeli kontener nie jest pusty
     {
-        this->doTcpConnect(); //to wykonaj najstarszą wiadomość z kontenera.
+        if (!m_bWaitingForReadyRead) //zaczekaj z kolejkowaniem kolejnego zapytania do TCP jeżeli...
+            //...czekamy aktualnie na przetworzenie jakiejś odpowiedzi z TCP
+            this->doTcpConnect(); //to wykonaj najstarszą wiadomość z kontenera.
         //TODO: To działa w założeniu, że kolejny ruch nie wykona się nigdy dopóki nie dostaniemy ...
         //...informacji o tym jaki jest status gry (tzn. ruch się w pełni wykonał). To czy inne...
         //...znikome wyjątki zamiany kolejności zapytań tutaj wystąpią może być niezwykle rzadkie i...
         //...wymaga głębszej analizy "nie na teraz" o tym czy to wystapi i w jakich warunkach.
-        //TODO2: nie wiem czy to się nie gryzie z drugą taką samą funkcją w tej klasie, tj. czy...
-        //...nie będzie przypadku, że zaczniemy wykonywać drugi raz tą funkcję, podczas gdy cykl...
-        //...życia zapytania-odpowiedzi jednego polecenia tcp się jeszcze nie zakończył, i czy to...
-        //...cokolwike zmienia.
     }
 }
 
@@ -60,6 +56,8 @@ void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
 //rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
 void TCPMsgs::doTcpConnect()
 {
+    m_bWaitingForReadyRead = true;
+
     socket = new QTcpSocket(this);
 
     //TODO: przesunąć sygnały do np. konstruktora? (tam chyba giną po zakończeniu jego inicjalizacji)
@@ -82,12 +80,18 @@ void TCPMsgs::doTcpConnect()
 
 void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
 {
-    TcpMsgMetadata QStrData = TCPMsgsList.last();
+    TcpMsgMetadata QStrData;
+    if (!TCPMsgsList.isEmpty()) QStrData = TCPMsgsList.last();
+    else
+    {
+        qDebug() << "ERROR: TCPMsgs::connected(): TCPMsgsList is empty";
+        return;
+    }
 
     //emit addTextToConsole("connected...\n", 't');
     //emit addTextToConsole("msg from websocket: " + QStrData.QStrMsgForTcp + "\n", 't');
     qDebug() << "TCPMsgs: connected...";
-    qDebug() << "TCPMsgs: msg from sender" << QStrData.QStrMsgForTcp;
+    qDebug() << "TCPMsgs: msg from sender:" << QStrData.QStrMsgForTcp;
 
     QByteArray QabMsgArrayed;
     QabMsgArrayed.append(QStrData.QStrMsgForTcp); //przetworzenie parametru dla funkcji write()
@@ -104,6 +108,7 @@ void TCPMsgs::disconnected()
     //...przeszkadzało, aczkolwiek wygląda to średnio.
     //emit addTextToConsole("disconnected...\n", 't');
     qDebug() << "disconnected...";
+    //TODO2: Odsyłać wiadomości z Tcp dopiero po disconnectowaniu? tj tutaj wrzucić doTcpConnect z kolejki?
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
@@ -121,29 +126,44 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     QString QStrMsgFromTcp = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
     //pokaż ją w consoli tcp. \n dodaje się sam
     emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
-    qDebug() << "tcp answer: " << QStrMsgFromTcp;
+    //qDebug() << "tcp answer: " << QStrMsgFromTcp;
 
     //TODO: dlaczego czasem dostaję 2 rozklejone wiadomości "OK 1" i "\n" zamiast 1 poprawnej "OK 1\n"?
-    if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp!= "\n") //jeżeli nie jest to końcówka/syf
+    if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
-        TcpMsgMetadata QStrData = TCPMsgsList.last();
+        TcpMsgMetadata QStrData;
+        if (!TCPMsgsList.isEmpty()) QStrData = TCPMsgsList.last();
+        else
+        {
+            qDebug() << "ERROR: TCPMsgs::readyRead(): TCPMsgsList is empty";
+            return;
+        }
 
         if (QStrData.nSender == WEBSITE) //inna klasa powinna o tym decydowac?
         {
+            qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
+                        ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
             //core niech odbierze tą wiadomość i zdecyduje do dalej
             emit this->msgFromTcpToWeb(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
+            m_bWaitingForReadyRead = false;
         }
         else if (QStrData.nSender == ARDUINO)
         {
+            qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
+                        ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
             emit this->msgFromTcpToArd(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
+            m_bWaitingForReadyRead = false;
         }
         else qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData.nSender value =" <<
                          QStrData.nSender;
     }
-    else qDebug() << "ERROR: TCPMsgs::readyRead() received empty or '\n' msg. Repair it. Msg =" <<
-                     QStrMsgFromTcp;
+    else if (QStrMsgFromTcp.isEmpty())
+        qDebug() << "ERROR: TCPMsgs::readyRead() received empty msg.";
+    else if (QStrMsgFromTcp == "\n")
+        qDebug() << "ERROR: TCPMsgs::readyRead() received '\\n' msg.";
 
-    TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je
+    if (!TCPMsgsList.isEmpty())
+        TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je
 
     if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
     {
@@ -151,9 +171,5 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
         //TODO: Nie wiem czy to tu nie przyczyni się kiedyś do jakiegoś błędu. Mółgbym ten warunek...
         //...przesunąć do funkcji w core odpowiadającej wykonywaniu odpowiedzi na "status" z tcp...
         //..., ale to też wymaga analizy.
-        //TODO2: nie wiem czy to się nie gryzie z drugą taką samą funkcją w tej klasie, tj. czy...
-        //...nie będzie przypadku, że zaczniemy wykonywać drugi raz tą funkcję, podczas gdy cykl...
-        //...życia zapytania-odpowiedzi jednego polecenia tcp się jeszcze nie zakończył, i czy to...
-        //...cokolwike zmienia.
     }
 }

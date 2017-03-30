@@ -1,7 +1,19 @@
 #include "webchess.h"
 
-#define ARDUINO 1
-#define WEBSITE 2
+#define ROW 1
+#define COLUMN 0
+
+#define OPEN 1
+#define CLOSE 0
+
+#define FROM 1
+#define TO 0
+
+#define UP 1
+#define DOWN 0
+
+#define WEBSITE 1
+#define ARDUINO 2
 
 WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
                    WebTable *pWebTable, Websockets *pWebsockets)
@@ -51,7 +63,6 @@ void WebChess::EndOfGame(QString msg)
     _pWebsockets->processWebsocketMsg(QsWhoWon);
 
     this->resetPiecePositions(); //przywróć wszystkie bierki do stanu początkowego
-    //TODO: zablokować możliwość robienia czegokolwiek na stronie/arduino aż to się nie zakończy
 }
 
 void WebChess::PromoteToWhat()
@@ -66,7 +77,7 @@ void WebChess::PromoteToWhat()
 
 void WebChess::checkMsgForChenard(QString msgFromWs)
 {
-    qDebug() << "Chess::checkMsgFromWebsockets: received: " << msgFromWs;
+    qDebug() << "Chess::checkMsgForChenard: received: " << msgFromWs;
     if (msgFromWs == "new") this->NewGame();
     else if (msgFromWs.left(4) == "move") this->TestMove(msgFromWs); //sprawdź najpierw czy nie występują ruchy specjalne
     else if (msgFromWs.left(10) == "promote_to") this->Promote(msgFromWs); //odp. z WWW odnośnie tego na co promujemy
@@ -76,8 +87,7 @@ void WebChess::checkMsgForChenard(QString msgFromWs)
 
 void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
 {
-    //TODO: ruchy z MoveOk i TestOk wykonywać w jednej funkcji dla porządku kodu?
-    qDebug() << "Chess::checkMsgFromChenard: " << QsTcpRespond;
+    qDebug() << "WebChess::checkMsgFromChenard: " << QsTcpRespond;
 
     if (tcpMsgType == "new")
     {
@@ -90,7 +100,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
     else if (tcpMsgType.left(4) == "move")
     {
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki poniżej
-        if (QsTcpRespond == "OK 1\n" || QsTcpRespond == "OK 1") this->MoveOk(WEBSITE);
+        if (QsTcpRespond == "OK 1\n" || QsTcpRespond == "OK 1") this->TcpMoveOk(WEBSITE);
         else if (QsTcpRespond/*.left(8)*/ == "BAD_MOVE") this->BadMove(QsTcpRespond);
         else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
     }
@@ -109,7 +119,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
             this->MoveTcpPiece(WEBSITE, _pChessboard->QsPiecieFromTo); //...to wykonaj zwykły ruch
         else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
     }
-    else qDebug() << "ERROR: Chess::checkMsgFromChenard() received unknown tcpMsgType: " << tcpMsgType;
+    else qDebug() << "ERROR: WebChess:checkMsgFromChenard() received unknown tcpMsgType: " << tcpMsgType;
 }
 
 void WebChess::Promote(QString msg)
