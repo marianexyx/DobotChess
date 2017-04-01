@@ -15,11 +15,10 @@
 #define WEBSITE 1
 #define ARDUINO 2
 
-//czysto wirtualne klasy muszą mieć pusty konstruktor i muszą mieć zadeklarowane wszystkie używane stałe
-Chess::Chess() :_nCommunicationType(0){}
+//czysto wirtualne klasy muszą mieć pusty konstruktor
+Chess::Chess() {}
 
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable)
-    :_nCommunicationType(0)
 {
     _pTCPMsgs = pTCPMsgs;
     _pDobot = pDobot;
@@ -105,16 +104,16 @@ void Chess::TcpMoveOk(int nSender) //ruch w pamięci sie powiódł. wykonaj fizy
     this->Status(nSender);
 }
 
-void Chess::TestMove(QString QStrMsgFromWebsockets)
+void Chess::TestMove(int nSender, QString QStrMsgFromWebsockets)
 {
     qDebug() << "Chess::TestMove(QString QStrMsgFromWebsockets)";
     _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
 
     //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
-    if(this->testPromotion()) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
-    else if (this->testEnpassant()) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i...
+    if(this->testPromotion(nSender)) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
+    else if (this->testEnpassant(nSender)) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i...
     //...przerwij jeśli test się powiódł.
-    else this->MoveTcpPiece(_nCommunicationType, QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi...
+    else this->MoveTcpPiece(QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi...
     //...ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
 }
 
@@ -153,7 +152,7 @@ void Chess::enpassantMovingSequence()
 }
 
 //TODO: zamiast testować mogę to zestawiać z listą legalnych ruchów (zapytanie do chenard: "legal")
-bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
+bool Chess::testPromotion(int nSender) //sprawdzanie możliwości wystąpienia promocji
 {
     //poniżym warunkiem eliminuję jak największą ilość przypadkowych zapytań testowych do tcp o promocję
     if (((_pWebTable->getWhoseTurn() == "white_turn" &&  _pChessboard->PieceFrom.Digit == 6
@@ -169,7 +168,7 @@ bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
     {
         _pChessboard->bTestPromotion = true;
         _pChessboard->QsFuturePromote = _pChessboard->QsPiecieFromTo; //póki nie wiadomo na co promujemy to zapamiętaj zapytanie o ten ruch
-        _pTCPMsgs->queueMsgs(_nCommunicationType, "test " +
+        _pTCPMsgs->queueMsgs(nSender, "test " +
                              _pChessboard->QsPiecieFromTo + "q"); //test awansu na cokolwiek (królową), który pójdzie na chenard
         //odpowiedź z tcp będzie miała formę: "Ok e2e4 (...)" lub "ILLEGAL"
         return 1;
@@ -178,7 +177,7 @@ bool Chess::testPromotion() //sprawdzanie możliwości wystąpienia promocji
 }
 
 //TODO: zamiast testować mogę to zestawiać z listą legalnych ruchów (zapytanie do chenard: "legal")
-bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
+bool Chess::testEnpassant(int nSender) //sprawdzanie możliwości wystąpienia enpassant
 {
     //sprawdzamy czy zapytanie/ruch może być biciem w przelocie
     if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1  //jeżeli pionek nie idzie po prostej...
@@ -195,7 +194,7 @@ bool Chess::testEnpassant() //sprawdzanie możliwości wystąpienia enpassant
             && _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == 0)
     {
         _pChessboard->bTestEnpassant = true; //przy sprawdzaniu odpowiedzi z tcp warunek wpadnie na tą flagę, zamiast na normalny ruch
-        _pTCPMsgs->queueMsgs(_nCommunicationType, "test " + _pChessboard->QsPiecieFromTo);
+        _pTCPMsgs->queueMsgs(nSender, "test " + _pChessboard->QsPiecieFromTo);
         return 1; //możemy mieć do czynienia z enpassant
     }
     else return 0;

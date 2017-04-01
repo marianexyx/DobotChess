@@ -132,7 +132,8 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
         TcpMsgMetadata QStrData;
-        if (!TCPMsgsList.isEmpty()) QStrData = TCPMsgsList.last();
+        if (!TCPMsgsList.isEmpty())
+            QStrData = TCPMsgsList.takeLast();
         else
         {
             qDebug() << "ERROR: TCPMsgs::readyRead(): TCPMsgsList is empty";
@@ -145,14 +146,14 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
                         ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
             //core niech odbierze tą wiadomość i zdecyduje do dalej
             emit this->msgFromTcpToWeb(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            m_bWaitingForReadyRead = false;
+            //m_bWaitingForReadyRead = false;
         }
         else if (QStrData.nSender == ARDUINO)
         {
             qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
                         ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
             emit this->msgFromTcpToArd(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            m_bWaitingForReadyRead = false;
+            //m_bWaitingForReadyRead = false;
         }
         else qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData.nSender value =" <<
                          QStrData.nSender;
@@ -162,8 +163,10 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     else if (QStrMsgFromTcp == "\n")
         qDebug() << "ERROR: TCPMsgs::readyRead() received '\\n' msg.";
 
-    if (!TCPMsgsList.isEmpty())
-        TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je
+    m_bWaitingForReadyRead = false;
+
+    /*if (!TCPMsgsList.isEmpty())
+        TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je*/
 
     if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
     {

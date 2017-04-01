@@ -20,7 +20,6 @@ protected:
     WebTable *_pWebTable;
 
     bool _bServiceTests;
-    const int _nCommunicationType;
 
     //----------------KOMUNIKACJA Z GRACZEM-------------//
     virtual void GameStarted() = 0;
@@ -31,8 +30,8 @@ protected:
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
     virtual void NewGame() = 0;
-    virtual void MoveTcpPiece(int type, QString msg) = 0;
-    virtual void Status(int sender) = 0;
+    virtual void MoveTcpPiece( QString msg) = 0;
+    virtual void Status(int nSender) = 0;
     virtual void Promote(QString msg) = 0;
 
     //---------------STEROWANIE RAMIENIEM---------------//
@@ -42,9 +41,9 @@ protected:
     void enpassantMovingSequence();
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-    bool testEnpassant();
-    bool testPromotion();
-    void TestMove(QString QStrMsgFromWebsockets);
+    bool testEnpassant(int nSender);
+    bool testPromotion(int nSender);
+    void TestMove(int nSender, QString QStrMsgFromWebsockets);
 
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);

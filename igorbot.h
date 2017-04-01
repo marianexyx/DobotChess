@@ -14,7 +14,6 @@ private:
     bool m_bAI;
     bool m_bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
     //...na 'status' z tcp dotyczy wykonanego ruchu gracza lub igora
-    const int _nCommunicationType;
 
     void wrongTcpAnswer(QString msgType, QString respond);
     void checkAI();
@@ -32,7 +31,7 @@ public:
 
     //----------KOMUNIKACJA Z CHENARD----------//
     void NewGame();
-    void MoveTcpPiece(int type, QString msg);
+    void MoveTcpPiece(QString msg);
     void Status(int sender);
     void Promote(QString msg);
 

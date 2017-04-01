@@ -17,7 +17,6 @@
 
 IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
                  WebTable *pWebTable, ArduinoUsb *pArduinoUsb)
-    :_nCommunicationType(ARDUINO)
 {
     _pDobot = pDobot;
     _pChessboard = pChessboard;
@@ -115,7 +114,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     else if (tcpMsgType.left(4) == "test") //dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
     {
         if (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1") this->TestOk();
-        else if (tcpRespond == "ILLEGAL") this->MoveTcpPiece(ARDUINO, _pChessboard->QsPiecieFromTo);
+        else if (tcpRespond == "ILLEGAL") this->MoveTcpPiece(_pChessboard->QsPiecieFromTo);
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
     else if (tcpMsgType == "status")
@@ -141,7 +140,7 @@ void IgorBot::checkMsgForChenard(QString msg)
 {
     qDebug() << "IgorBot::checkMsgFromWebsockets: received: " << msg;
     if (msg == "new") this->NewGame();
-    else if (msg.left(4) == "move") this->TestMove(msg); //sprawdź najpierw czy nie występują ruchy specjalne
+    else if (msg.left(4) == "move") this->TestMove(ARDUINO, msg); //sprawdź najpierw czy nie występują ruchy specjalne
     else if (msg.left(10) == "promote_to") this->Promote(msg); //odp. z WWW odnośnie tego na co promujemy
     else if (msg.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
     else qDebug() << "ERROR: received not recognized msg in IgorBot::checkMsgForChenard: " << msg;
@@ -154,12 +153,12 @@ void IgorBot::NewGame()
     _pTCPMsgs->queueMsgs(ARDUINO, "new");
 }
 
-void IgorBot::MoveTcpPiece(int type, QString msg) // żądanie ruchu- przemieszczenie bierki.
+void IgorBot::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
 { //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    qDebug() << "Sending move to tcp: " << msg;
+    qDebug() << "IgorBot::MoveTcpPiece: Sending move to tcp: " << msg;
     emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
-    _pTCPMsgs->queueMsgs(type, msg); //zapytaj się tcp o poprawność prośby o ruch
+    _pTCPMsgs->queueMsgs(ARDUINO, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
 void IgorBot::Status(int sender)

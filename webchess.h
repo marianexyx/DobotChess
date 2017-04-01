@@ -9,9 +9,7 @@ class WebChess : public Chess
     Q_OBJECT
 
  private:
-    Websockets *_pWebsockets; //reszta wskaznikow dziedziczona
-
-    const int _nCommunicationType;
+    Websockets *_pWebsockets; //reszta wskaznikow dziedziczona 
 
 public:
     WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
@@ -26,7 +24,7 @@ public:
 
     //--------KOMUNIKACJA Z CHENARD--------//
     void NewGame();
-    void MoveTcpPiece(int type, QString msg);
+    void MoveTcpPiece(QString msg);
     void Status(int sender);
     void Promote(QString msg);
 

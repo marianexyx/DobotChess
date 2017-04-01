@@ -84,7 +84,7 @@ void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
 {
     if (QsUsbMsg == "start") emit this->AIEnemyStart(); //zresetuj szachownicę i rozpocznij nową grę
     else if (QsUsbMsg == "doFirstIgorMove") emit this->TcpQueueMsg(ARDUINO, "think 5000"); //think->save move -> undo
-    else if (QsUsbMsg.left(4) == "move") emit this->AIEnemySend(QsUsbMsg.mid(5,4)); // mid(5,4) = np. e2e4
+    else if (QsUsbMsg.left(4) == "move") emit this->AIEnemySend(QsUsbMsg);
     else if (QsUsbMsg.left(9) == "promoteTo") QsUsbMsg.left(10);
     else
     {

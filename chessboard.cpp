@@ -107,11 +107,11 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
     qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
 
     PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
-    PieceFrom.Digit = QsPiecePositions.mid(6,1).toInt() - 1;
+    PieceFrom.Digit = QsPiecePositions.mid(6,1).toInt();
     qDebug() << "Chessboard::findBoardPos: PieceFrom.Digit =" << PieceFrom.Digit;
 
     PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
-    PieceTo.Digit = QsPiecePositions.mid(8,1).toInt() - 1;
+    PieceTo.Digit = QsPiecePositions.mid(8,1).toInt();
     qDebug() << "Chessboard::findBoardPos: PieceTo.Digit =" << PieceTo.Digit;
 }
 
