@@ -76,7 +76,7 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
 }
 
 
-void Chess::TcpMoveOk(int nSender) //ruch w pamięci sie powiódł. wykonaj fizyczny ruch na ramieniu
+void Chess::TcpMoveOk() //ruch w pamięci sie powiódł. wykonaj fizyczny ruch na ramieniu
 {
     qDebug() << "-Begin move sequence-";
     emit this->addTextToConsole("-Begin move sequence-\n", 'd');
@@ -101,7 +101,7 @@ void Chess::TcpMoveOk(int nSender) //ruch w pamięci sie powiódł. wykonaj fizy
     else this->pieceMovingSequence('n'); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
 
     //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
-    this->Status(nSender);
+    this->Status();
 }
 
 void Chess::TestMove(int nSender, QString QStrMsgFromWebsockets)

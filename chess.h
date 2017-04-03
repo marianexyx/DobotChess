@@ -31,12 +31,12 @@ protected:
     //--------------KOMUNIKACJA Z CHENARD--------------//
     virtual void NewGame() = 0;
     virtual void MoveTcpPiece( QString msg) = 0;
-    virtual void Status(int nSender) = 0;
+    virtual void Status() = 0;
     virtual void Promote(QString msg) = 0;
 
     //---------------STEROWANIE RAMIENIEM---------------//
     void TestOk();
-    void TcpMoveOk(int nSender);
+    void TcpMoveOk();
     void castlingMovingSequence();
     void enpassantMovingSequence();
 

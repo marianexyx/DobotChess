@@ -107,7 +107,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     else if (tcpMsgType.left(4) == "move")
     {
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego 2 warunki
-        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->TcpMoveOk(ARDUINO);
+        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->TcpMoveOk();
         else if (tcpRespond.left(8) == "BAD_MOVE") this->BadMove(tcpRespond);
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
@@ -126,7 +126,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     }
     else if (tcpMsgType == "undo 1")
     {
-        if (tcpRespond == "OK\n") this->UndoOk();
+        if (tcpRespond == "OK\n" || tcpRespond == "OK") this->UndoOk();
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
     else if (tcpMsgType == "think 5000") //jeżeli mamy doczynienia z botem, który wymyślił ruch ...
@@ -161,11 +161,11 @@ void IgorBot::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bier
     _pTCPMsgs->queueMsgs(ARDUINO, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
-void IgorBot::Status(int sender)
+void IgorBot::Status()
 {
     this->addTextToConsole("Sending to tcp: status\n", 'w');
     qDebug() << "Sending to tcp: status";
-    _pTCPMsgs->queueMsgs(sender, "status");
+    _pTCPMsgs->queueMsgs(ARDUINO, "status");
 }
 
 void IgorBot::Promote(QString msg)

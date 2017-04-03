@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.2
+** Created by: Qt User Interface Compiler version 5.6.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -54,9 +54,11 @@ public:
     QPushButton *connectBtn;
     QGroupBox *groupBox_6;
     QGridLayout *gridLayout_6;
-    QCheckBox *serviceCheckBox;
-    QLineEdit *emulatePlayerMsgLineEdit;
     QPushButton *sendSimulatedMsgBtn;
+    QLineEdit *emulatePlayerMsgLineEdit;
+    QCheckBox *serviceCheckBox;
+    QLineEdit *sendTcpLineEdit;
+    QPushButton *sendTcpBtn;
     QGroupBox *chenardAI;
     QGridLayout *gridLayout_2;
     QPushButton *AIBtn;
@@ -148,7 +150,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(790, 732);
+        MainWindow->resize(790, 734);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_4 = new QGridLayout(centralWidget);
@@ -232,11 +234,12 @@ public:
         gridLayout_6->setSpacing(6);
         gridLayout_6->setContentsMargins(11, 11, 11, 11);
         gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
-        serviceCheckBox = new QCheckBox(groupBox_6);
-        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
-        serviceCheckBox->setEnabled(false);
+        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
+        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
+        sendSimulatedMsgBtn->setEnabled(false);
+        sendSimulatedMsgBtn->setAutoDefault(true);
 
-        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
+        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
 
         emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
         emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
@@ -244,12 +247,23 @@ public:
 
         gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 2);
 
-        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
-        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
-        sendSimulatedMsgBtn->setEnabled(false);
-        sendSimulatedMsgBtn->setAutoDefault(true);
+        serviceCheckBox = new QCheckBox(groupBox_6);
+        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
+        serviceCheckBox->setEnabled(false);
 
-        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
+        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
+
+        sendTcpLineEdit = new QLineEdit(groupBox_6);
+        sendTcpLineEdit->setObjectName(QStringLiteral("sendTcpLineEdit"));
+        sendTcpLineEdit->setEnabled(false);
+
+        gridLayout_6->addWidget(sendTcpLineEdit, 2, 0, 1, 1);
+
+        sendTcpBtn = new QPushButton(groupBox_6);
+        sendTcpBtn->setObjectName(QStringLiteral("sendTcpBtn"));
+        sendTcpBtn->setEnabled(false);
+
+        gridLayout_6->addWidget(sendTcpBtn, 2, 1, 1, 1);
 
 
         gridLayout_3->addWidget(groupBox_6, 0, 2, 1, 1);
@@ -709,7 +723,7 @@ public:
         log->raise();
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 790, 18));
+        menuBar->setGeometry(QRect(0, 0, 790, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -742,8 +756,9 @@ public:
         DeviceInfoLabel->setText(QString());
         connectBtn->setText(QApplication::translate("MainWindow", "Connect", 0));
         groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
-        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
         sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "SendWS", 0));
+        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
+        sendTcpBtn->setText(QApplication::translate("MainWindow", "SendTCP", 0));
         chenardAI->setTitle(QApplication::translate("MainWindow", "AI", 0));
         AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
         botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));

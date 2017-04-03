@@ -156,6 +156,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->AIBtn->setEnabled(false);
         ui->AIEnemyStartBtn->setEnabled(false);
         ui->AIEnemySendBtn->setEnabled(false);
+        ui->sendTcpBtn->setEnabled(false);
+        ui->sendTcpLineEdit->setEnabled(false);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
@@ -193,6 +195,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->botOffRadioBtn->setEnabled(true);
         ui->botOnRadioBtn->setEnabled(true);
         ui->AIBtn->setEnabled(true);
+        ui->sendTcpBtn->setEnabled(true);
+        ui->sendTcpLineEdit->setEnabled(true);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
 
@@ -572,4 +576,20 @@ void MainWindow::on_SimulateFromUsbBtn_clicked()
         _pArduinoUsb->ManageMsgFromUsb(ui->SimulateFromUsbLineEdit->text());
         ui->emulatePlayerMsgLineEdit->clear(); //czyść lineEdit
     }
+}
+
+void MainWindow::on_sendTcpBtn_clicked()
+{
+    if (!ui->sendTcpLineEdit->text().isEmpty()) //coś jest wpisane w lineEdit
+    {
+        _pTCPmsg->queueMsgs(2, ui->sendTcpLineEdit->text()); //#define ARDUINO 2
+        ui->sendTcpLineEdit->clear(); //czyść lineEdit
+    }
+}
+
+
+void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->sendTcpBtn->setEnabled(true);
+    else ui->sendTcpBtn->setEnabled(false);
 }

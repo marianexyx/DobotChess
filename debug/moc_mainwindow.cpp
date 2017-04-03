@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.2)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,15 +12,15 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'mainwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.2. It"
+#error "This file was generated using the moc from 5.6.0. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[51];
-    char stringdata0[931];
+    QByteArrayData data[53];
+    char stringdata0[984];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -79,7 +79,9 @@ QT_MOC_LITERAL(46, 798, 25), // "on_openGripperBtn_clicked"
 QT_MOC_LITERAL(47, 824, 26), // "on_closeGripperBtn_clicked"
 QT_MOC_LITERAL(48, 851, 24), // "on_startGmPosBtn_clicked"
 QT_MOC_LITERAL(49, 876, 24), // "on_startDtPosBtn_clicked"
-QT_MOC_LITERAL(50, 901, 29) // "on_SimulateFromUsbBtn_clicked"
+QT_MOC_LITERAL(50, 901, 29), // "on_SimulateFromUsbBtn_clicked"
+QT_MOC_LITERAL(51, 931, 21), // "on_sendTcpBtn_clicked"
+QT_MOC_LITERAL(52, 953, 30) // "on_sendTcpLineEdit_textChanged"
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
@@ -107,7 +109,9 @@ QT_MOC_LITERAL(50, 901, 29) // "on_SimulateFromUsbBtn_clicked"
     "on_closeGripperBtn_clicked\0"
     "on_startGmPosBtn_clicked\0"
     "on_startDtPosBtn_clicked\0"
-    "on_SimulateFromUsbBtn_clicked"
+    "on_SimulateFromUsbBtn_clicked\0"
+    "on_sendTcpBtn_clicked\0"
+    "on_sendTcpLineEdit_textChanged"
 };
 #undef QT_MOC_LITERAL
 
@@ -117,7 +121,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      31,   14, // methods
+      33,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -125,37 +129,39 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  169,    2, 0x08 /* Private */,
-       3,    1,  170,    2, 0x08 /* Private */,
-       5,    0,  173,    2, 0x08 /* Private */,
-       6,    0,  174,    2, 0x08 /* Private */,
-       7,    2,  175,    2, 0x08 /* Private */,
-      10,    0,  180,    2, 0x08 /* Private */,
-      11,    2,  181,    2, 0x08 /* Private */,
-      14,    2,  186,    2, 0x08 /* Private */,
-      17,    1,  191,    2, 0x08 /* Private */,
-      19,    3,  194,    2, 0x08 /* Private */,
-      23,    0,  201,    2, 0x08 /* Private */,
-      24,    1,  202,    2, 0x08 /* Private */,
-      26,    0,  205,    2, 0x08 /* Private */,
-      27,    5,  206,    2, 0x08 /* Private */,
-      33,    0,  217,    2, 0x08 /* Private */,
-      34,    0,  218,    2, 0x08 /* Private */,
-      35,    0,  219,    2, 0x08 /* Private */,
-      36,    0,  220,    2, 0x08 /* Private */,
-      37,    0,  221,    2, 0x08 /* Private */,
-      38,    0,  222,    2, 0x08 /* Private */,
-      39,    0,  223,    2, 0x08 /* Private */,
-      40,    0,  224,    2, 0x08 /* Private */,
-      41,    1,  225,    2, 0x08 /* Private */,
-      43,    1,  228,    2, 0x08 /* Private */,
-      44,    0,  231,    2, 0x08 /* Private */,
-      45,    0,  232,    2, 0x08 /* Private */,
-      46,    0,  233,    2, 0x08 /* Private */,
-      47,    0,  234,    2, 0x08 /* Private */,
-      48,    0,  235,    2, 0x08 /* Private */,
-      49,    0,  236,    2, 0x08 /* Private */,
-      50,    0,  237,    2, 0x08 /* Private */,
+       1,    0,  179,    2, 0x08 /* Private */,
+       3,    1,  180,    2, 0x08 /* Private */,
+       5,    0,  183,    2, 0x08 /* Private */,
+       6,    0,  184,    2, 0x08 /* Private */,
+       7,    2,  185,    2, 0x08 /* Private */,
+      10,    0,  190,    2, 0x08 /* Private */,
+      11,    2,  191,    2, 0x08 /* Private */,
+      14,    2,  196,    2, 0x08 /* Private */,
+      17,    1,  201,    2, 0x08 /* Private */,
+      19,    3,  204,    2, 0x08 /* Private */,
+      23,    0,  211,    2, 0x08 /* Private */,
+      24,    1,  212,    2, 0x08 /* Private */,
+      26,    0,  215,    2, 0x08 /* Private */,
+      27,    5,  216,    2, 0x08 /* Private */,
+      33,    0,  227,    2, 0x08 /* Private */,
+      34,    0,  228,    2, 0x08 /* Private */,
+      35,    0,  229,    2, 0x08 /* Private */,
+      36,    0,  230,    2, 0x08 /* Private */,
+      37,    0,  231,    2, 0x08 /* Private */,
+      38,    0,  232,    2, 0x08 /* Private */,
+      39,    0,  233,    2, 0x08 /* Private */,
+      40,    0,  234,    2, 0x08 /* Private */,
+      41,    1,  235,    2, 0x08 /* Private */,
+      43,    1,  238,    2, 0x08 /* Private */,
+      44,    0,  241,    2, 0x08 /* Private */,
+      45,    0,  242,    2, 0x08 /* Private */,
+      46,    0,  243,    2, 0x08 /* Private */,
+      47,    0,  244,    2, 0x08 /* Private */,
+      48,    0,  245,    2, 0x08 /* Private */,
+      49,    0,  246,    2, 0x08 /* Private */,
+      50,    0,  247,    2, 0x08 /* Private */,
+      51,    0,  248,    2, 0x08 /* Private */,
+      52,    1,  249,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -189,6 +195,8 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,   25,
 
        0        // eod
 };
@@ -230,6 +238,8 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 28: _t->on_startGmPosBtn_clicked(); break;
         case 29: _t->on_startDtPosBtn_clicked(); break;
         case 30: _t->on_SimulateFromUsbBtn_clicked(); break;
+        case 31: _t->on_sendTcpBtn_clicked(); break;
+        case 32: _t->on_sendTcpLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -260,13 +270,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 31)
+        if (_id < 33)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 31;
+        _id -= 33;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 31)
+        if (_id < 33)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 31;
+        _id -= 33;
     }
     return _id;
 }

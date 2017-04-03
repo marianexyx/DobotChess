@@ -95,6 +95,8 @@ private slots:
     void on_startGmPosBtn_clicked();
     void on_startDtPosBtn_clicked();
     void on_SimulateFromUsbBtn_clicked();
+    void on_sendTcpBtn_clicked();
+    void on_sendTcpLineEdit_textChanged(const QString &textChanged);
 };
 
 #endif // MAINWINDOW_H

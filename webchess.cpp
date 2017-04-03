@@ -99,7 +99,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
     else if (tcpMsgType.left(4) == "move")
     {
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki poniżej
-        if (QsTcpRespond == "OK 1\n" || QsTcpRespond == "OK 1") this->TcpMoveOk(WEBSITE);
+        if (QsTcpRespond == "OK 1\n" || QsTcpRespond == "OK 1") this->TcpMoveOk();
         else if (QsTcpRespond/*.left(8)*/ == "BAD_MOVE") this->BadMove(QsTcpRespond);
         else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
     }
@@ -151,9 +151,9 @@ void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bie
     _pTCPMsgs->queueMsgs(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
-void WebChess::Status(int sender)
+void WebChess::Status()
 {
     _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", 'w');
     qDebug() << "Sending 'status' command to tcp";
-    _pTCPMsgs->queueMsgs(sender, "status");
+    _pTCPMsgs->queueMsgs(WEBSITE, "status");
 }

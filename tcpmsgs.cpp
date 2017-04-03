@@ -1,21 +1,6 @@
 #include "tcpmsgs.h"
+#include <QDataStream>
 
-/*Jak działa ta klasa:
--jakiś inny obiekt odpala metode tcp->queueMsgs. argumenty wpadające to KTO wysyła i CO wysyła
--argumenty wpadająca zapisywane są od razu do jako struktura do listy (kolejki zapytań)
--jeżeli są jakieś dane w liście do przetworzenia przez chenard, to rozpoczynam sekwencje rozmowy z tcp
--pytam tcp czy żyje. jeżeli jest włączony to odpowiada mi on, że tak- odpala się metoda (slot) connected
--po połączeniu wysyłamy do tcp wiadomość z najstarszej struktury danych przychodzacych (bez usuwania jej z listy)
--wykonują i pokazują się pośrednie wiadomości połączenia tcp
--dostajemy odpowiedź z tcp w metodzie readyRead (sygnałem)
--odczytujemy ponownie najstarszą strukturę z listy (tak to jest zrobione, by nie było żadnych innych zmiennych,
-    które mogłyby być przesłonione gdyby do obiektu w listę wpadło kolejne polecenie do chenard)
--na podstawie danych z tej najstarszej struktury sprawdzamy kto wysyłał nam dane (by jemu coś odesłać)
--odsyłamy dane temu kto nam je wysłał (odsyłamy tą wiadomość którą nam przysłał i odpowiedź chenardu na tą
-    wiadomość. robimy to, bo odpowiedzi chenardu same z siebie są bardzo enigmatyczne)
--usuwamy najstarszą strukturę danych tcp z listy (jest już przetworzona)
--jeżeli w międzyczasie wpadły jakieś dane do listy to wykonaj kolejne zapytanie
-*/
 
 //TODO: jakaś normalizacja i odpowiednie miejsce na constanty
 const int WEBSITE = 1;
@@ -25,6 +10,7 @@ TCPMsgs::TCPMsgs()
 {
     m_bWaitingForReadyRead = false;
     m_ullID = 0;
+    m_blockSize = 0;
 }
 
 void TCPMsgs::queueMsgs(int nSender, QString msg)
@@ -56,6 +42,7 @@ void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
 //rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
 void TCPMsgs::doTcpConnect()
 {
+    m_blockSize = 0;
     m_bWaitingForReadyRead = true;
 
     socket = new QTcpSocket(this);
@@ -64,10 +51,17 @@ void TCPMsgs::doTcpConnect()
     connect(socket, SIGNAL(connected()),this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
-    connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
+    //connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
+    connect(socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
+    typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
+    connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
+            this, displayError);
 
     //emit addTextToConsole("connecting...\n", 't');
     qDebug() << "TCPMsgs: connecting...";
+
+    socket->abort(); //pozwoli to zakończyć stare połączenie jeżeli jeszcze nie zostało zerwane...
+    //...by można było stworzyć nowe
 
     // this is not blocking call
     socket->connectToHost("localhost", 22222); //docelowo emituje sygnał connected (tcp)
@@ -75,6 +69,29 @@ void TCPMsgs::doTcpConnect()
     if(!socket->waitForConnected(5000)) //czkemy na połączenie 5 sekund
     {
         emit addTextToConsole("Error12:" + socket->errorString() + "\n", 't');
+    }
+}
+
+void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
+{
+    switch (socketError) {
+    case QAbstractSocket::RemoteHostClosedError:
+        break; //server protocol ends with the server closing the connection
+    case QAbstractSocket::HostNotFoundError:
+        qDebug() << "ERROR: TCPMsgs: The host was not found. Please check the"
+                    "host name and port settings." ;
+        emit addTextToConsole("ERROR: TCPMsgs: The host was not found. Please check the"
+                              "host name and port settings.\n", 't');
+        break;
+    case QAbstractSocket::ConnectionRefusedError:
+        qDebug() << "ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
+                    "running, and check that the host name and port settings are correct.";
+        emit addTextToConsole("ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
+                              "running, and check that the host name and port settings are correct.", 't');
+        break;
+    default:
+        qDebug() << "ERROR: TCPMsgs: The following error occurred:" << socket->errorString();
+        emit addTextToConsole("ERROR: TCPMsgs: The following error occurred: " + socket->errorString(), 't');
     }
 }
 
@@ -91,7 +108,7 @@ void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
     //emit addTextToConsole("connected...\n", 't');
     //emit addTextToConsole("msg from websocket: " + QStrData.QStrMsgForTcp + "\n", 't');
     qDebug() << "TCPMsgs: connected...";
-    qDebug() << "TCPMsgs: msg from sender:" << QStrData.QStrMsgForTcp;
+    qDebug() << "TCPMsgs: parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 
     QByteArray QabMsgArrayed;
     QabMsgArrayed.append(QStrData.QStrMsgForTcp); //przetworzenie parametru dla funkcji write()
@@ -121,16 +138,55 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
 {
     //emit addTextToConsole("reading...\n", 't');
     qDebug() << "TCPMsgs: reading...";
-
-    // read the data from the socket
-    QString QStrMsgFromTcp = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
-    //pokaż ją w consoli tcp. \n dodaje się sam
-    emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
-    //qDebug() << "tcp answer: " << QStrMsgFromTcp;
+    QDataStream in(socket);
+    in.setVersion(QDataStream::Qt_4_0);
+    qDebug() << "reached1";
+    if (m_blockSize == 0)
+    {
+        /*if (socket->bytesAvailable() < (int)sizeof(quint16))
+        {
+            qDebug() << "reached2";
+            m_bWaitingForReadyRead = false;
+            return;
+        }
+        qDebug() << "reached3";*/
+        do
+        {
+            socket->waitForReadyRead(50);
+        }
+        while(socket->bytesAvailable() < (int)sizeof(quint64));
+        in >> m_blockSize;
+    }
+    qDebug() << "reached4";
+    /*if (socket->bytesAvailable() < m_blockSize) //to trzeba niby sprawdzać, ale z tym nie działa i o co tu chodzi??
+    {
+        qDebug() << "reached5";
+        qDebug() << "socket->bytesAvailable()=" << socket->bytesAvailable() <<
+                    ", m_blockSize=" << m_blockSize;
+        m_bWaitingForReadyRead = false;
+        return;
+    }*/
+    do
+    {
+        socket->waitForReadyRead(50);
+    }
+    while(socket->bytesAvailable() < m_blockSize);
+    qDebug() << "reached6";
+    QString QStrMsgFromTcp;
+    in >> QStrMsgFromTcp;
+    qDebug() << "reached7";
+    /*QString QStrMsgFromTcp = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
+    do
+    {
+        QStrMsgFromTcp = socket->readAll(); //ominięcie problemu pustych wiadomości, którego nie mogę rozwiązać
+    }
+    while (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n");*/
 
     //TODO: dlaczego czasem dostaję 2 rozklejone wiadomości "OK 1" i "\n" zamiast 1 poprawnej "OK 1\n"?
     if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
+        emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
+
         TcpMsgMetadata QStrData;
         if (!TCPMsgsList.isEmpty())
             QStrData = TCPMsgsList.takeLast();
@@ -162,11 +218,9 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
         qDebug() << "ERROR: TCPMsgs::readyRead() received empty msg.";
     else if (QStrMsgFromTcp == "\n")
         qDebug() << "ERROR: TCPMsgs::readyRead() received '\\n' msg.";
+    else qDebug() << "ERROR: TCPMsgs::readyRead() received:" << QStrMsgFromTcp;
 
     m_bWaitingForReadyRead = false;
-
-    /*if (!TCPMsgsList.isEmpty())
-        TCPMsgsList.removeLast(); //czyszczenie: po wykonaniu ostatniego polecenia z listy usuń je*/
 
     if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
     {

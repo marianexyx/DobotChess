@@ -11,7 +11,6 @@ struct TcpMsgMetadata
     QString QStrMsgForTcp;
 };
 
-
 class TCPMsgs: public QObject
 {
     Q_OBJECT
@@ -24,9 +23,11 @@ private:
     //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
     //...na którego odpowiedź(przetworzenie) z TCP czekamy
     unsigned long long m_ullID; //nr zapytania do tcp
+    quint16 m_blockSize;
     void doTcpConnect();
 
 private slots:
+    void displayError(QAbstractSocket::SocketError socketError);
     void connected();
     void disconnected();
     void bytesWritten(qint64 bytes);

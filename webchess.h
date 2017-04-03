@@ -25,7 +25,7 @@ public:
     //--------KOMUNIKACJA Z CHENARD--------//
     void NewGame();
     void MoveTcpPiece(QString msg);
-    void Status(int sender);
+    void Status();
     void Promote(QString msg);
 
     /*---------------DZIEDZICZONE Z CHESS---------------//
