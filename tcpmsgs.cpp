@@ -10,7 +10,6 @@ TCPMsgs::TCPMsgs()
 {
     m_bWaitingForReadyRead = false;
     m_ullID = 0;
-    m_blockSize = 0;
 }
 
 void TCPMsgs::queueMsgs(int nSender, QString msg)
@@ -27,10 +26,6 @@ void TCPMsgs::queueMsgs(int nSender, QString msg)
         if (!m_bWaitingForReadyRead) //zaczekaj z kolejkowaniem kolejnego zapytania do TCP jeżeli...
             //...czekamy aktualnie na przetworzenie jakiejś odpowiedzi z TCP
             this->doTcpConnect(); //to wykonaj najstarszą wiadomość z kontenera.
-        //TODO: To działa w założeniu, że kolejny ruch nie wykona się nigdy dopóki nie dostaniemy ...
-        //...informacji o tym jaki jest status gry (tzn. ruch się w pełni wykonał). To czy inne...
-        //...znikome wyjątki zamiany kolejności zapytań tutaj wystąpią może być niezwykle rzadkie i...
-        //...wymaga głębszej analizy "nie na teraz" o tym czy to wystapi i w jakich warunkach.
     }
 }
 
@@ -42,7 +37,6 @@ void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
 //rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
 void TCPMsgs::doTcpConnect()
 {
-    m_blockSize = 0;
     m_bWaitingForReadyRead = true;
 
     socket = new QTcpSocket(this);
@@ -111,80 +105,43 @@ void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
     qDebug() << "TCPMsgs: parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 
     QByteArray QabMsgArrayed;
-    QabMsgArrayed.append(QStrData.QStrMsgForTcp); //przetworzenie parametru dla funkcji write()
+    QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n"); //przetworzenie parametru dla funkcji write()
     // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
-    socket->write(QabMsgArrayed + "\n"); //write wysyła wiadomość (w bajtach) na server przez tcp
+    socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
 
-    emit addTextToConsole("wrote to TCP: " + QabMsgArrayed + "\n", 't');
+    emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, 't');
 }
 
 void TCPMsgs::disconnected()
 {
-    //TODO: Gdy dwa polecenie na tcp są wykonywane jedne po drugim, to tcp nie zdąży disconnectować...
-    //...pierwszej podczas gdy zaczyna od razu wykonywać drugą. Nie widzę na tą chwilę by to w czymś...
-    //...przeszkadzało, aczkolwiek wygląda to średnio.
-    //emit addTextToConsole("disconnected...\n", 't');
     qDebug() << "disconnected...";
-    //TODO2: Odsyłać wiadomości z Tcp dopiero po disconnectowaniu? tj tutaj wrzucić doTcpConnect z kolejki?
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
 {
-    //emit addTextToConsole(QString::number(bytes) + " bytes written...\n", 't');
     qDebug() << "TCPMsgs: " << QString::number(bytes) << " bytes written...";
 }
 
 void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej wysłanej wiadmoności
 {
-    //emit addTextToConsole("reading...\n", 't');
     qDebug() << "TCPMsgs: reading...";
-    QDataStream in(socket);
-    in.setVersion(QDataStream::Qt_4_0);
-    qDebug() << "reached1";
-    if (m_blockSize == 0)
-    {
-        /*if (socket->bytesAvailable() < (int)sizeof(quint16))
-        {
-            qDebug() << "reached2";
-            m_bWaitingForReadyRead = false;
-            return;
-        }
-        qDebug() << "reached3";*/
-        do
-        {
-            socket->waitForReadyRead(50);
-        }
-        while(socket->bytesAvailable() < (int)sizeof(quint64));
-        in >> m_blockSize;
-    }
-    qDebug() << "reached4";
-    /*if (socket->bytesAvailable() < m_blockSize) //to trzeba niby sprawdzać, ale z tym nie działa i o co tu chodzi??
-    {
-        qDebug() << "reached5";
-        qDebug() << "socket->bytesAvailable()=" << socket->bytesAvailable() <<
-                    ", m_blockSize=" << m_blockSize;
-        m_bWaitingForReadyRead = false;
-        return;
-    }*/
-    do
-    {
-        socket->waitForReadyRead(50);
-    }
-    while(socket->bytesAvailable() < m_blockSize);
-    qDebug() << "reached6";
-    QString QStrMsgFromTcp;
-    in >> QStrMsgFromTcp;
-    qDebug() << "reached7";
-    /*QString QStrMsgFromTcp = socket->readAll(); //w zmiennej zapisz odpowiedź z chenard
-    do
-    {
-        QStrMsgFromTcp = socket->readAll(); //ominięcie problemu pustych wiadomości, którego nie mogę rozwiązać
-    }
-    while (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n");*/
 
-    //TODO: dlaczego czasem dostaję 2 rozklejone wiadomości "OK 1" i "\n" zamiast 1 poprawnej "OK 1\n"?
+    QString QStrMsgFromTcp;
+    do
+    {
+        if (!QStrMsgFromTcp.isEmpty())
+            qDebug() << "WARNING: TCPMsgs::readyRead- needed to read data from socket 1 more time";
+        QStrMsgFromTcp += socket->readAll();
+        if (socket->bytesAvailable() > 0)
+            qDebug() << "WARNING: TCPMsgs::readyRead- socket->bytesAvailable() > 0 after 1st read";
+    }
+    while (socket->bytesAvailable() > 0);
+
+    //TODO: dostaję czasem rozklejone końcówki w bodajże kolejnej wiadomości: "" lub "/n". Póki co...
+    //zostało to naprawione półśrodkiems
     if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
+        if (QStrMsgFromTcp.right(1) != "\n") QStrMsgFromTcp += "\n";
         emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
 
         TcpMsgMetadata QStrData;
@@ -215,7 +172,10 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
                          QStrData.nSender;
     }
     else if (QStrMsgFromTcp.isEmpty())
+    {
         qDebug() << "ERROR: TCPMsgs::readyRead() received empty msg.";
+        return;
+    }
     else if (QStrMsgFromTcp == "\n")
         qDebug() << "ERROR: TCPMsgs::readyRead() received '\\n' msg.";
     else qDebug() << "ERROR: TCPMsgs::readyRead() received:" << QStrMsgFromTcp;
@@ -225,8 +185,5 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
     {
         this->doTcpConnect(); //to je wykonaj
-        //TODO: Nie wiem czy to tu nie przyczyni się kiedyś do jakiegoś błędu. Mółgbym ten warunek...
-        //...przesunąć do funkcji w core odpowiadającej wykonywaniu odpowiedzi na "status" z tcp...
-        //..., ale to też wymaga analizy.
     }
 }

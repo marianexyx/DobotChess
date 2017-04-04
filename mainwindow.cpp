@@ -195,7 +195,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->botOffRadioBtn->setEnabled(true);
         ui->botOnRadioBtn->setEnabled(true);
         ui->AIBtn->setEnabled(true);
-        ui->sendTcpBtn->setEnabled(true);
         ui->sendTcpLineEdit->setEnabled(true);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(true);

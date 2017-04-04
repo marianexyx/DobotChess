@@ -43,22 +43,6 @@ public:
     QPlainTextEdit *debug_log;
     QGroupBox *groupBox_5;
     QGridLayout *gridLayout_3;
-    QGroupBox *dobotInfo;
-    QGridLayout *gridLayout_11;
-    QLabel *label_9;
-    QLabel *deviceSNLabel;
-    QLabel *label_10;
-    QLabel *DeviceNameLabel;
-    QLabel *label_11;
-    QLabel *DeviceInfoLabel;
-    QPushButton *connectBtn;
-    QGroupBox *groupBox_6;
-    QGridLayout *gridLayout_6;
-    QPushButton *sendSimulatedMsgBtn;
-    QLineEdit *emulatePlayerMsgLineEdit;
-    QCheckBox *serviceCheckBox;
-    QLineEdit *sendTcpLineEdit;
-    QPushButton *sendTcpBtn;
     QGroupBox *chenardAI;
     QGridLayout *gridLayout_2;
     QPushButton *AIBtn;
@@ -67,14 +51,6 @@ public:
     QLineEdit *AIEnemyLineEdit;
     QRadioButton *botOffRadioBtn;
     QPushButton *AIEnemyStartBtn;
-    QGroupBox *ArduinoUsbPanel;
-    QGridLayout *gridLayout_13;
-    QComboBox *portsComboBox;
-    QPushButton *reloadPortsBtn;
-    QLineEdit *usbCmdLine;
-    QPushButton *sendUsbBtn;
-    QPushButton *SimulateFromUsbBtn;
-    QLineEdit *SimulateFromUsbLineEdit;
     QGroupBox *JOGgroupBox;
     QGridLayout *gridLayout_10;
     QPushButton *rHeadAddBtn;
@@ -95,6 +71,30 @@ public:
     QPushButton *startGmPosBtn;
     QPushButton *homeBtn;
     QPushButton *startDtPosBtn;
+    QGroupBox *dobotInfo;
+    QGridLayout *gridLayout_11;
+    QLabel *label_9;
+    QLabel *deviceSNLabel;
+    QLabel *label_10;
+    QLabel *DeviceNameLabel;
+    QLabel *label_11;
+    QLabel *DeviceInfoLabel;
+    QPushButton *connectBtn;
+    QGroupBox *ArduinoUsbPanel;
+    QGridLayout *gridLayout_13;
+    QComboBox *portsComboBox;
+    QPushButton *reloadPortsBtn;
+    QLineEdit *usbCmdLine;
+    QPushButton *sendUsbBtn;
+    QPushButton *SimulateFromUsbBtn;
+    QLineEdit *SimulateFromUsbLineEdit;
+    QGroupBox *groupBox_6;
+    QGridLayout *gridLayout_6;
+    QPushButton *sendSimulatedMsgBtn;
+    QLineEdit *emulatePlayerMsgLineEdit;
+    QCheckBox *serviceCheckBox;
+    QLineEdit *sendTcpLineEdit;
+    QPushButton *sendTcpBtn;
     QGroupBox *dobotServiceMove;
     QFormLayout *formLayout_2;
     QLabel *label_17;
@@ -110,20 +110,6 @@ public:
     QLabel *label_13;
     QLineEdit *servo2GripperEdit;
     QPushButton *sendBtn;
-    QGroupBox *queue;
-    QGridLayout *gridLayout_5;
-    QLabel *CoreIndexAmountlabel;
-    QLabel *label_14;
-    QLabel *label_21;
-    QLabel *label_15;
-    QLabel *CoreMaxQueuedIndexLabel;
-    QLabel *DobotQueuedIndexLabel;
-    QLabel *label_16;
-    QLabel *DobotQueuedCmdLeftSpaceLabel;
-    QLabel *label_22;
-    QLabel *CoreNextIdLabel;
-    QPushButton *executeDobotComandsBtn;
-    QPushButton *resetDobotIndexBtn;
     QGroupBox *dobotPositions;
     QGridLayout *gridLayout;
     QLabel *joint1Label;
@@ -142,6 +128,20 @@ public:
     QLabel *label_8;
     QLabel *joint4Label;
     QLabel *joint2Label;
+    QGroupBox *queue;
+    QGridLayout *gridLayout_5;
+    QLabel *CoreIndexAmountlabel;
+    QLabel *label_14;
+    QLabel *label_21;
+    QLabel *label_15;
+    QLabel *CoreMaxQueuedIndexLabel;
+    QLabel *DobotQueuedIndexLabel;
+    QLabel *label_16;
+    QLabel *DobotQueuedCmdLeftSpaceLabel;
+    QLabel *label_22;
+    QLabel *CoreNextIdLabel;
+    QPushButton *executeDobotComandsBtn;
+    QPushButton *resetDobotIndexBtn;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -150,7 +150,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(790, 734);
+        MainWindow->resize(861, 737);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_4 = new QGridLayout(centralWidget);
@@ -159,6 +159,13 @@ public:
         gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
         log = new QGroupBox(centralWidget);
         log->setObjectName(QStringLiteral("log"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(log->sizePolicy().hasHeightForWidth());
+        log->setSizePolicy(sizePolicy);
+        log->setMinimumSize(QSize(100, 0));
+        log->setBaseSize(QSize(500, 0));
         verticalLayout = new QVBoxLayout(log);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -175,99 +182,17 @@ public:
 
         groupBox_5 = new QGroupBox(centralWidget);
         groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(groupBox_5->sizePolicy().hasHeightForWidth());
+        groupBox_5->setSizePolicy(sizePolicy1);
+        groupBox_5->setMinimumSize(QSize(0, 0));
+        groupBox_5->setMaximumSize(QSize(450, 16777215));
         gridLayout_3 = new QGridLayout(groupBox_5);
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
         gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-        dobotInfo = new QGroupBox(groupBox_5);
-        dobotInfo->setObjectName(QStringLiteral("dobotInfo"));
-        gridLayout_11 = new QGridLayout(dobotInfo);
-        gridLayout_11->setSpacing(6);
-        gridLayout_11->setContentsMargins(11, 11, 11, 11);
-        gridLayout_11->setObjectName(QStringLiteral("gridLayout_11"));
-        label_9 = new QLabel(dobotInfo);
-        label_9->setObjectName(QStringLiteral("label_9"));
-
-        gridLayout_11->addWidget(label_9, 0, 0, 1, 1);
-
-        deviceSNLabel = new QLabel(dobotInfo);
-        deviceSNLabel->setObjectName(QStringLiteral("deviceSNLabel"));
-        deviceSNLabel->setFrameShape(QFrame::Panel);
-
-        gridLayout_11->addWidget(deviceSNLabel, 0, 1, 1, 1);
-
-        label_10 = new QLabel(dobotInfo);
-        label_10->setObjectName(QStringLiteral("label_10"));
-
-        gridLayout_11->addWidget(label_10, 1, 0, 1, 1);
-
-        DeviceNameLabel = new QLabel(dobotInfo);
-        DeviceNameLabel->setObjectName(QStringLiteral("DeviceNameLabel"));
-        DeviceNameLabel->setFrameShape(QFrame::Panel);
-        DeviceNameLabel->setTextFormat(Qt::AutoText);
-
-        gridLayout_11->addWidget(DeviceNameLabel, 1, 1, 1, 1);
-
-        label_11 = new QLabel(dobotInfo);
-        label_11->setObjectName(QStringLiteral("label_11"));
-
-        gridLayout_11->addWidget(label_11, 2, 0, 1, 1);
-
-        DeviceInfoLabel = new QLabel(dobotInfo);
-        DeviceInfoLabel->setObjectName(QStringLiteral("DeviceInfoLabel"));
-        DeviceInfoLabel->setFrameShape(QFrame::Panel);
-        DeviceInfoLabel->setFrameShadow(QFrame::Plain);
-
-        gridLayout_11->addWidget(DeviceInfoLabel, 2, 1, 1, 1);
-
-        connectBtn = new QPushButton(dobotInfo);
-        connectBtn->setObjectName(QStringLiteral("connectBtn"));
-
-        gridLayout_11->addWidget(connectBtn, 3, 1, 1, 1);
-
-
-        gridLayout_3->addWidget(dobotInfo, 1, 2, 1, 1);
-
-        groupBox_6 = new QGroupBox(groupBox_5);
-        groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        gridLayout_6 = new QGridLayout(groupBox_6);
-        gridLayout_6->setSpacing(6);
-        gridLayout_6->setContentsMargins(11, 11, 11, 11);
-        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
-        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
-        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
-        sendSimulatedMsgBtn->setEnabled(false);
-        sendSimulatedMsgBtn->setAutoDefault(true);
-
-        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
-
-        emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
-        emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
-        emulatePlayerMsgLineEdit->setEnabled(false);
-
-        gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 2);
-
-        serviceCheckBox = new QCheckBox(groupBox_6);
-        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
-        serviceCheckBox->setEnabled(false);
-
-        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
-
-        sendTcpLineEdit = new QLineEdit(groupBox_6);
-        sendTcpLineEdit->setObjectName(QStringLiteral("sendTcpLineEdit"));
-        sendTcpLineEdit->setEnabled(false);
-
-        gridLayout_6->addWidget(sendTcpLineEdit, 2, 0, 1, 1);
-
-        sendTcpBtn = new QPushButton(groupBox_6);
-        sendTcpBtn->setObjectName(QStringLiteral("sendTcpBtn"));
-        sendTcpBtn->setEnabled(false);
-
-        gridLayout_6->addWidget(sendTcpBtn, 2, 1, 1, 1);
-
-
-        gridLayout_3->addWidget(groupBox_6, 0, 2, 1, 1);
-
         chenardAI = new QGroupBox(groupBox_5);
         chenardAI->setObjectName(QStringLiteral("chenardAI"));
         gridLayout_2 = new QGridLayout(chenardAI);
@@ -313,50 +238,6 @@ public:
 
 
         gridLayout_3->addWidget(chenardAI, 1, 0, 1, 2);
-
-        ArduinoUsbPanel = new QGroupBox(groupBox_5);
-        ArduinoUsbPanel->setObjectName(QStringLiteral("ArduinoUsbPanel"));
-        gridLayout_13 = new QGridLayout(ArduinoUsbPanel);
-        gridLayout_13->setSpacing(6);
-        gridLayout_13->setContentsMargins(11, 11, 11, 11);
-        gridLayout_13->setObjectName(QStringLiteral("gridLayout_13"));
-        portsComboBox = new QComboBox(ArduinoUsbPanel);
-        portsComboBox->setObjectName(QStringLiteral("portsComboBox"));
-        portsComboBox->setEnabled(false);
-
-        gridLayout_13->addWidget(portsComboBox, 2, 0, 1, 1);
-
-        reloadPortsBtn = new QPushButton(ArduinoUsbPanel);
-        reloadPortsBtn->setObjectName(QStringLiteral("reloadPortsBtn"));
-
-        gridLayout_13->addWidget(reloadPortsBtn, 2, 1, 1, 1);
-
-        usbCmdLine = new QLineEdit(ArduinoUsbPanel);
-        usbCmdLine->setObjectName(QStringLiteral("usbCmdLine"));
-        usbCmdLine->setEnabled(false);
-
-        gridLayout_13->addWidget(usbCmdLine, 1, 0, 1, 1);
-
-        sendUsbBtn = new QPushButton(ArduinoUsbPanel);
-        sendUsbBtn->setObjectName(QStringLiteral("sendUsbBtn"));
-        sendUsbBtn->setEnabled(false);
-
-        gridLayout_13->addWidget(sendUsbBtn, 1, 1, 1, 1);
-
-        SimulateFromUsbBtn = new QPushButton(ArduinoUsbPanel);
-        SimulateFromUsbBtn->setObjectName(QStringLiteral("SimulateFromUsbBtn"));
-        SimulateFromUsbBtn->setEnabled(false);
-
-        gridLayout_13->addWidget(SimulateFromUsbBtn, 0, 1, 1, 1);
-
-        SimulateFromUsbLineEdit = new QLineEdit(ArduinoUsbPanel);
-        SimulateFromUsbLineEdit->setObjectName(QStringLiteral("SimulateFromUsbLineEdit"));
-        SimulateFromUsbLineEdit->setEnabled(false);
-
-        gridLayout_13->addWidget(SimulateFromUsbLineEdit, 0, 0, 1, 1);
-
-
-        gridLayout_3->addWidget(ArduinoUsbPanel, 0, 0, 1, 2);
 
         JOGgroupBox = new QGroupBox(groupBox_5);
         JOGgroupBox->setObjectName(QStringLiteral("JOGgroupBox"));
@@ -472,6 +353,139 @@ public:
 
         gridLayout_3->addWidget(dobotMovements, 2, 1, 1, 1);
 
+        dobotInfo = new QGroupBox(groupBox_5);
+        dobotInfo->setObjectName(QStringLiteral("dobotInfo"));
+        gridLayout_11 = new QGridLayout(dobotInfo);
+        gridLayout_11->setSpacing(6);
+        gridLayout_11->setContentsMargins(11, 11, 11, 11);
+        gridLayout_11->setObjectName(QStringLiteral("gridLayout_11"));
+        label_9 = new QLabel(dobotInfo);
+        label_9->setObjectName(QStringLiteral("label_9"));
+
+        gridLayout_11->addWidget(label_9, 0, 0, 1, 1);
+
+        deviceSNLabel = new QLabel(dobotInfo);
+        deviceSNLabel->setObjectName(QStringLiteral("deviceSNLabel"));
+        deviceSNLabel->setFrameShape(QFrame::Panel);
+
+        gridLayout_11->addWidget(deviceSNLabel, 0, 1, 1, 1);
+
+        label_10 = new QLabel(dobotInfo);
+        label_10->setObjectName(QStringLiteral("label_10"));
+
+        gridLayout_11->addWidget(label_10, 1, 0, 1, 1);
+
+        DeviceNameLabel = new QLabel(dobotInfo);
+        DeviceNameLabel->setObjectName(QStringLiteral("DeviceNameLabel"));
+        DeviceNameLabel->setFrameShape(QFrame::Panel);
+        DeviceNameLabel->setTextFormat(Qt::AutoText);
+
+        gridLayout_11->addWidget(DeviceNameLabel, 1, 1, 1, 1);
+
+        label_11 = new QLabel(dobotInfo);
+        label_11->setObjectName(QStringLiteral("label_11"));
+
+        gridLayout_11->addWidget(label_11, 2, 0, 1, 1);
+
+        DeviceInfoLabel = new QLabel(dobotInfo);
+        DeviceInfoLabel->setObjectName(QStringLiteral("DeviceInfoLabel"));
+        DeviceInfoLabel->setFrameShape(QFrame::Panel);
+        DeviceInfoLabel->setFrameShadow(QFrame::Plain);
+
+        gridLayout_11->addWidget(DeviceInfoLabel, 2, 1, 1, 1);
+
+        connectBtn = new QPushButton(dobotInfo);
+        connectBtn->setObjectName(QStringLiteral("connectBtn"));
+
+        gridLayout_11->addWidget(connectBtn, 3, 1, 1, 1);
+
+
+        gridLayout_3->addWidget(dobotInfo, 1, 2, 1, 1);
+
+        ArduinoUsbPanel = new QGroupBox(groupBox_5);
+        ArduinoUsbPanel->setObjectName(QStringLiteral("ArduinoUsbPanel"));
+        gridLayout_13 = new QGridLayout(ArduinoUsbPanel);
+        gridLayout_13->setSpacing(6);
+        gridLayout_13->setContentsMargins(11, 11, 11, 11);
+        gridLayout_13->setObjectName(QStringLiteral("gridLayout_13"));
+        portsComboBox = new QComboBox(ArduinoUsbPanel);
+        portsComboBox->setObjectName(QStringLiteral("portsComboBox"));
+        portsComboBox->setEnabled(false);
+
+        gridLayout_13->addWidget(portsComboBox, 2, 0, 1, 1);
+
+        reloadPortsBtn = new QPushButton(ArduinoUsbPanel);
+        reloadPortsBtn->setObjectName(QStringLiteral("reloadPortsBtn"));
+
+        gridLayout_13->addWidget(reloadPortsBtn, 2, 1, 1, 1);
+
+        usbCmdLine = new QLineEdit(ArduinoUsbPanel);
+        usbCmdLine->setObjectName(QStringLiteral("usbCmdLine"));
+        usbCmdLine->setEnabled(false);
+
+        gridLayout_13->addWidget(usbCmdLine, 1, 0, 1, 1);
+
+        sendUsbBtn = new QPushButton(ArduinoUsbPanel);
+        sendUsbBtn->setObjectName(QStringLiteral("sendUsbBtn"));
+        sendUsbBtn->setEnabled(false);
+
+        gridLayout_13->addWidget(sendUsbBtn, 1, 1, 1, 1);
+
+        SimulateFromUsbBtn = new QPushButton(ArduinoUsbPanel);
+        SimulateFromUsbBtn->setObjectName(QStringLiteral("SimulateFromUsbBtn"));
+        SimulateFromUsbBtn->setEnabled(false);
+
+        gridLayout_13->addWidget(SimulateFromUsbBtn, 0, 1, 1, 1);
+
+        SimulateFromUsbLineEdit = new QLineEdit(ArduinoUsbPanel);
+        SimulateFromUsbLineEdit->setObjectName(QStringLiteral("SimulateFromUsbLineEdit"));
+        SimulateFromUsbLineEdit->setEnabled(false);
+
+        gridLayout_13->addWidget(SimulateFromUsbLineEdit, 0, 0, 1, 1);
+
+
+        gridLayout_3->addWidget(ArduinoUsbPanel, 0, 0, 1, 2);
+
+        groupBox_6 = new QGroupBox(groupBox_5);
+        groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
+        gridLayout_6 = new QGridLayout(groupBox_6);
+        gridLayout_6->setSpacing(6);
+        gridLayout_6->setContentsMargins(11, 11, 11, 11);
+        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
+        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
+        sendSimulatedMsgBtn->setEnabled(false);
+        sendSimulatedMsgBtn->setAutoDefault(true);
+
+        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
+
+        emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
+        emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
+        emulatePlayerMsgLineEdit->setEnabled(false);
+
+        gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 2);
+
+        serviceCheckBox = new QCheckBox(groupBox_6);
+        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
+        serviceCheckBox->setEnabled(false);
+
+        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
+
+        sendTcpLineEdit = new QLineEdit(groupBox_6);
+        sendTcpLineEdit->setObjectName(QStringLiteral("sendTcpLineEdit"));
+        sendTcpLineEdit->setEnabled(false);
+
+        gridLayout_6->addWidget(sendTcpLineEdit, 2, 0, 1, 1);
+
+        sendTcpBtn = new QPushButton(groupBox_6);
+        sendTcpBtn->setObjectName(QStringLiteral("sendTcpBtn"));
+        sendTcpBtn->setEnabled(false);
+
+        gridLayout_6->addWidget(sendTcpBtn, 2, 1, 1, 1);
+
+
+        gridLayout_3->addWidget(groupBox_6, 0, 2, 1, 1);
+
         dobotServiceMove = new QGroupBox(groupBox_5);
         dobotServiceMove->setObjectName(QStringLiteral("dobotServiceMove"));
         formLayout_2 = new QFormLayout(dobotServiceMove);
@@ -552,77 +566,6 @@ public:
 
 
         gridLayout_3->addWidget(dobotServiceMove, 2, 0, 1, 1);
-
-        queue = new QGroupBox(groupBox_5);
-        queue->setObjectName(QStringLiteral("queue"));
-        gridLayout_5 = new QGridLayout(queue);
-        gridLayout_5->setSpacing(6);
-        gridLayout_5->setContentsMargins(11, 11, 11, 11);
-        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
-        CoreIndexAmountlabel = new QLabel(queue);
-        CoreIndexAmountlabel->setObjectName(QStringLiteral("CoreIndexAmountlabel"));
-
-        gridLayout_5->addWidget(CoreIndexAmountlabel, 3, 1, 1, 1);
-
-        label_14 = new QLabel(queue);
-        label_14->setObjectName(QStringLiteral("label_14"));
-
-        gridLayout_5->addWidget(label_14, 0, 0, 1, 1);
-
-        label_21 = new QLabel(queue);
-        label_21->setObjectName(QStringLiteral("label_21"));
-
-        gridLayout_5->addWidget(label_21, 2, 0, 1, 1);
-
-        label_15 = new QLabel(queue);
-        label_15->setObjectName(QStringLiteral("label_15"));
-
-        gridLayout_5->addWidget(label_15, 1, 0, 1, 1);
-
-        CoreMaxQueuedIndexLabel = new QLabel(queue);
-        CoreMaxQueuedIndexLabel->setObjectName(QStringLiteral("CoreMaxQueuedIndexLabel"));
-
-        gridLayout_5->addWidget(CoreMaxQueuedIndexLabel, 1, 1, 1, 1);
-
-        DobotQueuedIndexLabel = new QLabel(queue);
-        DobotQueuedIndexLabel->setObjectName(QStringLiteral("DobotQueuedIndexLabel"));
-
-        gridLayout_5->addWidget(DobotQueuedIndexLabel, 0, 1, 1, 1);
-
-        label_16 = new QLabel(queue);
-        label_16->setObjectName(QStringLiteral("label_16"));
-
-        gridLayout_5->addWidget(label_16, 3, 0, 1, 1);
-
-        DobotQueuedCmdLeftSpaceLabel = new QLabel(queue);
-        DobotQueuedCmdLeftSpaceLabel->setObjectName(QStringLiteral("DobotQueuedCmdLeftSpaceLabel"));
-
-        gridLayout_5->addWidget(DobotQueuedCmdLeftSpaceLabel, 2, 1, 1, 1);
-
-        label_22 = new QLabel(queue);
-        label_22->setObjectName(QStringLiteral("label_22"));
-
-        gridLayout_5->addWidget(label_22, 4, 0, 1, 1);
-
-        CoreNextIdLabel = new QLabel(queue);
-        CoreNextIdLabel->setObjectName(QStringLiteral("CoreNextIdLabel"));
-
-        gridLayout_5->addWidget(CoreNextIdLabel, 4, 1, 1, 1);
-
-        executeDobotComandsBtn = new QPushButton(queue);
-        executeDobotComandsBtn->setObjectName(QStringLiteral("executeDobotComandsBtn"));
-        executeDobotComandsBtn->setEnabled(false);
-
-        gridLayout_5->addWidget(executeDobotComandsBtn, 5, 1, 1, 1);
-
-        resetDobotIndexBtn = new QPushButton(queue);
-        resetDobotIndexBtn->setObjectName(QStringLiteral("resetDobotIndexBtn"));
-        resetDobotIndexBtn->setEnabled(false);
-
-        gridLayout_5->addWidget(resetDobotIndexBtn, 5, 0, 1, 1);
-
-
-        gridLayout_3->addWidget(queue, 4, 2, 2, 1);
 
         dobotPositions = new QGroupBox(groupBox_5);
         dobotPositions->setObjectName(QStringLiteral("dobotPositions"));
@@ -715,15 +658,86 @@ public:
 
         gridLayout_3->addWidget(dobotPositions, 4, 0, 2, 2);
 
+        queue = new QGroupBox(groupBox_5);
+        queue->setObjectName(QStringLiteral("queue"));
+        gridLayout_5 = new QGridLayout(queue);
+        gridLayout_5->setSpacing(6);
+        gridLayout_5->setContentsMargins(11, 11, 11, 11);
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        CoreIndexAmountlabel = new QLabel(queue);
+        CoreIndexAmountlabel->setObjectName(QStringLiteral("CoreIndexAmountlabel"));
 
-        gridLayout_4->addWidget(groupBox_5, 0, 0, 1, 2);
+        gridLayout_5->addWidget(CoreIndexAmountlabel, 3, 1, 1, 1);
+
+        label_14 = new QLabel(queue);
+        label_14->setObjectName(QStringLiteral("label_14"));
+
+        gridLayout_5->addWidget(label_14, 0, 0, 1, 1);
+
+        label_21 = new QLabel(queue);
+        label_21->setObjectName(QStringLiteral("label_21"));
+
+        gridLayout_5->addWidget(label_21, 2, 0, 1, 1);
+
+        label_15 = new QLabel(queue);
+        label_15->setObjectName(QStringLiteral("label_15"));
+
+        gridLayout_5->addWidget(label_15, 1, 0, 1, 1);
+
+        CoreMaxQueuedIndexLabel = new QLabel(queue);
+        CoreMaxQueuedIndexLabel->setObjectName(QStringLiteral("CoreMaxQueuedIndexLabel"));
+
+        gridLayout_5->addWidget(CoreMaxQueuedIndexLabel, 1, 1, 1, 1);
+
+        DobotQueuedIndexLabel = new QLabel(queue);
+        DobotQueuedIndexLabel->setObjectName(QStringLiteral("DobotQueuedIndexLabel"));
+
+        gridLayout_5->addWidget(DobotQueuedIndexLabel, 0, 1, 1, 1);
+
+        label_16 = new QLabel(queue);
+        label_16->setObjectName(QStringLiteral("label_16"));
+
+        gridLayout_5->addWidget(label_16, 3, 0, 1, 1);
+
+        DobotQueuedCmdLeftSpaceLabel = new QLabel(queue);
+        DobotQueuedCmdLeftSpaceLabel->setObjectName(QStringLiteral("DobotQueuedCmdLeftSpaceLabel"));
+
+        gridLayout_5->addWidget(DobotQueuedCmdLeftSpaceLabel, 2, 1, 1, 1);
+
+        label_22 = new QLabel(queue);
+        label_22->setObjectName(QStringLiteral("label_22"));
+
+        gridLayout_5->addWidget(label_22, 4, 0, 1, 1);
+
+        CoreNextIdLabel = new QLabel(queue);
+        CoreNextIdLabel->setObjectName(QStringLiteral("CoreNextIdLabel"));
+
+        gridLayout_5->addWidget(CoreNextIdLabel, 4, 1, 1, 1);
+
+        executeDobotComandsBtn = new QPushButton(queue);
+        executeDobotComandsBtn->setObjectName(QStringLiteral("executeDobotComandsBtn"));
+        executeDobotComandsBtn->setEnabled(false);
+
+        gridLayout_5->addWidget(executeDobotComandsBtn, 5, 1, 1, 1);
+
+        resetDobotIndexBtn = new QPushButton(queue);
+        resetDobotIndexBtn->setObjectName(QStringLiteral("resetDobotIndexBtn"));
+        resetDobotIndexBtn->setEnabled(false);
+
+        gridLayout_5->addWidget(resetDobotIndexBtn, 5, 0, 1, 1);
+
+
+        gridLayout_3->addWidget(queue, 4, 2, 2, 1);
+
+
+        gridLayout_4->addWidget(groupBox_5, 0, 0, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         groupBox_5->raise();
         log->raise();
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 790, 21));
+        menuBar->setGeometry(QRect(0, 0, 861, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -747,28 +761,12 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
         log->setTitle(QApplication::translate("MainWindow", "Log", 0));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "Dobot Arm", 0));
-        dobotInfo->setTitle(QApplication::translate("MainWindow", "Device", 0));
-        label_9->setText(QApplication::translate("MainWindow", "SN", 0));
-        deviceSNLabel->setText(QString());
-        label_10->setText(QApplication::translate("MainWindow", "Name", 0));
-        DeviceNameLabel->setText(QString());
-        label_11->setText(QApplication::translate("MainWindow", "Info", 0));
-        DeviceInfoLabel->setText(QString());
-        connectBtn->setText(QApplication::translate("MainWindow", "Connect", 0));
-        groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
-        sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "SendWS", 0));
-        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
-        sendTcpBtn->setText(QApplication::translate("MainWindow", "SendTCP", 0));
         chenardAI->setTitle(QApplication::translate("MainWindow", "AI", 0));
         AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
         botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));
         AIEnemySendBtn->setText(QApplication::translate("MainWindow", "PlayerSend", 0));
         botOffRadioBtn->setText(QApplication::translate("MainWindow", "Off", 0));
         AIEnemyStartBtn->setText(QApplication::translate("MainWindow", "PlayerStart", 0));
-        ArduinoUsbPanel->setTitle(QApplication::translate("MainWindow", "Arduino Usb", 0));
-        reloadPortsBtn->setText(QApplication::translate("MainWindow", "Reload", 0));
-        sendUsbBtn->setText(QApplication::translate("MainWindow", "SendToUSB", 0));
-        SimulateFromUsbBtn->setText(QApplication::translate("MainWindow", "SimFromUSB", 0));
         JOGgroupBox->setTitle(QApplication::translate("MainWindow", "JOG", 0));
         rHeadAddBtn->setText(QApplication::translate("MainWindow", "J4+", 0));
         baseAngleSubBtn->setText(QApplication::translate("MainWindow", "J1-", 0));
@@ -791,6 +789,22 @@ public:
         startGmPosBtn->setText(QApplication::translate("MainWindow", "StGmPos", 0));
         homeBtn->setText(QApplication::translate("MainWindow", "HOME", 0));
         startDtPosBtn->setText(QApplication::translate("MainWindow", "StDtPos", 0));
+        dobotInfo->setTitle(QApplication::translate("MainWindow", "Device", 0));
+        label_9->setText(QApplication::translate("MainWindow", "SN", 0));
+        deviceSNLabel->setText(QString());
+        label_10->setText(QApplication::translate("MainWindow", "Name", 0));
+        DeviceNameLabel->setText(QString());
+        label_11->setText(QApplication::translate("MainWindow", "Info", 0));
+        DeviceInfoLabel->setText(QString());
+        connectBtn->setText(QApplication::translate("MainWindow", "Connect", 0));
+        ArduinoUsbPanel->setTitle(QApplication::translate("MainWindow", "Arduino Usb", 0));
+        reloadPortsBtn->setText(QApplication::translate("MainWindow", "Reload", 0));
+        sendUsbBtn->setText(QApplication::translate("MainWindow", "SendToUSB", 0));
+        SimulateFromUsbBtn->setText(QApplication::translate("MainWindow", "SimFromUSB", 0));
+        groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
+        sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "SendWS", 0));
+        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
+        sendTcpBtn->setText(QApplication::translate("MainWindow", "SendTCP", 0));
         dobotServiceMove->setTitle(QApplication::translate("MainWindow", "Service PTP", 0));
         label_17->setText(QApplication::translate("MainWindow", "X", 0));
         label_18->setText(QApplication::translate("MainWindow", "Y", 0));
@@ -799,19 +813,6 @@ public:
         label_12->setText(QApplication::translate("MainWindow", "s1", 0));
         label_13->setText(QApplication::translate("MainWindow", "s2", 0));
         sendBtn->setText(QApplication::translate("MainWindow", "Send", 0));
-        queue->setTitle(QApplication::translate("MainWindow", "Queue", 0));
-        CoreIndexAmountlabel->setText(QApplication::translate("MainWindow", "-1", 0));
-        label_14->setText(QApplication::translate("MainWindow", "DIndex", 0));
-        label_21->setText(QApplication::translate("MainWindow", "DLeftSpc", 0));
-        label_15->setText(QApplication::translate("MainWindow", "CMaxIdx", 0));
-        CoreMaxQueuedIndexLabel->setText(QApplication::translate("MainWindow", "-1", 0));
-        DobotQueuedIndexLabel->setText(QApplication::translate("MainWindow", "-1", 0));
-        label_16->setText(QApplication::translate("MainWindow", "CIds", 0));
-        DobotQueuedCmdLeftSpaceLabel->setText(QApplication::translate("MainWindow", "-1", 0));
-        label_22->setText(QApplication::translate("MainWindow", "CNextId", 0));
-        CoreNextIdLabel->setText(QApplication::translate("MainWindow", "-1", 0));
-        executeDobotComandsBtn->setText(QApplication::translate("MainWindow", "ExecDtCmds", 0));
-        resetDobotIndexBtn->setText(QApplication::translate("MainWindow", "ResDtId", 0));
         dobotPositions->setTitle(QApplication::translate("MainWindow", "Pose", 0));
         joint1Label->setText(QApplication::translate("MainWindow", "0", 0));
         yLabel->setText(QApplication::translate("MainWindow", "0", 0));
@@ -829,6 +830,19 @@ public:
         label_8->setText(QApplication::translate("MainWindow", "R", 0));
         joint4Label->setText(QApplication::translate("MainWindow", "0", 0));
         joint2Label->setText(QApplication::translate("MainWindow", "0", 0));
+        queue->setTitle(QApplication::translate("MainWindow", "Queue", 0));
+        CoreIndexAmountlabel->setText(QApplication::translate("MainWindow", "-1", 0));
+        label_14->setText(QApplication::translate("MainWindow", "DIndex", 0));
+        label_21->setText(QApplication::translate("MainWindow", "DLeftSpc", 0));
+        label_15->setText(QApplication::translate("MainWindow", "CMaxIdx", 0));
+        CoreMaxQueuedIndexLabel->setText(QApplication::translate("MainWindow", "-1", 0));
+        DobotQueuedIndexLabel->setText(QApplication::translate("MainWindow", "-1", 0));
+        label_16->setText(QApplication::translate("MainWindow", "CIds", 0));
+        DobotQueuedCmdLeftSpaceLabel->setText(QApplication::translate("MainWindow", "-1", 0));
+        label_22->setText(QApplication::translate("MainWindow", "CNextId", 0));
+        CoreNextIdLabel->setText(QApplication::translate("MainWindow", "-1", 0));
+        executeDobotComandsBtn->setText(QApplication::translate("MainWindow", "ExecDtCmds", 0));
+        resetDobotIndexBtn->setText(QApplication::translate("MainWindow", "ResDtId", 0));
     } // retranslateUi
 
 };
