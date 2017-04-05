@@ -157,3 +157,9 @@ void WebChess::Status()
     qDebug() << "Sending 'status' command to tcp";
     _pTCPMsgs->queueMsgs(WEBSITE, "status");
 }
+
+//-----------------FUNKCJE SZACHOWE-----------------//
+void WebChess::resetBoardCompleted()
+{
+    //todo
+}

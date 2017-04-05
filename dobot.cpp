@@ -340,7 +340,7 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
              << nLetter << ", nDigit =" << nDigit;
     emit this->addTextToConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
-                                     + QString::number(nDigit) + "\n", '0');
+                                     + QString::number(nDigit+1) + "\n", '0');
     
     this->addCmdToList(NORMAL, false, f_xFromTo, f_yFromTo, f_zFromTo + m_nMaxPieceHeight, f_rFromTo);
     

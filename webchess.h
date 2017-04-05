@@ -28,6 +28,9 @@ public:
     void Status();
     void Promote(QString msg);
 
+    //-----------------FUNKCJE SZACHOWE-----------------//
+     void resetBoardCompleted();
+
     /*---------------DZIEDZICZONE Z CHESS---------------//
     //---------------STEROWANIE RAMIENIEM---------------//
     void TestOk();

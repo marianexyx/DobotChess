@@ -519,7 +519,6 @@ void MainWindow::on_reloadPortsBtn_clicked()
 {
     ui->usbCmdLine->setEnabled(true);
     ui->portsComboBox->setEnabled(true);
-    ui->SimulateFromUsbBtn->setEnabled(true);
     ui->SimulateFromUsbLineEdit->setEnabled(true);
     _pArduinoUsb->searchDevices();
 }
@@ -572,8 +571,14 @@ void MainWindow::on_SimulateFromUsbBtn_clicked()
     if (!ui->SimulateFromUsbLineEdit->text().isEmpty()) //coś jest wpisane w lineEdit
     {
         _pArduinoUsb->ManageMsgFromUsb(ui->SimulateFromUsbLineEdit->text());
-        ui->emulatePlayerMsgLineEdit->clear(); //czyść lineEdit
+        ui->SimulateFromUsbLineEdit->clear(); //czyść lineEdit
     }
+}
+
+void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
+    else ui->SimulateFromUsbBtn->setEnabled(false);
 }
 
 void MainWindow::on_sendTcpBtn_clicked()

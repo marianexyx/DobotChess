@@ -90,16 +90,14 @@ void IgorBot::PromoteToWhat() //inicjalizowane w TestOk()
 void IgorBot::EnemyStart()
 {
     this->checkAI();
-
     this->resetPiecePositions(); //przywróć bierki na pierwotne pozycje
-    this->NewGame(); //zacznij w pamięci chenardu nową grę
 }
 
 void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
     this->checkAI();
 
-    if (tcpMsgType == "new")
+    if (tcpMsgType == "new") //todo: podwójne zagnieżdżenia if'ów upakować do jednych linijek
     {
         if (tcpRespond == "OK\n" || tcpRespond == "OK") this->GameStarted();
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
@@ -220,4 +218,10 @@ void IgorBot::checkAI()
         emit this->addTextToConsole("ERROR: initiated IgorBot method with AI turned off\n", '0');
         qDebug() << "ERROR: initiated IgorBot method with AI turned off";
     }
+}
+
+//-----------------FUNKCJE SZACHOWE-----------------//
+void IgorBot::resetBoardCompleted()
+{
+    this->NewGame();
 }

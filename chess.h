@@ -34,6 +34,9 @@ protected:
     virtual void Status() = 0;
     virtual void Promote(QString msg) = 0;
 
+    //-----------------FUNKCJE SZACHOWE-----------------//
+    virtual void resetBoardCompleted() = 0;
+
     //---------------STEROWANIE RAMIENIEM---------------//
     void TestOk();
     void TcpMoveOk();

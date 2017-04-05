@@ -41,7 +41,7 @@ void TCPMsgs::doTcpConnect()
 
     socket = new QTcpSocket(this);
 
-    //TODO: przesunąć sygnały do np. konstruktora? (tam chyba giną po zakończeniu jego inicjalizacji)
+    //każde nowe zapytanie jest nowym połączeniem
     connect(socket, SIGNAL(connected()),this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
@@ -51,7 +51,6 @@ void TCPMsgs::doTcpConnect()
     connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
             this, displayError);
 
-    //emit addTextToConsole("connecting...\n", 't');
     qDebug() << "TCPMsgs: connecting...";
 
     socket->abort(); //pozwoli to zakończyć stare połączenie jeżeli jeszcze nie zostało zerwane...
@@ -99,8 +98,6 @@ void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
         return;
     }
 
-    //emit addTextToConsole("connected...\n", 't');
-    //emit addTextToConsole("msg from websocket: " + QStrData.QStrMsgForTcp + "\n", 't');
     qDebug() << "TCPMsgs: connected...";
     qDebug() << "TCPMsgs: parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 

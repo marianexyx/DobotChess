@@ -403,4 +403,6 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
 
         qDebug() << "End of: Chess::resetPiecePositions()";
     }
+    qDebug() << "Chess::resetBoardCompleted().";
+    this->resetBoardCompleted();
 }

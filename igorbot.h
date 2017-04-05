@@ -39,6 +39,9 @@ public:
     void UndoOk();
     void ThinkOk(QString msg);
 
+    //-----------------FUNKCJE SZACHOWE-----------------//
+     void resetBoardCompleted();
+
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     void setAI(bool bAI)    { m_bAI = bAI; }
     bool getAI()            {return m_bAI; }
