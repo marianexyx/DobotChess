@@ -15,7 +15,6 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QFormLayout>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
@@ -96,7 +95,7 @@ public:
     QLineEdit *sendTcpLineEdit;
     QPushButton *sendTcpBtn;
     QGroupBox *dobotServiceMove;
-    QFormLayout *formLayout_2;
+    QGridLayout *gridLayout_7;
     QLabel *label_17;
     QLineEdit *xPTPEdit;
     QLabel *label_18;
@@ -106,9 +105,7 @@ public:
     QLabel *label_20;
     QLineEdit *rPTPEdit;
     QLabel *label_12;
-    QLineEdit *servo1GripperEdit;
-    QLabel *label_13;
-    QLineEdit *servo2GripperEdit;
+    QLineEdit *servoGripperEdit;
     QPushButton *sendBtn;
     QGroupBox *dobotPositions;
     QGridLayout *gridLayout;
@@ -488,81 +485,70 @@ public:
 
         dobotServiceMove = new QGroupBox(groupBox_5);
         dobotServiceMove->setObjectName(QStringLiteral("dobotServiceMove"));
-        formLayout_2 = new QFormLayout(dobotServiceMove);
-        formLayout_2->setSpacing(6);
-        formLayout_2->setContentsMargins(11, 11, 11, 11);
-        formLayout_2->setObjectName(QStringLiteral("formLayout_2"));
+        gridLayout_7 = new QGridLayout(dobotServiceMove);
+        gridLayout_7->setSpacing(6);
+        gridLayout_7->setContentsMargins(11, 11, 11, 11);
+        gridLayout_7->setObjectName(QStringLiteral("gridLayout_7"));
         label_17 = new QLabel(dobotServiceMove);
         label_17->setObjectName(QStringLiteral("label_17"));
 
-        formLayout_2->setWidget(0, QFormLayout::LabelRole, label_17);
+        gridLayout_7->addWidget(label_17, 0, 0, 1, 1);
 
         xPTPEdit = new QLineEdit(dobotServiceMove);
         xPTPEdit->setObjectName(QStringLiteral("xPTPEdit"));
         xPTPEdit->setEnabled(false);
 
-        formLayout_2->setWidget(0, QFormLayout::FieldRole, xPTPEdit);
+        gridLayout_7->addWidget(xPTPEdit, 0, 1, 1, 1);
 
         label_18 = new QLabel(dobotServiceMove);
         label_18->setObjectName(QStringLiteral("label_18"));
 
-        formLayout_2->setWidget(2, QFormLayout::LabelRole, label_18);
+        gridLayout_7->addWidget(label_18, 1, 0, 1, 1);
 
         yPTPEdit = new QLineEdit(dobotServiceMove);
         yPTPEdit->setObjectName(QStringLiteral("yPTPEdit"));
         yPTPEdit->setEnabled(false);
 
-        formLayout_2->setWidget(2, QFormLayout::FieldRole, yPTPEdit);
+        gridLayout_7->addWidget(yPTPEdit, 1, 1, 1, 1);
 
         label_19 = new QLabel(dobotServiceMove);
         label_19->setObjectName(QStringLiteral("label_19"));
 
-        formLayout_2->setWidget(3, QFormLayout::LabelRole, label_19);
+        gridLayout_7->addWidget(label_19, 2, 0, 1, 1);
 
         zPTPEdit = new QLineEdit(dobotServiceMove);
         zPTPEdit->setObjectName(QStringLiteral("zPTPEdit"));
         zPTPEdit->setEnabled(false);
 
-        formLayout_2->setWidget(3, QFormLayout::FieldRole, zPTPEdit);
+        gridLayout_7->addWidget(zPTPEdit, 2, 1, 1, 1);
 
         label_20 = new QLabel(dobotServiceMove);
         label_20->setObjectName(QStringLiteral("label_20"));
 
-        formLayout_2->setWidget(5, QFormLayout::LabelRole, label_20);
+        gridLayout_7->addWidget(label_20, 3, 0, 1, 1);
 
         rPTPEdit = new QLineEdit(dobotServiceMove);
         rPTPEdit->setObjectName(QStringLiteral("rPTPEdit"));
         rPTPEdit->setEnabled(false);
 
-        formLayout_2->setWidget(5, QFormLayout::FieldRole, rPTPEdit);
+        gridLayout_7->addWidget(rPTPEdit, 3, 1, 1, 1);
 
         label_12 = new QLabel(dobotServiceMove);
         label_12->setObjectName(QStringLiteral("label_12"));
 
-        formLayout_2->setWidget(6, QFormLayout::LabelRole, label_12);
+        gridLayout_7->addWidget(label_12, 4, 0, 1, 1);
 
-        servo1GripperEdit = new QLineEdit(dobotServiceMove);
-        servo1GripperEdit->setObjectName(QStringLiteral("servo1GripperEdit"));
-        servo1GripperEdit->setEnabled(false);
+        servoGripperEdit = new QLineEdit(dobotServiceMove);
+        servoGripperEdit->setObjectName(QStringLiteral("servoGripperEdit"));
+        servoGripperEdit->setEnabled(false);
 
-        formLayout_2->setWidget(6, QFormLayout::FieldRole, servo1GripperEdit);
-
-        label_13 = new QLabel(dobotServiceMove);
-        label_13->setObjectName(QStringLiteral("label_13"));
-
-        formLayout_2->setWidget(8, QFormLayout::LabelRole, label_13);
-
-        servo2GripperEdit = new QLineEdit(dobotServiceMove);
-        servo2GripperEdit->setObjectName(QStringLiteral("servo2GripperEdit"));
-        servo2GripperEdit->setEnabled(false);
-
-        formLayout_2->setWidget(8, QFormLayout::FieldRole, servo2GripperEdit);
+        gridLayout_7->addWidget(servoGripperEdit, 4, 1, 1, 1);
 
         sendBtn = new QPushButton(dobotServiceMove);
         sendBtn->setObjectName(QStringLiteral("sendBtn"));
         sendBtn->setEnabled(false);
 
-        formLayout_2->setWidget(9, QFormLayout::FieldRole, sendBtn);
+        gridLayout_7->addWidget(sendBtn, 5, 1, 1, 1);
 
 
         gridLayout_3->addWidget(dobotServiceMove, 2, 0, 1, 1);
@@ -810,8 +796,7 @@ public:
         label_18->setText(QApplication::translate("MainWindow", "Y", 0));
         label_19->setText(QApplication::translate("MainWindow", "Z", 0));
         label_20->setText(QApplication::translate("MainWindow", "R", 0));
-        label_12->setText(QApplication::translate("MainWindow", "s1", 0));
-        label_13->setText(QApplication::translate("MainWindow", "s2", 0));
+        label_12->setText(QApplication::translate("MainWindow", "s", 0));
         sendBtn->setText(QApplication::translate("MainWindow", "Send", 0));
         dobotPositions->setTitle(QApplication::translate("MainWindow", "Pose", 0));
         joint1Label->setText(QApplication::translate("MainWindow", "0", 0));

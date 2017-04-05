@@ -524,7 +524,7 @@
          <property name="title">
           <string>Service PTP</string>
          </property>
-         <layout class="QFormLayout" name="formLayout_2">
+         <layout class="QGridLayout" name="gridLayout_7">
           <item row="0" column="0">
            <widget class="QLabel" name="label_17">
             <property name="text">
@@ -539,77 +539,63 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_18">
             <property name="text">
              <string>Y</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QLineEdit" name="yPTPEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_19">
             <property name="text">
              <string>Z</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="zPTPEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_20">
             <property name="text">
              <string>R</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="rPTPEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>s1</string>
+             <string>s</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
-           <widget class="QLineEdit" name="servo1GripperEdit">
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="servoGripperEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>s2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLineEdit" name="servo2GripperEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="1">
+          <item row="5" column="1">
            <widget class="QPushButton" name="sendBtn">
             <property name="enabled">
              <bool>false</bool>

@@ -34,9 +34,8 @@ private:
 
     bool connectStatus;
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
-    IOPWM m_gripperServo1;
-    IOPWM m_gripperServo2;
-    const float m_fGrip1Opened, m_fGrip1Closed, m_fGrip2Opened, m_fGrip2Closed;
+    IOPWM m_gripperServo;
+    const float m_fGripOpened, m_fGripClosed;
     const int m_nMaxPieceHeight; //na jakiej wysokości ma latać ramię by nie przewracać bierek
     const int m_nMaxRemPieceH; //na jaką dodatkową wysokość może się podnieść...
     //...ramię nad bierkami zbitymi
@@ -67,7 +66,7 @@ public:
     void onPTPsendBtnClicked();
     void closeEvent(QCloseEvent *);
 
-    void gripperAngle(float fDutyCycle1, float fDutyCycle2);
+    void gripperAngle(float fDutyCycle);
 
     void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMoveType);
     void gripperOpennedState(bool gripperOpened, char chMovetType);

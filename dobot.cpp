@@ -5,8 +5,7 @@
 
 #define NORMAL -1
 #define WAIT 0
-#define GRIPPER1 1
-#define GRIPPER2 2
+#define GRIPPER 1
 
 //TODO: nie mam wogle sprawdzane czy jakiekolwiek dane dotarły do dobota. program wypuszcza dane na...
 //...usb i zakłada że ruch się wykonał bez sprawdzania tego.
@@ -20,23 +19,19 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_fPtpCmd_yActualVal(0),
     m_fPtpCmd_zActualVal(25),
     m_fPtpCmd_rActualVal(0),
-    m_fGrip1Opened(3.6f), //m_fGrip1Opened(3.6f),
-    m_fGrip1Closed(3.1f), //m_fGrip1Closed(3.1f),
-    m_fGrip2Opened(8.3f), //m_fGrip2Opened(8.3f),
-    m_fGrip2Closed(8.8f) //m_fGrip2Closed(8.8f)
-  //testy: close 3.1 9.7 - za huja coś nie chce łapać drugie serwo dobrze
-  //open 3.4  9.4
+    m_fGripOpened(3.6f),
+    m_fGripClosed(3.1f)
+    /*10.2/10.7
+    8.6/9.1*/
+
 {
     _pChessboard = pChessboard;
     
     connectStatus = false;
     
-    m_gripperServo1.address = 8;
-    m_gripperServo1.frequency = 50.f;
-    m_gripperServo1.dutyCycle = 7.5f;
-    m_gripperServo2.address = 4;
-    m_gripperServo2.frequency = 50.f;
-    m_gripperServo2.dutyCycle = 7.5f;
+    m_gripperServo.address = 8;
+    m_gripperServo.frequency = 50.f;
+    m_gripperServo.dutyCycle = 7.5f;
     
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
@@ -154,13 +149,9 @@ void Dobot::QueuedIdList()
                 case WAIT:
                     SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
                     break;
-                case GRIPPER1:
-                    m_gripperServo1.dutyCycle = takenPosId.state ? m_fGrip1Opened : m_fGrip1Closed;
-                    SetIOPWM(&m_gripperServo1, true, &takenPosId.index);
-                    break;
-                case GRIPPER2:
-                    m_gripperServo2.dutyCycle = takenPosId.state ? m_fGrip2Opened : m_fGrip2Closed;
-                    SetIOPWM(&m_gripperServo2, true, &takenPosId.index);
+                case GRIPPER:
+                    m_gripperServo.dutyCycle = takenPosId.state ? m_fGripOpened : m_fGripClosed;
+                    SetIOPWM(&m_gripperServo, true, &takenPosId.index);
                     break;
                 default:
                     qDebug() << "ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:" << takenPosId.type;
@@ -298,15 +289,12 @@ void Dobot::initDobot()
 }
 
 //TODO: tu nie zadziała to
-void Dobot::gripperAngle(float fDutyCycle1, float fDutyCycle2)
+void Dobot::gripperAngle(float fDutyCycle)
 {
     //uwaga: wykonuje się to polecenie bez kolejki
-    if (fDutyCycle1 != 0) m_gripperServo1.dutyCycle = fDutyCycle1;
-    if (fDutyCycle2 != 0) m_gripperServo2.dutyCycle = fDutyCycle2;
-    qDebug() << "m_gripperServo1.dutyCycle = " << fDutyCycle1;
-    qDebug() << "m_gripperServo2.dutyCycle = " << fDutyCycle2;
-    SetIOPWM(&m_gripperServo1, false, NULL);
-    SetIOPWM(&m_gripperServo2, false, NULL);
+    if (fDutyCycle != 0) m_gripperServo.dutyCycle = fDutyCycle;
+    qDebug() << "m_gripperServo.dutyCycle = " << fDutyCycle;
+    SetIOPWM(&m_gripperServo, false, NULL);
 }
 
 ///TYPY RUCHÓW PO PLANSZY
@@ -362,9 +350,7 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
 
 void Dobot::gripperOpennedState(bool isGripperOpened, char chMovetType) //open/close
 {
-    this->addCmdToList(GRIPPER1, isGripperOpened);
-    this->addCmdToList(GRIPPER2, isGripperOpened);
-    
+    this->addCmdToList(GRIPPER, isGripperOpened);
     this->writeMoveTypeInConsole(chMovetType, isGripperOpened ? 'o' : 'c'); //o-open, c-close
 }
 
@@ -457,7 +443,7 @@ void Dobot::addCmdToList(int nType, bool bState, int x, int y, int z, int r)
         
     m_ullCoreQueuedCmdIndex += 1; //aktualne id ruchu = +1 większe od ostatniego
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
-    m_posIdx.type = nType; //wait, gripper1, gripper2
+    m_posIdx.type = nType; //wait, gripper
     m_posIdx.state = bState; //open/close gripper
     m_posIdx.x = m_fPtpCmd_xActualVal;
     m_posIdx.y = m_fPtpCmd_yActualVal;

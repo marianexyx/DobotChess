@@ -145,8 +145,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->yPTPEdit->setEnabled(false);
         ui->zPTPEdit->setEnabled(false);
         ui->rPTPEdit->setEnabled(false);
-        ui->servo1GripperEdit->setEnabled(false);
-        ui->servo2GripperEdit->setEnabled(false);
+        ui->servoGripperEdit->setEnabled(false);
         ui->homeBtn->setEnabled(false);
         ui->serviceCheckBox->setEnabled(false);
         ui->upBtn->setEnabled(false);
@@ -186,8 +185,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->yPTPEdit->setEnabled(true);
         ui->zPTPEdit->setEnabled(true);
         ui->rPTPEdit->setEnabled(true);
-        ui->servo1GripperEdit->setEnabled(true);
-        ui->servo2GripperEdit->setEnabled(true);
+        ui->servoGripperEdit->setEnabled(true);
         ui->homeBtn->setEnabled(true);
         ui->serviceCheckBox->setEnabled(true);
         ui->upBtn->setEnabled(true);
@@ -214,18 +212,19 @@ void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QStri
 //TODO: dodać tu kod actual_state
 void MainWindow::onPTPsendBtnClicked()
 {
+    qDebug() << "sendBtn clicked";
+
     int nPtpCmd_x = ui->xPTPEdit->text().toFloat();
     int nPtpCmd_y = ui->yPTPEdit->text().toFloat();
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
-    if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0)
+    if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0) // dla wygody zera są zabronione
         _pDobotArm->addCmdToList(-1, false, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
     //TODO: serwisowe watrości skaczą jak pojebane, a wydaje się że inne nie
-    float fServoDutyCycle1 = ui->servo1GripperEdit->text().toFloat();
-    float fServoDutyCycle2 = ui->servo2GripperEdit->text().toFloat();
-    if (fServoDutyCycle1 !=0 && fServoDutyCycle2 !=0)
-        _pDobotArm->gripperAngle(fServoDutyCycle1, fServoDutyCycle2);
+    float fServoDutyCycle = ui->servoGripperEdit->text().toFloat();
+    if (fServoDutyCycle !=0)
+        _pDobotArm->gripperAngle(fServoDutyCycle);
 }
 
 void MainWindow::showDobotErrorMsgBox()
@@ -592,3 +591,5 @@ void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
     if (textChanged != NULL) ui->sendTcpBtn->setEnabled(true);
     else ui->sendTcpBtn->setEnabled(false);
 }
+
+
