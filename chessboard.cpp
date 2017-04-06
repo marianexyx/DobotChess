@@ -27,6 +27,8 @@ Chessboard::Chessboard():
     memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //anBoard = anStartBoard
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //anTempBoard = anStartBoard
 
+    m_WhoseTurn = NO_TURN;
+
     QsPiecieFromTo = "";
     nGripperPiece = 0;
 
@@ -36,9 +38,9 @@ Chessboard::Chessboard():
     QsFuturePromote = "";
     bPromotionConfirmed = false;
 
-    float a1_x = 186.5; float a1_y = 75.6; float a1_z = -2.5;
+    float a1_x = 190.6; float a1_y = 70.3; float a1_z = -20.1;
     float a8_x = 330.7; float a8_y = 73.1; float a8_z = -0.1;
-    float h1_x = 185.4; float h1_y = -81.6; float h1_z = -3.3;
+    float h1_x = 185.3; float h1_y = -89.0; float h1_z = -20.3;
     float h8_x = 330.1; float h8_y = -79.5; float h8_z = -0.6;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
@@ -178,7 +180,7 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
     else
     {
         emit this->addTextToConsole("ERROR. Chess::fieldNrToFieldPos: "
-                                         "próba dzielenia przez zero \n");
+                                    "próba dzielenia przez zero \n");
         qDebug() << "ERROR. Chess::fieldNrToFieldPos: proba dzielenia przez zero";
         return 0; //coś trzeba zwrócić
     }
@@ -224,7 +226,7 @@ void Chessboard::castlingFindRookToMove() //ustawiane skąd-dokąd przenoszona b
 }
 
 void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
-                                    int nPieceDigit, char chMoveType)
+                                   int nPieceDigit, char chMoveType)
 {
     if (chMoveType == 's' && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
@@ -281,3 +283,25 @@ bool Chessboard::compareArrays(int nArray1[][8], int nArray2[][8])
     return true;
 }
 
+void Chessboard::changeWindowTitle()
+{
+    QString title;
+
+    switch(m_WhoseTurn)
+    {
+    case NO_TURN:
+        title = "Awaiting for new game";
+        break;
+    case WHITE_TURN:
+        title = "White's turn";
+        break;
+    case BLACK_TURN:
+        title = "Black's turn";
+        break;
+    default:
+        qDebug() << "ERROR: Chessboard::changeWindowTitle()- unknown m_WhoseTurn parameter";
+        title = "ERROR";
+    }
+
+    emit this->changeWindowTitle(title);
+}

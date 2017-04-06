@@ -3,8 +3,6 @@
 
 QT_USE_NAMESPACE
 
-//TODO: wszystkie log okien wrzucić do jednego okna z typem komunikatu
-
 MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                        IgorBot *pIgorBot, WebChess *pWebChess, QWidget *parent) :
@@ -13,6 +11,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 {
     ui->setupUi(this); //bodajże wskazuje że UI dziedziczy to tej (this) klasie, przez co zostanie...
     //... zniszczona razem z mainwindow.
+    this->setWindowTitle("Awaiting for new game");
 
     _pDobotArm = pDobotArm;
     _pWebTable = pWebTable;
@@ -32,8 +31,6 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
-    //TODO: naprawić sygnały
-    connect(_pArduinoUsb, SIGNAL(AIEnemyStart()), _pIgorBot, SLOT(EnemyStart()));
     connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgForChenard(QString)));
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(int, QString)), _pTCPmsg, SLOT(TcpQueueMsg(int, QString)));
 
@@ -63,6 +60,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(setQueueLabels(int,int,int,int,int)));
     connect(_pArduinoUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
+    connect(_pChessboard, SIGNAL(changeWindowTitle(QString)),
+            this, SLOT(changeWindowtitle(QString)));
 
     //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)), //przesyłanie odpowiedzi z chenard...
@@ -153,10 +152,10 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->botOffRadioBtn->setEnabled(false);
         ui->botOnRadioBtn->setEnabled(false);
         ui->AIBtn->setEnabled(false);
-        ui->AIEnemyStartBtn->setEnabled(false);
         ui->AIEnemySendBtn->setEnabled(false);
         ui->sendTcpBtn->setEnabled(false);
         ui->sendTcpLineEdit->setEnabled(false);
+        ui->simulateArduinoPlayer2checkBox->setEnabled(false);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
@@ -194,6 +193,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->botOnRadioBtn->setEnabled(true);
         ui->AIBtn->setEnabled(true);
         ui->sendTcpLineEdit->setEnabled(true);
+        ui->simulateArduinoPlayer2checkBox->setEnabled(true);
 
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
 
@@ -443,7 +443,6 @@ void MainWindow::on_AIBtn_clicked()
     {
         _pIgorBot->setAI(false);
         this->writeInConsole("Turned off Igors AI\n",'m');
-        ui->AIEnemyStartBtn->setEnabled(false);
         ui->AIEnemySendBtn->setEnabled(false);
         ui->AIEnemyLineEdit->setEnabled(false);
     }
@@ -452,7 +451,6 @@ void MainWindow::on_AIBtn_clicked()
         _pIgorBot->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
         //...wtedy ruszy z ruchem swoim
         this->writeInConsole("Turned on Igors AI\n",'m');
-        ui->AIEnemyStartBtn->setEnabled(true);
         ui->AIEnemySendBtn->setEnabled(true);
         ui->AIEnemyLineEdit->setEnabled(true);
     }
@@ -460,13 +458,9 @@ void MainWindow::on_AIBtn_clicked()
     _pIgorBot->EnemyStart();
 }
 
-void MainWindow::on_AIEnemyStartBtn_clicked() //jeżeli ktoś wciska start to niech bot zacznie swój ruch
-{
-    _pIgorBot->EnemyStart();
-}
-
 void MainWindow::on_AIEnemySendBtn_clicked()
 {
+    _pIgorBot->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
     QString QsAIEnemySend = this->checkMoveForTcp(ui->AIEnemyLineEdit->text());
     this->writeInConsole(QsAIEnemySend, 'm');
     qDebug() << QsAIEnemySend;
@@ -590,11 +584,13 @@ void MainWindow::on_sendTcpBtn_clicked()
     }
 }
 
-
 void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
 {
     if (textChanged != NULL) ui->sendTcpBtn->setEnabled(true);
     else ui->sendTcpBtn->setEnabled(false);
 }
 
-
+void MainWindow::changeWindowtitle(QString title)
+{
+    this->setWindowTitle(title);
+}

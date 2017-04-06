@@ -14,6 +14,7 @@ private:
     bool m_bAI;
     bool m_bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
     //...na 'status' z tcp dotyczy wykonanego ruchu gracza lub igora
+    bool m_bIsIgorsAiSimulatedAsPlayer2;
 
     void wrongTcpAnswer(QString msgType, QString respond);
     void checkAI();
@@ -43,8 +44,11 @@ public:
      void resetBoardCompleted();
 
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    void setAI(bool bAI)    { m_bAI = bAI; }
-    bool getAI()            {return m_bAI; }
+    void setAI(bool bAI)                { m_bAI = bAI; } //todo: wszystkie nazwy "AI" zamienić na "Igor"
+    void setAIAsPlayer2(bool bIsAIAsP2)   { m_bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
+
+    bool getAIAsPlayer2()               { return m_bIsIgorsAiSimulatedAsPlayer2; }
+    bool getAI()                        { return m_bAI; }
 
     /*---------------DZIEDZICZONE Z CHESS---------------//
     //---------------STEROWANIE RAMIENIEM---------------//

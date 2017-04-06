@@ -11,12 +11,17 @@ struct ArmPosition
     int Digit = -1;
 };
 
+enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //TODO: praktycznie powtórzenie z webtable
+
+//TODO: chessboard powinien być obiektem klasy chess
 class Chessboard: public QObject
 {
     Q_OBJECT
 
 private:
+    WHOSE_TURN m_WhoseTurn;
 
+    void changeWindowTitle();
 
 public:
     Chessboard();
@@ -65,8 +70,13 @@ public:
     float afRemovedPiecesPositions_y[8][4];
     float afRemovedPiecesPositions_z[8][4];
 
+    //metody dostępowe
+    void setWhoseTurn (WHOSE_TURN Turn) { m_WhoseTurn = Turn; this->changeWindowTitle();}
+    WHOSE_TURN getWhoseTurn ()          { return m_WhoseTurn; }
+
 signals:
     void addTextToConsole(QString);
+    void changeWindowTitle(QString);
 };
 
 #endif // CHESSBOARD_H

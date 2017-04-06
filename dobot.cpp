@@ -11,7 +11,7 @@
 //...usb i zakłada że ruch się wykonał bez sprawdzania tego.
 
 Dobot::Dobot(Chessboard *pChessboard):
-    m_nMaxPieceHeight(45), //max. wys. króla to równo 43 mm. Dla pola h8 max wysokość bierki to 46...
+    m_nMaxPieceHeight(50), //max. wys. króla to równo 43 mm. Dla pola h8 max wysokość bierki to 46...
     //..., powyżej tych wartości ramię traci zakres ruchu od góry/dołu. TODO: zmienna chessboardu
     m_nMaxRemPieceH(44.5), //TODO: zmienna chessboardu
     m_nActualPos(1000),
@@ -29,7 +29,7 @@ Dobot::Dobot(Chessboard *pChessboard):
     
     connectStatus = false;
     
-    m_gripperServo.address = 8;
+    m_gripperServo.address = 4;
     m_gripperServo.frequency = 50.f;
     m_gripperServo.dutyCycle = 7.5f;
     

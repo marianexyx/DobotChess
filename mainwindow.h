@@ -63,6 +63,7 @@ private slots:
 
     /*---sloty do używania GUI MainWindow---*/
     void writeInConsole(QString QStrMsg, char chLogType);
+    void changeWindowtitle(QString title);
 
     //dobot slots
     void setDobotValidators();
@@ -82,7 +83,6 @@ private slots:
     void on_resetDobotIndexBtn_clicked();
     void on_executeDobotComandsBtn_clicked();
     void on_AIBtn_clicked();
-    void on_AIEnemyStartBtn_clicked();
     void on_AIEnemySendBtn_clicked();
 
     //arduino usb slots

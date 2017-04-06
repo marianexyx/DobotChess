@@ -10,7 +10,6 @@
 
 //TODO: każde zapytanie o ruch powinno by opatrzene identyfikatorem przynajmniej koloru gracza by...
 //...kontrolować czy nie robimy ruchu za gracza przeciwnego
-
 class WebTable: public QObject
 {
     Q_OBJECT

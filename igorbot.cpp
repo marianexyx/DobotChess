@@ -54,12 +54,15 @@ void IgorBot::GameInProgress() //gra w toku
              << _pChessboard->QsPiecieFromTo;
     emit this->addTextToConsole("game_in_progress " + _pChessboard->QsPiecieFromTo, 'c');
 
-    if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku...
-        this->Think5000(); //...to wymyśl kolejny ruch bota białego Igora...
-    else  //...a jeżeli po wykonaniu ruchu Igora gra jest dalej w toku...
+    if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
+    {
+        if (m_bIsIgorsAiSimulatedAsPlayer2) _pArduinoUsb->sendDataToUsb("EnterSimulatedIgorsMove");
+        else this->Think5000(); //wymyśl kolejny ruch bota białego Igora
+    }
+    else  //a jeżeli po wykonaniu ruchu Igora gra jest dalej w toku
     {
         m_bUndo = false;
-        _pArduinoUsb->sendDataToUsb("IgorHasEndedMove"); //...to niech gracz wykonuje swój kolejny ruch.
+        _pArduinoUsb->sendDataToUsb("IgorHasEndedMove"); //niech gracz wykonuje swój kolejny ruch
     }
 }
 
@@ -97,10 +100,10 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
     this->checkAI();
 
-    if (tcpMsgType == "new") //todo: podwójne zagnieżdżenia if'ów upakować do jednych linijek
+    if (tcpMsgType == "new" && (tcpRespond == "OK\n" || tcpRespond == "OK"))
     {
-        if (tcpRespond == "OK\n" || tcpRespond == "OK") this->GameStarted();
-        else wrongTcpAnswer(tcpMsgType, tcpRespond);
+        _pChessboard->setWhoseTurn(WHITE_TURN);
+        this->GameStarted();
     }
     else if (tcpMsgType.left(4) == "move")
     {
@@ -117,21 +120,28 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     }
     else if (tcpMsgType == "status")
     {
+        if (tcpRespond.contains(" w ",Qt::CaseInsensitive)) _pChessboard->setWhoseTurn(WHITE_TURN);
+        else if (tcpRespond.contains(" b ",Qt::CaseInsensitive)) _pChessboard->setWhoseTurn(BLACK_TURN);
+        else
+        {
+            _pChessboard->setWhoseTurn(NO_TURN);
+            qDebug () << "ERROR: IgorBot::checkMsgFromChenard- unknown turn type from status";
+        }
+
         if (tcpRespond.left(1) == "*") this ->GameInProgress();
         else  if (tcpRespond.left(3) == "1-0" || tcpRespond.left(3) == "0-1" || tcpRespond.left(7) == "1/2-1/2")
             this->EndOfGame(tcpRespond);
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
-    else if (tcpMsgType == "undo 1")
+    else if (tcpMsgType == "undo 1" && (tcpRespond == "OK\n" || tcpRespond == "OK"))
     {
-        if (tcpRespond == "OK\n" || tcpRespond == "OK") this->UndoOk();
-        else wrongTcpAnswer(tcpMsgType, tcpRespond);
+        this->UndoOk();
     }
-    else if (tcpMsgType == "think 5000") //jeżeli mamy doczynienia z botem, który wymyślił ruch ...
+    else if (tcpMsgType == "think 5000" && (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
     {
-        if (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1") this->ThinkOk(tcpRespond); //"OK d1h5 Qh5#"
-        else wrongTcpAnswer(tcpMsgType, tcpRespond);
+        this->ThinkOk(tcpRespond); //"OK d1h5 Qh5#"
     }
+    else wrongTcpAnswer(tcpMsgType, tcpRespond);
 }
 
 void IgorBot::checkMsgForChenard(QString msg)
