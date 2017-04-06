@@ -110,7 +110,8 @@ void Chess::TestMove(int nSender, QString QStrMsgFromWebsockets)
     _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
 
     //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
-    if(this->testPromotion(nSender)) return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
+    if(this->testPromotion(nSender))
+        return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
     else if (this->testEnpassant(nSender)) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i...
     //...przerwij jeśli test się powiódł.
     else this->MoveTcpPiece(QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi...

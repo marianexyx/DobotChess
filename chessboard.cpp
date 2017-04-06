@@ -38,15 +38,11 @@ Chessboard::Chessboard():
     QsFuturePromote = "";
     bPromotionConfirmed = false;
 
-    float a1_x = 190.6; float a1_y = 70.3; float a1_z = -20.1;
-    float a8_x = 330.7; float a8_y = 73.1; float a8_z = -0.1;
-    float h1_x = 185.3; float h1_y = -89.0; float h1_z = -20.3;
-    float h8_x = 330.1; float h8_y = -79.5; float h8_z = -0.6;
+    float a1_x = 172.4; float a1_y = 76.5; float a1_z = -20.5; //ok
+    float a8_x = 319.1; float a8_y = 70.3; float a8_z = -16.3; //ok
+    float h1_x = 165.5; float h1_y = -93.6; float h1_z = -21.1; //ok
+    float h8_x = 315.1; float h8_y = -87.3; float h8_z = -16.1; //ok
     //                                      "z" to pozycje na styku chwytaka z szachownicą
-
-    //testowo w pamięci przybliż szachownicę o 1cm w stronę dobota
-    int nM = - 10;
-    a1_x += nM; a8_x += nM; h1_x += nM; h8_x += nM;
 
     for (int digit = 0; digit <= 7; digit++)
     {
@@ -58,10 +54,9 @@ Chessboard::Chessboard():
             afChessboardPositions_y[letter][digit] = a1_y +
                     digit*(((a8_y-a1_y)/7)+((letter/14)*(((a1_y-h1_y)/7)-((a8_y-h8_y)/7))))-
                     letter*(((a1_y-h1_y)/7)-((digit/14)*(((h8_y-h1_y)/7)-((a8_y-a1_y)/7))));
-            afChessboardPositions_z[letter][digit] = -22 + a1_z +
+            afChessboardPositions_z[letter][digit] = a1_z +
                     digit*(((a8_z-a1_z)/7)+((letter/14)*(((a1_z-h1_z)/7)-((a8_z-h8_z)/7))))-
                     letter*(((a1_z-h1_z)/7)-((digit/14)*(((h8_z-h1_z)/7)-((a8_z-a1_z)/7))));
-            //z testów wysokości wysokość 'z' ustawiona na poprawkę o: -22.
         }
     }
 

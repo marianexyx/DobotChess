@@ -19,11 +19,8 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_fPtpCmd_yActualVal(0),
     m_fPtpCmd_zActualVal(25),
     m_fPtpCmd_rActualVal(0),
-    m_fGripOpened(3.6f),
-    m_fGripClosed(3.1f)
-    /*10.2/10.7
-    8.6/9.1*/
-
+    m_fGripOpened(8.7f),
+    m_fGripClosed(9.2f)
 {
     _pChessboard = pChessboard;
     

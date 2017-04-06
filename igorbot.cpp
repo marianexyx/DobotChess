@@ -120,6 +120,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     }
     else if (tcpMsgType == "status")
     {
+        //czyja tura
         if (tcpRespond.contains(" w ",Qt::CaseInsensitive)) _pChessboard->setWhoseTurn(WHITE_TURN);
         else if (tcpRespond.contains(" b ",Qt::CaseInsensitive)) _pChessboard->setWhoseTurn(BLACK_TURN);
         else
@@ -128,6 +129,41 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             qDebug () << "ERROR: IgorBot::checkMsgFromChenard- unknown turn type from status";
         }
 
+        /*//rozmieszczenie na planszy
+        char achBoard[8][8];
+        const int SPACE_CHAR = 32;
+        int nFENBoardStart = tcpRespond.indexOf(SPACE_CHAR);
+        int nFENBoardEnd = tcpRespond.indexOf(SPACE_CHAR, nFENBoardStart);
+        int nFENStringLength = nFENBoardEnd - nFENBoardStart;
+        QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);
+
+        QRegExp rx("////");
+        QStringList rxList;
+        int pos = 0;
+        while ((pos = rx.indexIn(QStrFENBoard, pos)) != -1)
+        {
+            list << rx.cap(1);
+            pos += rx.matchedLength();
+        }
+
+        for (int n=1; n <= 8; ++n)
+        {
+            //wydzierżaw jedną linię
+
+
+            //przeszukaj każdy element i zapisz w tablicy
+        }
+
+
+
+
+        //enpassant
+
+        //roszady*/
+
+
+
+        //stan gry
         if (tcpRespond.left(1) == "*") this ->GameInProgress();
         else  if (tcpRespond.left(3) == "1-0" || tcpRespond.left(3) == "0-1" || tcpRespond.left(7) == "1/2-1/2")
             this->EndOfGame(tcpRespond);

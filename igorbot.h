@@ -4,6 +4,7 @@
 #include "arduinousb.h"
 #include "chess.h"
 
+
 class IgorBot: public Chess
 {
     Q_OBJECT

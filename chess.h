@@ -4,6 +4,7 @@
 #include <QString>
 #include <QScrollBar>
 #include <QDebug>
+#include <QRegularExpression>
 #include "dobot.h"
 #include "chessboard.h"
 #include "tcpmsgs.h"
