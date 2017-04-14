@@ -366,8 +366,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
             //qDebug() << "nServiceLetterPos = " << nServiceLetterPos
             //<< ", nServiceDigitPos = " << nServiceDigitPos;
-            float fService_x = _pChessboard->afChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
-            float fService_y = _pChessboard->afChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
+            float fService_x = _pChessboard->adChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
+            float fService_y = _pChessboard->adChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
             qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y;
             _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, ACTUAL_POS, ACTUAL_POS);
             _pChessboard->PieceActualPos.Letter = nServiceLetterPos;

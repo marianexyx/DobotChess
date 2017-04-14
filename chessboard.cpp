@@ -24,8 +24,8 @@ Chessboard::Chessboard():
 {0, 0, 0, 0} ,
 {0, 0, 0, 0}}
 {
-    memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //anBoard = anStartBoard
-    memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //anTempBoard = anStartBoard
+    memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
+    memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard
 
     m_WhoseTurn = NO_TURN;
 
@@ -38,25 +38,25 @@ Chessboard::Chessboard():
     QsFuturePromote = "";
     bPromotionConfirmed = false;
 
-    float a1_x = 172.4; float a1_y = 76.5; float a1_z = -20.5; //ok
-    float a8_x = 319.1; float a8_y = 70.3; float a8_z = -16.3; //ok
-    float h1_x = 165.5; float h1_y = -93.6; float h1_z = -21.1; //ok
-    float h8_x = 315.1; float h8_y = -87.3; float h8_z = -16.1; //ok
+    double a1_x = 172.4; double a1_y = 76.5; double a1_z = -20.5;
+    double a8_x = 319.1; double a8_y = 70.3; double a8_z = -16.3;
+    double h1_x = 165.5; double h1_y = -93.6; double h1_z = -21.1;
+    double h8_x = 315.1; double h8_y = -87.3; double h8_z = -16.1;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
     for (int digit = 0; digit <= 7; digit++)
     {
         for (int letter = 0; letter <= 7; letter++)
         {
-            afChessboardPositions_x[letter][digit] = a1_x +
-                    digit*(((a8_x-a1_x)/7)+((letter/14)*(((a1_x-h1_x)/7)-((a8_x-h8_x)/7))))-
-                    letter*(((a1_x-h1_x)/7)-((digit/14)*(((h8_x-h1_x)/7)-((a8_x-a1_x)/7))));
-            afChessboardPositions_y[letter][digit] = a1_y +
-                    digit*(((a8_y-a1_y)/7)+((letter/14)*(((a1_y-h1_y)/7)-((a8_y-h8_y)/7))))-
-                    letter*(((a1_y-h1_y)/7)-((digit/14)*(((h8_y-h1_y)/7)-((a8_y-a1_y)/7))));
-            afChessboardPositions_z[letter][digit] = a1_z +
-                    digit*(((a8_z-a1_z)/7)+((letter/14)*(((a1_z-h1_z)/7)-((a8_z-h8_z)/7))))-
-                    letter*(((a1_z-h1_z)/7)-((digit/14)*(((h8_z-h1_z)/7)-((a8_z-a1_z)/7))));
+            adChessboardPositions_x[letter][digit] = a1_x +
+                    digit*(((a8_x-a1_x)/7.f)+((letter/14.f)*(((a1_x-h1_x)/7.f)-((a8_x-h8_x)/7.f))))-
+                    letter*(((a1_x-h1_x)/7.f)-((digit/14.f)*(((h8_x-h1_x)/7.f)-((a8_x-a1_x)/7.f))));
+            adChessboardPositions_y[letter][digit] = a1_y +
+                    digit*(((a8_y-a1_y)/7.f)+((letter/14.f)*(((a1_y-h1_y)/7.f)-((a8_y-h8_y)/7.f))))-
+                    letter*(((a1_y-h1_y)/7.f)-((digit/14.f)*(((h8_y-h1_y)/7.f)-((a8_y-a1_y)/7.f))));
+            adChessboardPositions_z[letter][digit] = a1_z +
+                    digit*(((a8_z-a1_z)/7.f)+((letter/14.f)*(((a1_z-h1_z)/7.f)-((a8_z-h8_z)/7.f))))-
+                    letter*(((a1_z-h1_z)/7.f)-((digit/14.f)*(((h8_z-h1_z)/7.f)-((a8_z-a1_z)/7.f))));
         }
     }
 
@@ -82,18 +82,18 @@ Chessboard::Chessboard():
     {
         for (int row = 0; row <= 7; row++)
         {
-            afRemovedPiecesPositions_x[row][column] = 100 + row*25;
-            afRemovedPiecesPositions_y[row][column] = 170 - column*25;
-            afRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
+            adRemovedPiecesPositions_x[row][column] = 100 + row*25;
+            adRemovedPiecesPositions_y[row][column] = 170 - column*25;
+            adRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
         }
     }
     for (int column = 2; column <= 3; column++)
     {
         for (int row = 0; row <= 7; row++)
         {
-            afRemovedPiecesPositions_x[row][column] = 100 + row*25;
-            afRemovedPiecesPositions_y[row][column] = -160 - ((column-2)*25);
-            afRemovedPiecesPositions_z[row][column] = -22.5 - row*((-22.5 + 17)/7);
+            adRemovedPiecesPositions_x[row][column] = 100 + row*25;
+            adRemovedPiecesPositions_y[row][column] = -160 - ((column-2)*25);
+            adRemovedPiecesPositions_z[row][column] = -22.5 - row*((-22.5 + 17)/7);
         }
     }
 }

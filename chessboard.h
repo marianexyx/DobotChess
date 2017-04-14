@@ -62,13 +62,13 @@ public:
                                         //...bierki na szachownicy do oryginalnego/pierwotnego stanu.
     int anRemoved[8][4];               //tablica usuniętych
 
-    float afChessboardPositions_x[8][8];
-    float afChessboardPositions_y[8][8];
-    float afChessboardPositions_z[8][8];
+    double adChessboardPositions_x[8][8];
+    double adChessboardPositions_y[8][8];
+    double adChessboardPositions_z[8][8];
 
-    float afRemovedPiecesPositions_x[8][4];
-    float afRemovedPiecesPositions_y[8][4];
-    float afRemovedPiecesPositions_z[8][4];
+    double adRemovedPiecesPositions_x[8][4];
+    double adRemovedPiecesPositions_y[8][4];
+    double adRemovedPiecesPositions_z[8][4];
 
     //metody dostępowe
     void setWhoseTurn (WHOSE_TURN Turn) { m_WhoseTurn = Turn; this->changeWindowTitle();}

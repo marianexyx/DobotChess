@@ -129,37 +129,60 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             qDebug () << "ERROR: IgorBot::checkMsgFromChenard- unknown turn type from status";
         }
 
-        /*//rozmieszczenie na planszy
-        char achBoard[8][8];
-        const int SPACE_CHAR = 32;
+        //rozmieszczenie na planszy
+        QString aQstrBoard[8][8];
+        /*const int SPACE_CHAR = 32;
         int nFENBoardStart = tcpRespond.indexOf(SPACE_CHAR);
         int nFENBoardEnd = tcpRespond.indexOf(SPACE_CHAR, nFENBoardStart);
         int nFENStringLength = nFENBoardEnd - nFENBoardStart;
-        QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);
+        QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);*/
+        QStringList QStrFENRecord = tcpRespond.split(QRegExp("\\s"));
+        QString QStrFENBoard = QStrFENRecord.at(1);
+        qDebug() << "QStrFENBoard =" << QStrFENBoard;
 
-        QRegExp rx("////");
-        QStringList rxList;
-        int pos = 0;
-        while ((pos = rx.indexIn(QStrFENBoard, pos)) != -1)
+tu skonczylem
+        QStringList QStrFENBoardRows = QStrFENBoard.split("/");
+        if (QStrFENBoardRows.size() == 8)
         {
-            list << rx.cap(1);
-            pos += rx.matchedLength();
+            QRegExp rxEmpty("\d");
+            for (int nRow=0; nRow<=7; ++nRow)
+            {
+                int nColumn = 0;
+                QStringList FENSigns = QStrFENBoardRows.split(".");
+                for (int nFENSignPos=1; nFENSignPos<=FENSigns.size(); ++nFENSignPos)
+                {
+                    QString QStrFENSign = FENSigns.at(nFENSignPos);
+                    if (!rxEmpty.exactMatch(QStrFENSign))
+                    {
+                        ++nColumn;
+                        aQstrBoard[nRow][nColumn] = QStrFENSign;
+                    }
+                    else
+                    {
+                        for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
+                        {
+                            ++nColumn;
+                            aQstrBoard[nRow][nColumn] = "0";
+                        }
+                    }
+                    if (nColumn>7)
+                        qDebug() << "ERROR: IgorBot::checkMsgFromChenard: nColumn>8 =" << nColumn;
+                }
+            }
         }
-
-        for (int n=1; n <= 8; ++n)
+        else qDebug() << "ERROR: IgorBot::checkMsgFromChenard: boardRows.size() != 8";
+        for (int i=0; i<=7; ++i)
         {
-            //wydzierżaw jedną linię
-
-
-            //przeszukaj każdy element i zapisz w tablicy
+            qDebug() << "Board's row" << i+1 << "pieces =" << aQstrBoard[i][0] << aQstrBoard[i][1] <<
+                        aQstrBoard[i][2] << aQstrBoard[i][3] << aQstrBoard[i][4] << aQstrBoard[i][5] <<
+                        aQstrBoard[i][6] << aQstrBoard[i][7];
         }
-
-
 
 
         //enpassant
 
-        //roszady*/
+
+        //roszady
 
 
 
