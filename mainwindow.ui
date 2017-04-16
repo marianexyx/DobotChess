@@ -208,21 +208,21 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>DIndex</string>
+             <string>DobotIndex</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_21">
             <property name="text">
-             <string>DLeftSpc</string>
+             <string>DobotLeftIdsSpc</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>CMaxIdx</string>
+             <string>CoreMaxIndex</string>
             </property>
            </widget>
           </item>
@@ -243,7 +243,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_16">
             <property name="text">
-             <string>CIds</string>
+             <string>CoreIdCounter</string>
             </property>
            </widget>
           </item>
@@ -257,7 +257,7 @@
           <item row="4" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>CNextId</string>
+             <string>CoreNextId</string>
             </property>
            </widget>
           </item>

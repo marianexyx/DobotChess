@@ -368,8 +368,10 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             //<< ", nServiceDigitPos = " << nServiceDigitPos;
             float fService_x = _pChessboard->adChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
             float fService_y = _pChessboard->adChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
-            qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y;
-            _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, ACTUAL_POS, ACTUAL_POS);
+            float fService_z = _pChessboard->adChessboardPositions_z[nServiceLetterPos][nServiceDigitPos];
+            qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y <<
+                        ", fService_z = " << fService_z;
+            _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, fService_z + _pDobotArm->getMaxPieceHeight(), ACTUAL_POS);
             _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
             _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
             if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);

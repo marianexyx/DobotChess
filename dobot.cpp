@@ -11,16 +11,15 @@
 //...usb i zakłada że ruch się wykonał bez sprawdzania tego.
 
 Dobot::Dobot(Chessboard *pChessboard):
-    m_nMaxPieceHeight(50), //max. wys. króla to równo 43 mm. Dla pola h8 max wysokość bierki to 46...
-    //..., powyżej tych wartości ramię traci zakres ruchu od góry/dołu. TODO: zmienna chessboardu
+    m_nMaxPieceHeight(52), // Dla pola h8 max wysokość bierki to 46. //TODO: zmienna chessboardu
     m_nMaxRemPieceH(44.5), //TODO: zmienna chessboardu
     m_nActualPos(1000),
     m_fPtpCmd_xActualVal(200), //TODO: zmienne chessboardu?
     m_fPtpCmd_yActualVal(0),
     m_fPtpCmd_zActualVal(25),
     m_fPtpCmd_rActualVal(0),
-    m_fGripOpened(8.7f),
-    m_fGripClosed(9.2f)
+    m_fGripOpened(6.85f),
+    m_fGripClosed(7.28f)
 {
     _pChessboard = pChessboard;
     
@@ -191,6 +190,9 @@ void Dobot::onConnectDobot()
             this->addTextToConsole("ERROR: Dobot::onConnectDobot(): "
                                         "GetQueuedCmdCurrentIndex gone wrong \n", 'd');
         }
+
+        m_ullCoreQueuedCmdIndex = m_ullDobotQueuedCmdIndex; //jeśli dobot przed aktualnym uruchomieniem programu...
+        //...wykonywał jakieś ruchy, to startowy index na core byłby normalnie mniejszy od aktualnego
     }
     else
     {
@@ -432,7 +434,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
 /// END OF: TYPY RUCHÓW PO PLANSZY
 
 //TODO: przy włączeniu programu pierwszy ID ustawiać jako ten który jest aktualnie na dobocie
-void Dobot::addCmdToList(int nType, bool bState, int x, int y, int z, int r)
+void Dobot::addCmdToList(int nType, bool bState, float x, float y, float z, float r)
 {
     if (x != m_nActualPos) m_fPtpCmd_xActualVal = x;
     if (y != m_nActualPos) m_fPtpCmd_yActualVal = y;

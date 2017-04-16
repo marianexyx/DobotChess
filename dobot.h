@@ -41,10 +41,10 @@ private:
     //...ramię nad bierkami zbitymi
     const int m_nActualPos; //działa jak warunek do sprawdzania czy pozycja ma się zmienić
 
-    int m_fPtpCmd_xActualVal;
-    int m_fPtpCmd_yActualVal;
-    int m_fPtpCmd_zActualVal;
-    int m_fPtpCmd_rActualVal;
+    float m_fPtpCmd_xActualVal;
+    float m_fPtpCmd_yActualVal;
+    float m_fPtpCmd_zActualVal;
+    float m_fPtpCmd_rActualVal;
 
     PTPCmd ptpCmd;
     WAITCmd gripperMoveDelay; //komenda mówiąca dobotowi, że ma nic nie robić przez chwilę...
@@ -71,18 +71,22 @@ public:
     void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMoveType);
     void gripperOpennedState(bool gripperOpened, char chMovetType);
     void wait(int nMs);
-    void addCmdToList(int nType = -1, bool bState = false, int x = ACTUAL_POS,
-                      int y = ACTUAL_POS, int z = ACTUAL_POS,
-                      int r = ACTUAL_POS);
+    void addCmdToList(int nType = -1, bool bState = false, float x = ACTUAL_POS,
+                      float y = ACTUAL_POS, float z = ACTUAL_POS,
+                      float r = ACTUAL_POS);
     void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMovementType);
     void removePiece(int nPieceRowPos, int nPieceColumnPos);
     void writeMoveTypeInConsole(char chMoveType, char chMoveState = 'x');
     void QueuedIdList();
 
     //metody dostępowe do pól
+    int getMaxPieceHeight() const {return m_nMaxPieceHeight;}
+    unsigned long long getCoreQueuedCmdIndex() const {return m_ullCoreQueuedCmdIndex;}
     unsigned long long  getDobotQueuedCmdIndex() const {return m_ullDobotQueuedCmdIndex;}
     unsigned int getQueuedCmdLeftSpace() const {return m_uiQueuedCmdLeftSpace;}
 
+    void setCoreQueuedCmdIndex(unsigned long long ullCoreQueuedCmdIndex)
+    {m_ullCoreQueuedCmdIndex = ullCoreQueuedCmdIndex;}
     void setDobotQueuedCmdIndex(unsigned long long ullDobotQueuedCmdIndex)
     {m_ullDobotQueuedCmdIndex = ullDobotQueuedCmdIndex;}
     void setQueuedCmdLeftSpace(unsigned int uiQueuedCmdLeftSpace)

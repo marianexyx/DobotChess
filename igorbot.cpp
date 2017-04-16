@@ -26,6 +26,7 @@ IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 
     m_bAI = false;
     m_bUndo = false;
+    m_bIsIgorsAiSimulatedAsPlayer2 = false;
 }
 
 //-------------------------------------------------------------------------------//
@@ -130,13 +131,13 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         }
 
         //rozmieszczenie na planszy
-        QString aQstrBoard[8][8];
+        //QString aQstrBoard[8][8];
         /*const int SPACE_CHAR = 32;
         int nFENBoardStart = tcpRespond.indexOf(SPACE_CHAR);
         int nFENBoardEnd = tcpRespond.indexOf(SPACE_CHAR, nFENBoardStart);
         int nFENStringLength = nFENBoardEnd - nFENBoardStart;
         QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);*/
-        QStringList QStrFENRecord = tcpRespond.split(QRegExp("\\s"));
+        /*QStringList QStrFENRecord = tcpRespond.split(QRegExp("\\s"));
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "QStrFENBoard =" << QStrFENBoard;
 
@@ -176,7 +177,7 @@ tu skonczylem
             qDebug() << "Board's row" << i+1 << "pieces =" << aQstrBoard[i][0] << aQstrBoard[i][1] <<
                         aQstrBoard[i][2] << aQstrBoard[i][3] << aQstrBoard[i][4] << aQstrBoard[i][5] <<
                         aQstrBoard[i][6] << aQstrBoard[i][7];
-        }
+        }*/
 
 
         //enpassant

@@ -14,8 +14,6 @@
 #include "DobotType.h"
 #include "websockets.h"
 #include "dobot.h"
-//#include "arduinousb.h"
-//#include "chess.h"
 #include "igorbot.h"
 #include "webchess.h"
 

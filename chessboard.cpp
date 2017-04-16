@@ -38,10 +38,10 @@ Chessboard::Chessboard():
     QsFuturePromote = "";
     bPromotionConfirmed = false;
 
-    double a1_x = 172.4; double a1_y = 76.5; double a1_z = -20.5;
-    double a8_x = 319.1; double a8_y = 70.3; double a8_z = -16.3;
-    double h1_x = 165.5; double h1_y = -93.6; double h1_z = -21.1;
-    double h8_x = 315.1; double h8_y = -87.3; double h8_z = -16.1;
+    double a1_x = 169.7; double a1_y = 76.0; double a1_z = -20.8;
+    double a8_x = 317.6; double a8_y = 70.6; double a8_z = -15.6;
+    double h1_x = 163.8; double h1_y = -92.2; double h1_z = -20.6;
+    double h8_x = 317.6; double h8_y = -87.3; double h8_z = -16.1;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
     for (int digit = 0; digit <= 7; digit++)
