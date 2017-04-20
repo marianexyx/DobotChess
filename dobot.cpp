@@ -254,9 +254,10 @@ void Dobot::initDobot()
     }
     SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
     
+    //todo: predkosci
     JOGCommonParams jogCommonParams;
-    jogCommonParams.velocityRatio = 50;
-    jogCommonParams.accelerationRatio = 50;
+    jogCommonParams.velocityRatio = 100;
+    jogCommonParams.accelerationRatio = 100;
     SetJOGCommonParams(&jogCommonParams, false, NULL);
     
     PTPJointParams ptpJointParams;
@@ -280,10 +281,10 @@ void Dobot::initDobot()
     SetPTPJumpParams(&ptpJumpParams, false, NULL);
     
     HOMEParams HomeChess;
-    HomeChess.x = 140;
-    HomeChess.y = 0;
-    HomeChess.z = 10; //niżej będzie waliło w szachownicę
-    HomeChess.r = 0;
+    HomeChess.x = nHome_x;
+    HomeChess.y = nHome_y;
+    HomeChess.z = nHome_x;
+    HomeChess.r = nHome_r;
     SetHOMEParams(&HomeChess, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 

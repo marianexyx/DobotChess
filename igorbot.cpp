@@ -136,12 +136,11 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         int nFENBoardStart = tcpRespond.indexOf(SPACE_CHAR);
         int nFENBoardEnd = tcpRespond.indexOf(SPACE_CHAR, nFENBoardStart);
         int nFENStringLength = nFENBoardEnd - nFENBoardStart;
-        QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);*/
-        /*QStringList QStrFENRecord = tcpRespond.split(QRegExp("\\s"));
+        QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);*/ /*
+        QStringList QStrFENRecord = tcpRespond.split(QRegExp("\\s"));
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "QStrFENBoard =" << QStrFENBoard;
 
-tu skonczylem
         QStringList QStrFENBoardRows = QStrFENBoard.split("/");
         if (QStrFENBoardRows.size() == 8)
         {
@@ -177,7 +176,7 @@ tu skonczylem
             qDebug() << "Board's row" << i+1 << "pieces =" << aQstrBoard[i][0] << aQstrBoard[i][1] <<
                         aQstrBoard[i][2] << aQstrBoard[i][3] << aQstrBoard[i][4] << aQstrBoard[i][5] <<
                         aQstrBoard[i][6] << aQstrBoard[i][7];
-        }*/
+        }//*/
 
 
         //enpassant

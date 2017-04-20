@@ -388,16 +388,29 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_homeBtn_clicked()
 {
+    //todo: w inicjalizacji nie powinni być w kółko jakiś definicjii
+    //todo: homecmd nie jest kolejkowany
     _pDobotArm->addTextToConsole("HomeCmd: recalibrating arm...\n", 'd');
     HOMECmd HOMEChess;
     HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
     uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
-    int result = SetHOMECmd(&HOMEChess, true, &homeIndex);
-    if (result == DobotCommunicate_NoError)
+
+    if (ui->xLabel->text().toInt() != _pDobotArm->nHome_x ||
+            ui->yLabel->text().toInt() != _pDobotArm->nHome_y ||
+            ui->zLabel->text().toInt() != _pDobotArm->nHome_z)
     {
-        uint64_t dobotQueue;
-        _pDobotArm->setDobotQueuedCmdIndex(GetQueuedCmdCurrentIndex(&dobotQueue));
-        _pDobotArm->setDobotQueuedCmdIndex(dobotQueue);
+        int result = SetHOMECmd(&HOMEChess, true, &homeIndex);
+        if (result == DobotCommunicate_NoError)
+        {
+            uint64_t dobotQueue;
+            _pDobotArm->setDobotQueuedCmdIndex(GetQueuedCmdCurrentIndex(&dobotQueue));
+            _pDobotArm->setDobotQueuedCmdIndex(dobotQueue);
+        }
+    }
+    else
+    {
+        qDebug() << "ERROR: Dobot not in home positions";
+        this->writeInConsole("ERROR: Dobot not in home positions",'d');
     }
 }
 
@@ -546,7 +559,7 @@ void MainWindow::on_startGmPosBtn_clicked()
 {
     qDebug() << "Placing arm above the chessboard.";
     _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", 'd');
-    _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
+    _pDobotArm->addCmdToList(-1, false, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
     _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
     _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
     _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
@@ -558,8 +571,8 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", 'd');
     _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
     _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
-    _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
-    _pDobotArm->addCmdToList(-1, false, 144, 0, 10);
+    _pDobotArm->addCmdToList(-1, false, 140, -103, 10);
+    _pDobotArm->addCmdToList(-1, false, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
 }
 
 void MainWindow::on_SimulateFromUsbBtn_clicked()

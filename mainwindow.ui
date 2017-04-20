@@ -442,7 +442,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>HOME</string>
+             <string>Calibrate</string>
             </property>
            </widget>
           </item>

@@ -61,6 +61,11 @@ private:
 public:
     Dobot(Chessboard *pChessboard);
 
+    const int nHome_x = 140;
+    const int nHome_y = 0;
+    const int nHome_z = 10; //niżej by waliło w szachownicę
+    const int nHome_r = 0;
+
     void refreshBtn();
     void initDobot();
     void onPTPsendBtnClicked();

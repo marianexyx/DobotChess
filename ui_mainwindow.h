@@ -781,7 +781,7 @@ public:
         openGripperBtn->setText(QApplication::translate("MainWindow", "OpenGrip", 0));
         upBtn->setText(QApplication::translate("MainWindow", "Up", 0));
         startGmPosBtn->setText(QApplication::translate("MainWindow", "StGmPos", 0));
-        homeBtn->setText(QApplication::translate("MainWindow", "HOME", 0));
+        homeBtn->setText(QApplication::translate("MainWindow", "Calibrate", 0));
         startDtPosBtn->setText(QApplication::translate("MainWindow", "StDtPos", 0));
         dobotInfo->setTitle(QApplication::translate("MainWindow", "Device", 0));
         label_9->setText(QApplication::translate("MainWindow", "SN", 0));
