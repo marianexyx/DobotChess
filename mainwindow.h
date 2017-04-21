@@ -75,7 +75,7 @@ private slots:
     void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
 
     //websocket slots
-    void on_homeBtn_clicked();
+    void on_calibrateBtn_clicked();
     void on_upBtn_clicked();
     void on_downBtn_clicked();
     void on_resetDobotIndexBtn_clicked();
@@ -96,6 +96,7 @@ private slots:
     void on_sendTcpBtn_clicked();
     void on_sendTcpLineEdit_textChanged(const QString &textChanged);
     void on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged);
+    void on_homeBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

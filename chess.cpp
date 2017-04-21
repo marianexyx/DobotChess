@@ -104,18 +104,33 @@ void Chess::TcpMoveOk() //ruch w pamięci sie powiódł. wykonaj fizyczny ruch n
     this->Status();
 }
 
-void Chess::TestMove(int nSender, QString QStrMsgFromWebsockets)
+void Chess::TestMove(int nSender, QString moveToTest)
 {
     qDebug() << "Chess::TestMove(QString QStrMsgFromWebsockets)";
-    _pChessboard->findBoardPos(QStrMsgFromWebsockets); //oblicz wszystkie pozycje bierek
+    _pChessboard->findBoardPos(moveToTest); //oblicz wszystkie pozycje bierek
 
     //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
     if(this->testPromotion(nSender))
         return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
     else if (this->testEnpassant(nSender)) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i...
     //...przerwij jeśli test się powiódł.
-    else this->MoveTcpPiece(QStrMsgFromWebsockets); //jeżeli nie mamy doczynienia ze specjalnymi...
+    else this->MoveTcpPiece(moveToTest); //jeżeli nie mamy doczynienia ze specjalnymi...
     //...ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
+
+    //todo: przenieść całośc do chessboard?
+    if (_pChessboard->getLegalMoves().contains(moveToTest + "q")) _pChessboard->setMoveType(PROMOTION);
+    else if (_pChessboard->getLegalMoves().contains(moveToTest))
+    {
+        else if (_pChessboard->getEnpassant() != "-") _pChessboard->setMoveType(ENPASSANT);
+        else if (_pChessboard->isMoveCastling(moveToTest)) _pChessboard->setMoveType(CASTLING);
+        else if (_pChessboard->isMoveRemoving()) _pChessboard->setMoveType(REMOVING);
+        else _pChessboard->setMoveType(NORMAL)/;
+    }
+    else _pChessboard->setMoveType(BADMOVE);
+
+    if (_pChessboard->getMoveType() == BADMOVE) this->MoveTcpPiece(moveToTest);
+    else this->BadMove(moveToTest); todo: tu skonczylem, to nie zadziala, bo virtual
+
 }
 
 void Chess::castlingMovingSequence()

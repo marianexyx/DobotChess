@@ -40,6 +40,7 @@ public:
     void Think5000();
     void UndoOk();
     void ThinkOk(QString msg);
+    void legalOk(QString msg);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
      void resetBoardCompleted();

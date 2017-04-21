@@ -34,6 +34,7 @@ protected:
     virtual void MoveTcpPiece( QString msg) = 0;
     virtual void Status() = 0;
     virtual void Promote(QString msg) = 0;
+    virtual void AskForLegalMoves() = 0;
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     virtual void resetBoardCompleted() = 0;
@@ -47,7 +48,7 @@ protected:
     //-----------------FUNKCJE SZACHOWE-----------------//
     bool testEnpassant(int nSender);
     bool testPromotion(int nSender);
-    void TestMove(int nSender, QString QStrMsgFromWebsockets);
+    void TestMove(int nSender, QString moveToTest);
 
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);

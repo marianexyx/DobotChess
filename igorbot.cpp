@@ -45,13 +45,14 @@ void IgorBot::BadMove(QString msg)
     qDebug() << "Sending to USB:" << msg;
     emit this->addTextToConsole("Sending to USB: " + msg + "\n", 'c');
 
+    //todo: simplified() nie usuwa tylko podmienia białe znaki. sprawdzić to wszędzie
     _pArduinoUsb->sendDataToUsb(msg.simplified()); //np. "BAD_MOVE e2e4"
 }
 
 void IgorBot::GameInProgress() //gra w toku
 {
     //podaj na stronę info o tym że ruch został wykonany
-    qDebug() << "Chess::GameInProgress(): Sending to Websockets: game_in_progress "
+    qDebug() << "IgorBot::GameInProgress(): Sending to Arduino: game_in_progress "
              << _pChessboard->QsPiecieFromTo;
     emit this->addTextToConsole("game_in_progress " + _pChessboard->QsPiecieFromTo, 'c');
 
@@ -121,76 +122,17 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     }
     else if (tcpMsgType == "status")
     {
-        //czyja tura
-        if (tcpRespond.contains(" w ",Qt::CaseInsensitive)) _pChessboard->setWhoseTurn(WHITE_TURN);
-        else if (tcpRespond.contains(" b ",Qt::CaseInsensitive)) _pChessboard->setWhoseTurn(BLACK_TURN);
+        _pChessboard->saveStatusData(tcpMsgType);
+        if (_pChessboard->getGameStatus() == "*")
+        {
+            this->AskForLegalMoves();
+            this ->GameInProgress();
+        }
         else
         {
-            _pChessboard->setWhoseTurn(NO_TURN);
-            qDebug () << "ERROR: IgorBot::checkMsgFromChenard- unknown turn type from status";
-        }
-
-        //rozmieszczenie na planszy
-        //QString aQstrBoard[8][8];
-        /*const int SPACE_CHAR = 32;
-        int nFENBoardStart = tcpRespond.indexOf(SPACE_CHAR);
-        int nFENBoardEnd = tcpRespond.indexOf(SPACE_CHAR, nFENBoardStart);
-        int nFENStringLength = nFENBoardEnd - nFENBoardStart;
-        QString QStrFENBoard = tcpRespond.mid(nFENBoardStart, nFENStringLength);*/ /*
-        QStringList QStrFENRecord = tcpRespond.split(QRegExp("\\s"));
-        QString QStrFENBoard = QStrFENRecord.at(1);
-        qDebug() << "QStrFENBoard =" << QStrFENBoard;
-
-        QStringList QStrFENBoardRows = QStrFENBoard.split("/");
-        if (QStrFENBoardRows.size() == 8)
-        {
-            QRegExp rxEmpty("\d");
-            for (int nRow=0; nRow<=7; ++nRow)
-            {
-                int nColumn = 0;
-                QStringList FENSigns = QStrFENBoardRows.split(".");
-                for (int nFENSignPos=1; nFENSignPos<=FENSigns.size(); ++nFENSignPos)
-                {
-                    QString QStrFENSign = FENSigns.at(nFENSignPos);
-                    if (!rxEmpty.exactMatch(QStrFENSign))
-                    {
-                        ++nColumn;
-                        aQstrBoard[nRow][nColumn] = QStrFENSign;
-                    }
-                    else
-                    {
-                        for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
-                        {
-                            ++nColumn;
-                            aQstrBoard[nRow][nColumn] = "0";
-                        }
-                    }
-                    if (nColumn>7)
-                        qDebug() << "ERROR: IgorBot::checkMsgFromChenard: nColumn>8 =" << nColumn;
-                }
-            }
-        }
-        else qDebug() << "ERROR: IgorBot::checkMsgFromChenard: boardRows.size() != 8";
-        for (int i=0; i<=7; ++i)
-        {
-            qDebug() << "Board's row" << i+1 << "pieces =" << aQstrBoard[i][0] << aQstrBoard[i][1] <<
-                        aQstrBoard[i][2] << aQstrBoard[i][3] << aQstrBoard[i][4] << aQstrBoard[i][5] <<
-                        aQstrBoard[i][6] << aQstrBoard[i][7];
-        }//*/
-
-
-        //enpassant
-
-
-        //roszady
-
-
-
-        //stan gry
-        if (tcpRespond.left(1) == "*") this ->GameInProgress();
-        else  if (tcpRespond.left(3) == "1-0" || tcpRespond.left(3) == "0-1" || tcpRespond.left(7) == "1/2-1/2")
+            _pChessboard->clearLegalMoves();
             this->EndOfGame(tcpRespond);
-        else wrongTcpAnswer(tcpMsgType, tcpRespond);
+        }
     }
     else if (tcpMsgType == "undo 1" && (tcpRespond == "OK\n" || tcpRespond == "OK"))
     {
@@ -200,6 +142,10 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     {
         this->ThinkOk(tcpRespond); //"OK d1h5 Qh5#"
     }
+    else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
+    {
+        this->legalOk(tcpRespond);
+    }
     else wrongTcpAnswer(tcpMsgType, tcpRespond);
 }
 
@@ -207,7 +153,7 @@ void IgorBot::checkMsgForChenard(QString msg)
 {
     qDebug() << "IgorBot::checkMsgFromWebsockets: received: " << msg;
     if (msg == "new") this->NewGame();
-    else if (msg.left(4) == "move") this->TestMove(ARDUINO, msg); //sprawdź najpierw czy nie występują ruchy specjalne
+    else if (msg.left(4) == "move") this->TestMove(ARDUINO, msg.mid(5)); //sprawdź najpierw czy nie występują ruchy specjalne
     else if (msg.left(10) == "promote_to") this->Promote(msg); //odp. z WWW odnośnie tego na co promujemy
     else if (msg.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
     else qDebug() << "ERROR: received not recognized msg in IgorBot::checkMsgForChenard: " << msg;
@@ -246,6 +192,11 @@ void IgorBot::Promote(QString msg)
     qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << msg.mid(11,1);
 }
 
+void IgorBot::AskForLegalMoves()
+{
+    _pTCPMsgs->queueMsgs(ARDUINO, "legal");
+}
+
 void IgorBot::Think5000()
 {
     _pTCPMsgs->queueMsgs(ARDUINO, "think 5000");
@@ -269,13 +220,27 @@ void IgorBot::ThinkOk(QString msg)
     //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }
 
+void legalOk(QString msg)
+{
+    m_legalMoves = msg.split(QRegExp("\\s"));
+    if (!m_legalMoves.isEmpty()) m_legalMoves.removeFirst(); //ok
+    if (!m_legalMoves.isEmpty()) m_legalMoves.removeFirst(); //np. 20
+    if (!m_legalMoves.isEmpty())
+    {
+        QString QStrLastLegalMove = m_legalMoves.last();
+        QStrLastLegalMove = QStrLastLegalMove.simplified();
+        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" );
+        m_legalMoves.last() = QStrLastLegalMove;
+    }
+}
+
 void IgorBot::wrongTcpAnswer(QString msgType, QString respond)
 {
     this->checkAI();
 
     //TODO: zapanować jakoś nad tymi sygnałami konsoli
-     emit this->addTextToConsole("ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " +
-                                  respond + "for tcpMsgType = " + msgType + "\n", 'c');
+    emit this->addTextToConsole("ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " +
+                                respond + "for tcpMsgType = " + msgType + "\n", 'c');
     qDebug() << "ERROR: IgorBot::checkMsgFromChenard(): unknown tcpRespond = " <<
                 respond << "for tcpMsgType = " << msgType;
 }

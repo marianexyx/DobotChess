@@ -126,7 +126,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
     if (bDobotButtonsStates)
     {
         ui->connectBtn->setText(tr("Connect"));
-
         ui->teachMode->setEnabled(false);
         ui->baseAngleAddBtn->setEnabled(false);
         ui->baseAngleSubBtn->setEnabled(false);
@@ -138,14 +137,13 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->rHeadSubBtn->setEnabled(false);
         ui->startGmPosBtn->setEnabled(false);
         ui->startDtPosBtn->setEnabled(false);
-
         ui->sendBtn->setEnabled(false);
         ui->xPTPEdit->setEnabled(false);
         ui->yPTPEdit->setEnabled(false);
         ui->zPTPEdit->setEnabled(false);
         ui->rPTPEdit->setEnabled(false);
         ui->servoGripperEdit->setEnabled(false);
-        ui->homeBtn->setEnabled(false);
+        ui->calibrateBtn->setEnabled(false);
         ui->serviceCheckBox->setEnabled(false);
         ui->upBtn->setEnabled(false);
         ui->downBtn->setEnabled(false);
@@ -156,17 +154,15 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->sendTcpBtn->setEnabled(false);
         ui->sendTcpLineEdit->setEnabled(false);
         ui->simulateArduinoPlayer2checkBox->setEnabled(false);
-
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
-
         ui->openGripperBtn->setEnabled(false);
         ui->closeGripperBtn->setEnabled(false);
+        ui->homeBtn->setEnabled(false);
     }
     else
     {
         ui->connectBtn->setText(tr("Disconnect"));
-
         ui->teachMode->setEnabled(true);
         ui->baseAngleAddBtn->setEnabled(true);
         ui->baseAngleSubBtn->setEnabled(true);
@@ -178,14 +174,13 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->rHeadSubBtn->setEnabled(true);
         ui->startGmPosBtn->setEnabled(true);
         ui->startDtPosBtn->setEnabled(true);
-
         ui->sendBtn->setEnabled(true);
         ui->xPTPEdit->setEnabled(true);
         ui->yPTPEdit->setEnabled(true);
         ui->zPTPEdit->setEnabled(true);
         ui->rPTPEdit->setEnabled(true);
         ui->servoGripperEdit->setEnabled(true);
-        ui->homeBtn->setEnabled(true);
+        ui->calibrateBtn->setEnabled(true);
         ui->serviceCheckBox->setEnabled(true);
         ui->upBtn->setEnabled(true);
         ui->downBtn->setEnabled(true);
@@ -194,11 +189,10 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->AIBtn->setEnabled(true);
         ui->sendTcpLineEdit->setEnabled(true);
         ui->simulateArduinoPlayer2checkBox->setEnabled(true);
-
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
-
         ui->openGripperBtn->setEnabled(true);
         ui->closeGripperBtn->setEnabled(true);
+        ui->homeBtn->setEnabled(true);
     }
 }
 
@@ -386,7 +380,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     }
 }
 
-void MainWindow::on_homeBtn_clicked()
+void MainWindow::on_calibrateBtn_clicked()
 {
     //todo: w inicjalizacji nie powinni być w kółko jakiś definicjii
     //todo: homecmd nie jest kolejkowany
@@ -395,9 +389,9 @@ void MainWindow::on_homeBtn_clicked()
     HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
     uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
 
-    if (ui->xLabel->text().toInt() != _pDobotArm->nHome_x ||
-            ui->yLabel->text().toInt() != _pDobotArm->nHome_y ||
-            ui->zLabel->text().toInt() != _pDobotArm->nHome_z)
+    if (ui->xLabel->text().toInt() == _pDobotArm->nHome_x &&
+            ui->yLabel->text().toInt() == _pDobotArm->nHome_y &&
+            ui->zLabel->text().toInt() == _pDobotArm->nHome_z)
     {
         int result = SetHOMECmd(&HOMEChess, true, &homeIndex);
         if (result == DobotCommunicate_NoError)
@@ -412,6 +406,11 @@ void MainWindow::on_homeBtn_clicked()
         qDebug() << "ERROR: Dobot not in home positions";
         this->writeInConsole("ERROR: Dobot not in home positions",'d');
     }
+}
+
+void MainWindow::on_homeBtn_clicked()
+{
+    _pDobotArm->addCmdToList(-1, false, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
 }
 
 void MainWindow::on_upBtn_clicked()
@@ -609,3 +608,5 @@ void MainWindow::changeWindowtitle(QString title)
 {
     this->setWindowTitle(title);
 }
+
+

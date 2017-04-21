@@ -12,6 +12,7 @@ struct ArmPosition
 };
 
 enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //TODO: praktycznie powtórzenie z webtable
+enum MOVE_TYPE { NONE, BADMOVE, NORMAL, PROMOTION, ENPASSANT, CASTLING, REMOVING };
 
 //TODO: chessboard powinien być obiektem klasy chess
 class Chessboard: public QObject
@@ -19,9 +20,19 @@ class Chessboard: public QObject
     Q_OBJECT
 
 private:
+    QString m_QStrGameStatus;
+    QString m_QStrBoard;
     WHOSE_TURN m_WhoseTurn;
+    QString m_QStrCastlings;
+    QString m_QStrEnpassant;
+    QStringList m_legalMoves;
+    MOVE_TYPE m_moveType;
 
     void changeWindowTitle();
+
+    void gameState(QString QStrGameState);
+    QString FENToBoard(QString FENBoard);
+    WHOSE_TURN whoseTurn(QString whoseTurn);
 
 public:
     Chessboard();
@@ -30,8 +41,8 @@ public:
     int findPieceLetterPos(QString QsLetter);
     QString findPieceLetterPos(int nLetter);
     int fieldNrToFieldPos(int nfieldNr, bool bRow);
-    bool removeStatements();
-    bool castlingStatements();
+    bool isMoveRemoving();
+    bool isMoveCastling(QString moveToTest);
     void castlingFindRookToMove();
     void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
                            int nPieceDigit, char chMoveType);
@@ -71,8 +82,19 @@ public:
     double adRemovedPiecesPositions_z[8][4];
 
     //metody dostępowe
-    void setWhoseTurn (WHOSE_TURN Turn) { m_WhoseTurn = Turn; this->changeWindowTitle();}
+    void setWhoseTurn (WHOSE_TURN Turn) { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
+    void setMoveType (MOVE_TYPE Type)   { m_moveType = Type; }
+
+    void clearLegalMoves()              { m_legalMoves.clear(); }
+
+    QString getGameStatus()             { return m_QStrGameStatus; }
+    QString getBoard()                  { return m_QStrBoard; }
     WHOSE_TURN getWhoseTurn ()          { return m_WhoseTurn; }
+    MOVE_TYPE getMoveType()             { return m_moveType; }
+    QString getCastlings()              { return m_QStrCastlings; }
+    QString getEnpassant()              { return m_QStrEnpassant; }
+    QStringList getLegalMoves()         { return m_legalMoves; }
+
 
 signals:
     void addTextToConsole(QString);

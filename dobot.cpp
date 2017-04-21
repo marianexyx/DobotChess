@@ -283,7 +283,7 @@ void Dobot::initDobot()
     HOMEParams HomeChess;
     HomeChess.x = nHome_x;
     HomeChess.y = nHome_y;
-    HomeChess.z = nHome_x;
+    HomeChess.z = nHome_z;
     HomeChess.r = nHome_r;
     SetHOMEParams(&HomeChess, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }

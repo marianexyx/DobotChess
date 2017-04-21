@@ -158,6 +158,11 @@ void WebChess::Status()
     _pTCPMsgs->queueMsgs(WEBSITE, "status");
 }
 
+void WebChess::AskForLegalMoves()
+{
+    _pTCPMsgs->queueMsgs(WEBSITE, "legal");
+}
+
 //-----------------FUNKCJE SZACHOWE-----------------//
 void WebChess::resetBoardCompleted()
 {

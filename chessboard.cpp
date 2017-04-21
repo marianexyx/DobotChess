@@ -82,7 +82,7 @@ Chessboard::Chessboard():
     {
         for (int row = 0; row <= 7; row++)
         {
-            adRemovedPiecesPositions_x[row][column] = 100 + row*25;
+            adRemovedPiecesPositions_x[row][column] = 125 + row*25;
             adRemovedPiecesPositions_y[row][column] = 170 - column*25;
             adRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
         }
@@ -91,7 +91,7 @@ Chessboard::Chessboard():
     {
         for (int row = 0; row <= 7; row++)
         {
-            adRemovedPiecesPositions_x[row][column] = 100 + row*25;
+            adRemovedPiecesPositions_x[row][column] = 125 + row*25;
             adRemovedPiecesPositions_y[row][column] = -160 - ((column-2)*25);
             adRemovedPiecesPositions_z[row][column] = -22.5 - row*((-22.5 + 17)/7);
         }
@@ -100,15 +100,12 @@ Chessboard::Chessboard():
 
 void Chessboard::findBoardPos(QString QsPiecePositions)
 {
-    QsPiecieFromTo = QsPiecePositions.mid(5,4); // e2e4. wycięte z "move e2e4".
-    qDebug() << "QsPiecieFromTo: " << QsPiecieFromTo;
-
-    PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.mid(5,1));
-    PieceFrom.Digit = QsPiecePositions.mid(6,1).toInt() - 1;
+    PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.left(1));
+    PieceFrom.Digit = QsPiecePositions.mid(1,1).toInt() - 1;
     qDebug() << "Chessboard::findBoardPos: PieceFrom.Digit =" << PieceFrom.Digit;
 
-    PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(7,1));
-    PieceTo.Digit = QsPiecePositions.mid(8,1).toInt() - 1;
+    PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(2,1));
+    PieceTo.Digit = QsPiecePositions.mid(3,1).toInt() - 1;
     qDebug() << "Chessboard::findBoardPos: PieceTo.Digit =" << PieceTo.Digit;
 }
 
@@ -182,28 +179,20 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
 }
 
 
-bool Chessboard::removeStatements() // funkcje do sprawdzania czy bijemy bierkę
+bool Chessboard::isMoveRemoving()
 {
-    //sprawdzanie czy na pole, gdzie bierka idzie nie jest zajęte
-    //w enpassant bierka "PieceTo" jest podmiania na pozycję bierki zbijanej, także ten warunek...
-    //...tam też zadziała
-    if (anBoard[PieceTo.Letter][PieceTo.Digit] != 0) return 1;
-    else return 0;
+    if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != "0") return true;
+    else return false;
 }
 
-bool Chessboard::castlingStatements() // sprawdzanie czy dany ruch jest prośbą o roszadę
+bool Chessboard::isMoveCastling(QString moveToTest)
 {    
-    if (PieceFrom.Letter == 4 && (PieceFrom.Digit == 0 || PieceFrom.Digit == 7)
-            //jeżeli ruszana jest bierka z pozycji króla
-            && (PieceTo.Letter == 2 || PieceTo.Letter == 6) // o 2 pola w lewo lub prawo
-            && (PieceTo.Digit == 0 || PieceTo.Digit == 7) //na tej samej linii
-            && (anBoard[PieceFrom.Letter][PieceFrom.Digit] == 5 //i jest to na pewno król (biały)
-                || anBoard[PieceFrom.Letter][PieceFrom.Digit] == 29)) //(lub czarny)
-    {
-        return 1; //to mamy do czynienia z roszadą
-    }
-    else
-        return 0; //a jak nie to nie
+    if ((moveToTest == "e1c1" && m_QStrCastlings.contains("Q") && m_QStrBoard[4][0] == "K") ||
+            (moveToTest == "e1g1" && m_QStrCastlings.contains("K") && m_QStrBoard[4][0] == "K") ||
+            (moveToTest == "e8c8" && m_QStrCastlings.contains("q") && m_QStrBoard[4][0] == "k") ||
+            (moveToTest == "e8g8" && m_QStrCastlings.contains("k") && m_QStrBoard[4][0] == "k"))
+        return true;
+    else return false;
 }
 
 void Chessboard::castlingFindRookToMove() //ustawiane skąd-dokąd przenoszona będzie wieża w roszadzie.
@@ -299,4 +288,105 @@ void Chessboard::changeWindowTitle()
     }
 
     emit this->changeWindowTitle(title);
+}
+
+void Chessboard::saveStatusData(QString status)
+{
+    //rozbicie statusu
+    QStringList QStrFENRecord = status.split(QRegExp("\\s")); //spacja
+
+    if (QStrFENRecord.size() == 7)
+    {
+        m_QStrGameStatus = QStrFENRecord.at(0);
+        qDebug() << "QStrGameStatus =" << m_QStrGameStatus;
+
+        QString QStrFENBoard = QStrFENRecord.at(1);
+        qDebug() << "QStrFENBoard =" << QStrFENBoard;
+        m_QStrBoard = FENToBoard(QStrFENBoard);
+
+        QString QStrWhoseTurn = QStrFENRecord.at(2);
+        qDebug() << "QStrWhoseTurn =" << QStrWhoseTurn;
+        this->setWhoseTurn(whoseTurn(QStrWhoseTurn)); //todo: sprawdzić to
+
+        m_QStrCastlings = QStrFENRecord.at(3);
+        qDebug() << "QStrCastlings =" << m_QStrCastlings;
+
+        m_QStrEnpassant = QStrFENRecord.at(4);
+        qDebug() << "QStrenpassant =" << m_QStrEnpassant;
+
+        //QString QStrHalfmoveClock = QStrFENRecord.at(5); //przyda sie na przyszlosc
+        //QString QStrFullmoveNumber = QStrFENRecord.at(6);
+    }
+    else
+    {
+        qDebug() << "ERROR: Chessboard::saveStatusData: wrong QStrFENRecord size =" <<
+                    QStrFENRecord.size();
+        this->addTextToConsole("ERROR: Chessboard::saveStatusData: wrong QStrFENRecord size = "
+                               + QStrFENRecord.size());
+    }
+}
+
+/*void Chessboard::gameState(QString QStrGameState)
+{
+    if (QStrGameStatus == "*") this->GameInProgress();
+    else  if (QStrGameStatus == "1-0" || QStrGameStatus == "0-1" || QStrGameStatus == "1/2-1/2")
+        this->EndOfGame(QStrGameStatus);
+    else wrongTcpAnswer(tcpMsgType, tcpRespond);
+}*/
+
+QString Chessboard::FENToBoard(QString FENBoard)
+{
+    //rozmieszczenie na planszy
+    QString aBoard[8][8];
+
+    QStringList QStrFENBoardRows = QStrFENBoard.split("/");
+    if (QStrFENBoardRows.size() == 8)
+    {
+        QRegExp rxEmpty("\d");
+        for (int nRow=0; nRow<=7; ++nRow)
+        {
+            int nColumn = 0;
+            QStringList FENSigns = QStrFENBoardRows.split(".");
+            for (int nFENSignPos=1; nFENSignPos<=FENSigns.size(); ++nFENSignPos)
+            {
+                QString QStrFENSign = FENSigns.at(nFENSignPos);
+                if (!rxEmpty.exactMatch(QStrFENSign))
+                {
+                    ++nColumn;
+                    aBoard[nRow][nColumn] = QStrFENSign;
+                }
+                else
+                {
+                    for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
+                    {
+                        ++nColumn;
+                        aBoard[nRow][nColumn] = "0";
+                    }
+                }
+                if (nColumn>7)
+                    qDebug() << "ERROR: IgorBot::checkMsgFromChenard: nColumn>8 =" << nColumn;
+            }
+        }
+    }
+    else qDebug() << "ERROR: IgorBot::checkMsgFromChenard: boardRows.size() != 8";
+
+    for (int i=0; i<=7; ++i)
+    {
+        qDebug() << "Board's row" << i+1 << "pieces =" << aBoard[i][0] << aBoard[i][1] <<
+                    aBoard[i][2] << aBoard[i][3] << aBoard[i][4] << aBoard[i][5] <<
+                    aBoard[i][6] << aBoard[i][7];
+    }
+
+    return aBoard;
+}
+
+WHOSE_TURN Chessboard::whoseTurn(QString whoseTurn)
+{
+    if (whoseTurn == "w") return WHITE_TURN;
+    else if (whoseTurn == "b") return BLACK_TURN;
+    else
+    {
+        return NO_TURN;
+        qDebug () << "ERROR: IgorBot::checkMsgFromChenard- unknown turn type from status";
+    }
 }
