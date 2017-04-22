@@ -29,13 +29,14 @@ public:
     void BadMove(QString msg);
     void GameInProgress();
     void EndOfGame(QString msg);
-    void PromoteToWhat();
+    void PromoteToWhat(QString moveForFuturePromote);
 
     //----------KOMUNIKACJA Z CHENARD----------//
     void NewGame();
     void MoveTcpPiece(QString msg);
     void Status();
     void Promote(QString msg);
+    void AskForLegalMoves();
 
     void Think5000();
     void UndoOk();
@@ -43,7 +44,8 @@ public:
     void legalOk(QString msg);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-     void resetBoardCompleted();
+    void TcpMoveOk();
+    void resetBoardCompleted();
 
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     void setAI(bool bAI)                { m_bAI = bAI; } //todo: wszystkie nazwy "AI" zamienić na "Igor"
@@ -52,28 +54,14 @@ public:
     bool getAIAsPlayer2()               { return m_bIsIgorsAiSimulatedAsPlayer2; }
     bool getAI()                        { return m_bAI; }
 
-    /*---------------DZIEDZICZONE Z CHESS---------------//
-    //---------------STEROWANIE RAMIENIEM---------------//
-    void TestOk();
-    void MoveOk(int nSender);
-    void castlingMovingSequence();
-    void enpassantMovingSequence();
-
-    //-----------------FUNKCJE SZACHOWE-----------------//
-    bool testEnpassant();
-    bool testPromotion();
-    void TestMove(QString QStrMsgFromWebsockets);
-
-    //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
-    void wrongTcpAnswer(QString msgType, QString respond);*/
 
 signals:
     //void addTextToConsole(QString, char); //jest dziedziczone?
 
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//
-    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
     void checkMsgForChenard(QString msg);
+    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
     void EnemyStart(); //ogólna funkcja sterująca
 };
 

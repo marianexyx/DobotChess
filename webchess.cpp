@@ -64,8 +64,9 @@ void WebChess::EndOfGame(QString msg)
     this->resetPiecePositions(); //przywróć wszystkie bierki do stanu początkowego
 }
 
-void WebChess::PromoteToWhat()
+void WebChess::PromoteToWhat(QString moveForFuturePromote)
 {
+    _pChessboard->QStrFuturePromote = moveForFuturePromote;
     qDebug() << "Sending 'promote_to_what' to websockets";
     _pWebsockets->processWebsocketMsg("promote_to_what"); //to trzeba jeszcze zapytać się na WWW na co ma być ta promocja.
 }
@@ -76,12 +77,12 @@ void WebChess::PromoteToWhat()
 
 void WebChess::checkMsgForChenard(QString msgFromWs)
 {
-    qDebug() << "Chess::checkMsgForChenard: received: " << msgFromWs;
+    qDebug() << "WebChess::checkMsgForChenard: received: " << msgFromWs;
     if (msgFromWs == "new") this->NewGame();
-    else if (msgFromWs.left(4) == "move") this->TestMove(WEBSITE, msgFromWs); //sprawdź najpierw czy nie występują ruchy specjalne
-    else if (msgFromWs.left(10) == "promote_to") this->Promote(msgFromWs); //odp. z WWW odnośnie tego na co promujemy
-    else if (msgFromWs.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
-    else qDebug() << "ERROR: received not recognized msg in Chess::checkMsgForChenard: " << msgFromWs;
+    else if (msgFromWs.left(4) == "move") this->handleMove(msgFromWs.mid(5));
+    else if (msgFromWs.left(10) == "promote_to") this->Promote(msgFromWs);
+    else if (msgFromWs.left(5) == "reset") this->resetPiecePositions();
+    else qDebug() << "ERROR: received not recognized msg in WebChess::checkMsgForChenard: " << msgFromWs;
 }
 
 void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
@@ -110,24 +111,13 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
                  QsTcpRespond.left(7) == "1/2-1/2") this->EndOfGame(QsTcpRespond);
         else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
     }
-    else if (tcpMsgType.left(4) == "test")
-    {
-        if (QsTcpRespond.left(3) == "OK " && QsTcpRespond.left(4) != "OK 1")
-            this->TestOk(); //odpowiedź na testy np. dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
-        else if (QsTcpRespond == "ILLEGAL") //jeżeli test na ruch specjalny się nie powiódł...
-            this->MoveTcpPiece(_pChessboard->QsPiecieFromTo); //...to wykonaj zwykły ruch
-        else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
-    }
     else qDebug() << "ERROR: WebChess:checkMsgFromChenard() received unknown tcpMsgType: " << tcpMsgType;
 }
 
 void WebChess::Promote(QString msg)
 {
-    _pChessboard->bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu...
-    //...promocja, by sprawdzić czy nie ma dodatkowo bicia
-    _pTCPMsgs->queueMsgs(WEBSITE, "move " + _pChessboard->QsFuturePromote + msg.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
-    //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to ruch może się odbywać jako normalne przemieszczenie
-    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << msg.mid(11,1);
+    _pTCPMsgs->queueMsgs(WEBSITE, "move " + _pChessboard->QStrFuturePromote + msg);
+    _pChessboard->QStrFuturePromote.clear();
 }
 
 void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
@@ -164,6 +154,11 @@ void WebChess::AskForLegalMoves()
 }
 
 //-----------------FUNKCJE SZACHOWE-----------------//
+void WebChess::TcpMoveOk()
+{
+    //todo
+}
+
 void WebChess::resetBoardCompleted()
 {
     //todo

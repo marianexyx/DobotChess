@@ -415,12 +415,12 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobotArm->armUpDown(true, true, 'v');
+    _pDobotArm->armUpDown(true, true, SERVICE);
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobotArm->armUpDown(false, true, 'v');
+    _pDobotArm->armUpDown(false, true, SERVICE);
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
@@ -544,13 +544,13 @@ void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
 
 void MainWindow::on_openGripperBtn_clicked()
 {
-    _pDobotArm->gripperOpennedState(true, 'v');
+    _pDobotArm->gripperOpennedState(true, SERVICE);
 }
 
 
 void MainWindow::on_closeGripperBtn_clicked()
 {
-    _pDobotArm->gripperOpennedState(false, 'v');
+    _pDobotArm->gripperOpennedState(false, SERVICE);
 }
 
 

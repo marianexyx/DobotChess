@@ -30,18 +30,18 @@ struct qt_meta_stringdata_IgorBot_t {
 static const qt_meta_stringdata_IgorBot_t qt_meta_stringdata_IgorBot = {
     {
 QT_MOC_LITERAL(0, 0, 7), // "IgorBot"
-QT_MOC_LITERAL(1, 8, 19), // "checkMsgFromChenard"
-QT_MOC_LITERAL(2, 28, 0), // ""
-QT_MOC_LITERAL(3, 29, 10), // "tcpMsgType"
-QT_MOC_LITERAL(4, 40, 10), // "tcpRespond"
-QT_MOC_LITERAL(5, 51, 18), // "checkMsgForChenard"
-QT_MOC_LITERAL(6, 70, 3), // "msg"
+QT_MOC_LITERAL(1, 8, 18), // "checkMsgForChenard"
+QT_MOC_LITERAL(2, 27, 0), // ""
+QT_MOC_LITERAL(3, 28, 3), // "msg"
+QT_MOC_LITERAL(4, 32, 19), // "checkMsgFromChenard"
+QT_MOC_LITERAL(5, 52, 10), // "tcpMsgType"
+QT_MOC_LITERAL(6, 63, 10), // "tcpRespond"
 QT_MOC_LITERAL(7, 74, 10) // "EnemyStart"
 
     },
-    "IgorBot\0checkMsgFromChenard\0\0tcpMsgType\0"
-    "tcpRespond\0checkMsgForChenard\0msg\0"
-    "EnemyStart"
+    "IgorBot\0checkMsgForChenard\0\0msg\0"
+    "checkMsgFromChenard\0tcpMsgType\0"
+    "tcpRespond\0EnemyStart"
 };
 #undef QT_MOC_LITERAL
 
@@ -59,13 +59,13 @@ static const uint qt_meta_data_IgorBot[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    2,   29,    2, 0x0a /* Public */,
-       5,    1,   34,    2, 0x0a /* Public */,
+       1,    1,   29,    2, 0x0a /* Public */,
+       4,    2,   32,    2, 0x0a /* Public */,
        7,    0,   37,    2, 0x0a /* Public */,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString, QMetaType::QString,    3,    4,
-    QMetaType::Void, QMetaType::QString,    6,
+    QMetaType::Void, QMetaType::QString,    3,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString,    5,    6,
     QMetaType::Void,
 
        0        // eod
@@ -77,8 +77,8 @@ void IgorBot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         IgorBot *_t = static_cast<IgorBot *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->checkMsgFromChenard((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
-        case 1: _t->checkMsgForChenard((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 0: _t->checkMsgForChenard((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 1: _t->checkMsgFromChenard((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 2: _t->EnemyStart(); break;
         default: ;
         }

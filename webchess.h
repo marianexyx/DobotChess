@@ -20,34 +20,24 @@ public:
     void BadMove(QString msg);
     void GameInProgress();
     void EndOfGame(QString msg);
-    void PromoteToWhat();
+    void PromoteToWhat(QString moveForFuturePromote);
 
     //--------KOMUNIKACJA Z CHENARD--------//
     void NewGame();
     void MoveTcpPiece(QString msg);
     void Status();
     void Promote(QString msg);
+    void AskForLegalMoves();
+
+    void legalOk(QString msg);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
+    void TcpMoveOk();
+    MOVE_TYPE checkMoveType(QString move);
      void resetBoardCompleted();
 
-    /*---------------DZIEDZICZONE Z CHESS---------------//
-    //---------------STEROWANIE RAMIENIEM---------------//
-    void TestOk();
-    void MoveOk(int nSender);
-    void castlingMovingSequence();
-    void enpassantMovingSequence();
-
-    //-----------------FUNKCJE SZACHOWE-----------------//
-    bool testEnpassant();
-    bool testPromotion();
-    void TestMove(QString QStrMsgFromWebsockets);
-
-    //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
-    void wrongTcpAnswer(QString msgType, QString respond);*/
-
 signals:
-    //void addTextToConsole(QString, char); //sygnał będę miał z klasy bazowej?
+    //void addTextToConsole(QString, char); //TODO: sygnał będę miał z klasy bazowej?
 
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//

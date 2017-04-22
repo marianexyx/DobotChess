@@ -33,7 +33,7 @@ IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 //----------------------------KOMUNIKACJA Z ARDUINO------------------------------//
 //-------------------------------------------------------------------------------//
 
-void IgorBot::GameStarted() //zareaguj na to że gra wystartowała
+void IgorBot::GameStarted()
 {
     emit this->addTextToConsole("new_game\n", 'a');
     qDebug() << "Sending to USB: new_game";
@@ -49,12 +49,11 @@ void IgorBot::BadMove(QString msg)
     _pArduinoUsb->sendDataToUsb(msg.simplified()); //np. "BAD_MOVE e2e4"
 }
 
-void IgorBot::GameInProgress() //gra w toku
+void IgorBot::GameInProgress()
 {
     //podaj na stronę info o tym że ruch został wykonany
-    qDebug() << "IgorBot::GameInProgress(): Sending to Arduino: game_in_progress "
-             << _pChessboard->QsPiecieFromTo;
-    emit this->addTextToConsole("game_in_progress " + _pChessboard->QsPiecieFromTo, 'c');
+    qDebug() << "IgorBot::GameInProgress(): Sending to Arduino: game_in_progress";
+    emit this->addTextToConsole("game_in_progress", 'c');
 
     if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
     {
@@ -82,8 +81,9 @@ void IgorBot::EndOfGame(QString msg)
     //TODO: zablokować możliwość robienia czegokolwiek na stronie/arduino aż to się nie zakończy
 }
 
-void IgorBot::PromoteToWhat() //inicjalizowane w TestOk()
+void IgorBot::PromoteToWhat(QString moveForFuturePromote)
 {
+    _pChessboard->QStrFuturePromote = moveForFuturePromote;
     qDebug() << "Sending to arduino: promote";
     _pArduinoUsb->sendDataToUsb("promote"); //zapytaj się arduino na co ma być ta promocja
 }
@@ -95,7 +95,17 @@ void IgorBot::PromoteToWhat() //inicjalizowane w TestOk()
 void IgorBot::EnemyStart()
 {
     this->checkAI();
-    this->resetPiecePositions(); //przywróć bierki na pierwotne pozycje
+    this->resetPiecePositions();
+}
+
+void IgorBot::checkMsgForChenard(QString msg)
+{
+    qDebug() << "IgorBot::checkMsgForChenard: received: " << msg;
+    if (msg == "new") this->NewGame();
+    else if (msg.left(4) == "move") this->handleMove(msg.mid(5));
+    else if (msg.left(9) == "promoteTo") this->Promote(msg.mid(10));
+    else if (msg.left(5) == "reset") this->resetPiecePositions();
+    else qDebug() << "ERROR: received not recognized msg in IgorBot::checkMsgForChenard: " << msg;
 }
 
 void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
@@ -104,7 +114,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 
     if (tcpMsgType == "new" && (tcpRespond == "OK\n" || tcpRespond == "OK"))
     {
-        _pChessboard->setWhoseTurn(WHITE_TURN);
+        this->Status();
         this->GameStarted();
     }
     else if (tcpMsgType.left(4) == "move")
@@ -114,19 +124,12 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         else if (tcpRespond.left(8) == "BAD_MOVE") this->BadMove(tcpRespond);
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
-    else if (tcpMsgType.left(4) == "test") //dla zapytania: 'test e2e4' dostaniemy: 'OK e2e4 (...)'.
-    {
-        if (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1") this->TestOk();
-        else if (tcpRespond == "ILLEGAL") this->MoveTcpPiece(_pChessboard->QsPiecieFromTo);
-        else wrongTcpAnswer(tcpMsgType, tcpRespond);
-    }
     else if (tcpMsgType == "status")
     {
-        _pChessboard->saveStatusData(tcpMsgType);
+        _pChessboard->saveStatusData(tcpRespond);
         if (_pChessboard->getGameStatus() == "*")
         {
             this->AskForLegalMoves();
-            this ->GameInProgress();
         }
         else
         {
@@ -149,16 +152,6 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     else wrongTcpAnswer(tcpMsgType, tcpRespond);
 }
 
-void IgorBot::checkMsgForChenard(QString msg)
-{
-    qDebug() << "IgorBot::checkMsgFromWebsockets: received: " << msg;
-    if (msg == "new") this->NewGame();
-    else if (msg.left(4) == "move") this->TestMove(ARDUINO, msg.mid(5)); //sprawdź najpierw czy nie występują ruchy specjalne
-    else if (msg.left(10) == "promote_to") this->Promote(msg); //odp. z WWW odnośnie tego na co promujemy
-    else if (msg.left(5) == "reset") this->resetPiecePositions(); //przywróć bierki na szachownicę do stanu startowego
-    else qDebug() << "ERROR: received not recognized msg in IgorBot::checkMsgForChenard: " << msg;
-}
-
 void IgorBot::NewGame()
 {
     qDebug() << "Sending to tcp: new";
@@ -166,12 +159,11 @@ void IgorBot::NewGame()
     _pTCPMsgs->queueMsgs(ARDUINO, "new");
 }
 
-void IgorBot::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
-{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
-    //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
+void IgorBot::MoveTcpPiece(QString msg)
+{
     qDebug() << "IgorBot::MoveTcpPiece: Sending move to tcp: " << msg;
     emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
-    _pTCPMsgs->queueMsgs(ARDUINO, msg); //zapytaj się tcp o poprawność prośby o ruch
+    _pTCPMsgs->queueMsgs(ARDUINO, msg);
 }
 
 void IgorBot::Status()
@@ -183,17 +175,15 @@ void IgorBot::Status()
 
 void IgorBot::Promote(QString msg)
 {
-    _pChessboard->bPromotionConfirmed = true; //w odpowiedzi na chenard ma się wykonać ruch typu...
-    //...promocja, by sprawdzić czy nie ma dodatkowo bicia
-    _pTCPMsgs->queueMsgs(ARDUINO, "move " + _pChessboard->QsFuturePromote +
-                         msg.mid(11,1)); //scal żądanie o ruch z żądanym typem promocji
-    //dopóki fizycznie nie podmieniam pionków na nowe figury w promocji, to...
-    //...ruch może się odbywać jako normalne przemieszczenie
-    qDebug() << "Sent to TCP: move " << _pChessboard->QsFuturePromote << msg.mid(11,1);
+     this->pieceMovingSequence(PROMOTION);
+    _pChessboard->setMoveType(PROMOTION);
+    _pTCPMsgs->queueMsgs(ARDUINO, "move " + _pChessboard->QStrFuturePromote + msg);
+    _pChessboard->QStrFuturePromote.clear();
 }
 
 void IgorBot::AskForLegalMoves()
 {
+    qDebug() << "IgorBot::AskForLegalMoves()";
     _pTCPMsgs->queueMsgs(ARDUINO, "legal");
 }
 
@@ -220,18 +210,19 @@ void IgorBot::ThinkOk(QString msg)
     //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }
 
-void legalOk(QString msg)
+void IgorBot::legalOk(QString msg)
 {
-    m_legalMoves = msg.split(QRegExp("\\s"));
-    if (!m_legalMoves.isEmpty()) m_legalMoves.removeFirst(); //ok
-    if (!m_legalMoves.isEmpty()) m_legalMoves.removeFirst(); //np. 20
-    if (!m_legalMoves.isEmpty())
+    QStringList legalMoves = msg.split(QRegExp("\\s"));
+    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
+    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
+    if (!legalMoves.isEmpty())
     {
-        QString QStrLastLegalMove = m_legalMoves.last();
+        QString QStrLastLegalMove = legalMoves.last();
         QStrLastLegalMove = QStrLastLegalMove.simplified();
-        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" );
-        m_legalMoves.last() = QStrLastLegalMove;
+        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" ); //remove np. "\n"
+        legalMoves.last() = QStrLastLegalMove;
     }
+    _pChessboard->setLegalMoves(legalMoves);
 }
 
 void IgorBot::wrongTcpAnswer(QString msgType, QString respond)
@@ -258,4 +249,12 @@ void IgorBot::checkAI()
 void IgorBot::resetBoardCompleted()
 {
     this->NewGame();
+}
+
+void IgorBot::TcpMoveOk()
+{
+    qDebug() << "IgorBot::TcpMoveOk()";
+
+    this->GameInProgress();
+    this->Status();
 }

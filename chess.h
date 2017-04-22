@@ -27,7 +27,7 @@ protected:
     virtual void BadMove(QString msg) = 0;
     virtual void GameInProgress() = 0;
     virtual void EndOfGame(QString msg) = 0;
-    virtual void PromoteToWhat() = 0;
+    virtual void PromoteToWhat(QString moveForFuturePromote) = 0;
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
     virtual void NewGame() = 0;
@@ -37,18 +37,16 @@ protected:
     virtual void AskForLegalMoves() = 0;
 
     //-----------------FUNKCJE SZACHOWE-----------------//
+    virtual void TcpMoveOk() = 0;
     virtual void resetBoardCompleted() = 0;
 
     //---------------STEROWANIE RAMIENIEM---------------//
-    void TestOk();
-    void TcpMoveOk();
     void castlingMovingSequence();
     void enpassantMovingSequence();
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-    bool testEnpassant(int nSender);
-    bool testPromotion(int nSender);
-    void TestMove(int nSender, QString moveToTest);
+    MOVE_TYPE checkMoveType(QString move);
+    void handleMove(QString move);
 
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);
@@ -64,7 +62,7 @@ public:
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void resetPiecePositions();
-    void pieceMovingSequence(char chMoveType,
+    void pieceMovingSequence(MOVE_TYPE Type,
                              int nPieceFromLetter = -1, int nPieceFromDigit = -1,
                              int nPieceToLetter = -1, int nPieceToDigit = -1);
 

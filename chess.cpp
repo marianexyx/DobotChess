@@ -28,10 +28,10 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable
     _bServiceTests = false;
 }
 
-void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPieceFromDigit,
+void Chess::pieceMovingSequence(MOVE_TYPE Type, int nPieceFromLetter, int nPieceFromDigit,
                                 int nPieceToLetter, int nPieceToDigit)
 {
-    _pDobot->writeMoveTypeInConsole(chMoveType);
+    _pDobot->writeMoveTypeInConsole(Type);
 
     //jeżeli nie podano skąd i/lub dokąd, to jest to ruch z aktualnego pola szachownicy nad którym wisi ramie
     if (nPieceFromLetter == -1) nPieceFromLetter = _pChessboard->PieceFrom.Letter;
@@ -39,7 +39,7 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     if (nPieceToLetter == -1) nPieceToLetter = _pChessboard->PieceTo.Letter;
     if (nPieceToDigit == -1) nPieceToDigit = _pChessboard->PieceTo.Digit;
 
-    if (chMoveType == 'r')
+    if (Type == REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
     {
         nPieceFromLetter = nPieceToLetter; //przy usuwaniu bierka "from" to ta...
         nPieceFromDigit = nPieceToDigit; //...która w każdym innym ruchu jest jako "to"
@@ -48,20 +48,20 @@ void Chess::pieceMovingSequence(char chMoveType, int nPieceFromLetter, int nPiec
     qDebug() << "-Start move sequence-";
     emit this->addTextToConsole("-Start move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
 
-    _pDobot->gripperOpennedState(OPEN, chMoveType);
-    _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, chMoveType);
-    _pDobot->armUpDown(DOWN, FROM, chMoveType);
-    _pDobot->gripperOpennedState(CLOSE, chMoveType);
+    _pDobot->gripperOpennedState(OPEN, Type);
+    _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, Type);
+    _pDobot->armUpDown(DOWN, FROM, Type);
+    _pDobot->gripperOpennedState(CLOSE, Type);
     _pDobot->wait(300);
-    _pDobot->armUpDown(UP, FROM, chMoveType);
-    _pChessboard->pieceStateChanged(FROM, nPieceFromLetter, nPieceFromDigit, chMoveType);
+    _pDobot->armUpDown(UP, FROM, Type);
+    _pChessboard->pieceStateChanged(FROM, nPieceFromLetter, nPieceFromDigit, Type);
 
-    _pDobot->pieceFromTo(TO, nPieceToLetter, nPieceToDigit, chMoveType);
-    _pDobot->armUpDown(DOWN, TO, chMoveType);
-    _pDobot->gripperOpennedState(OPEN, chMoveType);
+    _pDobot->pieceFromTo(TO, nPieceToLetter, nPieceToDigit, Type);
+    _pDobot->armUpDown(DOWN, TO, Type);
+    _pDobot->gripperOpennedState(OPEN, Type);
     _pDobot->wait(300);
-    _pDobot->armUpDown(UP, TO, chMoveType);
-    _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, chMoveType);
+    _pDobot->armUpDown(UP, TO, Type);
+    _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, Type);
 
     qDebug() << "-End of move sequence-";
     emit this->addTextToConsole("-End of move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
@@ -75,158 +75,35 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
                 respond << "for tcpMsgType = " << msgType;
 }
 
-
-void Chess::TcpMoveOk() //ruch w pamięci sie powiódł. wykonaj fizyczny ruch na ramieniu
-{
-    qDebug() << "-Begin move sequence-";
-    emit this->addTextToConsole("-Begin move sequence-\n", 'd');
-
-    if (_pChessboard->castlingStatements()) //jeżeli warunki dla roszady spełnione...
-        this->castlingMovingSequence(); //...to rozpocznij roszadę
-    //enpassant wykonuje się w testach
-    else if (_pChessboard->removeStatements()  //jeżeli warunki dla bicia są spełnione...
-             && !_pChessboard->bPromotionConfirmed) //..., ale nie są spełnione dla promocji...
-    {
-        this->pieceMovingSequence('r'); //... to rozpocznij zbijanie ...
-        this->pieceMovingSequence('n'); //... a potem wykonaj normalny ruch
-    }
-    else if (_pChessboard->bPromotionConfirmed) //jeżeli tcp potwierdził wykonanie promocji to rozpocznij promocję
-    {
-        if (_pChessboard->removeStatements()) //jeżeli przy promocji następuje bicie
-            this->pieceMovingSequence('r'); //to najpierw zbijamy
-        this->pieceMovingSequence('p'); //promocja bez podmiany bierek na inne to póki co zwykły ruch
-        _pChessboard->bTestPromotion = false; //czyszczenie zmiennych
-        _pChessboard->bPromotionConfirmed = false;
-    }
-    else this->pieceMovingSequence('n'); //jak nie występuje specjalny ruch, to rozpocznij normalny ruch
-
-    //ruch niech się wykonuje, a w ten czas niech gra sprawdzi czy to nie jest koniec gry komendą 'status'
-    this->Status();
-}
-
-void Chess::TestMove(int nSender, QString moveToTest)
-{
-    qDebug() << "Chess::TestMove(QString QStrMsgFromWebsockets)";
-    _pChessboard->findBoardPos(moveToTest); //oblicz wszystkie pozycje bierek
-
-    //warunki w testach się znoszą, więc nie trzeba sprawdzać czy wykonają się oba testy.
-    if(this->testPromotion(nSender))
-        return; //jeżeli możemy mieć doczynienia z promocją, to sprawdź tą opcję i przerwij jeśli test się powiódł.
-    else if (this->testEnpassant(nSender)) return; //jeżeli możemy mieć doczynienia z enpassant, to sprawdź tą opcję i...
-    //...przerwij jeśli test się powiódł.
-    else this->MoveTcpPiece(moveToTest); //jeżeli nie mamy doczynienia ze specjalnymi...
-    //...ruchami, to wykonuj zwykły ruch, roszadę lub bicie.
-
-    //todo: przenieść całośc do chessboard?
-    if (_pChessboard->getLegalMoves().contains(moveToTest + "q")) _pChessboard->setMoveType(PROMOTION);
-    else if (_pChessboard->getLegalMoves().contains(moveToTest))
-    {
-        else if (_pChessboard->getEnpassant() != "-") _pChessboard->setMoveType(ENPASSANT);
-        else if (_pChessboard->isMoveCastling(moveToTest)) _pChessboard->setMoveType(CASTLING);
-        else if (_pChessboard->isMoveRemoving()) _pChessboard->setMoveType(REMOVING);
-        else _pChessboard->setMoveType(NORMAL)/;
-    }
-    else _pChessboard->setMoveType(BADMOVE);
-
-    if (_pChessboard->getMoveType() == BADMOVE) this->MoveTcpPiece(moveToTest);
-    else this->BadMove(moveToTest); todo: tu skonczylem, to nie zadziala, bo virtual
-
-}
-
 void Chess::castlingMovingSequence()
 {
-    this->pieceMovingSequence('c'); //wykonaj przemieszczenie królem
+    //todo: ogarnąć jakoś nadmiar zmiennych typu castling
+    this->pieceMovingSequence(CASTLING_KING); //wykonaj przemieszczenie królem
     _pChessboard->castlingFindRookToMove(); //podmień pozycje ruszonego króla na pozycję wieży
-    this->pieceMovingSequence('o'); //wykonaj przemieszczenie wieżą
+    this->pieceMovingSequence(CASTLING_ROOK); //wykonaj przemieszczenie wieżą
 }
 
 void Chess::enpassantMovingSequence()
 {
     //wykonaj normalny ruch. enpassant to jedyny przypadek bicia, gdzie mogę zbić po normalnym ruchu.
-    this->pieceMovingSequence('e');
+    this->pieceMovingSequence(ENPASSANT);
 
     int nTempDigitPos = _pChessboard->PieceTo.Digit; //w razie czego zapaiętaj oryginalną wartość pola (cyfry) bijącego
-    if (_pWebTable->getWhoseTurn() == "white_turn")
+    if (_pChessboard->getWhoseTurn() == WHITE_TURN) //todo
         _pChessboard->PieceTo.Digit -= 1; //pozycja zbijanego czarnego pionka przez pionka białego w jego turze (białego)
-    else if (_pWebTable->getWhoseTurn() == "black_turn")
+    else if (_pChessboard->getWhoseTurn() == BLACK_TURN)
         _pChessboard->PieceTo.Digit += 1; //pozycja zbijanego białego pionka przez pionka czarnego w jego turze (czarnego)
     else
     {
         emit _pDobot->addTextToConsole("Error03!: Wrong turn in enpassant statement: "
-                                            + _pWebTable->getWhoseTurn() + "/n", 'd');
+                                            + (QString)_pChessboard->getWhoseTurn() + "/n", 'd');
         qDebug() << "Error03!: Chess::enpassantMovingSequence(): Unknown turn type: "
-                 << _pWebTable->getWhoseTurn() << "/n";
+                 << _pChessboard->getWhoseTurn() << "/n";
         return;
     }
     //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
-    this->pieceMovingSequence('r'); //usuń pionka bitego ze  zmienioną pozycją.
+    this->pieceMovingSequence(REMOVING); //usuń pionka bitego ze  zmienioną pozycją.
     _pChessboard->PieceTo.Digit = nTempDigitPos; //wróć prewencyjnie w pamięci do normalnej pozycji
-
-    //TODO: te testy mogłyby by być bardziej na poziomie tcp, tzn odpowiedź z tcp mogłaby być...
-    //...modyfikowana jeszcze przed wyjściem z ciała obiektu tcp, tak by te flagi tam były wyłączane.
-    _pChessboard->bTestEnpassant = false; //wyłączenie, by nie zapętlać testów w odpowiedzi tcp.
-}
-
-//TODO: zamiast testować mogę to zestawiać z listą legalnych ruchów (zapytanie do chenard: "legal")
-bool Chess::testPromotion(int nSender) //sprawdzanie możliwości wystąpienia promocji
-{
-    //poniżym warunkiem eliminuję jak największą ilość przypadkowych zapytań testowych do tcp o promocję
-    if (((_pWebTable->getWhoseTurn() == "white_turn" &&  _pChessboard->PieceFrom.Digit == 6
-          && _pChessboard->PieceTo.Digit == 7   //jeżeli w turze białego bierka chce isć z pola 7 na 8...
-          && (_pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] > 8 //...i jeżeli ruszany to...
-              && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] <= 16)) //...biały pionek...
-         || (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 1
-             && _pChessboard->PieceTo.Digit == 0    //...lub z pola 1 na 0 w turze czarnego...
-             && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter]
-             [_pChessboard->PieceFrom.Digit] > 48)) //...i jeśli jest to czarny pionek...
-            && abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) <= 1) //... i ruch odbywa się max o 1 pole odległości...
-        //...liter po ukosie (0 dla zwykłego ruchu, 1 dla bicia)
-    {
-        _pChessboard->bTestPromotion = true;
-        _pChessboard->QsFuturePromote = _pChessboard->QsPiecieFromTo; //póki nie wiadomo na co promujemy to zapamiętaj zapytanie o ten ruch
-        _pTCPMsgs->queueMsgs(nSender, "test " +
-                             _pChessboard->QsPiecieFromTo + "q"); //test awansu na cokolwiek (królową), który pójdzie na chenard
-        //odpowiedź z tcp będzie miała formę: "Ok e2e4 (...)" lub "ILLEGAL"
-        return 1;
-    }
-    else return 0;
-}
-
-//TODO: zamiast testować mogę to zestawiać z listą legalnych ruchów (zapytanie do chenard: "legal")
-bool Chess::testEnpassant(int nSender) //sprawdzanie możliwości wystąpienia enpassant
-{
-    //sprawdzamy czy zapytanie/ruch może być biciem w przelocie
-    if (abs(_pChessboard->PieceFrom.Letter - _pChessboard->PieceTo.Letter) == 1  //jeżeli pionek nie idzie po prostej...
-            //...(tj. po ukosie o 1 pole)...
-            && ((_pWebTable->getWhoseTurn() == "white_turn" && _pChessboard->PieceFrom.Digit == 4
-                 && _pChessboard->PieceTo.Digit == 5  //... i jeżeli bije biały z pola 5 na 6
-                 && (_pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] > 8 //...i jeżeli ruszany to...
-                     && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter][_pChessboard->PieceFrom.Digit] <= 16)) //...biały pionek...)
-                || (_pWebTable->getWhoseTurn() == "black_turn" && _pChessboard->PieceFrom.Digit == 3
-                    && _pChessboard->PieceTo.Digit == 2  //... lub czarny bije z pola 4 na 3...
-                    && _pChessboard->anBoard[_pChessboard->PieceFrom.Letter]
-                    [_pChessboard->PieceFrom.Digit] > 48)) //...i jeśli jest to czarny pionek...
-            //... i pole na które idzie pionek nie jest zajete (inaczej byłoby to zwykłe bicie, a nie bicie w przelocie)
-            && _pChessboard->anBoard[_pChessboard->PieceTo.Letter][_pChessboard->PieceFrom.Digit] == 0)
-    {
-        _pChessboard->bTestEnpassant = true; //przy sprawdzaniu odpowiedzi z tcp warunek wpadnie na tą flagę, zamiast na normalny ruch
-        _pTCPMsgs->queueMsgs(nSender, "test " + _pChessboard->QsPiecieFromTo);
-        return 1; //możemy mieć do czynienia z enpassant
-    }
-    else return 0;
-}
-
-void Chess::TestOk()
-{
-    if(_pChessboard->bTestPromotion) //jeżeli to test na promocję wg tcp się powiódł
-        this->PromoteToWhat();
-    else if (_pChessboard->bTestEnpassant)
-        this->enpassantMovingSequence(); //jeżeli test na enpassant się powiódł, to rozpocznij ten ruch
-    else
-    {
-        qDebug() << "Error: Chess::TestOk: None test is true.";
-        emit this->addTextToConsole("Error: Chess::TestOk: None test is true.\n", 'w');
-    }
 }
 
 void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new game"
@@ -294,7 +171,7 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
                     if(nRemovedFieldPieceType > 0) //jeżeli na polu zbitych jest bierka, która startowo stoi na aktualnie sprawdzanym polu
                     {
                         qDebug() << "Chess::resetPiecePositions(): put piece back on its empty checked field from removed area";
-                        this->pieceMovingSequence('s', //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
+                        this->pieceMovingSequence(RESTORE, //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
                                                   _pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, ROW),
                                                   _pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, COLUMN),
                                                   _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
@@ -312,7 +189,7 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
                                 //...na obcym polu startowym)
                             {
                                 //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                                this->pieceMovingSequence('n',_pChessboard->fieldNrToFieldPos(nField, ROW),
+                                this->pieceMovingSequence(REGULAR,_pChessboard->fieldNrToFieldPos(nField, ROW),
                                                           _pChessboard->fieldNrToFieldPos(nField, COLUMN),
                                                           _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
                                                           _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
@@ -330,7 +207,7 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
                         qDebug() << "Chess::resetPiecePositions(): put piece from checked field to its own empty start field";
 
                         //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                        this->pieceMovingSequence('n', _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
+                        this->pieceMovingSequence(REGULAR, _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
                                                   _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN),
                                                   _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
                                                   _pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN));
@@ -352,19 +229,19 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
                             qDebug() << "Chess::resetPiecePositions(): 2 pieces on each other start field. Remove 2nd, move 1st, restore 2nd.";
 
                             //to przenieś ją na chwilę na jej miejsce na obszarze bierek zbitych.
-                            this->pieceMovingSequence('r', _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
+                            this->pieceMovingSequence(REMOVING, _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
                                                       _pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN),
                                                       _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW),
                                                       _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN));
 
                             //teraz przenieś bierkę z pola aktualnie sprawdzanego, na pole bierki dopiero co odłożonej na obszar bierek zbitych
-                            this->pieceMovingSequence('n', _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
+                            this->pieceMovingSequence(REGULAR, _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
                                                       _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN),
                                                       _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
                                                       _pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN));
 
                             //na końcu bierkę odłożoną poza planszę przywróć na pole bierki wcześniej przestawionej
-                            this->pieceMovingSequence('s', _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW),
+                            this->pieceMovingSequence(RESTORE, _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW),
                                                       _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN),
                                                       _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
                                                       _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
@@ -421,4 +298,55 @@ void Chess::resetPiecePositions() //dostaliśmy komunikat "end game" albo "new g
     }
     qDebug() << "Chess::resetBoardCompleted().";
     this->resetBoardCompleted();
+}
+
+void Chess::handleMove(QString move)
+{
+    qDebug() << "Chess::handleMove =" << move;
+    _pChessboard->findBoardPos(move);
+
+    _pChessboard->setMoveType(this->checkMoveType(move));
+
+    switch(_pChessboard->getMoveType())
+    {
+    case PROMOTE_TO_WHAT:
+        this->PromoteToWhat(move);
+        break;
+    case ENPASSANT:
+        this->enpassantMovingSequence();
+        this->MoveTcpPiece("move " + move);
+        break;
+    case CASTLING:
+        this->castlingMovingSequence();
+        this->MoveTcpPiece("move " + move);
+        break;
+    case REMOVING:
+        this->pieceMovingSequence(REMOVING);
+        this->MoveTcpPiece("move " + move);
+        break;
+    case REGULAR:
+        this->pieceMovingSequence(REGULAR);
+        this->MoveTcpPiece("move " + move);
+        break;
+    case BADMOVE:
+        this->BadMove(move);
+        break;
+    case NONE:
+    default:
+        qDebug() << "ERROR: Chess::handleMove: wrong MoveType :" << _pChessboard->getMoveType();
+        break;
+    }
+}
+
+MOVE_TYPE Chess::checkMoveType(QString move)
+{
+    if (_pChessboard->getLegalMoves().contains(move + "q")) return PROMOTE_TO_WHAT;
+    else if (_pChessboard->getLegalMoves().contains(move))
+    {
+        if (_pChessboard->isMoveEnpassant(move)) return ENPASSANT;
+        else if (_pChessboard->isMoveCastling(move)) return CASTLING;
+        else if (_pChessboard->isMoveRemoving()) return REMOVING;
+        else return REGULAR;
+    }
+    else return BADMOVE;
 }

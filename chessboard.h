@@ -12,7 +12,8 @@ struct ArmPosition
 };
 
 enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //TODO: praktycznie powtórzenie z webtable
-enum MOVE_TYPE { NONE, BADMOVE, NORMAL, PROMOTION, ENPASSANT, CASTLING, REMOVING };
+enum MOVE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT,
+                 CASTLING, CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
 
 //TODO: chessboard powinien być obiektem klasy chess
 class Chessboard: public QObject
@@ -21,7 +22,7 @@ class Chessboard: public QObject
 
 private:
     QString m_QStrGameStatus;
-    QString m_QStrBoard;
+    QString m_QStrBoard[8][8];
     WHOSE_TURN m_WhoseTurn;
     QString m_QStrCastlings;
     QString m_QStrEnpassant;
@@ -30,9 +31,8 @@ private:
 
     void changeWindowTitle();
 
-    void gameState(QString QStrGameState);
-    QString FENToBoard(QString FENBoard);
-    WHOSE_TURN whoseTurn(QString whoseTurn);
+    void FENToBoard(QString FENBoard);
+    WHOSE_TURN whoseTurn(QString whoseTurn); //TODO: to samo co w _pWebTable
 
 public:
     Chessboard();
@@ -43,10 +43,12 @@ public:
     int fieldNrToFieldPos(int nfieldNr, bool bRow);
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);
+    bool isMoveEnpassant(QString moveToTest);
     void castlingFindRookToMove();
     void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
-                           int nPieceDigit, char chMoveType);
+                           int nPieceDigit, MOVE_TYPE Type);
     bool compareArrays(int nArray1[][8], int nArray2[][8]);
+    void saveStatusData(QString status);
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
@@ -57,13 +59,7 @@ public:
 
     int nGripperPiece;                  // nr bierki znajdującej się aktualnie w chwytaku
 
-    bool bTestEnpassant;                //czy wewnętrzny powierzchowny test na enpassant się powiódł
-
-    bool bTestPromotion;                //czy wewnętrzny powierzchowny test na promocję się powiódł
-    QString QsFuturePromote;            //zmienna pamiętająca jakie było zapytanie o ruch typu promocja...
-    //... Pójdzie drugie zapytanie na WWW i potrzeba będzie później stare skądś odczytać.
-    bool bPromotionConfirmed;           //gdy podczas promocji pojawi się zbijanie, to dzięki tej...
-    //...zmiennej program wie co i jak zbijać podczas ruchu typu promocja.
+    QString QStrFuturePromote;
 
     /*const*/ int anStartBoard[8][8];       //do sprawdzania przy odkładaniu bierek na miejsce czy ...
                                         //...szachownica osiągła swoje startowe ułożenie bierek.
@@ -82,19 +78,18 @@ public:
     double adRemovedPiecesPositions_z[8][4];
 
     //metody dostępowe
-    void setWhoseTurn (WHOSE_TURN Turn) { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
-    void setMoveType (MOVE_TYPE Type)   { m_moveType = Type; }
+    void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
+    void setMoveType (MOVE_TYPE Type)           { m_moveType = Type; }
+    void setLegalMoves(QStringList legalMoves)  { m_legalMoves = legalMoves; }
 
     void clearLegalMoves()              { m_legalMoves.clear(); }
 
     QString getGameStatus()             { return m_QStrGameStatus; }
-    QString getBoard()                  { return m_QStrBoard; }
     WHOSE_TURN getWhoseTurn ()          { return m_WhoseTurn; }
     MOVE_TYPE getMoveType()             { return m_moveType; }
     QString getCastlings()              { return m_QStrCastlings; }
     QString getEnpassant()              { return m_QStrEnpassant; }
     QStringList getLegalMoves()         { return m_legalMoves; }
-
 
 signals:
     void addTextToConsole(QString);

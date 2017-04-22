@@ -298,24 +298,26 @@ void Dobot::gripperAngle(float fDutyCycle)
 }
 
 ///TYPY RUCHÓW PO PLANSZY
-void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char chMoveType)
+void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, MOVE_TYPE Type)
 {
     float f_xFromTo, f_yFromTo, f_zFromTo, f_rFromTo;
     //jeżeli bierka jest usuwania na pola zbite(pieceTo) albo przywracania z pól zbitych(pieceFrom)
-    if ((chMoveType == 'r' && !bIsPieceMovingFrom) || (chMoveType == 's' && bIsPieceMovingFrom))
+    if ((Type == REMOVING && !bIsPieceMovingFrom) || (Type == RESTORE && bIsPieceMovingFrom))
     {
         int nRemPiece, nRemPieceDestLetter, nRemPieceDestDigit;
-        if (chMoveType == 'r') //jako że usuwanie na obszar zbity jest drugim ruchem, to...
+        if (Type == REMOVING) //jako że usuwanie na obszar zbity jest drugim ruchem, to...
             //...pozycję docelową bierki możemy wywnioskować z bierki trzymanej przez chwytak
         {
+            qDebug() << "pieceFromTo move type = REMOVING";
             nRemPiece = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
             nRemPieceDestLetter = _pChessboard->fieldNrToFieldPos(nRemPiece, ROW);
             nRemPieceDestDigit = _pChessboard->fieldNrToFieldPos(nRemPiece, COLUMN);
         }
-        else if (chMoveType == 's') //dla restore() pozycja pola na obszarze usuniętych musi...
+        else if (Type == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
             //...być podana wprost do pieceFromTo()
         {
-            //dla 's' wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
+            qDebug() << "pieceFromTo move type = RESTORE";
+            //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
             nRemPieceDestLetter = nLetter;
             nRemPieceDestDigit = nDigit;
         }
@@ -327,19 +329,20 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     //reszta ruchów: normalne ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
     else
     {
+        qDebug() << "pieceFromTo move type = REST";
         f_xFromTo = _pChessboard->adChessboardPositions_x[nLetter][nDigit];
         f_yFromTo = _pChessboard->adChessboardPositions_y[nLetter][nDigit];
         f_zFromTo = _pChessboard->adChessboardPositions_z[nLetter][nDigit];
         f_rFromTo = m_nActualPos;
-        qDebug() << "x=" << f_xFromTo << ", y=" << f_yFromTo << ", z=" << f_zFromTo;
+        //qDebug() << "x=" << f_xFromTo << ", y=" << f_yFromTo << ", z=" << f_zFromTo;
     }
     
-    this->writeMoveTypeInConsole(chMoveType);
+    this->writeMoveTypeInConsole(Type);
     
     QString QsMoveType = "";
     bIsPieceMovingFrom ? QsMoveType = ": PieceFrom: " : QsMoveType = ": Pieceto: ";
     qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
-             << nLetter << ", nDigit =" << nDigit;
+             << nLetter << ", nDigit =" << nDigit << ", Type =" << Type;
     emit this->addTextToConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
                                      + QString::number(nDigit+1) + "\n", '0');
     
@@ -349,10 +352,10 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, char c
     _pChessboard->PieceActualPos.Digit = nDigit;
 }
 
-void Dobot::gripperOpennedState(bool isGripperOpened, char chMovetType) //open/close
+void Dobot::gripperOpennedState(bool isGripperOpened, MOVE_TYPE Type) //open/close
 {
     this->addCmdToList(GRIPPER, isGripperOpened);
-    this->writeMoveTypeInConsole(chMovetType, isGripperOpened ? 'o' : 'c'); //o-open, c-close
+    this->writeMoveTypeInConsole(Type, isGripperOpened ? 'o' : 'c'); //o-open, c-close
 }
 
 void Dobot::wait(int nMs)
@@ -362,12 +365,13 @@ void Dobot::wait(int nMs)
     this->addCmdToList(WAIT);
 }
 
-void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMoveType)
+void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, MOVE_TYPE Type)
 { //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     //pozycje obszaru bierek usuniętych
-    if (chMoveType == 'r' && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszar zbitych...
+    if (Type == REMOVING && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszar zbitych...
     {
+        qDebug() << "Dobot::armUpDown: _pChessboard->nGripperPiece =" << _pChessboard->nGripperPiece;
         qDebug() << "Dobot::armUpDown: nRemovingRWPos ="
                  << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)
                  << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)
@@ -386,7 +390,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
                 [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
         f_rUpDown = m_nActualPos;
     }
-    else if (chMoveType == 's' && bIsArmAboveFromSquare) //...lub pochwycamy bierkę z obszaru zbitych
+    else if (Type == RESTORE && bIsArmAboveFromSquare) //...lub pochwycamy bierkę z obszaru zbitych
     {
         qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->PieceActualPos.Letter
                  << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << isArmGoingUp;
@@ -416,7 +420,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMove
     }
     this->addCmdToList(NORMAL, false, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
     
-    this->writeMoveTypeInConsole(chMoveType, isArmGoingUp ? 'u' : 'd'); //u-up, d-down
+    this->writeMoveTypeInConsole(Type, isArmGoingUp ? 'u' : 'd'); //u-up, d-down
 }
 
 //TODO: chyba to się niczym nie różni od Dobot::pieceFromTo oprócz szachownicy/usuniętych
@@ -453,21 +457,21 @@ void Dobot::addCmdToList(int nType, bool bState, float x, float y, float z, floa
     QueuedCmdIndexList << m_posIdx; //wepchnij do kontenera strukturę. << == append == push_back
 }
 
-void Dobot::writeMoveTypeInConsole(char chMoveType, char chMoveState)
+void Dobot::writeMoveTypeInConsole(MOVE_TYPE Type, char chMoveState)
 {
     QString QsConsoleMsg;
-    switch(chMoveType)
+    switch(Type)
     {
-    case 'n': QsConsoleMsg = "normal"; break; //ruch z szachownicy na szachownicę (zwykły)
-    case 'c': QsConsoleMsg = "castling(king)"; break; //ruch po szachownicy (roszada królem)
-    case 'o': QsConsoleMsg = "castling(rook)"; break; //ruch po szachownicy (roszada wieżą)
-    case 'e': QsConsoleMsg = "enpassant"; break; //ruch z szachownicy na szachownicę (enpassant)
-    case 'p': QsConsoleMsg = "promotion"; break; //ruch z szachownicy na szachownicę (promocja)
-    case 'r': QsConsoleMsg = "remove"; break; //ruch z szachownicy na obszar zbitych bierek
-    case 's': QsConsoleMsg = "restore"; break; //ruch z obszaru zbitych bierek na szachownicę
-    case 'v': QsConsoleMsg = "service"; break; //ruch serwisowy
+    case REGULAR: QsConsoleMsg = "normal"; break; //ruch z szachownicy na szachownicę (zwykły)
+    case CASTLING_KING: QsConsoleMsg = "castling(king)"; break; //ruch po szachownicy (roszada królem)
+    case CASTLING_ROOK: QsConsoleMsg = "castling(rook)"; break; //ruch po szachownicy (roszada wieżą)
+    case ENPASSANT: QsConsoleMsg = "enpassant"; break; //ruch z szachownicy na szachownicę (enpassant)
+    case PROMOTION: QsConsoleMsg = "promotion"; break; //ruch z szachownicy na szachownicę (promocja)
+    case REMOVING: QsConsoleMsg = "remove"; break; //ruch z szachownicy na obszar zbitych bierek
+    case RESTORE: QsConsoleMsg = "restore"; break; //ruch z obszaru zbitych bierek na szachownicę
+    case SERVICE: QsConsoleMsg = "service"; break; //ruch serwisowy
     default: QsConsoleMsg = "ERROR. Wrong movement type: "
-                + static_cast<QString>(chMoveType) + "\n"; break;
+                + static_cast<QString>(Type) + "\n"; break;
     }
     emit this->addTextToConsole(QsConsoleMsg + "PieceMove", 'd');
     

@@ -73,15 +73,15 @@ public:
 
     void gripperAngle(float fDutyCycle);
 
-    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, char chMoveType);
-    void gripperOpennedState(bool gripperOpened, char chMovetType);
+    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, MOVE_TYPE Type);
+    void gripperOpennedState(bool gripperOpened, MOVE_TYPE Type);
     void wait(int nMs);
     void addCmdToList(int nType = -1, bool bState = false, float x = ACTUAL_POS,
                       float y = ACTUAL_POS, float z = ACTUAL_POS,
                       float r = ACTUAL_POS);
-    void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, char chMovementType);
+    void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, MOVE_TYPE Type);
     void removePiece(int nPieceRowPos, int nPieceColumnPos);
-    void writeMoveTypeInConsole(char chMoveType, char chMoveState = 'x');
+    void writeMoveTypeInConsole(MOVE_TYPE Type, char chMoveState = 'x');
     void QueuedIdList();
 
     //metody dostępowe do pól
