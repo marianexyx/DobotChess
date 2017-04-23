@@ -95,11 +95,13 @@ void Chessboard::findBoardPos(QString QsPiecePositions)
 {
     PieceFrom.Letter = this->findPieceLetterPos(QsPiecePositions.left(1));
     PieceFrom.Digit = QsPiecePositions.mid(1,1).toInt() - 1;
-    qDebug() << "Chessboard::findBoardPos: PieceFrom.Digit =" << PieceFrom.Digit;
 
     PieceTo.Letter = this->findPieceLetterPos(QsPiecePositions.mid(2,1));
     PieceTo.Digit = QsPiecePositions.mid(3,1).toInt() - 1;
-    qDebug() << "Chessboard::findBoardPos: PieceTo.Digit =" << PieceTo.Digit;
+    qDebug() << "Chessboard::findBoardPos: PieceFrom.Letter =" << PieceFrom.Letter <<
+                ", PieceFrom.Digit =" << PieceFrom.Digit <<
+                ", PieceTo.Letter =" << PieceTo.Letter <<
+                ", PieceTo.Digit =" << PieceTo.Digit;
 }
 
 int Chessboard::findPieceLetterPos(QString QsLetter)
@@ -355,7 +357,7 @@ void Chessboard::FENToBoard(QString FENBoard)
                 QString QStrFENSign = FENSigns.at(nFENSignPos);
                 if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
                 {
-                    m_QStrBoard[nRow][nColumn] = QStrFENSign;
+                    m_QStrBoard[nColumn][nRow] = QStrFENSign;
                     if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn>8 =" << nColumn;
                     ++nColumn;
                 }
@@ -363,7 +365,7 @@ void Chessboard::FENToBoard(QString FENBoard)
                 {
                     for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
                     {
-                        m_QStrBoard[nRow][nColumn] = "0";
+                        m_QStrBoard[nColumn][nRow] = "0";
                         if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn>8 =" << nColumn;
                         ++nColumn;
                     }
@@ -378,12 +380,7 @@ void Chessboard::FENToBoard(QString FENBoard)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
 
-    for (int i=0; i<=7; ++i)
-    {
-        qDebug() << "Board's row" << i+1 << "pieces =" << m_QStrBoard[i][0] << m_QStrBoard[i][1] <<
-                    m_QStrBoard[i][2] << m_QStrBoard[i][3] << m_QStrBoard[i][4] << m_QStrBoard[i][5] <<
-                    m_QStrBoard[i][6] << m_QStrBoard[i][7];
-    }
+    this->showBoardInDebug();
 }
 
 WHOSE_TURN Chessboard::whoseTurn(QString whoseTurn)
@@ -394,5 +391,15 @@ WHOSE_TURN Chessboard::whoseTurn(QString whoseTurn)
     {
         return NO_TURN;
         qDebug () << "ERROR: IgorBot::checkMsgFromChenard- unknown turn type from status";
+    }
+}
+
+void Chessboard::showBoardInDebug()
+{
+    for (int i=0; i<=7; ++i)
+    {
+        qDebug() << "Board's row" << i+1 << "pieces =" << m_QStrBoard[i][0] << m_QStrBoard[i][1] <<
+                    m_QStrBoard[i][2] << m_QStrBoard[i][3] << m_QStrBoard[i][4] << m_QStrBoard[i][5] <<
+                    m_QStrBoard[i][6] << m_QStrBoard[i][7];
     }
 }

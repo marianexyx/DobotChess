@@ -49,6 +49,7 @@ public:
                            int nPieceDigit, MOVE_TYPE Type);
     bool compareArrays(int nArray1[][8], int nArray2[][8]);
     void saveStatusData(QString status);
+    void showBoardInDebug();
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?

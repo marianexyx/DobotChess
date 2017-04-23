@@ -162,7 +162,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(log->sizePolicy().hasHeightForWidth());
         log->setSizePolicy(sizePolicy);
-        log->setMinimumSize(QSize(100, 0));
+        log->setMinimumSize(QSize(300, 0));
         log->setBaseSize(QSize(500, 0));
         verticalLayout = new QVBoxLayout(log);
         verticalLayout->setSpacing(6);

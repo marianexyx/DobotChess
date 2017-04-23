@@ -322,6 +322,7 @@ void Chess::handleMove(QString move)
         break;
     case REMOVING:
         this->pieceMovingSequence(REMOVING);
+        this->pieceMovingSequence(REGULAR);
         this->MoveTcpPiece("move " + move);
         break;
     case REGULAR:
