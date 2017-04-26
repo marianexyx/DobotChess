@@ -139,19 +139,10 @@
           <string>Simulate player msg </string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
-          <item row="1" column="1">
-           <widget class="QPushButton" name="sendSimulatedMsgBtn">
+          <item row="2" column="0">
+           <widget class="QLineEdit" name="sendTcpLineEdit">
             <property name="enabled">
              <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>SendWS</string>
-            </property>
-            <property name="autoDefault">
-             <bool>true</bool>
-            </property>
-            <property name="default">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -172,20 +163,29 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLineEdit" name="sendTcpLineEdit">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
+          <item row="2" column="1" colspan="2">
            <widget class="QPushButton" name="sendTcpBtn">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
              <string>SendTCP</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="sendSimulatedMsgBtn">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Send</string>
+            </property>
+            <property name="autoDefault">
+             <bool>true</bool>
+            </property>
+            <property name="default">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -271,27 +271,14 @@
           <string>Arduino Igor</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="2" column="4">
-           <widget class="QPushButton" name="AIBtn">
+          <item row="5" column="2" colspan="2">
+           <widget class="QLineEdit" name="AIEnemyLineEdit">
             <property name="enabled">
              <bool>false</bool>
             </property>
-            <property name="text">
-             <string>Set</string>
-            </property>
            </widget>
           </item>
-          <item row="4" column="2">
-           <widget class="QCheckBox" name="simulateArduinoPlayer2checkBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>SimP2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="4">
+          <item row="5" column="5">
            <widget class="QPushButton" name="AIEnemySendBtn">
             <property name="enabled">
              <bool>false</bool>
@@ -301,10 +288,13 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="3">
-           <widget class="QLineEdit" name="AIEnemyLineEdit">
+          <item row="2" column="5">
+           <widget class="QPushButton" name="AIBtn">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Set</string>
             </property>
            </widget>
           </item>
@@ -328,6 +318,16 @@
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="4">
+           <widget class="QCheckBox" name="simulateArduinoPlayer2checkBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>SimP2</string>
             </property>
            </widget>
           </item>

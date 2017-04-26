@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ArduinoUsb_t {
     QByteArrayData data[10];
-    char stringdata0[121];
+    char stringdata0[114];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,18 +33,18 @@ QT_MOC_LITERAL(0, 0, 10), // "ArduinoUsb"
 QT_MOC_LITERAL(1, 11, 16), // "addTextToConsole"
 QT_MOC_LITERAL(2, 28, 0), // ""
 QT_MOC_LITERAL(3, 29, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(4, 49, 12), // "AIEnemyStart"
-QT_MOC_LITERAL(5, 62, 11), // "AIEnemySend"
-QT_MOC_LITERAL(6, 74, 11), // "TcpQueueMsg"
-QT_MOC_LITERAL(7, 86, 16), // "portIndexChanged"
-QT_MOC_LITERAL(8, 103, 5), // "index"
-QT_MOC_LITERAL(9, 109, 11) // "readUsbData"
+QT_MOC_LITERAL(4, 49, 5), // "reset"
+QT_MOC_LITERAL(5, 55, 11), // "AIEnemySend"
+QT_MOC_LITERAL(6, 67, 11), // "TcpQueueMsg"
+QT_MOC_LITERAL(7, 79, 16), // "portIndexChanged"
+QT_MOC_LITERAL(8, 96, 5), // "index"
+QT_MOC_LITERAL(9, 102, 11) // "readUsbData"
 
     },
     "ArduinoUsb\0addTextToConsole\0\0"
-    "updatePortsComboBox\0AIEnemyStart\0"
-    "AIEnemySend\0TcpQueueMsg\0portIndexChanged\0"
-    "index\0readUsbData"
+    "updatePortsComboBox\0reset\0AIEnemySend\0"
+    "TcpQueueMsg\0portIndexChanged\0index\0"
+    "readUsbData"
 };
 #undef QT_MOC_LITERAL
 
@@ -94,7 +94,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
         case 1: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 2: _t->AIEnemyStart(); break;
+        case 2: _t->reset(); break;
         case 3: _t->AIEnemySend((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 4: _t->TcpQueueMsg((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 5: _t->portIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -120,7 +120,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         }
         {
             typedef void (ArduinoUsb::*_t)();
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ArduinoUsb::AIEnemyStart)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ArduinoUsb::reset)) {
                 *result = 2;
                 return;
             }
@@ -193,7 +193,7 @@ void ArduinoUsb::updatePortsComboBox(int _t1)
 }
 
 // SIGNAL 2
-void ArduinoUsb::AIEnemyStart()
+void ArduinoUsb::reset()
 {
     QMetaObject::activate(this, &staticMetaObject, 2, Q_NULLPTR);
 }

@@ -33,6 +33,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 
     connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgForChenard(QString)));
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(int, QString)), _pTCPmsg, SLOT(TcpQueueMsg(int, QString)));
+    connect(_pArduinoUsb, SIGNAL(reset()), _pIgorBot, SLOT(resetPiecePositions()));
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
     connect(_pDobotArm, SIGNAL(addTextToConsole(QString,char)),
@@ -355,19 +356,23 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             QString QsServiceMsg = ui->emulatePlayerMsgLineEdit->text();
             if (QsServiceMsg.left(4) == "move") QsServiceMsg = QsServiceMsg.mid(7);
             qDebug() << "QsServiceMsg.mid(7) = " << QsServiceMsg;
-            //qDebug() << "QsServiceMsg = " << QsServiceMsg;
+
             int nServiceLetterPos = _pChessboard->findPieceLetterPos(QsServiceMsg.left(1));
             int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
-            //qDebug() << "nServiceLetterPos = " << nServiceLetterPos
-            //<< ", nServiceDigitPos = " << nServiceDigitPos;
-            float fService_x = _pChessboard->adChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
-            float fService_y = _pChessboard->adChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
-            float fService_z = _pChessboard->adChessboardPositions_z[nServiceLetterPos][nServiceDigitPos];
-            qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y <<
-                        ", fService_z = " << fService_z;
-            _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, fService_z + _pDobotArm->getMaxPieceHeight(), ACTUAL_POS);
-            _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
-            _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
+
+            if (QsServiceMsg.right(1) != "r")
+            {
+                float fService_x = _pChessboard->adChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
+                float fService_y = _pChessboard->adChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
+                float fService_z = _pChessboard->adChessboardPositions_z[nServiceLetterPos][nServiceDigitPos];
+                qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y <<
+                            ", fService_z = " << fService_z;
+
+                _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, fService_z +
+                                         _pDobotArm->getMaxPieceHeight(), ACTUAL_POS);
+                _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
+                _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
+            }
             if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);
         }
         else //dotyczy tylko gracza z WWW
@@ -483,7 +488,8 @@ void MainWindow::on_AIEnemySendBtn_clicked()
 QString MainWindow::checkMoveForTcp(QString QsFT)
 {
     QString QsRespond;
-    if (QsFT.length() == 4) //np. 'e2e4'
+    if (QsFT.length() == 4 || (QsFT.length() == 5 && (QsFT.right(1) == "q" || QsFT.right(1) == "r" ||
+                                                      QsFT.right(1) == "b" || QsFT.right(1) == "k")))
     {
         //TODO: nie ogarniam wyrażeń regularnych:
         if ((QsFT.at(0) == 'a' || QsFT.at(0) == 'b' || QsFT.at(0) == 'c' || QsFT.at(0) == 'd' ||
@@ -498,9 +504,9 @@ QString MainWindow::checkMoveForTcp(QString QsFT)
             QsRespond = "move " + QsFT;
             _pIgorBot->checkMsgForChenard(QsRespond); //wyślij zapytanie o ruch jak z arduino
         }
-        else QsRespond = "ERROR: Chess::AIEnemySend(: Wrong square positions\n";
+        else QsRespond = "ERROR: MainWindow::checkMoveForTcp: Wrong square positions\n";
     }
-    else QsRespond = "ERROR: Chess::AIEnemySend(: Wrong lenght of move cmd\n";
+    else QsRespond = "ERROR: MainWindow::checkMoveForTcp: Wrong lenght of move cmd\n";
 
     return QsRespond;
 }

@@ -56,12 +56,14 @@ public slots:
     virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0; //protected slot?
     virtual void checkMsgForChenard(QString msg) = 0; //protected slot?
 
+    //---------------STEROWANIE RAMIENIEM--------------//
+    void resetPiecePositions();
+
 public:
     Chess(); //czysto wirtualne klasy muszą mieć pusty konstruktor
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
 
     //---------------STEROWANIE RAMIENIEM--------------//
-    void resetPiecePositions();
     void pieceMovingSequence(MOVE_TYPE Type,
                              int nPieceFromLetter = -1, int nPieceFromDigit = -1,
                              int nPieceToLetter = -1, int nPieceToDigit = -1);

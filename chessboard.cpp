@@ -31,10 +31,10 @@ Chessboard::Chessboard():
     nGripperPiece = 0;
 
 
-    double a1_x = 169.7; double a1_y = 76.0; double a1_z = -20.8;
-    double a8_x = 317.6; double a8_y = 70.6; double a8_z = -15.6;
-    double h1_x = 163.8; double h1_y = -92.2; double h1_z = -20.6;
-    double h8_x = 317.6; double h8_y = -87.3; double h8_z = -16.1;
+    double a1_x = 168.8; double a1_y = 77.4; double a1_z = -21.9;
+    double a8_x = 317.0; double a8_y = 71.8; double a8_z = -16.6;
+    double h1_x = 164.7; double h1_y = -91.2; double h1_z = -21.5;
+    double h8_x = 314.0; double h8_y = -85.5; double h8_z = -16.3;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
     for (int digit = 0; digit <= 7; digit++)
@@ -53,40 +53,22 @@ Chessboard::Chessboard():
         }
     }
 
-    /*prawa strona:
-    x = 100 (skok po 25 mm)
-    rząd bliżej środka: y = -155
-    rząd zewnętrzny:    y = -185
-    z_max = 56
-    dla x = 100, y = -155  wynik z = -22.5
-    dla x = 275, y = -185  wynik z = -17
-
-    środek: x = 130, y = 0
-
-    lewa strona zatem:
-    x = 100 (skok po 25 mm)
-    rząd bliżej środka: y = 140
-    rząd zewnętrzny:    y = 170
-    z_max = 40 (a dla y = 145 -> z_max = 44.5)
-    dla x = 100, y = 140  wynik z = -22.3
-    dla x = 275, y = 170  wynik z = -16.5*/
-
     for (int column = 0; column <= 1; column++)
     {
         for (int row = 0; row <= 7; row++)
         {
-            adRemovedPiecesPositions_x[row][column] = 125 + row*25;
-            adRemovedPiecesPositions_y[row][column] = 170 - column*25;
-            adRemovedPiecesPositions_z[row][column] = -22.3 - row*((-22.3 + 16.5)/7);
+            adRemovedPiecesPositions_x[row][column] = 115.f + row*((266.7-115.f)/7.f);
+            adRemovedPiecesPositions_y[row][column] = 177.f - column*21.2 + (-7.8/7.f)*row; //169.2-177= -7.8
+            adRemovedPiecesPositions_z[row][column] = -21.f - row*((-21.f + 20.f)/7.f);
         }
     }
     for (int column = 2; column <= 3; column++)
     {
         for (int row = 0; row <= 7; row++)
         {
-            adRemovedPiecesPositions_x[row][column] = 125 + row*25;
-            adRemovedPiecesPositions_y[row][column] = -160 - ((column-2)*25);
-            adRemovedPiecesPositions_z[row][column] = -22.5 - row*((-22.5 + 17)/7);
+            adRemovedPiecesPositions_x[row][column] = 118.7 + row*((271.5-118.7)/7.f);
+            adRemovedPiecesPositions_y[row][column] = -160.7 + ((column-2)*(-20.3)) + (10.f/7.f)*row; //-181-(-160.7) = -20.3
+            adRemovedPiecesPositions_z[row][column] = -20.4 - row*((-4.6)/7.f); //(-20.4 - (-15.8) = -4.6
         }
     }
 }

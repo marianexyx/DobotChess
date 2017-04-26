@@ -52,11 +52,11 @@ public:
     QLineEdit *SimulateFromUsbLineEdit;
     QGroupBox *groupBox_6;
     QGridLayout *gridLayout_6;
-    QPushButton *sendSimulatedMsgBtn;
+    QLineEdit *sendTcpLineEdit;
     QLineEdit *emulatePlayerMsgLineEdit;
     QCheckBox *serviceCheckBox;
-    QLineEdit *sendTcpLineEdit;
     QPushButton *sendTcpBtn;
+    QPushButton *sendSimulatedMsgBtn;
     QGroupBox *dobotInfo;
     QGridLayout *gridLayout_11;
     QLabel *label_9;
@@ -68,12 +68,12 @@ public:
     QPushButton *connectBtn;
     QGroupBox *chenardAI;
     QGridLayout *gridLayout_2;
-    QPushButton *AIBtn;
-    QCheckBox *simulateArduinoPlayer2checkBox;
-    QPushButton *AIEnemySendBtn;
     QLineEdit *AIEnemyLineEdit;
+    QPushButton *AIEnemySendBtn;
+    QPushButton *AIBtn;
     QRadioButton *botOnRadioBtn;
     QRadioButton *botOffRadioBtn;
+    QCheckBox *simulateArduinoPlayer2checkBox;
     QGroupBox *JOGgroupBox;
     QGridLayout *gridLayout_10;
     QPushButton *rHeadAddBtn;
@@ -241,12 +241,11 @@ public:
         gridLayout_6->setSpacing(6);
         gridLayout_6->setContentsMargins(11, 11, 11, 11);
         gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
-        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
-        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
-        sendSimulatedMsgBtn->setEnabled(false);
-        sendSimulatedMsgBtn->setAutoDefault(true);
+        sendTcpLineEdit = new QLineEdit(groupBox_6);
+        sendTcpLineEdit->setObjectName(QStringLiteral("sendTcpLineEdit"));
+        sendTcpLineEdit->setEnabled(false);
 
-        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
+        gridLayout_6->addWidget(sendTcpLineEdit, 2, 0, 1, 1);
 
         emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
         emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
@@ -260,17 +259,18 @@ public:
 
         gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
 
-        sendTcpLineEdit = new QLineEdit(groupBox_6);
-        sendTcpLineEdit->setObjectName(QStringLiteral("sendTcpLineEdit"));
-        sendTcpLineEdit->setEnabled(false);
-
-        gridLayout_6->addWidget(sendTcpLineEdit, 2, 0, 1, 1);
-
         sendTcpBtn = new QPushButton(groupBox_6);
         sendTcpBtn->setObjectName(QStringLiteral("sendTcpBtn"));
         sendTcpBtn->setEnabled(false);
 
-        gridLayout_6->addWidget(sendTcpBtn, 2, 1, 1, 1);
+        gridLayout_6->addWidget(sendTcpBtn, 2, 1, 1, 2);
+
+        sendSimulatedMsgBtn = new QPushButton(groupBox_6);
+        sendSimulatedMsgBtn->setObjectName(QStringLiteral("sendSimulatedMsgBtn"));
+        sendSimulatedMsgBtn->setEnabled(false);
+        sendSimulatedMsgBtn->setAutoDefault(true);
+
+        gridLayout_6->addWidget(sendSimulatedMsgBtn, 1, 1, 1, 1);
 
 
         gridLayout_3->addWidget(groupBox_6, 0, 2, 1, 1);
@@ -330,29 +330,23 @@ public:
         gridLayout_2->setSpacing(6);
         gridLayout_2->setContentsMargins(11, 11, 11, 11);
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        AIBtn = new QPushButton(chenardAI);
-        AIBtn->setObjectName(QStringLiteral("AIBtn"));
-        AIBtn->setEnabled(false);
+        AIEnemyLineEdit = new QLineEdit(chenardAI);
+        AIEnemyLineEdit->setObjectName(QStringLiteral("AIEnemyLineEdit"));
+        AIEnemyLineEdit->setEnabled(false);
 
-        gridLayout_2->addWidget(AIBtn, 2, 4, 1, 1);
-
-        simulateArduinoPlayer2checkBox = new QCheckBox(chenardAI);
-        simulateArduinoPlayer2checkBox->setObjectName(QStringLiteral("simulateArduinoPlayer2checkBox"));
-        simulateArduinoPlayer2checkBox->setEnabled(false);
-
-        gridLayout_2->addWidget(simulateArduinoPlayer2checkBox, 4, 2, 1, 1);
+        gridLayout_2->addWidget(AIEnemyLineEdit, 5, 2, 1, 2);
 
         AIEnemySendBtn = new QPushButton(chenardAI);
         AIEnemySendBtn->setObjectName(QStringLiteral("AIEnemySendBtn"));
         AIEnemySendBtn->setEnabled(false);
 
-        gridLayout_2->addWidget(AIEnemySendBtn, 4, 4, 1, 1);
+        gridLayout_2->addWidget(AIEnemySendBtn, 5, 5, 1, 1);
 
-        AIEnemyLineEdit = new QLineEdit(chenardAI);
-        AIEnemyLineEdit->setObjectName(QStringLiteral("AIEnemyLineEdit"));
-        AIEnemyLineEdit->setEnabled(false);
+        AIBtn = new QPushButton(chenardAI);
+        AIBtn->setObjectName(QStringLiteral("AIBtn"));
+        AIBtn->setEnabled(false);
 
-        gridLayout_2->addWidget(AIEnemyLineEdit, 4, 3, 1, 1);
+        gridLayout_2->addWidget(AIBtn, 2, 5, 1, 1);
 
         botOnRadioBtn = new QRadioButton(chenardAI);
         botOnRadioBtn->setObjectName(QStringLiteral("botOnRadioBtn"));
@@ -366,6 +360,12 @@ public:
         botOffRadioBtn->setChecked(true);
 
         gridLayout_2->addWidget(botOffRadioBtn, 2, 2, 1, 1);
+
+        simulateArduinoPlayer2checkBox = new QCheckBox(chenardAI);
+        simulateArduinoPlayer2checkBox->setObjectName(QStringLiteral("simulateArduinoPlayer2checkBox"));
+        simulateArduinoPlayer2checkBox->setEnabled(false);
+
+        gridLayout_2->addWidget(simulateArduinoPlayer2checkBox, 5, 4, 1, 1);
 
 
         gridLayout_3->addWidget(chenardAI, 1, 0, 1, 2);
@@ -759,9 +759,9 @@ public:
         sendUsbBtn->setText(QApplication::translate("MainWindow", "SendToUSB", 0));
         SimulateFromUsbBtn->setText(QApplication::translate("MainWindow", "SimFromUSB", 0));
         groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
-        sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "SendWS", 0));
         serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
         sendTcpBtn->setText(QApplication::translate("MainWindow", "SendTCP", 0));
+        sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "Send", 0));
         dobotInfo->setTitle(QApplication::translate("MainWindow", "Device", 0));
         label_9->setText(QApplication::translate("MainWindow", "SN", 0));
         deviceSNLabel->setText(QString());
@@ -771,11 +771,11 @@ public:
         DeviceInfoLabel->setText(QString());
         connectBtn->setText(QApplication::translate("MainWindow", "Connect", 0));
         chenardAI->setTitle(QApplication::translate("MainWindow", "Arduino Igor", 0));
-        AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
-        simulateArduinoPlayer2checkBox->setText(QApplication::translate("MainWindow", "SimP2", 0));
         AIEnemySendBtn->setText(QApplication::translate("MainWindow", "SimPlrSend", 0));
+        AIBtn->setText(QApplication::translate("MainWindow", "Set", 0));
         botOnRadioBtn->setText(QApplication::translate("MainWindow", "On", 0));
         botOffRadioBtn->setText(QApplication::translate("MainWindow", "Off", 0));
+        simulateArduinoPlayer2checkBox->setText(QApplication::translate("MainWindow", "SimP2", 0));
         JOGgroupBox->setTitle(QApplication::translate("MainWindow", "JOG", 0));
         rHeadAddBtn->setText(QApplication::translate("MainWindow", "J4+", 0));
         baseAngleSubBtn->setText(QApplication::translate("MainWindow", "J1-", 0));

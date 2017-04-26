@@ -41,7 +41,7 @@ private slots:
 signals:
     void addTextToConsole(QString, char);
     void updatePortsComboBox(int);
-    void AIEnemyStart();
+    void reset();
     void AIEnemySend(QString);
     void TcpQueueMsg(int, QString); //zakolejkuj żądanie do wykonania na tcp
 };

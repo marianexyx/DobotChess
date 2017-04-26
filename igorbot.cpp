@@ -42,11 +42,12 @@ void IgorBot::GameStarted()
 
 void IgorBot::BadMove(QString msg)
 {
-    qDebug() << "Sending to USB:" << msg;
-    emit this->addTextToConsole("Sending to USB: " + msg + "\n", 'c');
+    qDebug() << "Bad move:" << msg << ". Sending to USB: BAD_MOVE";
+    emit this->addTextToConsole("Bad move: " + msg + ". Sending to USB: BAD_MOVE\n", 'c');
 
     //todo: simplified() nie usuwa tylko podmienia białe znaki. sprawdzić to wszędzie
-    _pArduinoUsb->sendDataToUsb(msg.simplified()); //np. "BAD_MOVE e2e4"
+    //_pArduinoUsb->sendDataToUsb(msg.simplified());
+    _pArduinoUsb->sendDataToUsb("BAD_MOVE");
 }
 
 void IgorBot::GameInProgress()
@@ -85,6 +86,7 @@ void IgorBot::PromoteToWhat(QString moveForFuturePromote)
 {
     _pChessboard->QStrFuturePromote = moveForFuturePromote;
     qDebug() << "Sending to arduino: promote";
+    this->addTextToConsole("Sending to arduino: promote", 'c');
     _pArduinoUsb->sendDataToUsb("promote"); //zapytaj się arduino na co ma być ta promocja
 }
 
