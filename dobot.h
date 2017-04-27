@@ -58,6 +58,8 @@ private:
     QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
     ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId; //TODO: sprawdzić to
 
+    void checkPWM();
+
 public:
     Dobot(Chessboard *pChessboard);
 

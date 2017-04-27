@@ -27,7 +27,7 @@ Dobot::Dobot(Chessboard *pChessboard):
     
     m_gripperServo.address = 4;
     m_gripperServo.frequency = 50.f;
-    m_gripperServo.dutyCycle = 7.5f;
+    m_gripperServo.dutyCycle = m_fGripOpened;
     
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
@@ -89,6 +89,7 @@ void Dobot::onGetPoseTimer()
     emit AxisLabelText(QString::number(pose.r), 'r');
     
     this->QueuedIdList(); //sprawdzaj w kółko czy można wypchać do zakolejkowania dobotowi kolejny ruch
+    this->checkPWM();
     //TODO: to tu  powoduje to deziorientację będąc w tym miejscu.
     
     getPoseTimer->start();
@@ -125,10 +126,9 @@ void Dobot::QueuedIdList()
         QueuedCmdIndexIter.toFront(); //najstarszy wpis w kontenerze
         if(QueuedCmdIndexIter.hasNext())  //zabezpieczenie przed segmentation fault
         {
-           firstPosId = QueuedCmdIndexIter.next(); //najstarszy wpis w kontenerze (najmniejszy ID)
+            firstPosId = QueuedCmdIndexIter.next(); //najstarszy wpis w kontenerze (najmniejszy ID)
 
-            if(firstPosId.index  - m_ullDobotQueuedCmdIndex < 15) //ten warunek powinien działać w...
-                //...100%, jeżeli nie działa to błąd jest gdzie indziej
+            if(firstPosId.index  - m_ullDobotQueuedCmdIndex < 15)
             {
                 takenPosId = QueuedCmdIndexList.takeFirst(); //wypchnij na dobota kolejny id...
                 //...ruchu z kontenera. najstarszy wpis w kontenerze znajduje się na jego początku.
@@ -136,23 +136,43 @@ void Dobot::QueuedIdList()
                 {
                 //TODO: brakuje tu HOMEcmd
                 case NORMAL:
+                {
                     ptpCmd.x = takenPosId.x;
                     ptpCmd.y = takenPosId.y;
                     ptpCmd.z = takenPosId.z;
                     ptpCmd.r = takenPosId.r;
                     SetPTPCmd(&ptpCmd, true, &takenPosId.index);
+                }
                     break;
                 case WAIT:
+                {
                     SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
+                }
                     break;
                 case GRIPPER:
+                {
                     m_gripperServo.dutyCycle = takenPosId.state ? m_fGripOpened : m_fGripClosed;
-                    SetIOPWM(&m_gripperServo, true, &takenPosId.index);
+                    if (m_gripperServo.address != 4 || m_gripperServo.frequency != 50.f ||
+                            (m_gripperServo.dutyCycle != 6.85f && m_gripperServo.dutyCycle != 7.35f))
+                    {
+                        qDebug() << "ERROR: Dobot::QueuedIdList(): Wrong m_gripperServo values.";
+                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): Wrong m_gripperServo values.",'d');
+                    }
+                    int setPWM_Result = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
+                    if (setPWM_Result != DobotCommunicate_NoError)
+                    {
+                        qDebug() << "ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong";
+                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", 'd');
+                    }
+                }
                     break;
                 default:
+                {
                     qDebug() << "ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:" << takenPosId.type;
                     this->addTextToConsole("ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:"
-                                                + takenPosId.type, 'd');
+                                           + takenPosId.type, 'd');
+                }
+                    break;
                 }
             }
         }
@@ -181,14 +201,14 @@ void Dobot::onConnectDobot()
             emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
                                    m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
                                    firstPosId.index); //TODO: w zasadzie potrzebuje tylko zaaktualizować...
-                                   //...m_ullDobotQueuedCmdIndex, i to możę nie warto tutaj nawet. bardziej...
-                                   //...są to testy czy to się dzieje
+            //...m_ullDobotQueuedCmdIndex, i to możę nie warto tutaj nawet. bardziej...
+            //...są to testy czy to się dzieje
         }
         else
         {
             qDebug() << "ERROR: Dobot::onConnectDobot(): GetQueuedCmdCurrentIndex gone wrong";
             this->addTextToConsole("ERROR: Dobot::onConnectDobot(): "
-                                        "GetQueuedCmdCurrentIndex gone wrong \n", 'd');
+                                   "GetQueuedCmdCurrentIndex gone wrong \n", 'd');
         }
 
         m_ullCoreQueuedCmdIndex = m_ullDobotQueuedCmdIndex; //jeśli dobot przed aktualnym uruchomieniem programu...
@@ -344,7 +364,7 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, MOVE_T
     qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
              << nLetter << ", nDigit =" << nDigit << ", Type =" << Type;
     emit this->addTextToConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
-                                     + QString::number(nDigit+1) + "\n", '0');
+                                + QString::number(nDigit+1) + "\n", '0');
     
     this->addCmdToList(NORMAL, false, f_xFromTo, f_yFromTo, f_zFromTo + m_nMaxPieceHeight, f_rFromTo);
     
@@ -445,7 +465,7 @@ void Dobot::addCmdToList(int nType, bool bState, float x, float y, float z, floa
     if (y != m_nActualPos) m_fPtpCmd_yActualVal = y;
     if (z != m_nActualPos) m_fPtpCmd_zActualVal = z;
     if (r != m_nActualPos) m_fPtpCmd_rActualVal = r;
-        
+
     m_ullCoreQueuedCmdIndex += 1; //aktualne id ruchu = +1 większe od ostatniego
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
     m_posIdx.type = nType; //wait, gripper
@@ -455,6 +475,34 @@ void Dobot::addCmdToList(int nType, bool bState, float x, float y, float z, floa
     m_posIdx.z = m_fPtpCmd_zActualVal;
     m_posIdx.r = m_fPtpCmd_rActualVal;
     QueuedCmdIndexList << m_posIdx; //wepchnij do kontenera strukturę. << == append == push_back
+}
+
+void Dobot::checkPWM()
+{
+    IOPWM gripperControl;
+    if (gripperControl.address != 0 && gripperControl.frequency != 0 && gripperControl.dutyCycle != 0)
+    {
+        GetIOPWM(&gripperControl);
+
+        if (gripperControl.address!= 4 )
+        {
+            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" << gripperControl.address;
+            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" +
+                                   QString::number(gripperControl.address) + "\n",'d');
+        }
+        if (gripperControl.frequency != 50.f)
+        {
+            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.frequency != 50.f. val =" << gripperControl.address;
+            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.frequency != 50.f. val =" +
+                                   QString::number(gripperControl.frequency) + "\n",'d');
+        }
+        if (gripperControl.dutyCycle != 6.85f && gripperControl.dutyCycle != 7.35f)
+        {
+            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.35f. val =" << gripperControl.dutyCycle;
+            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.35f. val =" +
+                                   QString::number(gripperControl.dutyCycle) + "\n",'d');
+        }
+    }
 }
 
 void Dobot::writeMoveTypeInConsole(MOVE_TYPE Type, char chMoveState)
