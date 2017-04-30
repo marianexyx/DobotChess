@@ -599,7 +599,7 @@ void MainWindow::on_sendTcpBtn_clicked()
 {
     if (!ui->sendTcpLineEdit->text().isEmpty()) //coś jest wpisane w lineEdit
     {
-        _pTCPmsg->queueMsgs(2, ui->sendTcpLineEdit->text()); //#define ARDUINO 2
+        _pTCPmsg->TcpQueueMsg(2, ui->sendTcpLineEdit->text()); //#define ARDUINO 2
         ui->sendTcpLineEdit->clear(); //czyść lineEdit
     }
 }

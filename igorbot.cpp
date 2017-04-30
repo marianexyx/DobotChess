@@ -158,40 +158,40 @@ void IgorBot::NewGame()
 {
     qDebug() << "Sending to tcp: new";
     emit this->addTextToConsole("Sending to tcp: new\n", 'c');
-    _pTCPMsgs->queueMsgs(ARDUINO, "new");
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, "new");
 }
 
 void IgorBot::MoveTcpPiece(QString msg)
 {
     qDebug() << "IgorBot::MoveTcpPiece: Sending move to tcp: " << msg;
     emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
-    _pTCPMsgs->queueMsgs(ARDUINO, msg);
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, msg);
 }
 
 void IgorBot::Status()
 {
     this->addTextToConsole("Sending to tcp: status\n", 'w');
     qDebug() << "Sending to tcp: status";
-    _pTCPMsgs->queueMsgs(ARDUINO, "status");
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, "status");
 }
 
 void IgorBot::Promote(QString msg)
 {
      this->pieceMovingSequence(PROMOTION);
     _pChessboard->setMoveType(PROMOTION);
-    _pTCPMsgs->queueMsgs(ARDUINO, "move " + _pChessboard->QStrFuturePromote + msg);
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, "move " + _pChessboard->QStrFuturePromote + msg);
     _pChessboard->QStrFuturePromote.clear();
 }
 
 void IgorBot::AskForLegalMoves()
 {
     qDebug() << "IgorBot::AskForLegalMoves()";
-    _pTCPMsgs->queueMsgs(ARDUINO, "legal");
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, "legal");
 }
 
 void IgorBot::Think5000()
 {
-    _pTCPMsgs->queueMsgs(ARDUINO, "think 5000");
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, "think 5000");
 }
 
 void IgorBot::UndoOk()
@@ -208,7 +208,7 @@ void IgorBot::ThinkOk(QString msg)
     qDebug() << "AI is ready to start move";
 
     _pChessboard->QsAIPiecieFromTo = msg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
-    _pTCPMsgs->queueMsgs(ARDUINO, "undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
+    _pTCPMsgs->TcpQueueMsg(ARDUINO, "undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
     //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }
 

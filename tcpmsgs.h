@@ -35,8 +35,6 @@ private slots:
 public:
     TCPMsgs();
 
-    void queueMsgs(int nSender, QString msg);
-
 public slots:
     void TcpQueueMsg(int nSender, QString msg);
 

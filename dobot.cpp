@@ -18,15 +18,15 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_fPtpCmd_yActualVal(0),
     m_fPtpCmd_zActualVal(25),
     m_fPtpCmd_rActualVal(0),
-    m_fGripOpened(6.85f),
-    m_fGripClosed(7.35f)
+    m_fGripOpened(6.9f),
+    m_fGripClosed(7.55f)
 {
     _pChessboard = pChessboard;
     
     connectStatus = false;
     
     m_gripperServo.address = 4;
-    m_gripperServo.frequency = 50.f;
+    m_gripperServo.frequency = 50;
     m_gripperServo.dutyCycle = m_fGripOpened;
     
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
@@ -152,8 +152,8 @@ void Dobot::QueuedIdList()
                 case GRIPPER:
                 {
                     m_gripperServo.dutyCycle = takenPosId.state ? m_fGripOpened : m_fGripClosed;
-                    if (m_gripperServo.address != 4 || m_gripperServo.frequency != 50.f ||
-                            (m_gripperServo.dutyCycle != 6.85f && m_gripperServo.dutyCycle != 7.35f))
+                    if (m_gripperServo.address != 4 || m_gripperServo.frequency != 50 ||
+                            (m_gripperServo.dutyCycle != m_fGripOpened && m_gripperServo.dutyCycle != m_fGripClosed))
                     {
                         qDebug() << "ERROR: Dobot::QueuedIdList(): Wrong m_gripperServo values.";
                         this->addTextToConsole("ERROR: Dobot::QueuedIdList(): Wrong m_gripperServo values.",'d');
@@ -283,16 +283,16 @@ void Dobot::initDobot()
     PTPJointParams ptpJointParams;
     for (int i = 0; i < 4; i++)
     {
-        ptpJointParams.velocity[i] = 100;
-        ptpJointParams.acceleration[i] = 100;
+        ptpJointParams.velocity[i] = 200;
+        ptpJointParams.acceleration[i] = 200;
     }
     SetPTPJointParams(&ptpJointParams, false, NULL);
     
     PTPCoordinateParams ptpCoordinateParams;
-    ptpCoordinateParams.xyzVelocity = 100;
-    ptpCoordinateParams.xyzAcceleration = 100;
-    ptpCoordinateParams.rVelocity = 100;
-    ptpCoordinateParams.rAcceleration = 100;
+    ptpCoordinateParams.xyzVelocity = 200;
+    ptpCoordinateParams.xyzAcceleration = 200;
+    ptpCoordinateParams.rVelocity = 200;
+    ptpCoordinateParams.rAcceleration = 200;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
     
     PTPJumpParams ptpJumpParams;
@@ -490,16 +490,16 @@ void Dobot::checkPWM()
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" +
                                    QString::number(gripperControl.address) + "\n",'d');
         }
-        if (gripperControl.frequency != 50.f)
+        if (gripperControl.frequency != 50)
         {
-            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.frequency != 50.f. val =" << gripperControl.address;
-            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.frequency != 50.f. val =" +
+            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" << gripperControl.address;
+            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" +
                                    QString::number(gripperControl.frequency) + "\n",'d');
         }
-        if (gripperControl.dutyCycle != 6.85f && gripperControl.dutyCycle != 7.35f)
+        if (gripperControl.dutyCycle != m_fGripOpened && gripperControl.dutyCycle != m_fGripClosed)
         {
-            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.35f. val =" << gripperControl.dutyCycle;
-            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.35f. val =" +
+            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" << gripperControl.dutyCycle;
+            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" +
                                    QString::number(gripperControl.dutyCycle) + "\n",'d');
         }
     }

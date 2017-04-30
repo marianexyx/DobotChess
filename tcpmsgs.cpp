@@ -12,7 +12,7 @@ TCPMsgs::TCPMsgs()
     m_ullID = 0;
 }
 
-void TCPMsgs::queueMsgs(int nSender, QString msg)
+void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
 {
     qDebug() << "TCPMsgs::queueMsgs received msg: " << msg << ", sender = " << nSender;
 
@@ -21,17 +21,12 @@ void TCPMsgs::queueMsgs(int nSender, QString msg)
     QStrReceivedData.nSender = nSender;
     QStrReceivedData.QStrMsgForTcp = msg;
     TCPMsgsList << QStrReceivedData; //wrzuć do kontenera wiadomość
-    if (!TCPMsgsList.isEmpty()) //jeżeli kontener nie jest pusty
+    if (!TCPMsgsList.isEmpty() && !m_bWaitingForReadyRead)
     {
-        if (!m_bWaitingForReadyRead) //zaczekaj z kolejkowaniem kolejnego zapytania do TCP jeżeli...
-            //...czekamy aktualnie na przetworzenie jakiejś odpowiedzi z TCP
-            this->doTcpConnect(); //to wykonaj najstarszą wiadomość z kontenera.
+        //zaczekaj z wykonywaniem kolejnego zapytania do TCP z kontenera...
+        //...jeżeli czekamy aktualnie na przetworzenie jakiejś odpowiedzi z TCP
+        this->doTcpConnect(); //to wykonaj najstarszą wiadomość z kontenera.
     }
-}
-
-void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
-{
-    this->queueMsgs(nSender, msg);
 }
 
 //rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
@@ -45,7 +40,6 @@ void TCPMsgs::doTcpConnect()
     connect(socket, SIGNAL(connected()),this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
-    //connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     connect(socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
@@ -59,7 +53,7 @@ void TCPMsgs::doTcpConnect()
     // this is not blocking call
     socket->connectToHost("localhost", 22222); //docelowo emituje sygnał connected (tcp)
 
-    if(!socket->waitForConnected(5000)) //czkemy na połączenie 5 sekund
+    if(!socket->waitForConnected(5000))
     {
         emit addTextToConsole("Error12:" + socket->errorString() + "\n", 't');
     }
@@ -88,22 +82,23 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
     }
 }
 
-void TCPMsgs::connected() //udało się nawiązać połączenie z tcp
+void TCPMsgs::connected()
 {
     TcpMsgMetadata QStrData;
-    if (!TCPMsgsList.isEmpty()) QStrData = TCPMsgsList.last();
+    if (!TCPMsgsList.isEmpty())
+        QStrData = TCPMsgsList.last();
     else
     {
         qDebug() << "ERROR: TCPMsgs::connected(): TCPMsgsList is empty";
         return;
     }
 
-    qDebug() << "TCPMsgs: connected...";
-    qDebug() << "TCPMsgs: parsing msg to chenard:" << QStrData.QStrMsgForTcp;
+    qDebug() << "TCPMsgs: Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 
     QByteArray QabMsgArrayed;
     QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n"); //przetworzenie parametru dla funkcji write()
     // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
+    //todo: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
     socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
 
     emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, 't');
@@ -128,14 +123,16 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     {
         if (!QStrMsgFromTcp.isEmpty())
             qDebug() << "WARNING: TCPMsgs::readyRead- needed to read data from socket 1 more time";
+
         QStrMsgFromTcp += socket->readAll();
+
         if (socket->bytesAvailable() > 0)
             qDebug() << "WARNING: TCPMsgs::readyRead- socket->bytesAvailable() > 0 after 1st read";
     }
     while (socket->bytesAvailable() > 0);
 
     //TODO: dostaję czasem rozklejone końcówki w bodajże kolejnej wiadomości: "" lub "/n". Póki co...
-    //zostało to naprawione półśrodkiems
+    //zostało to naprawione półśrodkiem
     if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
         if (QStrMsgFromTcp.right(1) != "\n") QStrMsgFromTcp += "\n";
@@ -154,28 +151,25 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
         {
             qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
                         ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
-            //core niech odbierze tą wiadomość i zdecyduje do dalej
             emit this->msgFromTcpToWeb(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            //m_bWaitingForReadyRead = false;
         }
         else if (QStrData.nSender == ARDUINO)
         {
             qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
                         ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
             emit this->msgFromTcpToArd(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            //m_bWaitingForReadyRead = false;
         }
         else qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData.nSender value =" <<
                          QStrData.nSender;
     }
     else if (QStrMsgFromTcp.isEmpty())
     {
-        qDebug() << "ERROR: TCPMsgs::readyRead() received empty msg.";
+        qDebug() << "WARNING: TCPMsgs::readyRead() received empty msg.";
         return;
     }
     else if (QStrMsgFromTcp == "\n")
-        qDebug() << "ERROR: TCPMsgs::readyRead() received '\\n' msg.";
-    else qDebug() << "ERROR: TCPMsgs::readyRead() received:" << QStrMsgFromTcp;
+        qDebug() << "WARNING: TCPMsgs::readyRead() received '\\n' msg.";
+    else qDebug() << "WARNING: TCPMsgs::readyRead() received:" << QStrMsgFromTcp;
 
     m_bWaitingForReadyRead = false;
 

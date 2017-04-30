@@ -116,7 +116,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
 
 void WebChess::Promote(QString msg)
 {
-    _pTCPMsgs->queueMsgs(WEBSITE, "move " + _pChessboard->QStrFuturePromote + msg);
+    _pTCPMsgs->TcpQueueMsg(WEBSITE, "move " + _pChessboard->QStrFuturePromote + msg);
     _pChessboard->QStrFuturePromote.clear();
 }
 
@@ -128,7 +128,7 @@ void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
         _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", 'w');
-        _pTCPMsgs->queueMsgs(WEBSITE, "new");
+        _pTCPMsgs->TcpQueueMsg(WEBSITE, "new");
     }
     else _pWebsockets->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", 'w');
 }
@@ -138,19 +138,19 @@ void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bie
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
     _pWebsockets->addTextToConsole("WebChess::MoveTcpPiece: Sending normal move to tcp: " + msg + "\n", 'w');
     qDebug() << "WebChess::MoveTcpPiece: Sending normal move to tcp: " << msg;
-    _pTCPMsgs->queueMsgs(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
+    _pTCPMsgs->TcpQueueMsg(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
 void WebChess::Status()
 {
     _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", 'w');
     qDebug() << "Sending 'status' command to tcp";
-    _pTCPMsgs->queueMsgs(WEBSITE, "status");
+    _pTCPMsgs->TcpQueueMsg(WEBSITE, "status");
 }
 
 void WebChess::AskForLegalMoves()
 {
-    _pTCPMsgs->queueMsgs(WEBSITE, "legal");
+    _pTCPMsgs->TcpQueueMsg(WEBSITE, "legal");
 }
 
 //-----------------FUNKCJE SZACHOWE-----------------//
