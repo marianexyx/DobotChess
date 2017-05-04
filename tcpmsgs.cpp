@@ -74,11 +74,11 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
         qDebug() << "ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
                     "running, and check that the host name and port settings are correct.";
         emit addTextToConsole("ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
-                              "running, and check that the host name and port settings are correct.", 't');
+                              "running, and check that the host name and port settings are correct.\n", 't');
         break;
     default:
         qDebug() << "ERROR: TCPMsgs: The following error occurred:" << socket->errorString();
-        emit addTextToConsole("ERROR: TCPMsgs: The following error occurred: " + socket->errorString(), 't');
+        emit addTextToConsole("ERROR: TCPMsgs: The following error occurred: " + socket->errorString() + "\n", 't');
     }
 }
 
