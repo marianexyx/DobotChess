@@ -12,13 +12,13 @@
 #include "DobotType.h"
 #include "chessboard.h"
 
-#define ACTUAL_POS 1000
-
+const int ACTUAL_POS = 1000;
+enum DOBOT_MOVE { TO_POINT, HOME, WAIT, OPEN_GRIP, CLOSE_GRIP, UP, DOWN };
 struct ArmPosCrntCmdQIdx //ArmPosForCurrentCmdQueuedIndex
 {
     unsigned long long index;
-    int type;
-    bool state;
+    SEQUENCE_TYPE sequence;
+    DOBOT_MOVE move;
     float x;
     float y;
     float z;
@@ -75,15 +75,15 @@ public:
 
     void gripperAngle(float fDutyCycle);
 
-    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, MOVE_TYPE Type);
-    void gripperOpennedState(bool gripperOpened, MOVE_TYPE Type);
+    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, SEQUENCE_TYPE Type);
+    void gripperOpennedState(bool gripperOpened, SEQUENCE_TYPE Type);
     void wait(int nMs);
-    void addCmdToList(int nType = -1, bool bState = false, float x = ACTUAL_POS,
-                      float y = ACTUAL_POS, float z = ACTUAL_POS,
-                      float r = ACTUAL_POS);
-    void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, MOVE_TYPE Type);
+    void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = NONE,
+                      float x = ACTUAL_POS, float y = ACTUAL_POS,
+                      float z = ACTUAL_POS, float r = ACTUAL_POS);
+    void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TYPE Type);
     void removePiece(int nPieceRowPos, int nPieceColumnPos);
-    void writeMoveTypeInConsole(MOVE_TYPE Type, char chMoveState = 'x');
+    void writeMoveTypeInConsole(SEQUENCE_TYPE Type, DOBOT_MOVE moveState);
     void QueuedIdList();
 
     //metody dostępowe do pól

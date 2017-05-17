@@ -36,16 +36,16 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     connect(_pArduinoUsb, SIGNAL(reset()), _pIgorBot, SLOT(resetPiecePositions()));
 
     //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
-    connect(_pDobotArm, SIGNAL(addTextToConsole(QString,char)),
-            this, SLOT(writeInConsole(QString,char)));
-    connect(_pTCPmsg, SIGNAL(addTextToConsole(QString,char)),
-            this, SLOT(writeInConsole(QString,char)));
-    connect(_pWebSockets, SIGNAL(addTextToConsole(QString,char)),
-            this, SLOT(writeInConsole(QString,char)));
-    connect(_pWebChess, SIGNAL(addTextToConsole(QString,char)),
-            this, SLOT(writeInConsole(QString,char)));
-    connect(_pArduinoUsb, SIGNAL(addTextToConsole(QString,char)),
-            this, SLOT(writeInConsole(QString,char)));
+    connect(_pDobotArm, SIGNAL(addTextToConsole(QString,LOG)),
+            this, SLOT(writeInConsole(QString,LOG)));
+    connect(_pTCPmsg, SIGNAL(addTextToConsole(QString,LOG)),
+            this, SLOT(writeInConsole(QString,LOG)));
+    connect(_pWebSockets, SIGNAL(addTextToConsole(QString,LOG)),
+            this, SLOT(writeInConsole(QString,LOG)));
+    connect(_pWebChess, SIGNAL(addTextToConsole(QString,LOG)),
+            this, SLOT(writeInConsole(QString,LOG)));
+    connect(_pArduinoUsb, SIGNAL(addTextToConsole(QString,LOG)),
+            this, SLOT(writeInConsole(QString,LOG)));
 
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
@@ -214,9 +214,8 @@ void MainWindow::onPTPsendBtnClicked()
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
     if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0) // dla wygody zera są zabronione
-        _pDobotArm->addCmdToList(-1, false, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+        _pDobotArm->addCmdToList(TO_POINT, SERVICE, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
-    //TODO: serwisowe watrości skaczą jak pojebane, a wydaje się że inne nie
     float fServoDutyCycle = ui->servoGripperEdit->text().toFloat();
     if (fServoDutyCycle !=0)
         _pDobotArm->gripperAngle(fServoDutyCycle);
@@ -233,30 +232,29 @@ void MainWindow::showDobotErrorMsgBox()
 //TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich...
 //...qDebug, by nie robić tego wszędzie.
 //TODO3: dodać przed każdą komendą czas jej wywołania
-void MainWindow::writeInConsole(QString QStrMsg, char chLogType = '0')
+void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = NOTHING)
 {
     QString QsLogType;
-    switch(chLogType)
+    switch(msgType)
     {
-    case '0': QsLogType.clear(); break;
-    case 'c': QsLogType = "<Core>: "; break;
-    case 'd': QsLogType = "<Dobot>: "; break;
-    case 't': QsLogType = "<TCP>: "; break;
-    case 'w': QsLogType = "<Websockets>: "; break;
-    case 'm': QsLogType = "<mainwindow>: "; break;
-    case 'u': QsLogType = "<USB>: "; break;
-    case 'a': QsLogType = "<USB> Sent: "; break;
-    case 'r': QsLogType = "<USB> Received: "; break;
+    case NOTHING: QsLogType.clear(); break;
+    case CORE: QsLogType = "<Core>: "; break;
+    case DOBOT: QsLogType = "<Dobot>: "; break;
+    case TCP: QsLogType = "<TCP>: "; break;
+    case WEBSOCKET: QsLogType = "<Websockets>: "; break;
+    case MAINWINDOW: QsLogType = "<mainwindow>: "; break;
+    case USB: QsLogType = "<USB>: "; break;
+    case USB_SENT: QsLogType = "<USB> Sent: "; break;
+    case USB_RECEIVED: QsLogType = "<USB> Received: "; break;
     default:
-        QString QsChar = QChar(chLogType);
+        QString QsChar = msgType;
         QsLogType = "<ERROR: Wrong log type>: " + QsChar + ": ";
         break;
     }
 
-    //qDebug() << "MainWindow::writeInConsole received: " << QStrMsg;
     if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
 
-    if(QStrMsg == "/clear") //czy czyścimy okno
+    if(QStrMsg == "/clear")
     {
         ui->debug_log->clear();
         return;
@@ -387,35 +385,22 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_calibrateBtn_clicked()
 {
-    //todo: w inicjalizacji nie powinni być w kółko jakiś definicjii
-    //todo: homecmd nie jest kolejkowany
-    _pDobotArm->addTextToConsole("HomeCmd: recalibrating arm...\n", 'd');
-    HOMECmd HOMEChess;
-    HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
-    uint64_t homeIndex = _pDobotArm->getDobotQueuedCmdIndex();
-
     if (ui->xLabel->text().toInt() == _pDobotArm->nHome_x &&
             ui->yLabel->text().toInt() == _pDobotArm->nHome_y &&
             ui->zLabel->text().toInt() == _pDobotArm->nHome_z)
     {
-        int result = SetHOMECmd(&HOMEChess, true, &homeIndex);
-        if (result == DobotCommunicate_NoError)
-        {
-            uint64_t dobotQueue;
-            _pDobotArm->setDobotQueuedCmdIndex(GetQueuedCmdCurrentIndex(&dobotQueue));
-            _pDobotArm->setDobotQueuedCmdIndex(dobotQueue);
-        }
+        _pDobotArm->addCmdToList(HOME);
     }
     else
     {
         qDebug() << "ERROR: Dobot not in home positions";
-        this->writeInConsole("ERROR: Dobot not in home positions",'d');
+        this->writeInConsole("ERROR: Arm not in home positions", DOBOT);
     }
 }
 
 void MainWindow::on_homeBtn_clicked()
 {
-    _pDobotArm->addCmdToList(-1, false, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
 }
 
 void MainWindow::on_upBtn_clicked()
@@ -461,7 +446,7 @@ void MainWindow::on_AIBtn_clicked()
     if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
     {
         _pIgorBot->setAI(false);
-        this->writeInConsole("Turned off Igors AI\n",'m');
+        this->writeInConsole("Turned off Igors AI\n", MAINWINDOW);
         ui->AIEnemySendBtn->setEnabled(false);
         ui->AIEnemyLineEdit->setEnabled(false);
     }
@@ -469,7 +454,7 @@ void MainWindow::on_AIBtn_clicked()
     {
         _pIgorBot->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
         //...wtedy ruszy z ruchem swoim
-        this->writeInConsole("Turned on Igors AI\n",'m');
+        this->writeInConsole("Turned on Igors AI\n", MAINWINDOW);
         ui->AIEnemySendBtn->setEnabled(true);
         ui->AIEnemyLineEdit->setEnabled(true);
     }
@@ -481,7 +466,7 @@ void MainWindow::on_AIEnemySendBtn_clicked()
 {
     _pIgorBot->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
     QString QsAIEnemySend = this->checkMoveForTcp(ui->AIEnemyLineEdit->text());
-    this->writeInConsole(QsAIEnemySend, 'm');
+    this->writeInConsole(QsAIEnemySend, MAINWINDOW);
     qDebug() << QsAIEnemySend;
 }
 
@@ -515,7 +500,7 @@ void MainWindow::updatePortsComboBox(int nUsbPorst)
 {
     QString QSUsbPorst = QString::number(nUsbPorst)
             + (nUsbPorst == 1 ? " port is ready to use\n" : " ports are ready to use\n");
-    this->writeInConsole(QSUsbPorst, 'u'); //pokaż ile znaleziono portów
+    this->writeInConsole(QSUsbPorst, USB); //pokaż ile znaleziono portów
 
     //aktualizacja listy portów
     ui->portsComboBox->clear();
@@ -540,7 +525,7 @@ void MainWindow::on_reloadPortsBtn_clicked()
 void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
 {
     if(_pArduinoUsb->usbInfo == NULL) //by coś wysyłać musi istnieć wybrany jakiś port
-        this->writeInConsole("None port selected\n", 'u');
+        this->writeInConsole("None port selected\n", USB);
     else
     {
         _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text()); //wyślij na usb wiadomość z pola textowego
@@ -563,21 +548,21 @@ void MainWindow::on_closeGripperBtn_clicked()
 void MainWindow::on_startGmPosBtn_clicked()
 {
     qDebug() << "Placing arm above the chessboard.";
-    _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", 'd');
-    _pDobotArm->addCmdToList(-1, false, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
-    _pDobotArm->addCmdToList(-1, false, 144, -103, 10);
-    _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
-    _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
+    _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", DOBOT);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 144, -103, 10);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 260, -10, 65);
 }
 
 void MainWindow::on_startDtPosBtn_clicked()
 {
     qDebug() << "Returning safely to the HOME positions.";
-    _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", 'd');
-    _pDobotArm->addCmdToList(-1, false, 260, -10, 65);
-    _pDobotArm->addCmdToList(-1, false, 145, -103, 45);
-    _pDobotArm->addCmdToList(-1, false, 140, -103, 10);
-    _pDobotArm->addCmdToList(-1, false, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
+    _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", DOBOT);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 260, -10, 65);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 140, -103, 10);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
 }
 
 void MainWindow::on_SimulateFromUsbBtn_clicked()

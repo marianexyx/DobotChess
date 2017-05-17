@@ -17,6 +17,8 @@
 #include "igorbot.h"
 #include "webchess.h"
 
+enum LOG { NOTHING, CORE, DOBOT, TCP, WEBSOCKET, MAINWINDOW, USB, USB_SENT, USB_RECEIVED };
+
 namespace Ui
 {
     class MainWindow;
@@ -60,7 +62,7 @@ private slots:
     void onPTPsendBtnClicked();
 
     /*---sloty do używania GUI MainWindow---*/
-    void writeInConsole(QString QStrMsg, char chLogType);
+    void writeInConsole(QString QStrMsg, LOG msgType);
     void changeWindowtitle(QString title);
 
     //dobot slots

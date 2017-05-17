@@ -135,7 +135,9 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
     //zostało to naprawione półśrodkiem
     if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
-        if (QStrMsgFromTcp.right(1) != "\n") QStrMsgFromTcp += "\n";
+        if (QStrMsgFromTcp.right(1) != "\n")
+            QStrMsgFromTcp += "\n";
+
         emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
 
         TcpMsgMetadata QStrData;

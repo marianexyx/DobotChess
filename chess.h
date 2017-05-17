@@ -10,6 +10,8 @@
 #include "tcpmsgs.h"
 #include "webtable.h"
 
+//TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami wejsciowymi (arduino/website)
+
 class Chess: public QObject
 {
     Q_OBJECT
@@ -45,7 +47,7 @@ protected:
     void enpassantMovingSequence();
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-    MOVE_TYPE checkMoveType(QString move);
+    SEQUENCE_TYPE checkMoveType(QString move);
     void handleMove(QString move);
 
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
@@ -64,7 +66,7 @@ public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
 
     //---------------STEROWANIE RAMIENIEM--------------//
-    void pieceMovingSequence(MOVE_TYPE Type,
+    void pieceMovingSequence(SEQUENCE_TYPE Type,
                              int nPieceFromLetter = -1, int nPieceFromDigit = -1,
                              int nPieceToLetter = -1, int nPieceToDigit = -1);
 

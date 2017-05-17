@@ -12,7 +12,7 @@ struct ArmPosition
 };
 
 enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //TODO: praktycznie powtórzenie z webtable
-enum MOVE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT,
+enum SEQUENCE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT,
                  CASTLING, CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
 
 //TODO: chessboard powinien być obiektem klasy chess
@@ -27,7 +27,7 @@ private:
     QString m_QStrCastlings;
     QString m_QStrEnpassant;
     QStringList m_legalMoves;
-    MOVE_TYPE m_moveType;
+    SEQUENCE_TYPE m_moveType;
 
     void changeWindowTitle();
 
@@ -46,7 +46,7 @@ public:
     bool isMoveEnpassant(QString moveToTest);
     void castlingFindRookToMove();
     void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
-                           int nPieceDigit, MOVE_TYPE Type);
+                           int nPieceDigit, SEQUENCE_TYPE Type);
     bool compareArrays(int nArray1[][8], int nArray2[][8]);
     void saveStatusData(QString status);
     void showBoardInDebug();
@@ -80,14 +80,14 @@ public:
 
     //metody dostępowe
     void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
-    void setMoveType (MOVE_TYPE Type)           { m_moveType = Type; }
+    void setMoveType (SEQUENCE_TYPE Type)       { m_moveType = Type; }
     void setLegalMoves(QStringList legalMoves)  { m_legalMoves = legalMoves; }
 
     void clearLegalMoves()              { m_legalMoves.clear(); }
 
     QString getGameStatus()             { return m_QStrGameStatus; }
     WHOSE_TURN getWhoseTurn ()          { return m_WhoseTurn; }
-    MOVE_TYPE getMoveType()             { return m_moveType; }
+    SEQUENCE_TYPE getMoveType()         { return m_moveType; }
     QString getCastlings()              { return m_QStrCastlings; }
     QString getEnpassant()              { return m_QStrEnpassant; }
     QStringList getLegalMoves()         { return m_legalMoves; }

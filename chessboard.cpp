@@ -202,7 +202,7 @@ void Chessboard::castlingFindRookToMove() //ustawiane skąd-dokąd przenoszona b
 }
 
 void Chessboard::pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
-                                   int nPieceDigit, MOVE_TYPE Type)
+                                   int nPieceDigit, SEQUENCE_TYPE Type)
 {
     if (Type == RESTORE && bIsMoveFrom) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
