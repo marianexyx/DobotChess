@@ -41,10 +41,8 @@ HEADERS  +=  webtable.h \
     DobotDll/DobotType.h \
     mainwindow.h \
     igorbot.h \
-    webchess.h
-
-
-
+    webchess.h \
+    vars/log.h
 
 FORMS    += mainwindow.ui
 

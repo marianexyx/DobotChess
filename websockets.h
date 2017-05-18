@@ -7,6 +7,7 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 #include "webtable.h"
+#include "vars/log.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -31,7 +32,7 @@ public Q_SLOTS:
     void onNewConnection();
 
 signals:
-    void addTextToConsole(QString, char);
+    void addTextToConsole(QString, LOG);
     void MsgFromWebsocketsToChess(QString QStrMsgFromWebsockets);
     void MsgFromWebsocketsToWebtable(QString QStrMsgFromWebsockets);
 

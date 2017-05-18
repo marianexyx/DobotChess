@@ -3,11 +3,6 @@
 #define ROW 1
 #define COLUMN 0
 
-#define NORMAL -1
-#define WAIT 0
-#define GRIPPER 1
-#define HOME 2
-
 //TODO: nie mam wogle sprawdzane czy jakiekolwiek dane dotarły do dobota. program wypuszcza dane na...
 //...usb i zakłada że ruch się wykonał bez sprawdzania tego.
 
@@ -34,43 +29,18 @@ Dobot::Dobot(Chessboard *pChessboard):
     
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
-    //TODO: ptpCmd.velocity = 100; //niech używa wartości które ma aktualnie
     
-    m_ullCoreQueuedCmdIndex = 1; //TODO: dobot startuje bodajże z jedynką
+    m_ullCoreQueuedCmdIndex = 1;
     m_uiQueuedCmdLeftSpace = 10000; //jakaś duża liczba, bo mam dalej warunek krytycznego błędu dla zera
     
     firstPosId.index = 0;
     lastPosId.index = 0;
     takenPosId.index = 0;
-    
-    //to poniżej to w skrócie utrzymywanie ciągłej komunikacji z dobotem
-    
-    //potrzebny jest poniższy timer dla dobota, bo tylko w nim obracane są jego komendy.
-    QTimer *periodicTaskTimer = new QTimer(this); //stworzenie zegarka liczącego czas. zegar liczy
-    //czas jak normalny zegar. new QTimer(this) oznacza że obiekt jest dzieckiem tej klasy, tj.
-    //dobota i razem z nim zostanie zniszczony. zegarek wymaga jeszcze
-    periodicTaskTimer->setObjectName("periodicTaskTimer");
-    
-    //kiedy timer zakończy żywot/zatrzyma się to odpal funkcję spod slotu
-    connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
-    periodicTaskTimer->setSingleShot(true); //ustawia zegar na jednorazowy(?). nie odpala się co ...
-    //... jakiś ustalony interwał sam z siebie zegar (cokolwiek to znaczy w praktyce).
-    periodicTaskTimer->start(5); //za każdym razem zakończ poprzedni timer i po 5ms zresetuj zegar.
-    //ustawienie na 0 (brak) drenowało by kompa z zasobów najprawdopodobniej.
-    //ciągle dostaję błąd:
-    //QObject::startTimer: Timers can only be used with threads started with QThread
-    
-    //getPose Timer
-    QTimer *getPoseTimer = new QTimer(this);
-    getPoseTimer->setObjectName("getPoseTimer");
-    connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
-    getPoseTimer->setSingleShot(true);
-    //getPoseTimer->start(200);
 }
 
-void Dobot::onPeriodicTaskTimer() //wykonywane w kółko
+void Dobot::onPeriodicTaskTimer()
 {
-    PeriodicTask(); //zapytuj się dobota co tam u niego co 100ms
+    PeriodicTask(); //zapytuj się dobota co tam u niego co chwilę
     QTimer *periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer");
     periodicTaskTimer->start();
 }
@@ -90,12 +60,12 @@ void Dobot::onGetPoseTimer()
     emit AxisLabelText(QString::number(pose.y), 'y');
     emit AxisLabelText(QString::number(pose.z), 'z');
     emit AxisLabelText(QString::number(pose.r), 'r');
+
+    getPoseTimer->start();
     
     this->QueuedIdList(); //sprawdzaj w kółko czy można wypchać do zakolejkowania dobotowi kolejny ruch
     this->checkPWM();
     //TODO: to tu  powoduje to deziorientację będąc w tym miejscu.
-    
-    getPoseTimer->start();
 }
 
 void Dobot::QueuedIdList()
@@ -115,18 +85,18 @@ void Dobot::QueuedIdList()
 
     emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
                            m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
-                           firstPosId.index);
+                           firstPosId.index); //todo: zastrukturyzować
 
     if (!QueuedCmdIndexList.isEmpty()) //jeżeli kontener nie jest pusty
     {
-        QListIterator<ArmPosCrntCmdQIdx> QueuedCmdIndexIter(QueuedCmdIndexList);
+        QListIterator<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexIter(QueuedCmdIndexList);
 
         QueuedCmdIndexIter.toFront(); //najstarszy wpis w kontenerze
         if(QueuedCmdIndexIter.hasNext())
         {
             firstPosId = QueuedCmdIndexIter.next(); //najstarszy wpis w kontenerze (najmniejszy ID)
 
-            if(firstPosId.index  - m_ullDobotQueuedCmdIndex < 15)
+            if(firstPosId.index - m_ullDobotQueuedCmdIndex < 15)
             {
                 takenPosId = QueuedCmdIndexList.takeFirst(); //wypchnij na dobota kolejny id...
                 //...ruchu z kontenera. najstarszy wpis w kontenerze znajduje się na jego początku.
@@ -139,46 +109,47 @@ void Dobot::QueuedIdList()
                     ptpCmd.r = takenPosId.r;
                     SetPTPCmd(&ptpCmd, true, &takenPosId.index);
                     break;
-
                 case WAIT:
                     SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
                     break;
-
                 case OPEN_GRIP:
-                    int openGripResult = SetIOPWM(&m_fGripOpened, true, &takenPosId.index);
+                {
+                    m_gripperServo.dutyCycle = m_fGripOpened;
+                    int openGripResult = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
                     if (openGripResult != DobotCommunicate_NoError)
                     {
                         qDebug() << "ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong";
-                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", 'd');
+                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", DOBOT);
                     }
-                    else
-                        this->writeMoveTypeInConsole(sequence, 'o'); //todo: 2 różne typy pisania w konsoli
+                }
                     break;
-
                 case CLOSE_GRIP:
-                    int closeGripResult = SetIOPWM(&m_fGripClosed, true, &takenPosId.index);
+                {
+                    m_gripperServo.dutyCycle = m_fGripClosed;
+                    int closeGripResult = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
                     if (closeGripResult != DobotCommunicate_NoError)
                     {
                         qDebug() << "ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong";
-                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", 'd');
+                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", DOBOT);
                     }
-                    else
-                        this->writeMoveTypeInConsole(sequence, 'c'); //zamienić chary na enumy
+                }
                     break;
-
                 case HOME:
-                    this->addTextToConsole("HomeCmd: recalibrating arm...\n", 'd');
+                {
+                    this->addTextToConsole("HomeCmd: recalibrating arm...\n", DOBOT);
                     HOMECmd HOMEChess;
                     HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
                     int result = SetHOMECmd(&HOMEChess, true, &takenPosId.index);
                     if (result != DobotCommunicate_NoError)
                         qDebug() << "ERROR: SetHOMECmd result != DobotCommunicate_NoError";
+                }
                     break;
-
+                case UP:
+                case DOWN:
                 default:
-                    qDebug() << "ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:" << takenPosId.sequence;
-                    this->addTextToConsole("ERROR: Dobot::QueuedIdList(): unknown takenPosId.type:"
-                                           + takenPosId.sequence, 'd');
+                    qDebug() << "ERROR: Dobot::QueuedIdList(): wrong takenPosId.type:" << takenPosId.sequence;
+                    this->addTextToConsole("ERROR: Dobot::QueuedIdList(): wrong takenPosId.type:"
+                                           + takenPosId.sequence, DOBOT);
                     break;
                 }
             }
@@ -188,19 +159,28 @@ void Dobot::QueuedIdList()
 
 void Dobot::onConnectDobot()
 {
-    //connect dobot
     if (!connectStatus)
     {
         if (ConnectDobot(0, 115200) != DobotConnect_NoError) emit DobotErrorMsgBox();
         connectStatus = true;
+        qDebug() << "Dobot connection success";
+        this->addTextToConsole("Dobot connected \n", DOBOT);
+
+        QTimer *periodicTaskTimer = new QTimer(this);
+        periodicTaskTimer->setObjectName("periodicTaskTimer");
+        connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
+        periodicTaskTimer->setSingleShot(true);
+        periodicTaskTimer->start(5);
+        //ciągle dostaję błąd: QObject::startTimer: Timers can only be used with threads started with QThread
+
+        QTimer *getPoseTimer = new QTimer(this);
+        getPoseTimer->setObjectName("getPoseTimer");
+        connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
+        getPoseTimer->setSingleShot(true);
+        getPoseTimer->start(200);
+
         this->refreshBtn();
         this->initDobot();
-        
-        QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
-        getPoseTimer->start(200);
-        
-        qDebug() << "Dobot connection success";
-        this->addTextToConsole("Dobot connected \n", 'd');
         
         int result = GetQueuedCmdCurrentIndex(&m_ullDobotQueuedCmdIndex); //sprawdź aktualny id i zapisz w zmiennej
         if (result == DobotCommunicate_NoError)
@@ -215,7 +195,7 @@ void Dobot::onConnectDobot()
         {
             qDebug() << "ERROR: Dobot::onConnectDobot(): GetQueuedCmdCurrentIndex gone wrong";
             this->addTextToConsole("ERROR: Dobot::onConnectDobot(): "
-                                   "GetQueuedCmdCurrentIndex gone wrong \n", 'd');
+                                   "GetQueuedCmdCurrentIndex gone wrong \n", DOBOT);
         }
 
         m_ullCoreQueuedCmdIndex = m_ullDobotQueuedCmdIndex; //jeśli dobot przed aktualnym uruchomieniem programu...
@@ -223,6 +203,8 @@ void Dobot::onConnectDobot()
     }
     else
     {
+        QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
+        getPoseTimer->stop();
         connectStatus = false;
         refreshBtn();
         DisconnectDobot();
@@ -237,11 +219,9 @@ void Dobot::refreshBtn() //niby button, ale używamy póki co tylko jako funkcja
 
 void Dobot::initDobot()
 {
-    //Command timeout
-    SetCmdTimeout(3000);
-    //clear old commands and set the queued command running
-    SetQueuedCmdClear();
-    SetQueuedCmdStartExec();
+    SetCmdTimeout(3000); //Command timeout
+    SetQueuedCmdClear(); //clear old commands
+    SetQueuedCmdStartExec(); //set the queued command running
     
     char deviceSN[64];
     GetDeviceSN(deviceSN, sizeof(deviceSN));
@@ -335,7 +315,6 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, SEQUEN
         if (Type == REMOVING) //jako że usuwanie na obszar zbity jest drugim ruchem, to...
             //...pozycję docelową bierki możemy wywnioskować z bierki trzymanej przez chwytak
         {
-            //qDebug() << "pieceFromTo move type = REMOVING";
             nRemPiece = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
             nRemPieceDestLetter = _pChessboard->fieldNrToFieldPos(nRemPiece, ROW);
             nRemPieceDestDigit = _pChessboard->fieldNrToFieldPos(nRemPiece, COLUMN);
@@ -343,7 +322,6 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, SEQUEN
         else if (Type == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
             //...być podana wprost do pieceFromTo()
         {
-            //qDebug() << "pieceFromTo move type = RESTORE";
             //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
             nRemPieceDestLetter = nLetter;
             nRemPieceDestDigit = nDigit;
@@ -353,42 +331,41 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, SEQUEN
         f_zFromTo = _pChessboard->adRemovedPiecesPositions_z[nRemPieceDestLetter][nRemPieceDestDigit];
         f_rFromTo = m_nActualPos;
     }
-    //reszta ruchów: normalne ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
-    else
+    else //ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
     {
-        //qDebug() << "pieceFromTo move type = REST";
         f_xFromTo = _pChessboard->adChessboardPositions_x[nLetter][nDigit];
         f_yFromTo = _pChessboard->adChessboardPositions_y[nLetter][nDigit];
         f_zFromTo = _pChessboard->adChessboardPositions_z[nLetter][nDigit];
         f_rFromTo = m_nActualPos;
-        //qDebug() << "x=" << f_xFromTo << ", y=" << f_yFromTo << ", z=" << f_zFromTo;
     }
     
-    this->writeMoveTypeInConsole(Type);
+    this->writeMoveTypeInConsole(TO_POINT, Type);
     
-    QString QsMoveType = "";
-    bIsPieceMovingFrom ? QsMoveType = ": PieceFrom: " : QsMoveType = ": Pieceto: ";
+    QString QsMoveType;
+    bIsPieceMovingFrom ? QsMoveType = ": piece from " : QsMoveType = ": piece to ";
     qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
              << nLetter << ", nDigit =" << nDigit << ", Type =" << Type;
     emit this->addTextToConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
-                                + QString::number(nDigit+1) + "\n", '0');
+                                + QString::number(nDigit+1) + "\n", NOTHING);
     
-    this->addCmdToList(NORMAL, false, f_xFromTo, f_yFromTo, f_zFromTo + m_nMaxPieceHeight, f_rFromTo);
+    this->addCmdToList(TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo + m_nMaxPieceHeight, f_rFromTo);
     
     _pChessboard->PieceActualPos.Letter = nLetter;
     _pChessboard->PieceActualPos.Digit = nDigit;
 }
 
-void Dobot::gripperOpennedState(bool isGripperOpened, SEQUENCE_TYPE Type) //open/close
+void Dobot::gripperOpennedState(bool isGripperOpened, SEQUENCE_TYPE Type)
 {
-    this->addCmdToList(GRIPPER, isGripperOpened);
+    this->addCmdToList(isGripperOpened ? OPEN_GRIP : CLOSE_GRIP, Type);
+    this->writeMoveTypeInConsole(isGripperOpened ? OPEN_GRIP : CLOSE_GRIP, Type);
 }
 
-void Dobot::wait(int nMs)
+void Dobot::wait(int nMs, SEQUENCE_TYPE sequence)
 {
-    gripperMoveDelay.timeout = nMs; //czekaj 0,3 sekundy po dojściu na pozycję by chwytaka
-    //silniki zdążyły się ruszyć, zanimramię zacznie wykonywać kolejny ruch
-    this->addCmdToList(WAIT);
+    gripperMoveDelay.timeout = nMs; //czekaj chwilę po dojściu na pozycję by silniki...
+    //...chwytaka zdążyły się ruszyć, zanim ramię zacznie wykonywać kolejny ruch
+    this->addCmdToList(WAIT, sequence);
+    this->writeMoveTypeInConsole(WAIT, sequence);
 }
 
 void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TYPE Type)
@@ -397,11 +374,11 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TY
     //pozycje obszaru bierek usuniętych
     if (Type == REMOVING && !bIsArmAboveFromSquare) //jeżeli odstawiamy bierkę na obszar zbitych...
     {
-        qDebug() << "Dobot::armUpDown: _pChessboard->nGripperPiece =" << _pChessboard->nGripperPiece;
+        /*qDebug() << "Dobot::armUpDown: _pChessboard->nGripperPiece =" << _pChessboard->nGripperPiece;
         qDebug() << "Dobot::armUpDown: nRemovingRWPos ="
                  << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)
                  << _pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)
-                 << ", isArmGoingUp?:" << isArmGoingUp;
+                 << ", isArmGoingUp?:" << isArmGoingUp;*/
         //TODO: ten zapis fieldNrToFieldPos działa, ale zmienić jakoś nazewnictwo funkcji, bo jest...
         //...nieadekwatna w tym przypadku.
         f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
@@ -446,7 +423,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TY
     }
     this->addCmdToList(TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
     
-    this->writeMoveTypeInConsole(Type, isArmGoingUp ? 'u' : 'd'); //u-up, d-down
+    this->writeMoveTypeInConsole(isArmGoingUp ? UP : DOWN, Type);
 }
 
 //TODO: chyba to się niczym nie różni od Dobot::pieceFromTo oprócz szachownicy/usuniętych
@@ -488,52 +465,55 @@ void Dobot::checkPWM()
         {
             qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" << gripperControl.address;
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" +
-                                   QString::number(gripperControl.address) + "\n",'d');
+                                   QString::number(gripperControl.address) + "\n", DOBOT);
         }
         if (gripperControl.frequency != 50)
         {
             qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" << gripperControl.address;
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" +
-                                   QString::number(gripperControl.frequency) + "\n",'d');
+                                   QString::number(gripperControl.frequency) + "\n", DOBOT);
         }
         if (gripperControl.dutyCycle != m_fGripOpened && gripperControl.dutyCycle != m_fGripClosed)
         {
             qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" << gripperControl.dutyCycle;
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" +
-                                   QString::number(gripperControl.dutyCycle) + "\n",'d');
+                                   QString::number(gripperControl.dutyCycle) + "\n", DOBOT);
         }
     }
 }
 
-void Dobot::writeMoveTypeInConsole(SEQUENCE_TYPE Type, DOBOT_MOVE moveState)
+void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence)
 {
     QString QsConsoleMsg;
-    switch(Type)
+    switch(sequence)
     {
-    case REGULAR: QsConsoleMsg = "normal"; break; //ruch z szachownicy na szachownicę (zwykły)
-    case CASTLING_KING: QsConsoleMsg = "castling(king)"; break; //ruch po szachownicy (roszada królem)
-    case CASTLING_ROOK: QsConsoleMsg = "castling(rook)"; break; //ruch po szachownicy (roszada wieżą)
-    case ENPASSANT: QsConsoleMsg = "enpassant"; break; //ruch z szachownicy na szachownicę (enpassant)
-    case PROMOTION: QsConsoleMsg = "promotion"; break; //ruch z szachownicy na szachownicę (promocja)
-    case REMOVING: QsConsoleMsg = "remove"; break; //ruch z szachownicy na obszar zbitych bierek
-    case RESTORE: QsConsoleMsg = "restore"; break; //ruch z obszaru zbitych bierek na szachownicę
-    case SERVICE: QsConsoleMsg = "service"; break; //ruch serwisowy
+    case REGULAR: QsConsoleMsg = "normal"; break;
+    case CASTLING_KING: QsConsoleMsg = "castling(king)"; break;
+    case CASTLING_ROOK: QsConsoleMsg = "castling(rook)"; break;
+    case ENPASSANT: QsConsoleMsg = "enpassant"; break;
+    case PROMOTION: QsConsoleMsg = "promotion"; break;
+    case REMOVING: QsConsoleMsg = "remove"; break;
+    case RESTORE: QsConsoleMsg = "restore"; break;
+    case SERVICE: QsConsoleMsg = "service"; break;
     default: QsConsoleMsg = "ERROR. Wrong movement type: "
-                + static_cast<QString>(Type) + "\n"; break;
+                + static_cast<QString>(sequence) + "\n"; break;
     }
-    emit this->addTextToConsole(QsConsoleMsg + "PieceMove", DOBOT);
     
     QString QsSecondMsg;
     switch(moveState)
     {
-    case TO_POINT: break;
-    case OPEN_GRIP: QsSecondMsg = ": GripperOpened\n"; break;
-    case CLOSE_GRIP: QsSecondMsg = ": GripperClosed\n"; break;
-    case UP: QsSecondMsg = ": ArmUp\n"; break;
-    case DOWN: QsSecondMsg = ": ArmDown\n"; break;
-    default: QsSecondMsg = "ERROR. Wrong movement state: " + moveState + "\n"; break;
+    case TO_POINT: QsSecondMsg = ""; break;
+    case WAIT: QsSecondMsg = ": wait " + QString::number(gripperMoveDelay.timeout) + " ms\n"; break;
+    case OPEN_GRIP: QsSecondMsg = ": gripper opened\n"; break;
+    case CLOSE_GRIP: QsSecondMsg = ": gripper closed\n"; break;
+    case UP: QsSecondMsg = ": arm up\n"; break;
+    case DOWN: QsSecondMsg = ": arm down\n"; break;
+    default:
+        QsSecondMsg = "ERROR. Wrong movement state: " + static_cast<QString>(moveState) + "\n";
+        break;
     }
-    if (moveState != 'x') emit this->addTextToConsole(QsSecondMsg, '0');
+
+    emit this->addTextToConsole(QsConsoleMsg + " piece move" + QsSecondMsg, DOBOT);
 }
 
 void Dobot::closeEvent(QCloseEvent *)

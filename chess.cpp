@@ -31,8 +31,6 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable
 void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nPieceFromDigit,
                                 int nPieceToLetter, int nPieceToDigit)
 {
-    _pDobot->writeMoveTypeInConsole(Type);
-
     //jeżeli nie podano skąd i/lub dokąd, to jest to ruch z aktualnego pola szachownicy nad którym wisi ramie
     if (nPieceFromLetter == -1) nPieceFromLetter = _pChessboard->PieceFrom.Letter;
     if (nPieceFromDigit == -1) nPieceFromDigit = _pChessboard->PieceFrom.Digit;
@@ -45,7 +43,7 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nP
         nPieceFromDigit = nPieceToDigit; //...która w każdym innym ruchu jest jako "to"  
     }
 
-    if (Type == RESTORE) _pDobot->addCmdToList(-1, false, 260, -10, 40);
+    if (Type == RESTORE) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
     qDebug() << "-Start move sequence-";
@@ -55,20 +53,20 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nP
     _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, Type);
     _pDobot->armUpDown(DOWN, FROM, Type);
     _pDobot->gripperOpennedState(CLOSE, Type);
-    _pDobot->wait(400);
+    _pDobot->wait(400, Type);
     _pDobot->armUpDown(UP, FROM, Type);
     _pChessboard->pieceStateChanged(FROM, nPieceFromLetter, nPieceFromDigit, Type);
 
-    if (Type == REMOVING || Type == RESTORE) _pDobot->addCmdToList(-1, false, 260, -10, 40);
+    if (Type == REMOVING || Type == RESTORE) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
 
     _pDobot->pieceFromTo(TO, nPieceToLetter, nPieceToDigit, Type);
     _pDobot->armUpDown(DOWN, TO, Type);
     _pDobot->gripperOpennedState(OPEN, Type);
-    _pDobot->wait(400);
+    _pDobot->wait(400, Type);
     _pDobot->armUpDown(UP, TO, Type);
     _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, Type);
 
-    if (Type == REMOVING) _pDobot->addCmdToList(-1, false, 260, -10, 40);
+    if (Type == REMOVING) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
 
     qDebug() << "-End of move sequence-";
     emit this->addTextToConsole("-End of move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
@@ -103,7 +101,7 @@ void Chess::enpassantMovingSequence()
     else
     {
         emit _pDobot->addTextToConsole("Error03!: Wrong turn in enpassant statement: "
-                                            + (QString)_pChessboard->getWhoseTurn() + "/n", 'd');
+                                            + (QString)_pChessboard->getWhoseTurn() + "/n", DOBOT);
         qDebug() << "Error03!: Chess::enpassantMovingSequence(): Unknown turn type: "
                  << _pChessboard->getWhoseTurn() << "/n";
         return;

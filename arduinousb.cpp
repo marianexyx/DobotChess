@@ -34,13 +34,13 @@ void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
         //funkcja setPort() dziedziczy wszystkie atrybuty portu typu BaudRate, DataBits, Parity itd.
         usbPort->setPort(availablePort.at(nPortIndex-1)); //połącz z wybranym portem
         if(!usbPort->open(QIODevice::ReadWrite)) //jezeli port nie jest otwarty
-            this->addTextToConsole("ERROR: Unable to open port\n", 'u');
+            this->addTextToConsole("ERROR: Unable to open port\n", USB);
     }
     else usbInfo = NULL; //wskaźnik czyszczony, by nie wyświetlało wcześniejszych informacji
 
     if (QsPortName != "NULL") //nie pokazuj próby podłączania do pustego portu
     {
-        this->addTextToConsole("Connected to port: " + QsPortName + "\n", 'u');
+        this->addTextToConsole("Connected to port: " + QsPortName + "\n", USB);
         qDebug() << "Connected to port: " << QsPortName;
     }
 }
@@ -49,13 +49,13 @@ void ArduinoUsb::sendDataToUsb(QString QsMsg) //wyslij wiadomość na serial por
 {
     if(usbPort->isOpen())
     {
-        emit this->addTextToConsole(QsMsg + "\n", 'a');
+        emit this->addTextToConsole(QsMsg + "\n", USB_SENT);
         QsMsg += "$"; //wiadomości przez arduino odczytywane są póki nie natrafimy na znak '$'
 
         usbPort->write(QsMsg.toStdString().c_str());
         usbPort->waitForBytesWritten(-1); //czekaj aż przyjdą wszystkie dane
     }
-    else emit this->addTextToConsole("ERROR: USB port is closed\n", 'u');
+    else emit this->addTextToConsole("ERROR: USB port is closed\n", USB);
 }
 
 void ArduinoUsb::readUsbData()
@@ -72,7 +72,7 @@ void ArduinoUsb::readUsbData()
         QsFullSerialMsg.remove('$'); //...to jest to cała wiadomość...
         QsFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
 
-        emit this->addTextToConsole(QsFullSerialMsg + "\n", 'r');
+        emit this->addTextToConsole(QsFullSerialMsg + "\n", USB_RECEIVED);
         this->ManageMsgFromUsb(QsFullSerialMsg);
 
         QByteA_data.clear();
@@ -88,7 +88,7 @@ void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
     else if (QsUsbMsg.left(9) == "promoteTo") emit this->AIEnemySend(QsUsbMsg.left(10));
     else
     {
-        emit this->addTextToConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", 'r');
+        emit this->addTextToConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", USB_RECEIVED);
         qDebug() << "ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
                     " command from usb:" << QsUsbMsg;
     }

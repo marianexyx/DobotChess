@@ -75,7 +75,7 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             _pWebTable, SLOT(checkWebsocketMsg(QString))); //...websocketów na stół gry.
 
     //init JOG control
-    this->initControl();
+    this->initControl(); //dobot
 }
 
 MainWindow::~MainWindow()
@@ -227,8 +227,6 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-//TODO: ogarnąć sygnały wywołujące tą metodę- niech wszystkie się...
-//...nazywają przed wrostków typu: dobot, tcp itd.
 //TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich...
 //...qDebug, by nie robić tego wszędzie.
 //TODO3: dodać przed każdą komendą czas jej wywołania
@@ -242,17 +240,17 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = NOTHING)
     case DOBOT: QsLogType = "<Dobot>: "; break;
     case TCP: QsLogType = "<TCP>: "; break;
     case WEBSOCKET: QsLogType = "<Websockets>: "; break;
-    case MAINWINDOW: QsLogType = "<mainwindow>: "; break;
+    case MAINWINDOW: QsLogType = "<Mainwindow>: "; break;
     case USB: QsLogType = "<USB>: "; break;
     case USB_SENT: QsLogType = "<USB> Sent: "; break;
     case USB_RECEIVED: QsLogType = "<USB> Received: "; break;
     default:
-        QString QsChar = msgType;
+        QString QsChar = static_cast<QString>(msgType);
         QsLogType = "<ERROR: Wrong log type>: " + QsChar + ": ";
         break;
     }
 
-    if(QStrMsg.isEmpty()) return; //blokada możliwości wysyłania pustej wiadomości
+    if(QStrMsg.isEmpty()) return;
 
     if(QStrMsg == "/clear")
     {
@@ -353,7 +351,6 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
         {
             QString QsServiceMsg = ui->emulatePlayerMsgLineEdit->text();
             if (QsServiceMsg.left(4) == "move") QsServiceMsg = QsServiceMsg.mid(7);
-            qDebug() << "QsServiceMsg.mid(7) = " << QsServiceMsg;
 
             int nServiceLetterPos = _pChessboard->findPieceLetterPos(QsServiceMsg.left(1));
             int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
@@ -363,10 +360,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 float fService_x = _pChessboard->adChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
                 float fService_y = _pChessboard->adChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
                 float fService_z = _pChessboard->adChessboardPositions_z[nServiceLetterPos][nServiceDigitPos];
-                qDebug() << "fService_x = " << fService_x << ", fService_y = " << fService_y <<
-                            ", fService_z = " << fService_z;
 
-                _pDobotArm->addCmdToList(-1, false, fService_x, fService_y, fService_z +
+                _pDobotArm->addCmdToList(TO_POINT, REMOVING, fService_x, fService_y, fService_z +
                                          _pDobotArm->getMaxPieceHeight(), ACTUAL_POS);
                 _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
                 _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
@@ -418,13 +413,13 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
     int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToConsole("Cleared Dobot Queued Cmds.\n", 'd');
+        _pDobotArm->addTextToConsole("Cleared Dobot Queued Cmds.\n", DOBOT);
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", 'd');
+        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", DOBOT);
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.", 'd');
+        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.", DOBOT);
     else _pDobotArm->addTextToConsole("ERROR: wrong result in "
-                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n", 'd');
+                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n", DOBOT);
 }
 
 void MainWindow::on_executeDobotComandsBtn_clicked()
@@ -432,13 +427,13 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
     int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToConsole("Start executing dobot queued cmds.\n", 'd');
+        _pDobotArm->addTextToConsole("Start executing dobot queued cmds.\n", DOBOT);
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", 'd');
+        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", DOBOT);
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.\n", 'd');
+        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.\n", DOBOT);
     else _pDobotArm->addTextToConsole("ERROR: wrong result in "
-                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n", 'd');
+                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n", DOBOT);
 }
 
 void MainWindow::on_AIBtn_clicked()

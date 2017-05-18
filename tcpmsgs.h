@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 #include <QString>
+#include "vars/log.h"
 
 struct TcpMsgMetadata
 {
@@ -39,7 +40,7 @@ public slots:
     void TcpQueueMsg(int nSender, QString msg);
 
 signals:
-    void addTextToConsole(QString, char);
+    void addTextToConsole(QString, LOG);
     void msgFromTcpToWeb(QString, QString);
     void msgFromTcpToArd(QString, QString);
 };

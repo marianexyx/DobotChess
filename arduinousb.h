@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QSerialPort> //obsługa portu
 #include <QSerialPortInfo> //dostarczanie informacji o porcie
+#include "vars/log.h"
 
 class ArduinoUsb: public QObject
 {
@@ -39,7 +40,7 @@ private slots:
     //TODO: te sygnały to rympał w ogarnianiu kodu. działają na klasy pod którymi nie są, co...
     //...powoduje chaos w ogarnianiu co skąd i kiedy leci
 signals:
-    void addTextToConsole(QString, char);
+    void addTextToConsole(QString, LOG);
     void updatePortsComboBox(int);
     void reset();
     void AIEnemySend(QString);

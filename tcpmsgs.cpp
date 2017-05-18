@@ -55,7 +55,7 @@ void TCPMsgs::doTcpConnect()
 
     if(!socket->waitForConnected(5000))
     {
-        emit addTextToConsole("Error12:" + socket->errorString() + "\n", 't');
+        emit addTextToConsole("Error12:" + socket->errorString() + "\n", TCP);
     }
 }
 
@@ -68,17 +68,17 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
         qDebug() << "ERROR: TCPMsgs: The host was not found. Please check the"
                     "host name and port settings." ;
         emit addTextToConsole("ERROR: TCPMsgs: The host was not found. Please check the"
-                              "host name and port settings.\n", 't');
+                              "host name and port settings.\n", TCP);
         break;
     case QAbstractSocket::ConnectionRefusedError:
         qDebug() << "ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
                     "running, and check that the host name and port settings are correct.";
         emit addTextToConsole("ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
-                              "running, and check that the host name and port settings are correct.\n", 't');
+                              "running, and check that the host name and port settings are correct.\n", TCP);
         break;
     default:
         qDebug() << "ERROR: TCPMsgs: The following error occurred:" << socket->errorString();
-        emit addTextToConsole("ERROR: TCPMsgs: The following error occurred: " + socket->errorString() + "\n", 't');
+        emit addTextToConsole("ERROR: TCPMsgs: The following error occurred: " + socket->errorString() + "\n", TCP);
     }
 }
 
@@ -101,7 +101,7 @@ void TCPMsgs::connected()
     //todo: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
     socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
 
-    emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, 't');
+    emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, TCP);
 }
 
 void TCPMsgs::disconnected()
@@ -138,7 +138,7 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
         if (QStrMsgFromTcp.right(1) != "\n")
             QStrMsgFromTcp += "\n";
 
-        emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, 't');
+        emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, TCP);
 
         TcpMsgMetadata QStrData;
         if (!TCPMsgsList.isEmpty())

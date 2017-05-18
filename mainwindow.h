@@ -17,8 +17,6 @@
 #include "igorbot.h"
 #include "webchess.h"
 
-enum LOG { NOTHING, CORE, DOBOT, TCP, WEBSOCKET, MAINWINDOW, USB, USB_SENT, USB_RECEIVED };
-
 namespace Ui
 {
     class MainWindow;

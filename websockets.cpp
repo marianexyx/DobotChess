@@ -13,7 +13,7 @@ Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
                 this, &Websockets::onNewConnection);
 
         qDebug() << "WebSocket server listening on port" << port;
-        emit addTextToConsole("WebSocket server listening on port" + port, 'w');
+        emit addTextToConsole("WebSocket server listening on port" + port, WEBSOCKET);
     }
 
     _pWebTable = pWebTable;
@@ -36,7 +36,7 @@ void Websockets::onNewConnection() //nowe połączenia
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::processWebsocketMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected); //a jak disconnect, to disconnect
     m_clients << pSocket;
-    emit addTextToConsole("New connection \n", 'w');
+    emit addTextToConsole("New connection \n", WEBSOCKET);
 }
 
 //TODO: *wszystkie wiadomośći które przychodzą ze strony powinny być opatrzone identyfikatorem tego
@@ -243,14 +243,14 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
         }*/
     }
     if (!QsWebsocketConsoleMsg.isEmpty())
-        emit addTextToConsole(QsWebsocketConsoleMsg + "\n", 'w');
+        emit addTextToConsole(QsWebsocketConsoleMsg + "\n", WEBSOCKET);
     QsWebsocketConsoleMsg.clear();
 }
 
 void Websockets::sendToChess(QString QsMsgForChessClass)
 {
     qDebug() << "Sending to 'chess' class: " << QsMsgForChessClass;
-    emit this->addTextToConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", 'w');
+    emit this->addTextToConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", WEBSOCKET);
     emit this->MsgFromWebsocketsToChess(QsMsgForChessClass);
 }
 
@@ -261,6 +261,6 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
     {
         m_clients.removeAll(pClient);
         pClient->deleteLater();
-        emit addTextToConsole("Disconnected\n", 'w');
+        emit addTextToConsole("Disconnected\n", WEBSOCKET);
     }
 }

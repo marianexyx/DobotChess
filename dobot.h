@@ -11,10 +11,13 @@
 #include "DobotDll.h"
 #include "DobotType.h"
 #include "chessboard.h"
+#include "vars/log.h"
+
+//todo: oddzielić wszystko co związane z szachami od klasy dobota
 
 const int ACTUAL_POS = 1000;
 enum DOBOT_MOVE { TO_POINT, HOME, WAIT, OPEN_GRIP, CLOSE_GRIP, UP, DOWN };
-struct ArmPosCrntCmdQIdx //ArmPosForCurrentCmdQueuedIndex
+struct ArmPosForCurrentCmdQueuedIndex
 {
     unsigned long long index;
     SEQUENCE_TYPE sequence;
@@ -54,9 +57,9 @@ private:
     unsigned long long m_ullDobotQueuedCmdIndex; //aktualny id kolejki ruchu wykonywany przez dobota
     //Id nigdy się nie resetuje, bo raczej nie dobiję do 18 triliardów ruchów (unsigned long long)
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
-    ArmPosCrntCmdQIdx m_posIdx; //dane ramienia przypisane do danego indexu dobota  
-    QList<ArmPosCrntCmdQIdx> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
-    ArmPosCrntCmdQIdx firstPosId, lastPosId, takenPosId; //TODO: sprawdzić to
+    ArmPosForCurrentCmdQueuedIndex m_posIdx; //dane ramienia przypisane do danego indexu dobota
+    QList<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
+    ArmPosForCurrentCmdQueuedIndex firstPosId, lastPosId, takenPosId; //TODO: sprawdzić to
 
     void checkPWM();
 
@@ -77,13 +80,13 @@ public:
 
     void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, SEQUENCE_TYPE Type);
     void gripperOpennedState(bool gripperOpened, SEQUENCE_TYPE Type);
-    void wait(int nMs);
+    void wait(int nMs, SEQUENCE_TYPE sequence);
     void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = NONE,
                       float x = ACTUAL_POS, float y = ACTUAL_POS,
                       float z = ACTUAL_POS, float r = ACTUAL_POS);
     void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TYPE Type);
     void removePiece(int nPieceRowPos, int nPieceColumnPos);
-    void writeMoveTypeInConsole(SEQUENCE_TYPE Type, DOBOT_MOVE moveState);
+    void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = NONE);
     void QueuedIdList();
 
     //metody dostępowe do pól
@@ -106,7 +109,7 @@ public slots:
 
 signals:
     //sygnały do używania GUI MainWindow
-    void addTextToConsole(QString QS_msg, char chLogType); //dodawanie komunikatu do konsoli
+    void addTextToConsole(QString, LOG);
     void JointLabelText(QString QSLabelText, short sJoint);
     void AxisLabelText(QString QSAxisLabelText, char chAxis);
     void RefreshDobotButtonsStates(bool bDobotButtonsStates);

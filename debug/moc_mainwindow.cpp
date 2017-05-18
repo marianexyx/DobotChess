@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[56];
-    char stringdata0[1044];
+    QByteArrayData data[57];
+    char stringdata0[1046];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -38,59 +38,60 @@ QT_MOC_LITERAL(5, 52, 20), // "onJOGCtrlBtnReleased"
 QT_MOC_LITERAL(6, 73, 19), // "onPTPsendBtnClicked"
 QT_MOC_LITERAL(7, 93, 14), // "writeInConsole"
 QT_MOC_LITERAL(8, 108, 7), // "QStrMsg"
-QT_MOC_LITERAL(9, 116, 9), // "chLogType"
-QT_MOC_LITERAL(10, 126, 17), // "changeWindowtitle"
-QT_MOC_LITERAL(11, 144, 5), // "title"
-QT_MOC_LITERAL(12, 150, 18), // "setDobotValidators"
-QT_MOC_LITERAL(13, 169, 17), // "setJointLabelText"
-QT_MOC_LITERAL(14, 187, 16), // "QSJointLabelText"
-QT_MOC_LITERAL(15, 204, 6), // "sJoint"
-QT_MOC_LITERAL(16, 211, 16), // "setAxisLabelText"
-QT_MOC_LITERAL(17, 228, 15), // "QSAxisLabelText"
-QT_MOC_LITERAL(18, 244, 6), // "chAxis"
-QT_MOC_LITERAL(19, 251, 21), // "setDobotButtonsStates"
-QT_MOC_LITERAL(20, 273, 19), // "bDobotButtonsStates"
-QT_MOC_LITERAL(21, 293, 15), // "setDeviceLabels"
-QT_MOC_LITERAL(22, 309, 10), // "QSdeviceSN"
-QT_MOC_LITERAL(23, 320, 12), // "QSdeviceName"
-QT_MOC_LITERAL(24, 333, 15), // "QSdeviceVersion"
-QT_MOC_LITERAL(25, 349, 20), // "showDobotErrorMsgBox"
-QT_MOC_LITERAL(26, 370, 39), // "on_emulatePlayerMsgLineEdit_t..."
-QT_MOC_LITERAL(27, 410, 11), // "textChanged"
-QT_MOC_LITERAL(28, 422, 30), // "on_sendSimulatedMsgBtn_clicked"
-QT_MOC_LITERAL(29, 453, 14), // "setQueueLabels"
-QT_MOC_LITERAL(30, 468, 6), // "nSpace"
-QT_MOC_LITERAL(31, 475, 8), // "nDobotId"
-QT_MOC_LITERAL(32, 484, 10), // "nCoreMaxId"
-QT_MOC_LITERAL(33, 495, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(34, 507, 10), // "CoreNextId"
-QT_MOC_LITERAL(35, 518, 23), // "on_calibrateBtn_clicked"
-QT_MOC_LITERAL(36, 542, 16), // "on_upBtn_clicked"
-QT_MOC_LITERAL(37, 559, 18), // "on_downBtn_clicked"
-QT_MOC_LITERAL(38, 578, 29), // "on_resetDobotIndexBtn_clicked"
-QT_MOC_LITERAL(39, 608, 33), // "on_executeDobotComandsBtn_cli..."
-QT_MOC_LITERAL(40, 642, 16), // "on_AIBtn_clicked"
-QT_MOC_LITERAL(41, 659, 25), // "on_AIEnemySendBtn_clicked"
-QT_MOC_LITERAL(42, 685, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(43, 705, 9), // "nUsbPorst"
-QT_MOC_LITERAL(44, 715, 36), // "on_portsComboBox_currentIndex..."
-QT_MOC_LITERAL(45, 752, 25), // "on_reloadPortsBtn_clicked"
-QT_MOC_LITERAL(46, 778, 21), // "on_sendUsbBtn_clicked"
-QT_MOC_LITERAL(47, 800, 25), // "on_openGripperBtn_clicked"
-QT_MOC_LITERAL(48, 826, 26), // "on_closeGripperBtn_clicked"
-QT_MOC_LITERAL(49, 853, 24), // "on_startGmPosBtn_clicked"
-QT_MOC_LITERAL(50, 878, 24), // "on_startDtPosBtn_clicked"
-QT_MOC_LITERAL(51, 903, 29), // "on_SimulateFromUsbBtn_clicked"
-QT_MOC_LITERAL(52, 933, 21), // "on_sendTcpBtn_clicked"
-QT_MOC_LITERAL(53, 955, 30), // "on_sendTcpLineEdit_textChanged"
-QT_MOC_LITERAL(54, 986, 38), // "on_SimulateFromUsbLineEdit_te..."
-QT_MOC_LITERAL(55, 1025, 18) // "on_homeBtn_clicked"
+QT_MOC_LITERAL(9, 116, 3), // "LOG"
+QT_MOC_LITERAL(10, 120, 7), // "msgType"
+QT_MOC_LITERAL(11, 128, 17), // "changeWindowtitle"
+QT_MOC_LITERAL(12, 146, 5), // "title"
+QT_MOC_LITERAL(13, 152, 18), // "setDobotValidators"
+QT_MOC_LITERAL(14, 171, 17), // "setJointLabelText"
+QT_MOC_LITERAL(15, 189, 16), // "QSJointLabelText"
+QT_MOC_LITERAL(16, 206, 6), // "sJoint"
+QT_MOC_LITERAL(17, 213, 16), // "setAxisLabelText"
+QT_MOC_LITERAL(18, 230, 15), // "QSAxisLabelText"
+QT_MOC_LITERAL(19, 246, 6), // "chAxis"
+QT_MOC_LITERAL(20, 253, 21), // "setDobotButtonsStates"
+QT_MOC_LITERAL(21, 275, 19), // "bDobotButtonsStates"
+QT_MOC_LITERAL(22, 295, 15), // "setDeviceLabels"
+QT_MOC_LITERAL(23, 311, 10), // "QSdeviceSN"
+QT_MOC_LITERAL(24, 322, 12), // "QSdeviceName"
+QT_MOC_LITERAL(25, 335, 15), // "QSdeviceVersion"
+QT_MOC_LITERAL(26, 351, 20), // "showDobotErrorMsgBox"
+QT_MOC_LITERAL(27, 372, 39), // "on_emulatePlayerMsgLineEdit_t..."
+QT_MOC_LITERAL(28, 412, 11), // "textChanged"
+QT_MOC_LITERAL(29, 424, 30), // "on_sendSimulatedMsgBtn_clicked"
+QT_MOC_LITERAL(30, 455, 14), // "setQueueLabels"
+QT_MOC_LITERAL(31, 470, 6), // "nSpace"
+QT_MOC_LITERAL(32, 477, 8), // "nDobotId"
+QT_MOC_LITERAL(33, 486, 10), // "nCoreMaxId"
+QT_MOC_LITERAL(34, 497, 11), // "nCoreIdLeft"
+QT_MOC_LITERAL(35, 509, 10), // "CoreNextId"
+QT_MOC_LITERAL(36, 520, 23), // "on_calibrateBtn_clicked"
+QT_MOC_LITERAL(37, 544, 16), // "on_upBtn_clicked"
+QT_MOC_LITERAL(38, 561, 18), // "on_downBtn_clicked"
+QT_MOC_LITERAL(39, 580, 29), // "on_resetDobotIndexBtn_clicked"
+QT_MOC_LITERAL(40, 610, 33), // "on_executeDobotComandsBtn_cli..."
+QT_MOC_LITERAL(41, 644, 16), // "on_AIBtn_clicked"
+QT_MOC_LITERAL(42, 661, 25), // "on_AIEnemySendBtn_clicked"
+QT_MOC_LITERAL(43, 687, 19), // "updatePortsComboBox"
+QT_MOC_LITERAL(44, 707, 9), // "nUsbPorst"
+QT_MOC_LITERAL(45, 717, 36), // "on_portsComboBox_currentIndex..."
+QT_MOC_LITERAL(46, 754, 25), // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(47, 780, 21), // "on_sendUsbBtn_clicked"
+QT_MOC_LITERAL(48, 802, 25), // "on_openGripperBtn_clicked"
+QT_MOC_LITERAL(49, 828, 26), // "on_closeGripperBtn_clicked"
+QT_MOC_LITERAL(50, 855, 24), // "on_startGmPosBtn_clicked"
+QT_MOC_LITERAL(51, 880, 24), // "on_startDtPosBtn_clicked"
+QT_MOC_LITERAL(52, 905, 29), // "on_SimulateFromUsbBtn_clicked"
+QT_MOC_LITERAL(53, 935, 21), // "on_sendTcpBtn_clicked"
+QT_MOC_LITERAL(54, 957, 30), // "on_sendTcpLineEdit_textChanged"
+QT_MOC_LITERAL(55, 988, 38), // "on_SimulateFromUsbLineEdit_te..."
+QT_MOC_LITERAL(56, 1027, 18) // "on_homeBtn_clicked"
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
     "index\0onJOGCtrlBtnReleased\0"
     "onPTPsendBtnClicked\0writeInConsole\0"
-    "QStrMsg\0chLogType\0changeWindowtitle\0"
+    "QStrMsg\0LOG\0msgType\0changeWindowtitle\0"
     "title\0setDobotValidators\0setJointLabelText\0"
     "QSJointLabelText\0sJoint\0setAxisLabelText\0"
     "QSAxisLabelText\0chAxis\0setDobotButtonsStates\0"
@@ -139,61 +140,61 @@ static const uint qt_meta_data_MainWindow[] = {
        5,    0,  193,    2, 0x08 /* Private */,
        6,    0,  194,    2, 0x08 /* Private */,
        7,    2,  195,    2, 0x08 /* Private */,
-      10,    1,  200,    2, 0x08 /* Private */,
-      12,    0,  203,    2, 0x08 /* Private */,
-      13,    2,  204,    2, 0x08 /* Private */,
-      16,    2,  209,    2, 0x08 /* Private */,
-      19,    1,  214,    2, 0x08 /* Private */,
-      21,    3,  217,    2, 0x08 /* Private */,
-      25,    0,  224,    2, 0x08 /* Private */,
-      26,    1,  225,    2, 0x08 /* Private */,
-      28,    0,  228,    2, 0x08 /* Private */,
-      29,    5,  229,    2, 0x08 /* Private */,
-      35,    0,  240,    2, 0x08 /* Private */,
-      36,    0,  241,    2, 0x08 /* Private */,
-      37,    0,  242,    2, 0x08 /* Private */,
-      38,    0,  243,    2, 0x08 /* Private */,
-      39,    0,  244,    2, 0x08 /* Private */,
-      40,    0,  245,    2, 0x08 /* Private */,
-      41,    0,  246,    2, 0x08 /* Private */,
-      42,    1,  247,    2, 0x08 /* Private */,
-      44,    1,  250,    2, 0x08 /* Private */,
-      45,    0,  253,    2, 0x08 /* Private */,
-      46,    0,  254,    2, 0x08 /* Private */,
-      47,    0,  255,    2, 0x08 /* Private */,
-      48,    0,  256,    2, 0x08 /* Private */,
-      49,    0,  257,    2, 0x08 /* Private */,
-      50,    0,  258,    2, 0x08 /* Private */,
-      51,    0,  259,    2, 0x08 /* Private */,
-      52,    0,  260,    2, 0x08 /* Private */,
-      53,    1,  261,    2, 0x08 /* Private */,
-      54,    1,  264,    2, 0x08 /* Private */,
-      55,    0,  267,    2, 0x08 /* Private */,
+      11,    1,  200,    2, 0x08 /* Private */,
+      13,    0,  203,    2, 0x08 /* Private */,
+      14,    2,  204,    2, 0x08 /* Private */,
+      17,    2,  209,    2, 0x08 /* Private */,
+      20,    1,  214,    2, 0x08 /* Private */,
+      22,    3,  217,    2, 0x08 /* Private */,
+      26,    0,  224,    2, 0x08 /* Private */,
+      27,    1,  225,    2, 0x08 /* Private */,
+      29,    0,  228,    2, 0x08 /* Private */,
+      30,    5,  229,    2, 0x08 /* Private */,
+      36,    0,  240,    2, 0x08 /* Private */,
+      37,    0,  241,    2, 0x08 /* Private */,
+      38,    0,  242,    2, 0x08 /* Private */,
+      39,    0,  243,    2, 0x08 /* Private */,
+      40,    0,  244,    2, 0x08 /* Private */,
+      41,    0,  245,    2, 0x08 /* Private */,
+      42,    0,  246,    2, 0x08 /* Private */,
+      43,    1,  247,    2, 0x08 /* Private */,
+      45,    1,  250,    2, 0x08 /* Private */,
+      46,    0,  253,    2, 0x08 /* Private */,
+      47,    0,  254,    2, 0x08 /* Private */,
+      48,    0,  255,    2, 0x08 /* Private */,
+      49,    0,  256,    2, 0x08 /* Private */,
+      50,    0,  257,    2, 0x08 /* Private */,
+      51,    0,  258,    2, 0x08 /* Private */,
+      52,    0,  259,    2, 0x08 /* Private */,
+      53,    0,  260,    2, 0x08 /* Private */,
+      54,    1,  261,    2, 0x08 /* Private */,
+      55,    1,  264,    2, 0x08 /* Private */,
+      56,    0,  267,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    4,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::Char,    8,    9,
-    QMetaType::Void, QMetaType::QString,   11,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 9,    8,   10,
+    QMetaType::Void, QMetaType::QString,   12,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::Short,   14,   15,
-    QMetaType::Void, QMetaType::QString, QMetaType::Char,   17,   18,
-    QMetaType::Void, QMetaType::Bool,   20,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString,   22,   23,   24,
+    QMetaType::Void, QMetaType::QString, QMetaType::Short,   15,   16,
+    QMetaType::Void, QMetaType::QString, QMetaType::Char,   18,   19,
+    QMetaType::Void, QMetaType::Bool,   21,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString,   23,   24,   25,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   27,
+    QMetaType::Void, QMetaType::QString,   28,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   30,   31,   32,   33,   34,
-    QMetaType::Void,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   31,   32,   33,   34,   35,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   43,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   44,
     QMetaType::Void, QMetaType::Int,    4,
     QMetaType::Void,
     QMetaType::Void,
@@ -203,8 +204,8 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   27,
-    QMetaType::Void, QMetaType::QString,   27,
+    QMetaType::Void, QMetaType::QString,   28,
+    QMetaType::Void, QMetaType::QString,   28,
     QMetaType::Void,
 
        0        // eod
@@ -220,7 +221,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->onJOGCtrlBtnPressed((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 2: _t->onJOGCtrlBtnReleased(); break;
         case 3: _t->onPTPsendBtnClicked(); break;
-        case 4: _t->writeInConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
+        case 4: _t->writeInConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 5: _t->changeWindowtitle((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 6: _t->setDobotValidators(); break;
         case 7: _t->setJointLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< short(*)>(_a[2]))); break;

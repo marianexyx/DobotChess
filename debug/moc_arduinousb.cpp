@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_ArduinoUsb_t {
-    QByteArrayData data[10];
-    char stringdata0[114];
+    QByteArrayData data[11];
+    char stringdata0[118];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -32,16 +32,17 @@ static const qt_meta_stringdata_ArduinoUsb_t qt_meta_stringdata_ArduinoUsb = {
 QT_MOC_LITERAL(0, 0, 10), // "ArduinoUsb"
 QT_MOC_LITERAL(1, 11, 16), // "addTextToConsole"
 QT_MOC_LITERAL(2, 28, 0), // ""
-QT_MOC_LITERAL(3, 29, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(4, 49, 5), // "reset"
-QT_MOC_LITERAL(5, 55, 11), // "AIEnemySend"
-QT_MOC_LITERAL(6, 67, 11), // "TcpQueueMsg"
-QT_MOC_LITERAL(7, 79, 16), // "portIndexChanged"
-QT_MOC_LITERAL(8, 96, 5), // "index"
-QT_MOC_LITERAL(9, 102, 11) // "readUsbData"
+QT_MOC_LITERAL(3, 29, 3), // "LOG"
+QT_MOC_LITERAL(4, 33, 19), // "updatePortsComboBox"
+QT_MOC_LITERAL(5, 53, 5), // "reset"
+QT_MOC_LITERAL(6, 59, 11), // "AIEnemySend"
+QT_MOC_LITERAL(7, 71, 11), // "TcpQueueMsg"
+QT_MOC_LITERAL(8, 83, 16), // "portIndexChanged"
+QT_MOC_LITERAL(9, 100, 5), // "index"
+QT_MOC_LITERAL(10, 106, 11) // "readUsbData"
 
     },
-    "ArduinoUsb\0addTextToConsole\0\0"
+    "ArduinoUsb\0addTextToConsole\0\0LOG\0"
     "updatePortsComboBox\0reset\0AIEnemySend\0"
     "TcpQueueMsg\0portIndexChanged\0index\0"
     "readUsbData"
@@ -63,24 +64,24 @@ static const uint qt_meta_data_ArduinoUsb[] = {
 
  // signals: name, argc, parameters, tag, flags
        1,    2,   49,    2, 0x06 /* Public */,
-       3,    1,   54,    2, 0x06 /* Public */,
-       4,    0,   57,    2, 0x06 /* Public */,
-       5,    1,   58,    2, 0x06 /* Public */,
-       6,    2,   61,    2, 0x06 /* Public */,
+       4,    1,   54,    2, 0x06 /* Public */,
+       5,    0,   57,    2, 0x06 /* Public */,
+       6,    1,   58,    2, 0x06 /* Public */,
+       7,    2,   61,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    1,   66,    2, 0x0a /* Public */,
-       9,    0,   69,    2, 0x08 /* Private */,
+       8,    1,   66,    2, 0x0a /* Public */,
+      10,    0,   69,    2, 0x08 /* Private */,
 
  // signals: parameters
-    QMetaType::Void, QMetaType::QString, QMetaType::Char,    2,    2,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
     QMetaType::Void, QMetaType::Int,    2,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    2,
     QMetaType::Void, QMetaType::Int, QMetaType::QString,    2,    2,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::Int,    8,
+    QMetaType::Void, QMetaType::Int,    9,
     QMetaType::Void,
 
        0        // eod
@@ -92,7 +93,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         ArduinoUsb *_t = static_cast<ArduinoUsb *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
+        case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 1: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 2: _t->reset(); break;
         case 3: _t->AIEnemySend((*reinterpret_cast< QString(*)>(_a[1]))); break;
@@ -105,7 +106,7 @@ void ArduinoUsb::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         int *result = reinterpret_cast<int *>(_a[0]);
         void **func = reinterpret_cast<void **>(_a[1]);
         {
-            typedef void (ArduinoUsb::*_t)(QString , char );
+            typedef void (ArduinoUsb::*_t)(QString , LOG );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ArduinoUsb::addTextToConsole)) {
                 *result = 0;
                 return;
@@ -179,7 +180,7 @@ int ArduinoUsb::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void ArduinoUsb::addTextToConsole(QString _t1, char _t2)
+void ArduinoUsb::addTextToConsole(QString _t1, LOG _t2)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

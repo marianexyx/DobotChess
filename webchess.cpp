@@ -31,7 +31,7 @@ WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 
 void WebChess::GameStarted() //zareaguj na to że gra wystartowała
 {
-    _pWebsockets->addTextToConsole("new_game\n", 'w');
+    _pWebsockets->addTextToConsole("new_game\n", WEBSOCKET);
     qDebug() << "Sending 'new_game' to site";
     if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
 }
@@ -127,23 +127,23 @@ void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
             _bServiceTests) //albo mamy do czynienia z zapytaniem serwisowym
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
-        _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", 'w');
+        _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", WEBSOCKET);
         _pTCPMsgs->TcpQueueMsg(WEBSITE, "new");
     }
-    else _pWebsockets->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", 'w');
+    else _pWebsockets->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", WEBSOCKET);
 }
 
 void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
 { //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    _pWebsockets->addTextToConsole("WebChess::MoveTcpPiece: Sending normal move to tcp: " + msg + "\n", 'w');
+    _pWebsockets->addTextToConsole("WebChess::MoveTcpPiece: Sending normal move to tcp: " + msg + "\n", WEBSOCKET);
     qDebug() << "WebChess::MoveTcpPiece: Sending normal move to tcp: " << msg;
     _pTCPMsgs->TcpQueueMsg(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
 void WebChess::Status()
 {
-    _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", 'w');
+    _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", WEBSOCKET);
     qDebug() << "Sending 'status' command to tcp";
     _pTCPMsgs->TcpQueueMsg(WEBSITE, "status");
 }

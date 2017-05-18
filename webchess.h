@@ -37,7 +37,7 @@ public:
      void resetBoardCompleted();
 
 signals:
-    //void addTextToConsole(QString, char); //TODO: sygnał będę miał z klasy bazowej?
+    void addTextToConsole(QString, LOG);
 
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//
