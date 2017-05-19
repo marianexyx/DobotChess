@@ -1,8 +1,5 @@
 #include "chessboard.h"
 
-#define ROW 1
-#define COLUMN 0
-
 Chessboard::Chessboard():
     anStartBoard{
 {1, 9, 0, 0, 0, 0, 17, 25} ,

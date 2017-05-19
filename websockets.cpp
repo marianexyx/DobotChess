@@ -1,6 +1,6 @@
 #include "websockets.h"
 
-Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
+Websockets::Websockets(Chessboard *pChessboard, WebTable *pWebTable, quint16 port, QObject *parent):
     QObject(parent),
     m_clients()
 {
@@ -17,6 +17,7 @@ Websockets::Websockets(WebTable *pWebTable, quint16 port, QObject *parent):
     }
 
     _pWebTable = pWebTable;
+    _pChessboard = pChessboard;
 }
 
 Websockets::~Websockets()
@@ -81,9 +82,9 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
         }
         else if (QsWsMsgToProcess.mid(6) == "whose_turn")
         {
-            qDebug() << "Sending to website: checked_wt_is " << _pWebTable->getWhoseTurn();
-            QsWebsocketConsoleMsg = "Sending to website: checked_wt_is " + _pWebTable->getWhoseTurn();
-            pClient->sendTextMessage("checked_wt_is " + _pWebTable->getWhoseTurn());
+            qDebug() << "Sending to website: checked_wt_is " << _pChessboard->getWhoseTurn();
+            QsWebsocketConsoleMsg = "Sending to website: checked_wt_is " + _pChessboard->getWhoseTurn();
+            pClient->sendTextMessage("checked_wt_is " + _pChessboard->getWhoseTurn());
         }
         else
         {
@@ -117,9 +118,9 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
             else if (QsWsMsgToProcess.left(10) == "whose_turn") //?TODO: wiadomość wyskakuje 2 razy w qdebug
             {
                 emit MsgFromWebsocketsToWebtable(QsWsMsgToProcess); //zapamiętaj czyja jest tura
-                qDebug() << "Echo back to website: whose_turn " << _pWebTable->getWhoseTurn();
-                QsWebsocketConsoleMsg = "Echo back to website: whose_turn " + _pWebTable->getWhoseTurn();
-                pClient->sendTextMessage("whose_turn " + _pWebTable->getWhoseTurn()); //wyślij do websocketowców info o turze
+                qDebug() << "Echo back to website: whose_turn " << _pChessboard->getWhoseTurn();
+                QsWebsocketConsoleMsg = "Echo back to website: whose_turn " + _pChessboard->getWhoseTurn();
+                pClient->sendTextMessage("whose_turn " + _pChessboard->getWhoseTurn()); //wyślij do websocketowców info o turze
             }
             else if (QsWsMsgToProcess == "new_game") //udało się rozpocząć nową grę. wyślij info o tym na WWW
             {

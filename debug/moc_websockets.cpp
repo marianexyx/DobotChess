@@ -36,17 +36,17 @@ QT_MOC_LITERAL(3, 29, 3), // "LOG"
 QT_MOC_LITERAL(4, 33, 24), // "MsgFromWebsocketsToChess"
 QT_MOC_LITERAL(5, 58, 21), // "QStrMsgFromWebsockets"
 QT_MOC_LITERAL(6, 80, 27), // "MsgFromWebsocketsToWebtable"
-QT_MOC_LITERAL(7, 108, 19), // "processWebsocketMsg"
-QT_MOC_LITERAL(8, 128, 19), // "QS_WbstMsgToProcess"
-QT_MOC_LITERAL(9, 148, 15), // "onNewConnection"
-QT_MOC_LITERAL(10, 164, 18) // "socketDisconnected"
+QT_MOC_LITERAL(7, 108, 18), // "socketDisconnected"
+QT_MOC_LITERAL(8, 127, 19), // "processWebsocketMsg"
+QT_MOC_LITERAL(9, 147, 19), // "QS_WbstMsgToProcess"
+QT_MOC_LITERAL(10, 167, 15) // "onNewConnection"
 
     },
     "Websockets\0addTextToConsole\0\0LOG\0"
     "MsgFromWebsocketsToChess\0QStrMsgFromWebsockets\0"
     "MsgFromWebsocketsToWebtable\0"
-    "processWebsocketMsg\0QS_WbstMsgToProcess\0"
-    "onNewConnection\0socketDisconnected"
+    "socketDisconnected\0processWebsocketMsg\0"
+    "QS_WbstMsgToProcess\0onNewConnection"
 };
 #undef QT_MOC_LITERAL
 
@@ -69,9 +69,9 @@ static const uint qt_meta_data_Websockets[] = {
        6,    1,   52,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    1,   55,    2, 0x0a /* Public */,
-       9,    0,   58,    2, 0x0a /* Public */,
-      10,    0,   59,    2, 0x08 /* Private */,
+       7,    0,   55,    2, 0x08 /* Private */,
+       8,    1,   56,    2, 0x0a /* Public */,
+      10,    0,   59,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -79,8 +79,8 @@ static const uint qt_meta_data_Websockets[] = {
     QMetaType::Void, QMetaType::QString,    5,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString,    8,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    9,
     QMetaType::Void,
 
        0        // eod
@@ -95,9 +95,9 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 1: _t->MsgFromWebsocketsToChess((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 2: _t->MsgFromWebsocketsToWebtable((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 3: _t->processWebsocketMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 4: _t->onNewConnection(); break;
-        case 5: _t->socketDisconnected(); break;
+        case 3: _t->socketDisconnected(); break;
+        case 4: _t->processWebsocketMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 5: _t->onNewConnection(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {

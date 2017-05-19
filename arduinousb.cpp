@@ -1,7 +1,5 @@
 #include "arduinousb.h"
 
-#define ARDUINO 2
-
 ArduinoUsb::ArduinoUsb()
 {
     usbPort = new QSerialPort(this);

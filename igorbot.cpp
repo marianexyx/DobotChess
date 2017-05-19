@@ -1,20 +1,5 @@
 #include "igorbot.h"
 
-#define ROW 1
-#define COLUMN 0
-
-#define OPEN 1
-#define CLOSE 0
-
-#define FROM 1
-#define TO 0
-
-#define UP 1
-#define DOWN 0
-
-#define WEBSITE 1
-#define ARDUINO 2
-
 IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
                  WebTable *pWebTable, ArduinoUsb *pArduinoUsb)
 {
@@ -35,7 +20,7 @@ IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 
 void IgorBot::GameStarted()
 {
-    emit this->addTextToConsole("new_game\n", 'a');
+    emit this->addTextToConsole("new_game\n", USB_SENT);
     qDebug() << "Sending to USB: new_game";
     _pArduinoUsb->sendDataToUsb("started"); //na arduino daj możliwość już wciśnięcua start
 }
@@ -43,7 +28,7 @@ void IgorBot::GameStarted()
 void IgorBot::BadMove(QString msg)
 {
     qDebug() << "Bad move:" << msg << ". Sending to USB: BAD_MOVE";
-    emit this->addTextToConsole("Bad move: " + msg + ". Sending to USB: BAD_MOVE\n", 'c');
+    emit this->addTextToConsole("Bad move: " + msg + ". Sending to USB: BAD_MOVE\n", CORE);
 
     //todo: simplified() nie usuwa tylko podmienia białe znaki. sprawdzić to wszędzie
     //_pArduinoUsb->sendDataToUsb(msg.simplified());
@@ -54,7 +39,7 @@ void IgorBot::GameInProgress()
 {
     //podaj na stronę info o tym że ruch został wykonany
     qDebug() << "IgorBot::GameInProgress(): Sending to Arduino: game_in_progress";
-    emit this->addTextToConsole("game_in_progress", 'c');
+    emit this->addTextToConsole("game_in_progress", CORE);
 
     if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
     {
@@ -86,7 +71,7 @@ void IgorBot::PromoteToWhat(QString moveForFuturePromote)
 {
     _pChessboard->QStrFuturePromote = moveForFuturePromote;
     qDebug() << "Sending to arduino: promote";
-    this->addTextToConsole("Sending to arduino: promote", 'c');
+    this->addTextToConsole("Sending to arduino: promote", CORE);
     _pArduinoUsb->sendDataToUsb("promote"); //zapytaj się arduino na co ma być ta promocja
 }
 
@@ -157,20 +142,20 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 void IgorBot::NewGame()
 {
     qDebug() << "Sending to tcp: new";
-    emit this->addTextToConsole("Sending to tcp: new\n", 'c');
+    emit this->addTextToConsole("Sending to tcp: new\n", CORE);
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "new");
 }
 
 void IgorBot::MoveTcpPiece(QString msg)
 {
     qDebug() << "IgorBot::MoveTcpPiece: Sending move to tcp: " << msg;
-    emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", 'c');
+    emit this->addTextToConsole("Sending move to tcp: " + msg + "\n", CORE);
     _pTCPMsgs->TcpQueueMsg(ARDUINO, msg);
 }
 
 void IgorBot::Status()
 {
-    this->addTextToConsole("Sending to tcp: status\n", 'w');
+    this->addTextToConsole("Sending to tcp: status\n", WEBSOCKET);
     qDebug() << "Sending to tcp: status";
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "status");
 }
@@ -204,7 +189,7 @@ void IgorBot::UndoOk()
 
 void IgorBot::ThinkOk(QString msg)
 {
-    emit this->addTextToConsole("AI is ready to start move\n", 'c');
+    emit this->addTextToConsole("AI is ready to start move\n", CORE);
     qDebug() << "AI is ready to start move";
 
     _pChessboard->QsAIPiecieFromTo = msg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
@@ -233,7 +218,7 @@ void IgorBot::wrongTcpAnswer(QString msgType, QString respond)
 
     //TODO: zapanować jakoś nad tymi sygnałami konsoli
     emit this->addTextToConsole("ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " +
-                                respond + "for tcpMsgType = " + msgType + "\n", 'c');
+                                respond + "for tcpMsgType = " + msgType + "\n", CORE);
     qDebug() << "ERROR: IgorBot::checkMsgFromChenard(): unknown tcpRespond = " <<
                 respond << "for tcpMsgType = " << msgType;
 }
@@ -242,7 +227,7 @@ void IgorBot::checkAI()
 {
     if (!m_bAI) //wywal błąd jeżeli próbuje wywołać metodę w tej klasie bez włączonej SI
     {
-        emit this->addTextToConsole("ERROR: initiated IgorBot method with AI turned off\n", '0');
+        emit this->addTextToConsole("ERROR: initiated IgorBot method with AI turned off\n", NOTHING);
         qDebug() << "ERROR: initiated IgorBot method with AI turned off";
     }
 }

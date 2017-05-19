@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     Chessboard ChessboardDobot001;
     Dobot DobotArm001(&ChessboardDobot001);
     WebTable WebTable001;
-    Websockets Websockety(&WebTable001, 1234); // 1234- na którym porcie websockety mają nasłuchiwać
+    Websockets Websockety(&ChessboardDobot001, &WebTable001, 1234);
     //TODO: odpalać server websocket po konstruktorze mainwindow
     TCPMsgs TCPCommunication;
     ArduinoUsb ArduinoUsbEnemysUI;

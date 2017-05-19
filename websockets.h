@@ -6,6 +6,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
+#include "chessboard.h"
 #include "webtable.h"
 #include "vars/log.h"
 
@@ -17,8 +18,16 @@ class Websockets: public QObject
 {
     Q_OBJECT
 
+private:
+    WebTable *_pWebTable;
+    Chessboard *_pChessboard;
+
+private Q_SLOTS: //TODO: czym to się różni od zwykłego private/zwykłego slots?
+    //void onNewConnection();
+    void socketDisconnected();
+
 public:
-    Websockets(WebTable *pWebTable, quint16 port, QObject *parent = Q_NULLPTR);
+    Websockets(Chessboard *pChessboard, WebTable *pWebTable, quint16 port, QObject *parent = Q_NULLPTR);
 
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients; //kontener z aktywnymi połączeniami websocketowymi
@@ -35,13 +44,6 @@ signals:
     void addTextToConsole(QString, LOG);
     void MsgFromWebsocketsToChess(QString QStrMsgFromWebsockets);
     void MsgFromWebsocketsToWebtable(QString QStrMsgFromWebsockets);
-
-private:
-    WebTable *_pWebTable;
-
-private Q_SLOTS: //czym to się różni od zwykłego private/zwykłego slots?
-    //void onNewConnection();
-    void socketDisconnected();
 };
 
 #endif // Websockets_H

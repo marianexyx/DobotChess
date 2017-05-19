@@ -380,9 +380,9 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_calibrateBtn_clicked()
 {
-    if (ui->xLabel->text().toInt() == _pDobotArm->nHome_x &&
-            ui->yLabel->text().toInt() == _pDobotArm->nHome_y &&
-            ui->zLabel->text().toInt() == _pDobotArm->nHome_z)
+    if (ui->xLabel->text().toInt() == _pDobotArm->HomeChess.x &&
+            ui->yLabel->text().toInt() == _pDobotArm->HomeChess.y &&
+            ui->zLabel->text().toInt() == _pDobotArm->HomeChess.z)
     {
         _pDobotArm->addCmdToList(HOME);
     }
@@ -395,7 +395,10 @@ void MainWindow::on_calibrateBtn_clicked()
 
 void MainWindow::on_homeBtn_clicked()
 {
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE,
+                             _pDobotArm->HomeChess.x,
+                             _pDobotArm->HomeChess.y,
+                             _pDobotArm->HomeChess.z);
 }
 
 void MainWindow::on_upBtn_clicked()
@@ -541,10 +544,11 @@ void MainWindow::on_closeGripperBtn_clicked()
 
 
 void MainWindow::on_startGmPosBtn_clicked()
-{
+{ //todo: te punkty wstawićî jako stałe z xmla
     qDebug() << "Placing arm above the chessboard.";
     _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->HomeChess.x, _pDobotArm->HomeChess.y,
+                             _pDobotArm->HomeChess.z);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 144, -103, 10);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 260, -10, 65);
@@ -557,7 +561,8 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 260, -10, 65);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 140, -103, 10);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->nHome_x, _pDobotArm->nHome_y, _pDobotArm->nHome_z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->HomeChess.x, _pDobotArm->HomeChess.y,
+                             _pDobotArm->HomeChess.z);
 }
 
 void MainWindow::on_SimulateFromUsbBtn_clicked()

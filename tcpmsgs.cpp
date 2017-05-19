@@ -1,11 +1,6 @@
 #include "tcpmsgs.h"
 #include <QDataStream>
 
-
-//TODO: jakaś normalizacja i odpowiednie miejsce na constanty
-const int WEBSITE = 1;
-const int ARDUINO = 2;
-
 TCPMsgs::TCPMsgs()
 {
     m_bWaitingForReadyRead = false;

@@ -10,28 +10,26 @@
 
 //TODO: każde zapytanie o ruch powinno by opatrzene identyfikatorem przynajmniej koloru gracza by...
 //...kontrolować czy nie robimy ruchu za gracza przeciwnego
+
 class WebTable: public QObject
 {
     Q_OBJECT
 
 private:
     //zamienniki mysqla
-    bool _bGameInProgress;
-    QString _QSNameWhite; // nazwa białego- startowo "Biały"
-    QString _QSNameBlack; // nazwa czarnego- startowo "Czarny"
-    QString _QSWhoseTurn; // czyja tura aktualnie: no_turn, white_turn, black_turn
+    bool m_bGameInProgress;
+    QString m_QStrNameWhite; // nazwa białego- startowo "Biały"
+    QString m_QStrNameBlack; // nazwa czarnego- startowo "Czarny"
 
 public:
     WebTable();
 
 //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    QString getNameWhite() const          { return _QSNameWhite; }
-    QString getNameBlack() const          { return _QSNameBlack; }
-    QString getWhoseTurn() const          { return _QSWhoseTurn; }
+    QString getNameWhite() const          { return m_QStrNameWhite; }
+    QString getNameBlack() const          { return m_QStrNameBlack; }
 
-    void setNameWhite(QString QSNameWhite)           { _QSNameWhite = QSNameWhite; }
-    void setNameBlack(QString QSNameBlack)           { _QSNameBlack = QSNameBlack; }
-    void setWhoseTurn(QString QSWhoseTurn)           { _QSWhoseTurn = QSWhoseTurn; }
+    void setNameWhite(QString QSNameWhite)           { m_QStrNameWhite = QSNameWhite; }
+    void setNameBlack(QString QSNameBlack)           { m_QStrNameBlack = QSNameBlack; }
 
 public slots:
     void checkWebsocketMsg(QString QstrWebsocketMsg);

@@ -1,22 +1,7 @@
 #include "chess.h"
 
-#define ROW 1
-#define COLUMN 0
 
-#define OPEN 1
-#define CLOSE 0
-
-#define FROM 1
-#define TO 0
-
-#define UP 1
-#define DOWN 0
-
-#define WEBSITE 1
-#define ARDUINO 2
-
-//czysto wirtualne klasy muszą mieć pusty konstruktor
-Chess::Chess() {}
+Chess::Chess() {} //czysto wirtualne klasy muszą mieć pusty konstruktor
 
 Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable)
 {
@@ -47,7 +32,7 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nP
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
     qDebug() << "-Start move sequence-";
-    emit this->addTextToConsole("-Start move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
+    emit this->addTextToConsole("-Start move sequence-\n", DOBOT); //TODO: nie wyswietla sie (?)
 
     _pDobot->gripperOpennedState(OPEN, Type);
     _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, Type);
@@ -69,20 +54,19 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nP
     if (Type == REMOVING) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
 
     qDebug() << "-End of move sequence-";
-    emit this->addTextToConsole("-End of move sequence-\n", 'd'); //TODO: nie wyswietla sie (?)
+    emit this->addTextToConsole("-End of move sequence-\n", DOBOT); //TODO: nie wyswietla sie (?)
 }
 
 void Chess::wrongTcpAnswer(QString msgType, QString respond)
 {
      emit this->addTextToConsole("ERROR: Chess::wrongTcpAnswer(): unknown tcpRespond = " +
-                                  respond + "for tcpMsgType = " + msgType + "\n", 'c');
+                                  respond + "for tcpMsgType = " + msgType + "\n", CORE);
     qDebug() << "ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " <<
                 respond << "for tcpMsgType = " << msgType;
 }
 
 void Chess::castlingMovingSequence()
 {
-    //todo: ogarnąć jakoś nadmiar zmiennych typu castling
     this->pieceMovingSequence(CASTLING_KING); //wykonaj przemieszczenie królem
     _pChessboard->castlingFindRookToMove(); //podmień pozycje ruszonego króla na pozycję wieży
     this->pieceMovingSequence(CASTLING_ROOK); //wykonaj przemieszczenie wieżą

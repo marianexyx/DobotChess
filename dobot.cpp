@@ -1,7 +1,5 @@
 #include "dobot.h"
 
-#define ROW 1
-#define COLUMN 0
 
 //TODO: nie mam wogle sprawdzane czy jakiekolwiek dane dotarły do dobota. program wypuszcza dane na...
 //...usb i zakłada że ruch się wykonał bez sprawdzania tego.
@@ -11,18 +9,18 @@
 Dobot::Dobot(Chessboard *pChessboard):
     m_nMaxPieceHeight(52), // Dla pola h8 max wysokość bierki to 46. //TODO: zmienna chessboardu
     m_nMaxRemPieceH(44.5), //TODO: zmienna chessboardu
-    m_nActualPos(1000),
-    m_fPtpCmd_xActualVal(200), //TODO: zmienne chessboardu?
-    m_fPtpCmd_yActualVal(0),
-    m_fPtpCmd_zActualVal(25),
-    m_fPtpCmd_rActualVal(0),
     m_fGripOpened(6.9f),
     m_fGripClosed(7.55f)
 {
     _pChessboard = pChessboard;
     
     connectStatus = false;
-    
+
+    m_PtpCmdActualVal.x = 200;
+    m_PtpCmdActualVal.y = 0;
+    m_PtpCmdActualVal.z = 25;
+    m_PtpCmdActualVal.r = 0;
+
     m_gripperServo.address = 4;
     m_gripperServo.frequency = 50;
     m_gripperServo.dutyCycle = m_fGripOpened;
@@ -112,7 +110,7 @@ void Dobot::QueuedIdList()
                 case WAIT:
                     SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
                     break;
-                case OPEN_GRIP:
+                case OPEN:
                 {
                     m_gripperServo.dutyCycle = m_fGripOpened;
                     int openGripResult = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
@@ -123,7 +121,7 @@ void Dobot::QueuedIdList()
                     }
                 }
                     break;
-                case CLOSE_GRIP:
+                case CLOSE:
                 {
                     m_gripperServo.dutyCycle = m_fGripClosed;
                     int closeGripResult = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
@@ -287,11 +285,10 @@ void Dobot::initDobot()
     ptpJumpParams.zLimit = 150;
     SetPTPJumpParams(&ptpJumpParams, false, NULL);
     
-    HOMEParams HomeChess;
-    HomeChess.x = nHome_x;
-    HomeChess.y = nHome_y;
-    HomeChess.z = nHome_z;
-    HomeChess.r = nHome_r;
+    HomeChess.x = 140;
+    HomeChess.y = 0;
+    HomeChess.z = 10; //niżej by waliło w szachownicę
+    HomeChess.r = 0;
     SetHOMEParams(&HomeChess, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
@@ -329,14 +326,14 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, SEQUEN
         f_xFromTo = _pChessboard->adRemovedPiecesPositions_x[nRemPieceDestLetter][nRemPieceDestDigit];
         f_yFromTo = _pChessboard->adRemovedPiecesPositions_y[nRemPieceDestLetter][nRemPieceDestDigit];
         f_zFromTo = _pChessboard->adRemovedPiecesPositions_z[nRemPieceDestLetter][nRemPieceDestDigit];
-        f_rFromTo = m_nActualPos;
+        f_rFromTo = ACTUAL_POS;
     }
     else //ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
     {
         f_xFromTo = _pChessboard->adChessboardPositions_x[nLetter][nDigit];
         f_yFromTo = _pChessboard->adChessboardPositions_y[nLetter][nDigit];
         f_zFromTo = _pChessboard->adChessboardPositions_z[nLetter][nDigit];
-        f_rFromTo = m_nActualPos;
+        f_rFromTo = ACTUAL_POS;
     }
     
     this->writeMoveTypeInConsole(TO_POINT, Type);
@@ -356,8 +353,8 @@ void Dobot::pieceFromTo(bool bIsPieceMovingFrom, int nLetter, int nDigit, SEQUEN
 
 void Dobot::gripperOpennedState(bool isGripperOpened, SEQUENCE_TYPE Type)
 {
-    this->addCmdToList(isGripperOpened ? OPEN_GRIP : CLOSE_GRIP, Type);
-    this->writeMoveTypeInConsole(isGripperOpened ? OPEN_GRIP : CLOSE_GRIP, Type);
+    this->addCmdToList(isGripperOpened ? OPEN : CLOSE, Type);
+    this->writeMoveTypeInConsole(isGripperOpened ? OPEN : CLOSE, Type);
 }
 
 void Dobot::wait(int nMs, SEQUENCE_TYPE sequence)
@@ -391,7 +388,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TY
         else f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
                 [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
                 [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
-        f_rUpDown = m_nActualPos;
+        f_rUpDown = ACTUAL_POS;
     }
     else if (Type == RESTORE && bIsArmAboveFromSquare) //...lub pochwycamy bierkę z obszaru zbitych
     {
@@ -405,7 +402,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TY
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
         else f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_rUpDown = m_nActualPos;
+        f_rUpDown = ACTUAL_POS;
     }
     else //pozycje na szachownicy
     {
@@ -419,7 +416,7 @@ void Dobot::armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TY
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
         else f_zUpDown = _pChessboard->adChessboardPositions_z
                 [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_rUpDown = m_nActualPos;
+        f_rUpDown = ACTUAL_POS;
     }
     this->addCmdToList(TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
     
@@ -432,7 +429,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
     float f_xRemove = _pChessboard->adRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
     float f_yRemove = _pChessboard->adRemovedPiecesPositions_y[nPieceRowPos][nPieceColumnPos];
     //float f_zRemove = _pChessboard->adRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];//unused
-    float f_rRemove = m_nActualPos;
+    float f_rRemove = ACTUAL_POS;
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
                 m_nMaxRemPieceH << ", r =" << f_rRemove;
     
@@ -447,10 +444,10 @@ void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
     m_posIdx.sequence = sequence;
     m_posIdx.move = move;
-    m_posIdx.x = (x != m_nActualPos) ? x : m_fPtpCmd_xActualVal;
-    m_posIdx.y = (y != m_nActualPos) ? y : m_fPtpCmd_yActualVal;
-    m_posIdx.z = (z != m_nActualPos) ? z : m_fPtpCmd_zActualVal;
-    m_posIdx.r = (r != m_nActualPos) ? r : m_fPtpCmd_rActualVal;
+    m_posIdx.x = (x != ACTUAL_POS) ? x : m_PtpCmdActualVal.x;
+    m_posIdx.y = (y != ACTUAL_POS) ? y : m_PtpCmdActualVal.y;
+    m_posIdx.z = (z != ACTUAL_POS) ? z : m_PtpCmdActualVal.z;
+    m_posIdx.r = (r != ACTUAL_POS) ? r : m_PtpCmdActualVal.r;
     QueuedCmdIndexList << m_posIdx; //wepchnij do kontenera strukturę
 }
 
@@ -504,8 +501,8 @@ void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence)
     {
     case TO_POINT: QsSecondMsg = ""; break;
     case WAIT: QsSecondMsg = ": wait " + QString::number(gripperMoveDelay.timeout) + " ms\n"; break;
-    case OPEN_GRIP: QsSecondMsg = ": gripper opened\n"; break;
-    case CLOSE_GRIP: QsSecondMsg = ": gripper closed\n"; break;
+    case OPEN: QsSecondMsg = ": gripper opened\n"; break;
+    case CLOSE: QsSecondMsg = ": gripper closed\n"; break;
     case UP: QsSecondMsg = ": arm up\n"; break;
     case DOWN: QsSecondMsg = ": arm down\n"; break;
     default:

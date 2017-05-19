@@ -1,20 +1,5 @@
 #include "webchess.h"
 
-#define ROW 1
-#define COLUMN 0
-
-#define OPEN 1
-#define CLOSE 0
-
-#define FROM 1
-#define TO 0
-
-#define UP 1
-#define DOWN 0
-
-#define WEBSITE 1
-#define ARDUINO 2
-
 WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
                    WebTable *pWebTable, Websockets *pWebsockets)
 {
@@ -134,7 +119,7 @@ void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
 }
 
 void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
-{ //TODO: mylne jest wrażenie że ta funckja już wykonuje ruch bierką
+{
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
     _pWebsockets->addTextToConsole("WebChess::MoveTcpPiece: Sending normal move to tcp: " + msg + "\n", WEBSOCKET);
     qDebug() << "WebChess::MoveTcpPiece: Sending normal move to tcp: " << msg;

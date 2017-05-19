@@ -3,7 +3,7 @@
 
 #include "arduinousb.h"
 #include "chess.h"
-
+#include "vars/basic_vars.h"
 
 class IgorBot: public Chess
 {
@@ -54,9 +54,6 @@ public:
     bool getAIAsPlayer2()               { return m_bIsIgorsAiSimulatedAsPlayer2; }
     bool getAI()                        { return m_bAI; }
 
-
-signals:
-    //void addTextToConsole(QString, char); //jest dziedziczone?
 
 public slots:
     //--------KOMUNIKACJA Z CHENARD--------//

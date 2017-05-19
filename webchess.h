@@ -3,6 +3,7 @@
 
 #include "websockets.h"
 #include "chess.h"
+#include "vars/basic_vars.h"
 
 class WebChess : public Chess
 {

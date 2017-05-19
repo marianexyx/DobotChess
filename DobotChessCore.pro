@@ -42,7 +42,8 @@ HEADERS  +=  webtable.h \
     mainwindow.h \
     igorbot.h \
     webchess.h \
-    vars/log.h
+    vars/log.h \
+    vars/basic_vars.h
 
 FORMS    += mainwindow.ui
 

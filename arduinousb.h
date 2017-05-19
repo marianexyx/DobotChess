@@ -6,6 +6,7 @@
 #include <QSerialPort> //obsługa portu
 #include <QSerialPortInfo> //dostarczanie informacji o porcie
 #include "vars/log.h"
+#include "vars/basic_vars.h"
 
 class ArduinoUsb: public QObject
 {

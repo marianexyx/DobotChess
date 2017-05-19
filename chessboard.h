@@ -4,6 +4,7 @@
 #include "QString"
 #include "QObject"
 #include "qdebug.h"
+#include "vars/basic_vars.h"
 
 struct ArmPosition
 {
@@ -11,7 +12,7 @@ struct ArmPosition
     int Digit = -1;
 };
 
-enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //TODO: praktycznie powtórzenie z webtable
+enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN };
 enum SEQUENCE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT,
                  CASTLING, CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
 
@@ -77,6 +78,8 @@ public:
     double adRemovedPiecesPositions_x[8][4];
     double adRemovedPiecesPositions_y[8][4];
     double adRemovedPiecesPositions_z[8][4];
+
+
 
     //metody dostępowe
     void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
