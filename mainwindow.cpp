@@ -362,13 +362,13 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 float fService_z = _pChessboard->adChessboardPositions_z[nServiceLetterPos][nServiceDigitPos];
 
                 _pDobotArm->addCmdToList(TO_POINT, REMOVING, fService_x, fService_y, fService_z +
-                                         _pDobotArm->getMaxPieceHeight(), ACTUAL_POS);
+                                         _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
                 _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
                 _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
             }
             if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);
         }
-        else //dotyczy tylko gracza z WWW
+        else
         {
             _pWebChess->setServiceTests(true);
             _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
@@ -403,12 +403,12 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobotArm->armUpDown(true, true, SERVICE);
+    _pDobotArm->armUpDown(UP, FROM, SERVICE);
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobotArm->armUpDown(false, true, SERVICE);
+    _pDobotArm->armUpDown(UP, FROM, SERVICE);
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
@@ -533,15 +533,14 @@ void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
 
 void MainWindow::on_openGripperBtn_clicked()
 {
-    _pDobotArm->gripperOpennedState(true, SERVICE);
+    _pDobotArm->gripperState(OPEN, SERVICE);
 }
 
 
 void MainWindow::on_closeGripperBtn_clicked()
 {
-    _pDobotArm->gripperOpennedState(false, SERVICE);
+    _pDobotArm->gripperState(CLOSE, SERVICE);
 }
-
 
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawićî jako stałe z xmla

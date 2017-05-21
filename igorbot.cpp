@@ -130,7 +130,7 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     }
     else if (tcpMsgType == "think 5000" && (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
     {
-        this->ThinkOk(tcpRespond); //"OK d1h5 Qh5#"
+        this->ThinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
     }
     else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
     {
@@ -155,7 +155,7 @@ void IgorBot::MoveTcpPiece(QString msg)
 
 void IgorBot::Status()
 {
-    this->addTextToConsole("Sending to tcp: status\n", WEBSOCKET);
+    this->addTextToConsole("Sending to tcp: status\n", CORE);
     qDebug() << "Sending to tcp: status";
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "status");
 }
@@ -170,7 +170,6 @@ void IgorBot::Promote(QString msg)
 
 void IgorBot::AskForLegalMoves()
 {
-    qDebug() << "IgorBot::AskForLegalMoves()";
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "legal");
 }
 
@@ -197,21 +196,6 @@ void IgorBot::ThinkOk(QString msg)
     //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }
 
-void IgorBot::legalOk(QString msg)
-{
-    QStringList legalMoves = msg.split(QRegExp("\\s"));
-    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
-    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
-    if (!legalMoves.isEmpty())
-    {
-        QString QStrLastLegalMove = legalMoves.last();
-        QStrLastLegalMove = QStrLastLegalMove.simplified();
-        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" ); //remove np. "\n"
-        legalMoves.last() = QStrLastLegalMove;
-    }
-    _pChessboard->setLegalMoves(legalMoves);
-}
-
 void IgorBot::wrongTcpAnswer(QString msgType, QString respond)
 {
     this->checkAI();
@@ -233,11 +217,6 @@ void IgorBot::checkAI()
 }
 
 //-----------------FUNKCJE SZACHOWE-----------------//
-void IgorBot::resetBoardCompleted()
-{
-    this->NewGame();
-}
-
 void IgorBot::TcpMoveOk()
 {
     qDebug() << "IgorBot::TcpMoveOk()";
@@ -245,3 +224,9 @@ void IgorBot::TcpMoveOk()
     this->GameInProgress();
     this->Status();
 }
+
+void IgorBot::resetBoardCompleted()
+{
+    this->NewGame();
+}
+

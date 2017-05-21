@@ -14,18 +14,20 @@ WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 //----------------------------KOMUNIKACJA Z WWW------------------------------//
 //---------------------------------------------------------------------------//
 
-void WebChess::GameStarted() //zareaguj na to że gra wystartowała
+void WebChess::GameStarted()
 {
     _pWebsockets->addTextToConsole("new_game\n", WEBSOCKET);
     qDebug() << "Sending 'new_game' to site";
+
     if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
 }
 
 void WebChess::BadMove(QString msg)
 {
-    msg = msg.mid(9);
-    qDebug() << "Sending 'BAD_MOVE...' to websockets";
-    _pWebsockets->processWebsocketMsg("BAD_MOVE " + msg.simplified());
+    qDebug() << "BAD_MOVE:" + msg ;
+    emit this->addTextToConsole("BAD_MOVE: " + msg + "\n", CORE);
+
+    _pWebsockets->processWebsocketMsg("BAD_MOVE " + msg);
 }
 
 void WebChess::GameInProgress() //gra w toku
@@ -70,31 +72,49 @@ void WebChess::checkMsgForChenard(QString msgFromWs)
     else qDebug() << "ERROR: received not recognized msg in WebChess::checkMsgForChenard: " << msgFromWs;
 }
 
-void WebChess::checkMsgFromChenard(QString tcpMsgType, QString QsTcpRespond)
+void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
-    qDebug() << "WebChess::checkMsgFromChenard: " << QsTcpRespond;
+    qDebug() << "WebChess::checkMsgFromChenard: " << tcpRespond;
 
     if (tcpMsgType == "new")
     {
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki poniżej
-        if (QsTcpRespond == "OK\n" || QsTcpRespond == "OK")
+        if (tcpRespond == "OK\n" || tcpRespond == "OK")
+        {
+            this->Status();
             this->GameStarted();
+        }
         else
-            this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
+            this->wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
     else if (tcpMsgType.left(4) == "move")
     {
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki poniżej
-        if (QsTcpRespond == "OK 1\n" || QsTcpRespond == "OK 1") this->TcpMoveOk();
-        else if (QsTcpRespond/*.left(8)*/ == "BAD_MOVE") this->BadMove(QsTcpRespond);
-        else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
+        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->TcpMoveOk();
+        else if (tcpRespond/*.left(8)*/ == "BAD_MOVE") this->BadMove(tcpRespond);
+        else this->wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
     else if (tcpMsgType == "status")
     {
-        if (QsTcpRespond.left(1) == "*") this->GameInProgress(); //ruch wykonany poprawnie. gra w toku
-        else if (QsTcpRespond.left(3) == "1-0" || QsTcpRespond.left(3) == "0-1" ||
-                 QsTcpRespond.left(7) == "1/2-1/2") this->EndOfGame(QsTcpRespond);
-        else this->wrongTcpAnswer(tcpMsgType, QsTcpRespond);
+        if (tcpRespond.left(1) == "*") this->GameInProgress(); //ruch wykonany poprawnie. gra w toku
+        else if (tcpRespond.left(3) == "1-0" || tcpRespond.left(3) == "0-1" ||
+                 tcpRespond.left(7) == "1/2-1/2") this->EndOfGame(tcpRespond);
+        else this->wrongTcpAnswer(tcpMsgType, tcpRespond);
+
+        _pChessboard->saveStatusData(tcpRespond);
+        if (_pChessboard->getGameStatus() == "*")
+        {
+            this->AskForLegalMoves();
+        }
+        else
+        {
+            _pChessboard->clearLegalMoves();
+            this->EndOfGame(tcpRespond);
+        }
+    }
+    else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
+    {
+        this->legalOk(tcpRespond);
     }
     else qDebug() << "ERROR: WebChess:checkMsgFromChenard() received unknown tcpMsgType: " << tcpMsgType;
 }
@@ -128,8 +148,8 @@ void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bie
 
 void WebChess::Status()
 {
-    _pWebsockets->addTextToConsole("Sending 'status' command to tcp. \n", WEBSOCKET);
-    qDebug() << "Sending 'status' command to tcp";
+    _pWebsockets->addTextToConsole("Sending to tcp: status\n", CORE);
+    qDebug() << "Sending to tcp: status";
     _pTCPMsgs->TcpQueueMsg(WEBSITE, "status");
 }
 
@@ -141,10 +161,13 @@ void WebChess::AskForLegalMoves()
 //-----------------FUNKCJE SZACHOWE-----------------//
 void WebChess::TcpMoveOk()
 {
-    //todo
+    qDebug() << "WebChess::TcpMoveOk()";
+
+    this->GameInProgress();
+    this->Status();
 }
 
 void WebChess::resetBoardCompleted()
 {
-    //todo
+    this->NewGame();
 }

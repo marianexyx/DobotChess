@@ -13,11 +13,12 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable
     _bServiceTests = false;
 }
 
+//TODO: podmienić inty na enumy
 void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nPieceFromDigit,
                                 int nPieceToLetter, int nPieceToDigit)
 {
     //jeżeli nie podano skąd i/lub dokąd, to jest to ruch z aktualnego pola szachownicy nad którym wisi ramie
-    if (nPieceFromLetter == -1) nPieceFromLetter = _pChessboard->PieceFrom.Letter;
+    if (nPieceFromLetter == -1) nPieceFromLetter = _pChessboard->PieceFrom.Letter; //todo: podmienić tą magiczną -1
     if (nPieceFromDigit == -1) nPieceFromDigit = _pChessboard->PieceFrom.Digit;
     if (nPieceToLetter == -1) nPieceToLetter = _pChessboard->PieceTo.Letter;
     if (nPieceToDigit == -1) nPieceToDigit = _pChessboard->PieceTo.Digit;
@@ -28,33 +29,63 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nP
         nPieceFromDigit = nPieceToDigit; //...która w każdym innym ruchu jest jako "to"  
     }
 
-    if (Type == RESTORE) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
+    if (Type == RESTORE && (nPieceToLetter == A || nPieceToLetter == B || nPieceToLetter == C))
+        this->goToSafeRemovedField((DIGIT)nPieceToDigit);
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
-    qDebug() << "-Start move sequence-";
-    emit this->addTextToConsole("-Start move sequence-\n", DOBOT); //TODO: nie wyswietla sie (?)
 
-    _pDobot->gripperOpennedState(OPEN, Type);
+    _pDobot->gripperState(OPEN, Type);
     _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, Type);
     _pDobot->armUpDown(DOWN, FROM, Type);
-    _pDobot->gripperOpennedState(CLOSE, Type);
+    _pDobot->gripperState(CLOSE, Type);
     _pDobot->wait(400, Type);
     _pDobot->armUpDown(UP, FROM, Type);
     _pChessboard->pieceStateChanged(FROM, nPieceFromLetter, nPieceFromDigit, Type);
 
-    if (Type == REMOVING || Type == RESTORE) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
+    if ((Type == REMOVING || Type == RESTORE) && (nPieceToLetter == A || nPieceToLetter == B || nPieceToLetter == C))
+        this->goToSafeRemovedField((DIGIT)nPieceToDigit);
 
     _pDobot->pieceFromTo(TO, nPieceToLetter, nPieceToDigit, Type);
     _pDobot->armUpDown(DOWN, TO, Type);
-    _pDobot->gripperOpennedState(OPEN, Type);
+    _pDobot->gripperState(OPEN, Type);
     _pDobot->wait(400, Type);
     _pDobot->armUpDown(UP, TO, Type);
     _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, Type);
 
-    if (Type == REMOVING) _pDobot->addCmdToList(TO_POINT, SERVICE, 260, -10, 40);
+    if (Type == REMOVING && (nPieceToLetter == A || nPieceToLetter == B || nPieceToLetter == C))
+        this->goToSafeRemovedField((DIGIT)nPieceToDigit);
+}
 
-    qDebug() << "-End of move sequence-";
-    emit this->addTextToConsole("-End of move sequence-\n", DOBOT); //TODO: nie wyswietla sie (?)
+void Chess::goToSafeRemovedField(DIGIT digitTo)
+{
+    qDebug() << "goToSafeRemovedField. digitTo=" << digitTo;
+
+    DIGIT indirectFieldDigit;
+    if (digitTo == D_1 || digitTo == D_2) indirectFieldDigit = D_2;
+    else if (digitTo == D_3 || digitTo == D_4) indirectFieldDigit = D_3;
+    else qDebug() << "ERROR: unknown nPieceToDigit value =" << digitTo;
+
+    float fIndirect_x = _pChessboard->adRemovedPiecesPositions_x[D][indirectFieldDigit];
+    float fIndirect_y = _pChessboard->adRemovedPiecesPositions_y[D][indirectFieldDigit];
+    float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[D][indirectFieldDigit];
+
+    _pDobot->addCmdToList(TO_POINT, REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
+                          _pChessboard->getMaxRemovedPieceHeight(), ACTUAL_POS);
+}
+
+void Chess::legalOk(QString msg)
+{
+    QStringList legalMoves = msg.split(QRegExp("\\s"));
+    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
+    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
+    if (!legalMoves.isEmpty())
+    {
+        QString QStrLastLegalMove = legalMoves.last();
+        QStrLastLegalMove = QStrLastLegalMove.simplified();
+        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" ); //remove np. "\n"
+        legalMoves.last() = QStrLastLegalMove;
+    }
+    _pChessboard->setLegalMoves(legalMoves);
 }
 
 void Chess::wrongTcpAnswer(QString msgType, QString respond)

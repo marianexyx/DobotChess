@@ -79,21 +79,24 @@ public:
     double adRemovedPiecesPositions_y[8][4];
     double adRemovedPiecesPositions_z[8][4];
 
-
+    const int m_nMaxPieceHeight;
+    const int m_nMaxRemovedPieceH; //todo: powinna to być jedna wartość z powyższą?
 
     //metody dostępowe
     void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
     void setMoveType (SEQUENCE_TYPE Type)       { m_moveType = Type; }
     void setLegalMoves(QStringList legalMoves)  { m_legalMoves = legalMoves; }
 
-    void clearLegalMoves()              { m_legalMoves.clear(); }
+    void clearLegalMoves()                      { m_legalMoves.clear(); }
 
-    QString getGameStatus()             { return m_QStrGameStatus; }
-    WHOSE_TURN getWhoseTurn ()          { return m_WhoseTurn; }
-    SEQUENCE_TYPE getMoveType()         { return m_moveType; }
-    QString getCastlings()              { return m_QStrCastlings; }
-    QString getEnpassant()              { return m_QStrEnpassant; }
-    QStringList getLegalMoves()         { return m_legalMoves; }
+    int getMaxPieceHeight() const               { return m_nMaxPieceHeight; }
+    int getMaxRemovedPieceHeight() const        { return m_nMaxRemovedPieceH; }
+    QString getGameStatus()                     { return m_QStrGameStatus; }
+    WHOSE_TURN getWhoseTurn ()                  { return m_WhoseTurn; }
+    SEQUENCE_TYPE getMoveType()                 { return m_moveType; }
+    QString getCastlings()                      { return m_QStrCastlings; }
+    QString getEnpassant()                      { return m_QStrEnpassant; }
+    QStringList getLegalMoves()                 { return m_legalMoves; }
 
 signals:
     void addTextToConsole(QString);

@@ -19,7 +19,9 @@ Chessboard::Chessboard():
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
-{0, 0, 0, 0}}
+{0, 0, 0, 0}},
+    m_nMaxPieceHeight(52), // dla pola h8 max wysokość bierki to 46
+    m_nMaxRemovedPieceH(44.5)
 {
     memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard

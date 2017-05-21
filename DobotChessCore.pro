@@ -16,7 +16,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = DobotChessCore
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
     mainwindow.cpp \
     chess.cpp \
@@ -43,7 +42,8 @@ HEADERS  +=  webtable.h \
     igorbot.h \
     webchess.h \
     vars/log.h \
-    vars/basic_vars.h
+    vars/basic_vars.h \
+    vars/board_axis.h
 
 FORMS    += mainwindow.ui
 

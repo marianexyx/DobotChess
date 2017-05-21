@@ -97,6 +97,7 @@ void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
         Q_FOREACH (QWebSocket *pClient, m_clients) //to jest zapis który wkrótce podobno będzie deprecated
         //for (QWebSocket *pClient : qAsConst(m_clients)) //dla każdego klienta kontenera m_clients wykonaj
             //TODO: gracze dostają komunikatów gracza przeciwnego. naprawić to (przy BAD_MOVE jest dłuższy komentarz)
+            //TODO2: komendy serwisowe do wejdą tutaj
         {
             if (QsWsMsgToProcess.left(17) == "white_player_name")
                 //TODO: sprawdzić czy emit nie działa skrajnie asynchronicznie, tj. będzie próbowało...

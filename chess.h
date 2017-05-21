@@ -9,6 +9,7 @@
 #include "chessboard.h"
 #include "tcpmsgs.h"
 #include "webtable.h"
+#include "vars/board_axis.h"
 
 //TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami wejsciowymi (arduino/website)
 
@@ -37,6 +38,7 @@ protected:
     virtual void Status() = 0;
     virtual void Promote(QString msg) = 0;
     virtual void AskForLegalMoves() = 0;
+    void legalOk(QString msg);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     virtual void TcpMoveOk() = 0;
@@ -45,6 +47,7 @@ protected:
     //---------------STEROWANIE RAMIENIEM---------------//
     void castlingMovingSequence();
     void enpassantMovingSequence();
+    void goToSafeRemovedField(DIGIT digitTo);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     SEQUENCE_TYPE checkMoveType(QString move);

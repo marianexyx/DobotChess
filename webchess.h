@@ -30,8 +30,6 @@ public:
     void Promote(QString msg);
     void AskForLegalMoves();
 
-    void legalOk(QString msg);
-
     //-----------------FUNKCJE SZACHOWE-----------------//
     void TcpMoveOk();
     SEQUENCE_TYPE checkMoveType(QString move);

@@ -47,9 +47,6 @@ private:
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM m_gripperServo;
     const float m_fGripOpened, m_fGripClosed;
-    const int m_nMaxPieceHeight; //na jakiej wysokości ma latać ramię by nie przewracać bierek
-    const int m_nMaxRemPieceH; //na jaką dodatkową wysokość może się podnieść...
-    //...ramię nad bierkami zbitymi
 
     PtpCmdActualVal m_PtpCmdActualVal;
     PTPCmd ptpCmd;
@@ -78,19 +75,18 @@ public:
 
     void gripperAngle(float fDutyCycle);
 
-    void pieceFromTo(bool bIsPieceMovingTo, int nLetter, int nDigit, SEQUENCE_TYPE Type); //todo: do chessboardu?
-    void gripperOpennedState(bool gripperOpened, SEQUENCE_TYPE Type); //todo: do chessboardu?
+    void pieceFromTo(DOBOT_MOVE partOfSequence, int nLetter, int nDigit, SEQUENCE_TYPE Type); //todo: do chessboardu?
+    void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void wait(int nMs, SEQUENCE_TYPE sequence);
     void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = NONE,
                       float x = ACTUAL_POS, float y = ACTUAL_POS,
                       float z = ACTUAL_POS, float r = ACTUAL_POS);
-    void armUpDown(bool isArmGoingUp, bool bIsArmAboveFromSquare, SEQUENCE_TYPE Type); //todo: do chessboardu?
+    void armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void removePiece(int nPieceRowPos, int nPieceColumnPos); //todo: do chessboardu?
     void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = NONE);
     void QueuedIdList();
 
     //metody dostępowe do pól
-    int getMaxPieceHeight() const {return m_nMaxPieceHeight;}
     unsigned long long getCoreQueuedCmdIndex() const {return m_ullCoreQueuedCmdIndex;}
     unsigned long long  getDobotQueuedCmdIndex() const {return m_ullDobotQueuedCmdIndex;}
     unsigned int getQueuedCmdLeftSpace() const {return m_uiQueuedCmdLeftSpace;}

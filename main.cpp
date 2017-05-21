@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     ArduinoUsb ArduinoUsbEnemysUI;
     /*Chess ChessCore(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
                     &Websockety, &WebTable001, &ArduinoUsbEnemysUI);*/
+    //TODO: IgorBot i webchess tworzyć jako obiekty z parametrem a nie robić z tego oddzielnych klas
     IgorBot IgorBotAI(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
                        &WebTable001, &ArduinoUsbEnemysUI);
     WebChess WebChess001(&DobotArm001, &ChessboardDobot001, &TCPCommunication,
