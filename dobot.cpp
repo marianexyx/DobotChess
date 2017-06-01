@@ -300,52 +300,54 @@ void Dobot::gripperAngle(float fDutyCycle)
 }
 
 ///TYPY RUCHÓW PO PLANSZY
-void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, int nLetter, int nDigit, SEQUENCE_TYPE Type)
+void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type)
 {
     float f_xFromTo, f_yFromTo, f_zFromTo, f_rFromTo;
 
     if ((Type == REMOVING && partOfSequence == TO) || (Type == RESTORE && partOfSequence == FROM))
     {
-        int nRemPiece, nRemPieceDestLetter, nRemPieceDestDigit;
+        int nRemPieceType;
+        LETTER remPieceDestLetter;
+        DIGIT remPieceDestDigit;
         if (Type == REMOVING)
         {
-            nRemPiece = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
-            nRemPieceDestLetter = _pChessboard->fieldNrToFieldPos(nRemPiece, ROW);
-            nRemPieceDestDigit = _pChessboard->fieldNrToFieldPos(nRemPiece, COLUMN);
+            nRemPieceType = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
+            remPieceDestLetter = static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nRemPieceType, ROW));
+            remPieceDestDigit = static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemPieceType, COLUMN));
         }
         else if (Type == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
             //...być podana wprost do pieceFromTo()
         {
             //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
-            nRemPieceDestLetter = nLetter;
-            nRemPieceDestDigit = nDigit;
+            remPieceDestLetter = letter;
+            remPieceDestDigit = digit;
         }
-        f_xFromTo = _pChessboard->adRemovedPiecesPositions_x[nRemPieceDestLetter][nRemPieceDestDigit];
-        f_yFromTo = _pChessboard->adRemovedPiecesPositions_y[nRemPieceDestLetter][nRemPieceDestDigit];
-        f_zFromTo = _pChessboard->adRemovedPiecesPositions_z[nRemPieceDestLetter][nRemPieceDestDigit];
+        f_xFromTo = _pChessboard->adRemovedPiecesPositions_x[remPieceDestLetter][remPieceDestDigit];
+        f_yFromTo = _pChessboard->adRemovedPiecesPositions_y[remPieceDestLetter][remPieceDestDigit];
+        f_zFromTo = _pChessboard->adRemovedPiecesPositions_z[remPieceDestLetter][remPieceDestDigit];
         f_rFromTo = ACTUAL_POS;
     }
     else //ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
     {
-        f_xFromTo = _pChessboard->adChessboardPositions_x[nLetter][nDigit];
-        f_yFromTo = _pChessboard->adChessboardPositions_y[nLetter][nDigit];
-        f_zFromTo = _pChessboard->adChessboardPositions_z[nLetter][nDigit];
+        f_xFromTo = _pChessboard->adChessboardPositions_x[letter][digit];
+        f_yFromTo = _pChessboard->adChessboardPositions_y[letter][digit];
+        f_zFromTo = _pChessboard->adChessboardPositions_z[letter][digit];
         f_rFromTo = ACTUAL_POS;
     }
     
     this->writeMoveTypeInConsole(TO_POINT, Type);
     
-    QString QsMoveType;
-    partOfSequence == FROM ? QsMoveType = ": piece from " : QsMoveType = ": piece to ";
-    qDebug() << "Dobot::pieceFromTo:" << QsMoveType << "nLetter ="
-             << nLetter << ", nDigit =" << nDigit << ", Type =" << Type;
-    emit this->addTextToConsole(QsMoveType + _pChessboard->findPieceLetterPos(nLetter)
-                                + QString::number(nDigit+1) + "\n", NOTHING);
+    QString QstrMoveType;
+    partOfSequence == FROM ? QstrMoveType = ": piece from " : QstrMoveType = ": piece to ";
+    qDebug() << "Dobot::pieceFromTo:" << QstrMoveType << "nLetter ="
+             << letter << ", nDigit =" << digit << ", Type =" << Type;
+    emit this->addTextToConsole(QstrMoveType + _pChessboard->findPieceLetterPos(letter)
+                                + QString::number(digit+1) + "\n", NOTHING);
     
     this->addCmdToList(TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo + _pChessboard->getMaxPieceHeight(), f_rFromTo);
     
-    _pChessboard->PieceActualPos.Letter = nLetter;
-    _pChessboard->PieceActualPos.Digit = nDigit;
+    _pChessboard->PieceActualPos.Letter = letter;
+    _pChessboard->PieceActualPos.Digit = digit;
 }
 
 void Dobot::gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type)
@@ -442,7 +444,7 @@ void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float
     m_posIdx.y = (y != ACTUAL_POS) ? y : m_PtpCmdActualVal.y;
     m_posIdx.z = (z != ACTUAL_POS) ? z : m_PtpCmdActualVal.z;
     m_posIdx.r = (r != ACTUAL_POS) ? r : m_PtpCmdActualVal.r;
-    QueuedCmdIndexList << m_posIdx; //wepchnij do kontenera strukturę
+    QueuedCmdIndexList << m_posIdx;
 }
 
 void Dobot::checkPWM()
@@ -486,8 +488,8 @@ void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence)
     case REMOVING: QsConsoleMsg = "remove"; break;
     case RESTORE: QsConsoleMsg = "restore"; break;
     case SERVICE: QsConsoleMsg = "service"; break;
-    default: QsConsoleMsg = "ERROR. Wrong movement type: "
-                + static_cast<QString>(sequence) + "\n"; break;
+    default: QsConsoleMsg = "ERROR. Dobot::writeMoveTypeInConsole: Wrong movement type: " +
+                static_cast<QString>(sequence) + "\n"; break;
     }
     
     QString QsSecondMsg;
@@ -499,9 +501,10 @@ void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence)
     case CLOSE: QsSecondMsg = ": gripper closed\n"; break;
     case UP: QsSecondMsg = ": arm up\n"; break;
     case DOWN: QsSecondMsg = ": arm down\n"; break;
+    case INDIRECT: QsSecondMsg = ": indirect\n"; break;
     default:
-        QsSecondMsg = "ERROR. Wrong movement state: " + static_cast<QString>(moveState) + "\n";
-        break;
+        QsSecondMsg = "ERROR. Dobot::writeMoveTypeInConsole: Wrong movement state: " +
+                static_cast<QString>(moveState) + "\n"; break;
     }
 
     emit this->addTextToConsole(QsConsoleMsg + " piece move" + QsSecondMsg, DOBOT);

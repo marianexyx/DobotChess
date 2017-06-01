@@ -13,61 +13,61 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable
     _bServiceTests = false;
 }
 
-//TODO: podmienić inty na enumy
-void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, int nPieceFromLetter, int nPieceFromDigit,
-                                int nPieceToLetter, int nPieceToDigit)
+void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
+                                LETTER pieceToLetter, DIGIT pieceToDigit)
 {
     //jeżeli nie podano skąd i/lub dokąd, to jest to ruch z aktualnego pola szachownicy nad którym wisi ramie
-    if (nPieceFromLetter == -1) nPieceFromLetter = _pChessboard->PieceFrom.Letter; //todo: podmienić tą magiczną -1
-    if (nPieceFromDigit == -1) nPieceFromDigit = _pChessboard->PieceFrom.Digit;
-    if (nPieceToLetter == -1) nPieceToLetter = _pChessboard->PieceTo.Letter;
-    if (nPieceToDigit == -1) nPieceToDigit = _pChessboard->PieceTo.Digit;
+    if (pieceFromLetter == L_X) pieceFromLetter = static_cast<LETTER>(_pChessboard->PieceFrom.Letter);
+    if (pieceFromDigit == D_X) pieceFromDigit = static_cast<DIGIT>(_pChessboard->PieceFrom.Digit);
+    if (pieceToLetter == L_X) pieceToLetter = static_cast<LETTER>(_pChessboard->PieceTo.Letter);
+    if (pieceToDigit == D_X) pieceToDigit = static_cast<DIGIT>(_pChessboard->PieceTo.Digit);
 
     if (Type == REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
     {
-        nPieceFromLetter = nPieceToLetter; //przy usuwaniu bierka "from" to ta...
-        nPieceFromDigit = nPieceToDigit; //...która w każdym innym ruchu jest jako "to"  
+        pieceFromLetter = pieceToLetter; //przy usuwaniu bierka "from" to ta...
+        pieceFromDigit = pieceToDigit; //...która w każdym innym ruchu jest jako "to"
     }
 
-    if (Type == RESTORE && (nPieceToLetter == A || nPieceToLetter == B || nPieceToLetter == C))
-        this->goToSafeRemovedField((DIGIT)nPieceToDigit);
+    if (Type == RESTORE && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
 
     _pDobot->gripperState(OPEN, Type);
-    _pDobot->pieceFromTo(FROM, nPieceFromLetter, nPieceFromDigit, Type);
+    _pDobot->pieceFromTo(FROM, pieceFromLetter, pieceFromDigit, Type);
     _pDobot->armUpDown(DOWN, FROM, Type);
     _pDobot->gripperState(CLOSE, Type);
     _pDobot->wait(400, Type);
     _pDobot->armUpDown(UP, FROM, Type);
-    _pChessboard->pieceStateChanged(FROM, nPieceFromLetter, nPieceFromDigit, Type);
+    _pChessboard->pieceStateChanged(FROM, pieceFromLetter, pieceFromDigit, Type);
 
-    if ((Type == REMOVING || Type == RESTORE) && (nPieceToLetter == A || nPieceToLetter == B || nPieceToLetter == C))
-        this->goToSafeRemovedField((DIGIT)nPieceToDigit);
+    if ((Type == REMOVING || Type == RESTORE) && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
 
-    _pDobot->pieceFromTo(TO, nPieceToLetter, nPieceToDigit, Type);
+    _pDobot->pieceFromTo(TO, pieceToLetter, pieceToDigit, Type);
     _pDobot->armUpDown(DOWN, TO, Type);
     _pDobot->gripperState(OPEN, Type);
     _pDobot->wait(400, Type);
     _pDobot->armUpDown(UP, TO, Type);
-    _pChessboard->pieceStateChanged(TO, nPieceToLetter, nPieceToDigit, Type);
+    _pChessboard->pieceStateChanged(TO, pieceToLetter, pieceToDigit, Type);
 
-    if (Type == REMOVING && (nPieceToLetter == A || nPieceToLetter == B || nPieceToLetter == C))
-        this->goToSafeRemovedField((DIGIT)nPieceToDigit);
+    if (Type == REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
 }
 
-void Chess::goToSafeRemovedField(DIGIT digitTo)
+void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
 {
     qDebug() << "goToSafeRemovedField. digitTo=" << digitTo;
+    _pDobot->writeMoveTypeInConsole(INDIRECT, sequence);
 
     DIGIT indirectFieldDigit;
     if (digitTo == D_1 || digitTo == D_2) indirectFieldDigit = D_2;
     else if (digitTo == D_3 || digitTo == D_4) indirectFieldDigit = D_3;
-    else qDebug() << "ERROR: unknown nPieceToDigit value =" << digitTo;
+    else qDebug() << "ERROR: unknown pieceToDigit value =" << digitTo;
 
-    float fIndirect_x = _pChessboard->adRemovedPiecesPositions_x[D][indirectFieldDigit];
-    float fIndirect_y = _pChessboard->adRemovedPiecesPositions_y[D][indirectFieldDigit];
-    float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[D][indirectFieldDigit];
+    float fIndirect_x = _pChessboard->adRemovedPiecesPositions_x[L_D][indirectFieldDigit];
+    float fIndirect_y = _pChessboard->adRemovedPiecesPositions_y[L_D][indirectFieldDigit];
+    float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
 
     _pDobot->addCmdToList(TO_POINT, REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
                           _pChessboard->getMaxRemovedPieceHeight(), ACTUAL_POS);
@@ -108,11 +108,17 @@ void Chess::enpassantMovingSequence()
     //wykonaj normalny ruch. enpassant to jedyny przypadek bicia, gdzie mogę zbić po normalnym ruchu.
     this->pieceMovingSequence(ENPASSANT);
 
-    int nTempDigitPos = _pChessboard->PieceTo.Digit; //w razie czego zapaiętaj oryginalną wartość pola (cyfry) bijącego
-    if (_pChessboard->getWhoseTurn() == WHITE_TURN) //todo
-        _pChessboard->PieceTo.Digit -= 1; //pozycja zbijanego czarnego pionka przez pionka białego w jego turze (białego)
+    DIGIT tempDigitPos = _pChessboard->PieceTo.Digit; //w razie czego zapaiętaj oryginalną wartość pola (cyfry) bijącego
+    if (_pChessboard->getWhoseTurn() == WHITE_TURN)
+    {
+        //pozycja zbijanego czarnego pionka przez pionka białego w jego turze (białego)
+        _pChessboard->PieceTo.Digit = static_cast<DIGIT>((int)_pChessboard->PieceTo.Digit - 1); //todo: sprawdzi czy dziala
+    }
     else if (_pChessboard->getWhoseTurn() == BLACK_TURN)
-        _pChessboard->PieceTo.Digit += 1; //pozycja zbijanego białego pionka przez pionka czarnego w jego turze (czarnego)
+    {
+        //pozycja zbijanego białego pionka przez pionka czarnego w jego turze (czarnego)
+        _pChessboard->PieceTo.Digit = static_cast<DIGIT>((int)_pChessboard->PieceTo.Digit + 1);
+    }
     else
     {
         emit _pDobot->addTextToConsole("Error03!: Wrong turn in enpassant statement: "
@@ -123,7 +129,7 @@ void Chess::enpassantMovingSequence()
     }
     //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
     this->pieceMovingSequence(REMOVING); //usuń pionka bitego ze  zmienioną pozycją.
-    _pChessboard->PieceTo.Digit = nTempDigitPos; //wróć prewencyjnie w pamięci do normalnej pozycji
+    _pChessboard->PieceTo.Digit = tempDigitPos; //wróć prewencyjnie w pamięci do normalnej pozycji
 }
 
 void Chess::resetPiecePositions()
@@ -181,10 +187,10 @@ void Chess::resetPiecePositions()
                     {
                         //qDebug() << "Chess::resetPiecePositions(): put piece back on its empty checked field from removed area";
                         this->pieceMovingSequence(RESTORE, //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
-                                                  _pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, ROW),
-                                                  _pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, COLUMN),
-                                                  _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
-                                                  _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
+                                                  static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, ROW)),
+                                                  static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, COLUMN)),
+                                                  static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
+                                                  static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)));
                     }
                     else //jeżeli nie ma bierki na polu zbitych bierek, to leży ona gdzieś na szachownicy
                     {
@@ -197,10 +203,11 @@ void Chess::resetPiecePositions()
                                 //...na obcym polu startowym)
                             {
                                 //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                                this->pieceMovingSequence(REGULAR,_pChessboard->fieldNrToFieldPos(nField, ROW),
-                                                          _pChessboard->fieldNrToFieldPos(nField, COLUMN),
-                                                          _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
-                                                          _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
+                                this->pieceMovingSequence(REGULAR,
+                                                          static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nField, ROW)),
+                                                          static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nField, COLUMN)),
+                                                          static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
+                                                          static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)));
                             }
                         }
                     }
@@ -213,10 +220,11 @@ void Chess::resetPiecePositions()
                     if (nPieceOrigPos == 0) //czy startowe pole bierki jest puste, by tam można było ją odstawić
                     {
                         //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                        this->pieceMovingSequence(REGULAR, _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
-                                                  _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN),
-                                                  _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
-                                                  _pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN));
+                        this->pieceMovingSequence(REGULAR,
+                                                  static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
+                                                  static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)),
+                                                  static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW)),
+                                                  static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN)));
                     }
                     else //jeżeli startowe pole bierki na polu sprawdzanym jest zajęte przez inną bierkę
                     {
@@ -235,22 +243,25 @@ void Chess::resetPiecePositions()
                             qDebug() << "Chess::resetPiecePositions(): 2 pieces on each other start field. Remove 2nd, move 1st, restore 2nd.";
 
                             //to przenieś ją na chwilę na jej miejsce na obszarze bierek zbitych.
-                            this->pieceMovingSequence(REMOVING, _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
-                                                      _pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN),
-                                                      _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW),
-                                                      _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN));
+                            this->pieceMovingSequence(REMOVING,
+                                                      static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW)),
+                                                      static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN)),
+                                                      static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW)),
+                                                      static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN)));
 
                             //teraz przenieś bierkę z pola aktualnie sprawdzanego, na pole bierki dopiero co odłożonej na obszar bierek zbitych
-                            this->pieceMovingSequence(REGULAR, _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
-                                                      _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN),
-                                                      _pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW),
-                                                      _pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN));
+                            this->pieceMovingSequence(REGULAR,
+                                                      static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
+                                                      static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)),
+                                                      static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW)),
+                                                      static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN)));
 
                             //na końcu bierkę odłożoną poza planszę przywróć na pole bierki wcześniej przestawionej
-                            this->pieceMovingSequence(RESTORE, _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW),
-                                                      _pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN),
-                                                      _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW),
-                                                      _pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN));
+                            this->pieceMovingSequence(RESTORE,
+                                                      static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW)),
+                                                      static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN)),
+                                                      static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
+                                                      static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)));
                         }
                     }
                     //everything else: jeżeli oryginalne pole bierki na polu sprawdzanym też jest zajęte, a nie...

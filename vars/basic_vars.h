@@ -4,8 +4,8 @@
 const int WEBSITE = 1;
 const int ARDUINO = 2;
 
-const int ROW = 1;
-const int COLUMN = 0;
+const bool ROW = 1;
+const bool COLUMN = 0;
 
 const int ACTUAL_POS = 1000;
 

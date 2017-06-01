@@ -5,16 +5,18 @@
 #include "QObject"
 #include "qdebug.h"
 #include "vars/basic_vars.h"
+#include "vars/board_axis.h"
+#include "vars/dobot_moves.h"
 
 struct ArmPosition
 {
-    int Letter = -1;
-    int Digit = -1;
+    LETTER Letter = L_X;
+    DIGIT Digit = D_X;
 };
 
 enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN };
-enum SEQUENCE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT,
-                 CASTLING, CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
+enum SEQUENCE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT, CASTLING,
+                  CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
 
 //TODO: chessboard powinien być obiektem klasy chess
 class Chessboard: public QObject
@@ -38,16 +40,16 @@ private:
 public:
     Chessboard();
 
-    void findBoardPos(QString QsPiecePositions);
-    int findPieceLetterPos(QString QsLetter);
-    QString findPieceLetterPos(int nLetter);
+    void findBoardPos(QString QStrPiecePositions);
+    LETTER findPieceLetterPos(QString QsLetter);
+    QString findPieceLetterPos(LETTER letter);
     int fieldNrToFieldPos(int nfieldNr, bool bRow);
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);
     bool isMoveEnpassant(QString moveToTest);
     void castlingFindRookToMove();
-    void pieceStateChanged(bool bIsMoveFrom, int nPieceLetter,
-                           int nPieceDigit, SEQUENCE_TYPE Type);
+    void pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
+                           DIGIT digit, SEQUENCE_TYPE Type);
     bool compareArrays(int nArray1[][8], int nArray2[][8]);
     void saveStatusData(QString status);
     void showBoardInDebug();
@@ -59,6 +61,7 @@ public:
     QString QsPiecieFromTo;             // f.e. "e2e4"
     QString QsAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
 
+    //todo: zamienić można na litery odpowiadające im na szachownicy
     int nGripperPiece;                  // nr bierki znajdującej się aktualnie w chwytaku
 
     QString QStrFuturePromote;

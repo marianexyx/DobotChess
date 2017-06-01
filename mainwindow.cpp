@@ -349,24 +349,24 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     {
         if (ui->serviceCheckBox->isChecked()) //tylko wartości pola np. "e2" lub ew. usuwanie: "move xxe2"
         {
-            QString QsServiceMsg = ui->emulatePlayerMsgLineEdit->text();
-            if (QsServiceMsg.left(4) == "move") QsServiceMsg = QsServiceMsg.mid(7);
+            QString QStrServiceMsg = ui->emulatePlayerMsgLineEdit->text();
+            if (QStrServiceMsg.left(4) == "move") QStrServiceMsg = QStrServiceMsg.mid(7);
 
-            int nServiceLetterPos = _pChessboard->findPieceLetterPos(QsServiceMsg.left(1));
-            int nServiceDigitPos = QsServiceMsg.mid(1,1).toInt() - 1;
+            LETTER serviceLetterPos = _pChessboard->findPieceLetterPos(QStrServiceMsg.left(1));
+            DIGIT serviceDigitPos = static_cast<DIGIT>(QStrServiceMsg.mid(1,1).toInt() - 1);
 
-            if (QsServiceMsg.right(1) != "r")
+            if (QStrServiceMsg.right(1) != "r")
             {
-                float fService_x = _pChessboard->adChessboardPositions_x[nServiceLetterPos][nServiceDigitPos];
-                float fService_y = _pChessboard->adChessboardPositions_y[nServiceLetterPos][nServiceDigitPos];
-                float fService_z = _pChessboard->adChessboardPositions_z[nServiceLetterPos][nServiceDigitPos];
+                float fService_x = _pChessboard->adChessboardPositions_x[serviceLetterPos][serviceDigitPos];
+                float fService_y = _pChessboard->adChessboardPositions_y[serviceLetterPos][serviceDigitPos];
+                float fService_z = _pChessboard->adChessboardPositions_z[serviceLetterPos][serviceDigitPos];
 
                 _pDobotArm->addCmdToList(TO_POINT, REMOVING, fService_x, fService_y, fService_z +
                                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
-                _pChessboard->PieceActualPos.Letter = nServiceLetterPos;
-                _pChessboard->PieceActualPos.Digit = nServiceDigitPos;
+                _pChessboard->PieceActualPos.Letter = serviceLetterPos;
+                _pChessboard->PieceActualPos.Digit = serviceDigitPos;
             }
-            if (QsServiceMsg.right(1) == "r") _pDobotArm->removePiece(nServiceLetterPos, nServiceDigitPos);
+            if (QStrServiceMsg.right(1) == "r") _pDobotArm->removePiece(serviceLetterPos, serviceDigitPos);
         }
         else
         {

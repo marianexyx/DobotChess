@@ -47,7 +47,7 @@ protected:
     //---------------STEROWANIE RAMIENIEM---------------//
     void castlingMovingSequence();
     void enpassantMovingSequence();
-    void goToSafeRemovedField(DIGIT digitTo);
+    void goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     SEQUENCE_TYPE checkMoveType(QString move);
@@ -70,8 +70,8 @@ public:
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void pieceMovingSequence(SEQUENCE_TYPE Type,
-                             int nPieceFromLetter = -1, int nPieceFromDigit = -1,
-                             int nPieceToLetter = -1, int nPieceToDigit = -1);
+                             LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
+                             LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
 
     //-------------METODY DOSTĘPOWE DO PÓL-------------//
     bool getServiceTests() const                { return _bServiceTests; }

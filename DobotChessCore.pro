@@ -43,7 +43,8 @@ HEADERS  +=  webtable.h \
     webchess.h \
     vars/log.h \
     vars/basic_vars.h \
-    vars/board_axis.h
+    vars/board_axis.h \
+    vars/dobot_moves.h
 
 FORMS    += mainwindow.ui
 

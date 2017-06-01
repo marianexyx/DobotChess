@@ -13,10 +13,11 @@
 #include "chessboard.h"
 #include "vars/log.h"
 #include "vars/basic_vars.h"
+#include "vars/board_axis.h"
+#include "vars/dobot_moves.h"
 
 //todo: oddzielić wszystko co związane z szachami od klasy dobota
 
-enum DOBOT_MOVE { TO_POINT, HOME, WAIT, OPEN, CLOSE, UP, DOWN, FROM, TO };
 struct ArmPosForCurrentCmdQueuedIndex
 {
     unsigned long long index;
@@ -75,7 +76,7 @@ public:
 
     void gripperAngle(float fDutyCycle);
 
-    void pieceFromTo(DOBOT_MOVE partOfSequence, int nLetter, int nDigit, SEQUENCE_TYPE Type); //todo: do chessboardu?
+    void pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void wait(int nMs, SEQUENCE_TYPE sequence);
     void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = NONE,

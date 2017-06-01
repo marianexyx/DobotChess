@@ -3,15 +3,15 @@
 
 enum LETTER
 {
-    X = -1,
-    A = 0,
-    B = 1,
-    C = 2,
-    D = 3,
-    E = 4,
-    F = 5,
-    G = 6,
-    H = 7
+    L_X = -1,
+    L_A = 0,
+    L_B = 1,
+    L_C = 2,
+    L_D = 3,
+    L_E = 4,
+    L_F = 5,
+    L_G = 6,
+    L_H = 7
 };
 
 enum DIGIT
