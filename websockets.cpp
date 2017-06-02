@@ -46,43 +46,44 @@ void Websockets::onNewConnection() //nowe połączenia
 //TODO2: błędem jest aby wiadomości które wysyłam do WWW były przetwarzane przez processWebsocketMsg().
 //powinien był znajdywać gracza w liście graczy i jemu wiadomośc odsyłać
 
-void Websockets::processWebsocketMsg(QString QStrWsMsgToProcess)
+void Websockets::receivedMsg(QString QStrWsMsg)
 {
-    /*
-    keepConnected
-    newGame
-    move e2e4
-    reset
-    check whitePlayer
-    check blackPlayer
-    check whoseTurn
-    change whitePlayer
-    change blackPlayer
-    promoteTo q
-    */
+    qDebug() << "Websockets::receivedMsg: " << QStrWsMsg;
 
-    if (QsWsMsgToProcess == "keepConnected") {};
-    else if (QsWsMsgToProcess == "newGame") {};
-    else if (QsWsMsgToProcess.left(4) == "move") {};
-    else if (QsWsMsgToProcess == "reset") {};
-    else if (QsWsMsgToProcess.left(5) == "check")
+    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+
+    if (QStrWsMsg == "keepConnected") { pClient->sendTextMessage("connectionOnline"); };
+    else if (QStrWsMsg == "newGame") { this->sendToChess(QStrWsMsg); };
+    else if (QStrWsMsg.left(4) == "move") { this->sendToChess(QStrWsMsg); };
+    else if (QStrWsMsg == "reset") { this->sendToChess(QStrWsMsg); };
+    else if (QStrWsMsg.left(5) == "check")
     {
-        QsWsMsgToProcess = QsWsMsgToProcess.mid(6);
-        if (QsWsMsgToProcess == "whitePlayer") {};
-        else if (QsWsMsgToProcess == "blackPlayer") {};
-        else if (QsWsMsgToProcess == "whoseTurn") {};
-        else  qDebug() << "ERROR....";
+        QStrWsMsg = QStrWsMsg.mid(6);
+        if (QStrWsMsg == "whitePlayer") { pClient->sendTextMessage("checkedWhite " + _pWebTable->getNameWhite()); };
+        else if (QStrWsMsg == "blackPlayer") { pClient->sendTextMessage("checkedBlack " + _pWebTable->getNameBlack()); };
+        else if (QStrWsMsg == "whoseTurn") { pClient->sendTextMessage("checkedTurn " + _pChessboard->getWhoseTurn() ); };
+        else  qDebug() << "ERROR...."; //TODO
     };
-    else if (QsWsMsgToProcess.left(6) == "change")
+    else if (QStrWsMsg.left(6) == "change")
     {
-        QsWsMsgToProcess = QsWsMsgToProcess.mid(7);
-        if (QsWsMsgToProcess == "whitePlayer") {};
-        else if (QsWsMsgToProcess == "blackPlayer") {};
-        else  qDebug() << "ERROR....";
+        QStrWsMsg = QStrWsMsg.mid(7);
+        if (QStrWsMsg == "whitePlayer")
+        {
+            emit MsgFromWebsocketsToWebtable(QStrWsMsg); //zapamiętaj imię białego gracza  ->TODO: zmienić czytelność/formę kodu
+            pClient->sendTextMessage("newWhite " + _pWebTable->getNameWhite());
+        };
+        else if (QStrWsMsg == "blackPlayer")
+        {
+            emit MsgFromWebsocketsToWebtable(QStrWsMsg); //zapamiętaj imię białego gracza  ->TODO: zmienić czytelność/formę kodu
+            pClient->sendTextMessage("newBlack " + _pWebTable->getNameBlack());
+        };
+        else  qDebug() << "ERROR...."; //TODO
     };
-    else if (QsWsMsgToProcess.left(9) == "promoteTo") {};
-    else  qDebug() << "ERROR....";
+    else if (QStrWsMsg.left(9) == "promoteTo") { this->sendToChess(QStrWsMsg); };
+    else  qDebug() << "ERROR...."; //TODO
 }
+
+
 
 //przetwarzanie wiadomośći otrzymanej przez websockety
 void Websockets::processWebsocketMsg(QString QsWsMsgToProcess)
