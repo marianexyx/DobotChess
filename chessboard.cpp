@@ -385,3 +385,11 @@ void Chessboard::showBoardInDebug()
                     m_QStrBoard[i][6] << m_QStrBoard[i][7];
     }
 }
+
+QString Chessboard::getStrWhoseTurn()
+{
+    if (m_WhoseTurn == WHITE_TURN) return "wt";
+    else if (m_WhoseTurn == BLACK_TURN) return "bt";
+    else if (m_WhoseTurn == NO_TURN) return "nt";
+    else return "error: wroong turn type";
+}

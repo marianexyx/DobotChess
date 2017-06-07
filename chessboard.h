@@ -95,7 +95,8 @@ public:
     int getMaxPieceHeight() const               { return m_nMaxPieceHeight; }
     int getMaxRemovedPieceHeight() const        { return m_nMaxRemovedPieceH; }
     QString getGameStatus()                     { return m_QStrGameStatus; }
-    WHOSE_TURN getWhoseTurn ()                  { return m_WhoseTurn; }
+    WHOSE_TURN getWhoseTurn()                   { return m_WhoseTurn; }
+    QString getStrWhoseTurn();
     SEQUENCE_TYPE getMoveType()                 { return m_moveType; }
     QString getCastlings()                      { return m_QStrCastlings; }
     QString getEnpassant()                      { return m_QStrEnpassant; }

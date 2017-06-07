@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Websockets_t {
     QByteArrayData data[11];
-    char stringdata0[183];
+    char stringdata0[175];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,15 +37,15 @@ QT_MOC_LITERAL(4, 33, 24), // "MsgFromWebsocketsToChess"
 QT_MOC_LITERAL(5, 58, 21), // "QStrMsgFromWebsockets"
 QT_MOC_LITERAL(6, 80, 27), // "MsgFromWebsocketsToWebtable"
 QT_MOC_LITERAL(7, 108, 18), // "socketDisconnected"
-QT_MOC_LITERAL(8, 127, 19), // "processWebsocketMsg"
-QT_MOC_LITERAL(9, 147, 19), // "QS_WbstMsgToProcess"
-QT_MOC_LITERAL(10, 167, 15) // "onNewConnection"
+QT_MOC_LITERAL(8, 127, 11), // "receivedMsg"
+QT_MOC_LITERAL(9, 139, 19), // "QS_WbstMsgToProcess"
+QT_MOC_LITERAL(10, 159, 15) // "onNewConnection"
 
     },
     "Websockets\0addTextToConsole\0\0LOG\0"
     "MsgFromWebsocketsToChess\0QStrMsgFromWebsockets\0"
     "MsgFromWebsocketsToWebtable\0"
-    "socketDisconnected\0processWebsocketMsg\0"
+    "socketDisconnected\0receivedMsg\0"
     "QS_WbstMsgToProcess\0onNewConnection"
 };
 #undef QT_MOC_LITERAL
@@ -96,7 +96,7 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 1: _t->MsgFromWebsocketsToChess((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 2: _t->MsgFromWebsocketsToWebtable((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 3: _t->socketDisconnected(); break;
-        case 4: _t->processWebsocketMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 4: _t->receivedMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 5: _t->onNewConnection(); break;
         default: ;
         }

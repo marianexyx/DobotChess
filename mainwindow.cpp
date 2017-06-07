@@ -371,7 +371,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
         else
         {
             _pWebChess->setServiceTests(true);
-            _pWebSockets->processWebsocketMsg(ui->emulatePlayerMsgLineEdit->text());
+            _pWebSockets->receivedMsg(ui->emulatePlayerMsgLineEdit->text());
             ui->emulatePlayerMsgLineEdit->clear();
             _pWebChess->setServiceTests(false);
         }

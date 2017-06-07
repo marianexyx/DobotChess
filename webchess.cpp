@@ -16,46 +16,54 @@ WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 
 void WebChess::GameStarted()
 {
-    _pWebsockets->addTextToConsole("new_game\n", WEBSOCKET);
-    qDebug() << "Sending 'new_game' to site";
+    _pWebsockets->addTextToConsole("newGame\n", WEBSOCKET);
+    qDebug() << "Sending 'newOk' to site";
 
-    if (!_bServiceTests)_pWebsockets->processWebsocketMsg("new_game");
+    if (!_bServiceTests)_pWebsockets->sendMsg("newOk");
 }
 
 void WebChess::BadMove(QString msg)
 {
-    qDebug() << "BAD_MOVE:" + msg ;
-    emit this->addTextToConsole("BAD_MOVE: " + msg + "\n", CORE);
+    qDebug() << "Bad move:" << msg << ". Sending to WS: badMove";
+    emit this->addTextToConsole("Bad move: " + msg + ". Sending to USB: badMove\n", CORE);
 
-    _pWebsockets->processWebsocketMsg("BAD_MOVE " + msg);
+    _pWebsockets->sendMsg("badMove");
 }
 
-void WebChess::GameInProgress() //gra w toku
+void WebChess::GameInProgress()
 {
-    //podaj na stronę info o tym że ruch został wykonany
-    qDebug() << "Chess::GameInProgress(): Sending to Websockets: game_in_progress "
-             << _pChessboard->QsPiecieFromTo;
-    _pWebsockets->processWebsocketMsg("game_in_progress " + _pChessboard->QsPiecieFromTo);
+    qDebug() << "Chess::GameInProgress(): Sending to WS: moveOk" <<
+                _pChessboard->QsPiecieFromTo <<
+                _pChessboard->getStrWhoseTurn() << "continue";
+
+    _pWebsockets->sendMsg("moveOk " + _pChessboard->QsPiecieFromTo + " " +
+                          _pChessboard->getStrWhoseTurn() + " continue");
 }
 
 void WebChess::EndOfGame(QString msg)
 {
-    QString QsWhoWon;
-    if (msg.left(3) == "1-0") QsWhoWon = "white_won";
-    else if (msg.left(3) == "0-1") QsWhoWon = "black_won";
-    else if (msg.left(7) == "1/2-1/2") QsWhoWon = "draw";
+    QString whoWon;
+    if (msg.left(3) == "1-0") whoWon = "whiteWon";
+    else if (msg.left(3) == "0-1") whoWon = "blackWon";
+    else if (msg.left(7) == "1/2-1/2") whoWon = "draw";
 
-    qDebug() << "Sending '" << QsWhoWon << "' to websockets";
-    _pWebsockets->processWebsocketMsg(QsWhoWon);
+    qDebug() << "Sending to WS: moveOk " << _pChessboard->QsPiecieFromTo << " nt " << whoWon;
 
-    this->resetPiecePositions(); //przywróć wszystkie bierki do stanu początkowego
+    _pWebsockets->sendMsg("moveOk " + _pChessboard->QsPiecieFromTo + " nt " + whoWon);
+
+    this->resetPiecePositions();
 }
 
 void WebChess::PromoteToWhat(QString moveForFuturePromote)
 {
     _pChessboard->QStrFuturePromote = moveForFuturePromote;
-    qDebug() << "Sending 'promote_to_what' to websockets";
-    _pWebsockets->processWebsocketMsg("promote_to_what"); //to trzeba jeszcze zapytać się na WWW na co ma być ta promocja.
+
+    qDebug() << "Sending to WS: moveOK" << moveForFuturePromote <<
+                _pChessboard->getStrWhoseTurn() << "promote";
+
+
+    _pWebsockets->sendMsg("moveOK " + moveForFuturePromote + " " +
+                                      _pChessboard->getStrWhoseTurn() + " promote");
 }
 
 //-------------------------------------------------------------------------------//
@@ -65,9 +73,9 @@ void WebChess::PromoteToWhat(QString moveForFuturePromote)
 void WebChess::checkMsgForChenard(QString msgFromWs)
 {
     qDebug() << "WebChess::checkMsgForChenard: received: " << msgFromWs;
-    if (msgFromWs == "new") this->NewGame();
+    if (msgFromWs == "newGame") this->NewGame();
     else if (msgFromWs.left(4) == "move") this->handleMove(msgFromWs.mid(5));
-    else if (msgFromWs.left(10) == "promote_to") this->Promote(msgFromWs);
+    else if (msgFromWs.left(9) == "promoteTo") this->Promote(msgFromWs);
     else if (msgFromWs.left(5) == "reset") this->resetPiecePositions();
     else qDebug() << "ERROR: received not recognized msg in WebChess::checkMsgForChenard: " << msgFromWs;
 }
@@ -78,7 +86,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 
     if (tcpMsgType == "new")
     {
-        //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki poniżej
+        //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
         if (tcpRespond == "OK\n" || tcpRespond == "OK")
         {
             this->Status();

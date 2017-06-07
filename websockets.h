@@ -22,8 +22,10 @@ private:
     WebTable *_pWebTable;
     Chessboard *_pChessboard;
 
+    QWebSocket *m_pWhitePiecesSocket;
+    QWebSocket *m_pBlackPiecesSocket;
+
 private Q_SLOTS: //TODO: czym to się różni od zwykłego private/zwykłego slots?
-    //void onNewConnection();
     void socketDisconnected();
 
 public:
@@ -33,11 +35,12 @@ public:
     QList<QWebSocket *> m_clients; //kontener z aktywnymi połączeniami websocketowymi
 
     void sendToChess(QString QsMsgForChessClass);
+    void sendMsg(QString QStrWsMsg);
 
     ~Websockets();
 
 public Q_SLOTS:
-    void processWebsocketMsg(QString QS_WbstMsgToProcess);
+    void receivedMsg(QString QS_WbstMsgToProcess);
     void onNewConnection();
 
 signals:

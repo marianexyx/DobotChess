@@ -357,7 +357,7 @@ void Chess::handleMove(QString move)
     }
 }
 
-SEQUENCE_TYPE Chess::checkMoveType(QString move)
+SEQUENCE_TYPE Chess::checkMoveType(QString move) //TODO: check --> find ?
 {
     if (_pChessboard->getLegalMoves().contains(move + "q")) return PROMOTE_TO_WHAT;
     else if (_pChessboard->getLegalMoves().contains(move))

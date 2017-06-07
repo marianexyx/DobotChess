@@ -10,9 +10,9 @@ WebTable::WebTable():
 
 void WebTable::checkWebsocketMsg(QString QstrWebsocketMsg)
 {
-    if (QstrWebsocketMsg.left(17) == "white_player_name")
-        m_QStrNameWhite = QstrWebsocketMsg.mid(18);
-    else if (QstrWebsocketMsg.left(17) == "black_player_name")
-        m_QStrNameBlack = QstrWebsocketMsg.mid(18);
-    else qDebug() << "ERROR: unknown parameter in WebTable::checkWebsocketMsg";
+    if (QstrWebsocketMsg.left(8) == "newWhite")
+        m_QStrNameWhite = QstrWebsocketMsg.mid(9);
+    else if (QstrWebsocketMsg.left(8) == "newBlack")
+        m_QStrNameBlack = QstrWebsocketMsg.mid(9);
+    else qDebug() << "ERROR: WebTable::checkWebsocketMsg: unknown parameter";
 }
