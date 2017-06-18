@@ -125,6 +125,15 @@ QString Chessboard::findPieceLetterPos(LETTER letter)
     return QstrLetter;
 }
 
+QString Chessboard::getPiecieFromTo()
+{
+    QString piecieFromTo = findPieceLetterPos(PieceFrom.Letter) + QString::number(PieceFrom.Digit+1) +
+            findPieceLetterPos(PieceTo.Letter) + QString::number(PieceTo.Digit+1);
+
+    return piecieFromTo;
+}
+
+
 int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać też dla bierek...
 { //...zbitych jako PieceToRemoveToRemovedPiecePos (0-32)
     if (nfieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika

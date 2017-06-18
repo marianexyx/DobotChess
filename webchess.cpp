@@ -25,18 +25,18 @@ void WebChess::GameStarted()
 void WebChess::BadMove(QString msg)
 {
     qDebug() << "Bad move:" << msg << ". Sending to WS: badMove";
-    emit this->addTextToConsole("Bad move: " + msg + ". Sending to USB: badMove\n", CORE);
+    emit this->addTextToConsole("Bad move: " + msg + "\n", CORE);
 
-    _pWebsockets->sendMsg("badMove");
+    _pWebsockets->sendMsg("badMove " + msg);
 }
 
 void WebChess::GameInProgress()
 {
     qDebug() << "Chess::GameInProgress(): Sending to WS: moveOk" <<
-                _pChessboard->QsPiecieFromTo <<
+                _pChessboard->getPiecieFromTo() <<
                 _pChessboard->getStrWhoseTurn() << "continue";
 
-    _pWebsockets->sendMsg("moveOk " + _pChessboard->QsPiecieFromTo + " " +
+    _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " " +
                           _pChessboard->getStrWhoseTurn() + " continue");
 }
 
@@ -47,9 +47,9 @@ void WebChess::EndOfGame(QString msg)
     else if (msg.left(3) == "0-1") whoWon = "blackWon";
     else if (msg.left(7) == "1/2-1/2") whoWon = "draw";
 
-    qDebug() << "Sending to WS: moveOk " << _pChessboard->QsPiecieFromTo << " nt " << whoWon;
+    qDebug() << "Sending to WS: moveOk " << _pChessboard->getPiecieFromTo() << " nt " << whoWon;
 
-    _pWebsockets->sendMsg("moveOk " + _pChessboard->QsPiecieFromTo + " nt " + whoWon);
+    _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + whoWon);
 
     this->resetPiecePositions();
 }
@@ -82,7 +82,8 @@ void WebChess::checkMsgForChenard(QString msgFromWs)
 
 void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
-    qDebug() << "WebChess::checkMsgFromChenard: " << tcpRespond;
+    qDebug() << "WebChess::checkMsgFromChenard: tcpMsgType=" << tcpMsgType <<
+                ", tcpRespond:" << tcpRespond;
 
     if (tcpMsgType == "new")
     {
@@ -104,21 +105,21 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     }
     else if (tcpMsgType == "status")
     {
-        if (tcpRespond.left(1) == "*") this->GameInProgress(); //ruch wykonany poprawnie. gra w toku
-        else if (tcpRespond.left(3) == "1-0" || tcpRespond.left(3) == "0-1" ||
-                 tcpRespond.left(7) == "1/2-1/2") this->EndOfGame(tcpRespond);
-        else this->wrongTcpAnswer(tcpMsgType, tcpRespond);
-
         _pChessboard->saveStatusData(tcpRespond);
-        if (_pChessboard->getGameStatus() == "*")
+
+        if (_pChessboard->getGameStatus().left(1) == "*")
         {
             this->AskForLegalMoves();
         }
-        else
+        else if (_pChessboard->getGameStatus().left(3) == "1-0" ||
+                 _pChessboard->getGameStatus().left(3) == "0-1" ||
+                 _pChessboard->getGameStatus().left(7) == "1/2-1/2")
         {
             _pChessboard->clearLegalMoves();
             this->EndOfGame(tcpRespond);
         }
+        else
+            this->wrongTcpAnswer(tcpMsgType, _pChessboard->getGameStatus());
     }
     else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
     {

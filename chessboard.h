@@ -92,6 +92,7 @@ public:
 
     void clearLegalMoves()                      { m_legalMoves.clear(); }
 
+    QString getPiecieFromTo();
     int getMaxPieceHeight() const               { return m_nMaxPieceHeight; }
     int getMaxRemovedPieceHeight() const        { return m_nMaxRemovedPieceH; }
     QString getGameStatus()                     { return m_QStrGameStatus; }

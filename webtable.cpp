@@ -2,8 +2,8 @@
 
 WebTable::WebTable():
     m_bGameInProgress(false),
-    m_QStrNameWhite("Biały"),
-    m_QStrNameBlack("Czarny")
+    m_QStrNameWhite("White"),
+    m_QStrNameBlack("Black")
 {
 
 }

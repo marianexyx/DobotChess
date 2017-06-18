@@ -60,19 +60,19 @@ void Websockets::receivedMsg(QString QStrWsMsg)
         QStrWsMsg = QStrWsMsg.mid(6);
         if (QStrWsMsg == "whitePlayer")
         {
-            qDebug() << "Websockets::sendMsg (to site) received: checkedWhite " << _pWebTable->getNameWhite();
+            qDebug() << "Websockets received: checkedWhite " << _pWebTable->getNameWhite();
             emit addTextToConsole("sent: checkedWhite " + _pWebTable->getNameWhite() + "\n", WEBSOCKET);
             pClient->sendTextMessage("checkedWhite " + _pWebTable->getNameWhite());
         }
         else if (QStrWsMsg == "blackPlayer")
         {
-            qDebug() << "Websockets::sendMsg (to site) received: checkedBlack " << _pWebTable->getNameBlack();
+            qDebug() << "Websockets received: checkedBlack " << _pWebTable->getNameBlack();
             emit addTextToConsole("sent: checkedBlack " + _pWebTable->getNameBlack() + "\n", WEBSOCKET);
             pClient->sendTextMessage("checkedBlack " + _pWebTable->getNameBlack());
         }
         else if (QStrWsMsg == "whoseTurn")
         {
-            qDebug() << "Websockets::sendMsg (to site) received: checkedTurn " << _pChessboard->getStrWhoseTurn();
+            qDebug() << "Websockets received: checkedTurn " << _pChessboard->getStrWhoseTurn();
             emit addTextToConsole("sent: checkedTurn " + _pChessboard->getStrWhoseTurn() + "\n", WEBSOCKET);
             pClient->sendTextMessage("checkedTurn " + _pChessboard->getWhoseTurn() );
         }
@@ -81,29 +81,39 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     else if (QStrWsMsg.left(6) == "change")
     {
         QStrWsMsg = QStrWsMsg.mid(7);
-        QString QStrPlayerType = QStrWsMsg.left(11);
-        QString QStrPlayerName = QStrWsMsg.mid(12);
+        QString QStrPlayerType = QStrWsMsg.left(11); qDebug() << "QStrPlayerType =" << QStrPlayerType;
+        QString QStrPlayerName = QStrWsMsg.mid(12); qDebug() << "QStrPlayerName =" << QStrPlayerName;
 
         if (QStrPlayerType == "whitePlayer")
         {
             emit MsgFromWebsocketsToWebtable("newWhite " + QStrPlayerName);
-            if (QStrPlayerName == "Biały") m_pWhitePiecesSocket = nullptr;
+
+            if (QStrPlayerName == "White") m_pWhitePiecesSocket = nullptr; //todo: zastąpić white/black stałą string
             else m_pWhitePiecesSocket = pClient; //skojarzenie siadającego gracza białego z gniazdem bierek białych
+
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
                 pNextClient->sendTextMessage("newWhite " + _pWebTable->getNameWhite());
+
+            qDebug() << "newWhite:" << _pWebTable->getNameWhite();
+            this->addTextToConsole("New white player: " + _pWebTable->getNameWhite() + "\n", WEBSOCKET);
         }
         else if (QStrPlayerType.left(11) == "blackPlayer")
         {
             emit MsgFromWebsocketsToWebtable("newBlack " + QStrPlayerName);
-            if (QStrPlayerName == "Czarny") m_pBlackPiecesSocket = nullptr;
+
+            if (QStrPlayerName == "Black") m_pBlackPiecesSocket = nullptr;
             else m_pBlackPiecesSocket = pClient; //skojarzenie siadającego gracza czarnego z gniazdem bierek czarnych
+
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
                 pNextClient->sendTextMessage("newBlack " + _pWebTable->getNameBlack());
+
+            qDebug() << "newBlack:" << _pWebTable->getNameWhite();
+            this->addTextToConsole("New black player: " + _pWebTable->getNameBlack() + "\n", WEBSOCKET);
         }
         else  qDebug() << "ERROR: Websockets::receivedMsg(): wrong change parameter: " << QStrWsMsg;
     }
     else if (QStrWsMsg.left(9) == "promoteTo") { this->sendToChess(QStrWsMsg); }
-    else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter";
+    else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWsMsg;
 }
 
 void Websockets::sendMsg(QString QStrWsMsg)
@@ -116,12 +126,12 @@ void Websockets::sendMsg(QString QStrWsMsg)
         Q_FOREACH (QWebSocket *pNextClient, m_clients)
             pNextClient->sendTextMessage("newOk");
     }
-    else if (QStrWsMsg.left(6) == "moveOk" || QStrWsMsg == "badMove")
+    else if (QStrWsMsg.left(6) == "moveOk" || QStrWsMsg.left(7) == "badMove")
     {
-        if (QStrWsMsg == "badMove" || QStrWsMsg.right(7) == "promote")
+        if (QStrWsMsg.left(7) == "badMove" || QStrWsMsg.right(7) == "promote")
         {
             if (_pChessboard->getWhoseTurn() == WHITE_TURN) m_pWhitePiecesSocket->sendTextMessage(QStrWsMsg);
-            else if (_pChessboard->getWhoseTurn() == BLACK_TURN) m_pWhitePiecesSocket->sendTextMessage(QStrWsMsg);
+            else if (_pChessboard->getWhoseTurn() == BLACK_TURN) m_pBlackPiecesSocket->sendTextMessage(QStrWsMsg);
             else qDebug() << "ERROR: Websockets::sendMsg: uknown/wrong turn:" << _pChessboard->getWhoseTurn();
         }
         else
