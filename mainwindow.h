@@ -36,6 +36,10 @@ public:
 /*protected:
     void closeEvent(QCloseEvent *);*/ //TODO: to się może chyba przydać
 
+public slots:
+
+    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
+
 private:
     Ui::MainWindow *ui;
 

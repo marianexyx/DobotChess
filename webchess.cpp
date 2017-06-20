@@ -58,11 +58,11 @@ void WebChess::PromoteToWhat(QString moveForFuturePromote)
 {
     _pChessboard->QStrFuturePromote = moveForFuturePromote;
 
-    qDebug() << "Sending to WS: moveOK" << moveForFuturePromote <<
+    qDebug() << "Sending to WS: moveOk" << moveForFuturePromote <<
                 _pChessboard->getStrWhoseTurn() << "promote";
 
 
-    _pWebsockets->sendMsg("moveOK " + moveForFuturePromote + " " +
+    _pWebsockets->sendMsg("moveOk " + moveForFuturePromote + " " +
                                       _pChessboard->getStrWhoseTurn() + " promote");
 }
 
@@ -75,7 +75,7 @@ void WebChess::checkMsgForChenard(QString msgFromWs)
     qDebug() << "WebChess::checkMsgForChenard: received: " << msgFromWs;
     if (msgFromWs == "newGame") this->NewGame();
     else if (msgFromWs.left(4) == "move") this->handleMove(msgFromWs.mid(5));
-    else if (msgFromWs.left(9) == "promoteTo") this->Promote(msgFromWs);
+    else if (msgFromWs.left(9) == "promoteTo") this->Promote(msgFromWs.right(1));
     else if (msgFromWs.left(5) == "reset") this->resetPiecePositions();
     else qDebug() << "ERROR: received not recognized msg in WebChess::checkMsgForChenard: " << msgFromWs;
 }

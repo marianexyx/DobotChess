@@ -44,6 +44,7 @@ signals:
     void addTextToConsole(QString, LOG);
     void msgFromTcpToWeb(QString, QString);
     void msgFromTcpToArd(QString, QString);
+    void msgFromTcpToCore(QString, QString);
 };
 
 #endif // TCPMSGS_H

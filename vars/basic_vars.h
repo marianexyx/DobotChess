@@ -3,6 +3,7 @@
 
 const int WEBSITE = 1;
 const int ARDUINO = 2;
+const int TEST = 3;
 
 const bool ROW = 1;
 const bool COLUMN = 0;

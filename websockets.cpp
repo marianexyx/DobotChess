@@ -130,9 +130,12 @@ void Websockets::sendMsg(QString QStrWsMsg)
     {
         if (QStrWsMsg.left(7) == "badMove" || QStrWsMsg.right(7) == "promote")
         {
-            if (_pChessboard->getWhoseTurn() == WHITE_TURN) m_pWhitePiecesSocket->sendTextMessage(QStrWsMsg);
-            else if (_pChessboard->getWhoseTurn() == BLACK_TURN) m_pBlackPiecesSocket->sendTextMessage(QStrWsMsg);
-            else qDebug() << "ERROR: Websockets::sendMsg: uknown/wrong turn:" << _pChessboard->getWhoseTurn();
+            if (_pChessboard->getWhoseTurn() == WHITE_TURN)
+                m_pWhitePiecesSocket->sendTextMessage(QStrWsMsg);
+            else if (_pChessboard->getWhoseTurn() == BLACK_TURN)
+                m_pBlackPiecesSocket->sendTextMessage(QStrWsMsg);
+            else
+                qDebug() << "ERROR: Websockets::sendMsg: uknown/wrong turn:" << _pChessboard->getWhoseTurn();
         }
         else
         {

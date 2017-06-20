@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_TCPMsgs_t {
-    QByteArrayData data[17];
-    char stringdata0[192];
+    QByteArrayData data[18];
+    char stringdata0[209];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,25 +35,27 @@ QT_MOC_LITERAL(2, 25, 0), // ""
 QT_MOC_LITERAL(3, 26, 3), // "LOG"
 QT_MOC_LITERAL(4, 30, 15), // "msgFromTcpToWeb"
 QT_MOC_LITERAL(5, 46, 15), // "msgFromTcpToArd"
-QT_MOC_LITERAL(6, 62, 12), // "displayError"
-QT_MOC_LITERAL(7, 75, 28), // "QAbstractSocket::SocketError"
-QT_MOC_LITERAL(8, 104, 11), // "socketError"
-QT_MOC_LITERAL(9, 116, 9), // "connected"
-QT_MOC_LITERAL(10, 126, 12), // "disconnected"
-QT_MOC_LITERAL(11, 139, 12), // "bytesWritten"
-QT_MOC_LITERAL(12, 152, 5), // "bytes"
-QT_MOC_LITERAL(13, 158, 9), // "readyRead"
-QT_MOC_LITERAL(14, 168, 11), // "TcpQueueMsg"
-QT_MOC_LITERAL(15, 180, 7), // "nSender"
-QT_MOC_LITERAL(16, 188, 3) // "msg"
+QT_MOC_LITERAL(6, 62, 16), // "msgFromTcpToCore"
+QT_MOC_LITERAL(7, 79, 12), // "displayError"
+QT_MOC_LITERAL(8, 92, 28), // "QAbstractSocket::SocketError"
+QT_MOC_LITERAL(9, 121, 11), // "socketError"
+QT_MOC_LITERAL(10, 133, 9), // "connected"
+QT_MOC_LITERAL(11, 143, 12), // "disconnected"
+QT_MOC_LITERAL(12, 156, 12), // "bytesWritten"
+QT_MOC_LITERAL(13, 169, 5), // "bytes"
+QT_MOC_LITERAL(14, 175, 9), // "readyRead"
+QT_MOC_LITERAL(15, 185, 11), // "TcpQueueMsg"
+QT_MOC_LITERAL(16, 197, 7), // "nSender"
+QT_MOC_LITERAL(17, 205, 3) // "msg"
 
     },
     "TCPMsgs\0addTextToConsole\0\0LOG\0"
     "msgFromTcpToWeb\0msgFromTcpToArd\0"
-    "displayError\0QAbstractSocket::SocketError\0"
-    "socketError\0connected\0disconnected\0"
-    "bytesWritten\0bytes\0readyRead\0TcpQueueMsg\0"
-    "nSender\0msg"
+    "msgFromTcpToCore\0displayError\0"
+    "QAbstractSocket::SocketError\0socketError\0"
+    "connected\0disconnected\0bytesWritten\0"
+    "bytes\0readyRead\0TcpQueueMsg\0nSender\0"
+    "msg"
 };
 #undef QT_MOC_LITERAL
 
@@ -63,38 +65,40 @@ static const uint qt_meta_data_TCPMsgs[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      10,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       3,       // signalCount
+       4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    2,   59,    2, 0x06 /* Public */,
-       4,    2,   64,    2, 0x06 /* Public */,
-       5,    2,   69,    2, 0x06 /* Public */,
+       1,    2,   64,    2, 0x06 /* Public */,
+       4,    2,   69,    2, 0x06 /* Public */,
+       5,    2,   74,    2, 0x06 /* Public */,
+       6,    2,   79,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       6,    1,   74,    2, 0x08 /* Private */,
-       9,    0,   77,    2, 0x08 /* Private */,
-      10,    0,   78,    2, 0x08 /* Private */,
-      11,    1,   79,    2, 0x08 /* Private */,
-      13,    0,   82,    2, 0x08 /* Private */,
-      14,    2,   83,    2, 0x0a /* Public */,
+       7,    1,   84,    2, 0x08 /* Private */,
+      10,    0,   87,    2, 0x08 /* Private */,
+      11,    0,   88,    2, 0x08 /* Private */,
+      12,    1,   89,    2, 0x08 /* Private */,
+      14,    0,   92,    2, 0x08 /* Private */,
+      15,    2,   93,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
     QMetaType::Void, QMetaType::QString, QMetaType::QString,    2,    2,
     QMetaType::Void, QMetaType::QString, QMetaType::QString,    2,    2,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString,    2,    2,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 7,    8,
+    QMetaType::Void, 0x80000000 | 8,    9,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::LongLong,   12,
+    QMetaType::Void, QMetaType::LongLong,   13,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::QString,   15,   16,
+    QMetaType::Void, QMetaType::Int, QMetaType::QString,   16,   17,
 
        0        // eod
 };
@@ -108,18 +112,19 @@ void TCPMsgs::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 1: _t->msgFromTcpToWeb((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 2: _t->msgFromTcpToArd((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
-        case 3: _t->displayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
-        case 4: _t->connected(); break;
-        case 5: _t->disconnected(); break;
-        case 6: _t->bytesWritten((*reinterpret_cast< qint64(*)>(_a[1]))); break;
-        case 7: _t->readyRead(); break;
-        case 8: _t->TcpQueueMsg((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 3: _t->msgFromTcpToCore((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 4: _t->displayError((*reinterpret_cast< QAbstractSocket::SocketError(*)>(_a[1]))); break;
+        case 5: _t->connected(); break;
+        case 6: _t->disconnected(); break;
+        case 7: _t->bytesWritten((*reinterpret_cast< qint64(*)>(_a[1]))); break;
+        case 8: _t->readyRead(); break;
+        case 9: _t->TcpQueueMsg((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         switch (_id) {
         default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 3:
+        case 4:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
@@ -151,6 +156,13 @@ void TCPMsgs::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
                 return;
             }
         }
+        {
+            typedef void (TCPMsgs::*_t)(QString , QString );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&TCPMsgs::msgFromTcpToCore)) {
+                *result = 3;
+                return;
+            }
+        }
     }
 }
 
@@ -179,13 +191,13 @@ int TCPMsgs::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 10;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 10)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 10;
     }
     return _id;
 }
@@ -209,5 +221,12 @@ void TCPMsgs::msgFromTcpToArd(QString _t1, QString _t2)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
+}
+
+// SIGNAL 3
+void TCPMsgs::msgFromTcpToCore(QString _t1, QString _t2)
+{
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    QMetaObject::activate(this, &staticMetaObject, 3, _a);
 }
 QT_END_MOC_NAMESPACE

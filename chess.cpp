@@ -344,7 +344,7 @@ void Chess::handleMove(QString move)
         this->MoveTcpPiece("move " + move);
         break;
     case REGULAR:
-        this->pieceMovingSequence(REGULAR);
+        this->pieceMovingSequence(REGULAR); //TODO: to wygląda jakby to robił dobot wszystko, ten ruch tj.
         this->MoveTcpPiece("move " + move);
         break;
     case BADMOVE:

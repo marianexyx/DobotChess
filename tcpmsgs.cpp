@@ -81,22 +81,24 @@ void TCPMsgs::connected()
 {
     TcpMsgMetadata QStrData;
     if (!TCPMsgsList.isEmpty())
+    {
         QStrData = TCPMsgsList.last();
+
+        qDebug() << "TCPMsgs: Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
+
+        QByteArray QabMsgArrayed;
+        QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n"); //przetworzenie parametru dla funkcji write()
+        // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
+        //todo: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
+        socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
+
+        emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, TCP);
+    }
     else
     {
         qDebug() << "ERROR: TCPMsgs::connected(): TCPMsgsList is empty";
         return;
     }
-
-    qDebug() << "TCPMsgs: Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
-
-    QByteArray QabMsgArrayed;
-    QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n"); //przetworzenie parametru dla funkcji write()
-    // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
-    //todo: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
-    socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
-
-    emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, TCP);
 }
 
 void TCPMsgs::disconnected()
@@ -144,20 +146,24 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
             return;
         }
 
-        if (QStrData.nSender == WEBSITE) //inna klasa powinna o tym decydowac?
+        qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
+                    ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
+
+        switch (QStrData.nSender)
         {
-            qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
-                        ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
+        case WEBSITE:
             emit this->msgFromTcpToWeb(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-        }
-        else if (QStrData.nSender == ARDUINO)
-        {
-            qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
-                        ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
+            break;
+        case ARDUINO:
             emit this->msgFromTcpToArd(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
+            break;
+        case TEST:
+            emit this->msgFromTcpToCore(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
+            break;
+        default: qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData parameter =" <<
+                             QStrData.nSender;
+            break;
         }
-        else qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData.nSender value =" <<
-                         QStrData.nSender;
     }
     else if (QStrMsgFromTcp.isEmpty())
     {
