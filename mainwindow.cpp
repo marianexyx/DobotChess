@@ -267,6 +267,13 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = NOTHING)
     //auto scroll
     QScrollBar *scroll_debug_log = ui->debug_log->verticalScrollBar();
     scroll_debug_log->setValue(scroll_debug_log->maximum());
+
+    //todo: jeżeli zbyt wiele znaków, to usuwaj poprzednie
+    /*int maximum = 500;
+    if (ui.textEdit->toPlainText().length() > maximum)
+    {
+        ui.textEdit->textCursor().deletePreviousChar();
+    }*/
 }
 
 void MainWindow::initControl() {

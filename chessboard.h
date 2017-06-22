@@ -14,7 +14,7 @@ struct ArmPosition
     DIGIT Digit = D_X;
 };
 
-enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN };
+enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //todo: do zewnętrznych plików dać to też
 enum SEQUENCE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT, CASTLING,
                   CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
 
@@ -24,6 +24,7 @@ class Chessboard: public QObject
     Q_OBJECT
 
 private:
+    QString m_QStrSiteMoveRequest;
     QString m_QStrGameStatus;
     QString m_QStrBoard[8][8];
     WHOSE_TURN m_WhoseTurn;
@@ -92,6 +93,7 @@ public:
 
     void clearLegalMoves()                      { m_legalMoves.clear(); }
 
+    QString getSiteMoveRequest()                { return m_QStrSiteMoveRequest; }
     QString getPiecieFromTo();
     int getMaxPieceHeight() const               { return m_nMaxPieceHeight; }
     int getMaxRemovedPieceHeight() const        { return m_nMaxRemovedPieceH; }

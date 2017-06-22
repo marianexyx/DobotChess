@@ -57,10 +57,12 @@ private:
     unsigned long long m_ullCoreQueuedCmdIndex; //aktualny index kolejki w pamięci systemu
     unsigned long long m_ullDobotQueuedCmdIndex; //aktualny id kolejki ruchu wykonywany przez dobota
     //Id nigdy się nie resetuje, bo raczej nie dobiję do 18 triliardów ruchów (unsigned long long)
+    unsigned long long m_ullRetreatIndex; //id na którym ramie ma się odsunąć, by nie zasłaniać obrazu kamerki
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
     ArmPosForCurrentCmdQueuedIndex m_posIdx; //dane ramienia przypisane do danego indexu dobota
     QList<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
     ArmPosForCurrentCmdQueuedIndex firstPosId, lastPosId, takenPosId;
+    PtpCmdActualVal retreatId;
 
     void checkPWM();
 
@@ -90,12 +92,15 @@ public:
     //metody dostępowe do pól
     unsigned long long getCoreQueuedCmdIndex() const {return m_ullCoreQueuedCmdIndex;}
     unsigned long long  getDobotQueuedCmdIndex() const {return m_ullDobotQueuedCmdIndex;}
+    unsigned long long  getRetreatIndex() const {return m_ullRetreatIndex;}
     unsigned int getQueuedCmdLeftSpace() const {return m_uiQueuedCmdLeftSpace;}
 
     void setCoreQueuedCmdIndex(unsigned long long ullCoreQueuedCmdIndex)
     {m_ullCoreQueuedCmdIndex = ullCoreQueuedCmdIndex;}
     void setDobotQueuedCmdIndex(unsigned long long ullDobotQueuedCmdIndex)
     {m_ullDobotQueuedCmdIndex = ullDobotQueuedCmdIndex;}
+    void setRetreatIndex(unsigned long long ullRetreatIndex)
+    {m_ullRetreatIndex = ullRetreatIndex;}
     void setQueuedCmdLeftSpace(unsigned int uiQueuedCmdLeftSpace)
     {m_uiQueuedCmdLeftSpace = uiQueuedCmdLeftSpace;}
 

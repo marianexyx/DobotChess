@@ -53,6 +53,7 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGI
 
     if (Type == REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
+    else _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
 }
 
 void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)

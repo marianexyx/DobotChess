@@ -36,7 +36,7 @@ void WebChess::GameInProgress()
                 _pChessboard->getPiecieFromTo() <<
                 _pChessboard->getStrWhoseTurn() << "continue";
 
-    _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " " +
+    _pWebsockets->sendMsg("moveOk " + _pChessboard->getSiteMoveRequest() + " " +
                           _pChessboard->getStrWhoseTurn() + " continue");
 }
 
@@ -90,7 +90,9 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
         if (tcpRespond == "OK\n" || tcpRespond == "OK")
         {
-            this->Status();
+            _pChessboard->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
+            this->legalOk("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
+                          "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
             this->GameStarted();
         }
         else
@@ -110,6 +112,8 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         if (_pChessboard->getGameStatus().left(1) == "*")
         {
             this->AskForLegalMoves();
+            this->GameInProgress(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi na legal..
+            //...wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął blokadę przed kojenym ruchem)
         }
         else if (_pChessboard->getGameStatus().left(3) == "1-0" ||
                  _pChessboard->getGameStatus().left(3) == "0-1" ||
@@ -150,7 +154,7 @@ void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
 void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
 {
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    _pWebsockets->addTextToConsole("WebChess::MoveTcpPiece: Sending normal move to tcp: " + msg + "\n", WEBSOCKET);
+    _pWebsockets->addTextToConsole("Sending normal move to tcp: " + msg + "\n", WEBSOCKET);
     qDebug() << "WebChess::MoveTcpPiece: Sending normal move to tcp: " << msg;
     _pTCPMsgs->TcpQueueMsg(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
@@ -172,11 +176,10 @@ void WebChess::TcpMoveOk()
 {
     qDebug() << "WebChess::TcpMoveOk()";
 
-    this->GameInProgress();
     this->Status();
 }
 
 void WebChess::resetBoardCompleted()
 {
-    this->NewGame();
+    //TODO: prewencyjnie ustawić wszystkie wartości na startowe
 }

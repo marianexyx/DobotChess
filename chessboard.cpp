@@ -21,7 +21,8 @@ Chessboard::Chessboard():
 {0, 0, 0, 0} ,
 {0, 0, 0, 0}},
     m_nMaxPieceHeight(52), // dla pola h8 max wysokość bierki to 46
-    m_nMaxRemovedPieceH(44.5)
+    m_nMaxRemovedPieceH(44.5),
+    m_QStrSiteMoveRequest("")
 {
     memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard
@@ -74,6 +75,8 @@ Chessboard::Chessboard():
 
 void Chessboard::findBoardPos(QString QStrPiecePositions)
 {
+    m_QStrSiteMoveRequest = QStrPiecePositions; //niezbędne aktualnie powtórzenie
+
     PieceFrom.Letter = this->findPieceLetterPos(QStrPiecePositions.left(1)); //todo: czy uzywana jest dobra z dwóch dostepnych funkcji?
     PieceFrom.Digit = static_cast<DIGIT>(QStrPiecePositions.mid(1,1).toInt() - 1);
 
@@ -195,8 +198,9 @@ bool Chessboard::isMoveEnpassant(QString moveToTest)
     else return false;
 }
 
-void Chessboard::castlingFindRookToMove() //zmieniają się tylko litery. a cyrfy pozostają.
+void Chessboard::castlingFindRookToMove()
 {
+    //zmieniają się tylko litery, a cyrfy pozostają.
     if (PieceTo.Letter == L_C)
     {
         PieceFrom.Letter = L_A;

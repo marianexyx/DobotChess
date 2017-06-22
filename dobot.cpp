@@ -32,6 +32,11 @@ Dobot::Dobot(Chessboard *pChessboard):
     firstPosId.index = 0;
     lastPosId.index = 0;
     takenPosId.index = 0;
+
+    retreatId.x = /.,; //TODO: sprawdzić te wartości na chacie
+    retreatId.y = /.,;
+    retreatId.z = /.,;
+    retreatId.r = /.,;
 }
 
 void Dobot::onPeriodicTaskTimer()
@@ -148,6 +153,11 @@ void Dobot::QueuedIdList()
                                            + takenPosId.sequence, DOBOT);
                     break;
                 }
+            } 
+            else if (m_ullRetreatIndex <= m_ullDobotQueuedCmdIndex)
+            {
+                //todo: aktualnie to się bodajże zapętli whuj wrzucając tą komendę w nieskonczoność
+                addCmdToList(TO_POINT, NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
             }
         }
     }
