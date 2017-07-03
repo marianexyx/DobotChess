@@ -51,7 +51,7 @@ void WebChess::EndOfGame(QString msg)
 
     _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + whoWon);
 
-    this->resetPiecePositions();
+    this->reset();
 }
 
 void WebChess::PromoteToWhat(QString moveForFuturePromote)
@@ -76,7 +76,7 @@ void WebChess::checkMsgForChenard(QString msgFromWs)
     if (msgFromWs == "newGame") this->NewGame();
     else if (msgFromWs.left(4) == "move") this->handleMove(msgFromWs.mid(5));
     else if (msgFromWs.left(9) == "promoteTo") this->Promote(msgFromWs.right(1));
-    else if (msgFromWs.left(5) == "reset") this->resetPiecePositions();
+    else if (msgFromWs.left(5) == "reset") this->reset();
     else qDebug() << "ERROR: received not recognized msg in WebChess::checkMsgForChenard: " << msgFromWs;
 }
 
@@ -178,8 +178,14 @@ void WebChess::TcpMoveOk()
 
     this->Status();
 }
+void WebChess::reset()
+{
+    _pWebsockets->sendMsg("reseting");
+    this->resetPiecePositions();
+}
 
 void WebChess::resetBoardCompleted()
 {
-    //TODO: prewencyjnie ustawić wszystkie wartości na startowe
+    //TODO: prewencyjnie ustawić wszystkie wartości na startowe (rozpisać to: jakie, które i po co)
+    _pWebsockets->sendMsg("ready");
 }

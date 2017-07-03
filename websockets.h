@@ -46,7 +46,6 @@ public Q_SLOTS:
 signals:
     void addTextToConsole(QString, LOG);
     void MsgFromWebsocketsToChess(QString QStrMsgFromWebsockets);
-    void MsgFromWebsocketsToWebtable(QString QStrMsgFromWebsockets);
 };
 
 #endif // Websockets_H

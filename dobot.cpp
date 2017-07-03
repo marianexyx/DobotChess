@@ -9,6 +9,8 @@
 Dobot::Dobot(Chessboard *pChessboard):
     m_fGripOpened(6.9f),
     m_fGripClosed(7.55f)
+    //m_fGripOpened(30.f), testy
+    //m_fGripClosed(70.f)
 {
     _pChessboard = pChessboard;
     
@@ -33,10 +35,10 @@ Dobot::Dobot(Chessboard *pChessboard):
     lastPosId.index = 0;
     takenPosId.index = 0;
 
-    retreatId.x = /.,; //TODO: sprawdzić te wartości na chacie
-    retreatId.y = /.,;
-    retreatId.z = /.,;
-    retreatId.r = /.,;
+    retreatId.x = 260; //TODO: sprawdzić te wartości na chacie
+    retreatId.y = -110;
+    retreatId.z = 65; //todo: za wysoko?
+    retreatId.r = 0;
 }
 
 void Dobot::onPeriodicTaskTimer()

@@ -33,7 +33,8 @@ public:
     //-----------------FUNKCJE SZACHOWE-----------------//
     void TcpMoveOk();
     SEQUENCE_TYPE checkMoveType(QString move);
-     void resetBoardCompleted();
+    void reset();
+    void resetBoardCompleted();
 
 signals:
     void addTextToConsole(QString, LOG);

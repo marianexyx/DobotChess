@@ -22,7 +22,8 @@ Chessboard::Chessboard():
 {0, 0, 0, 0}},
     m_nMaxPieceHeight(52), // dla pola h8 max wysokość bierki to 46
     m_nMaxRemovedPieceH(44.5),
-    m_QStrSiteMoveRequest("")
+    m_QStrSiteMoveRequest(""),
+    m_WhoseTurn(NO_TURN)
 {
     memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard
@@ -404,5 +405,9 @@ QString Chessboard::getStrWhoseTurn()
     if (m_WhoseTurn == WHITE_TURN) return "wt";
     else if (m_WhoseTurn == BLACK_TURN) return "bt";
     else if (m_WhoseTurn == NO_TURN) return "nt";
-    else return "error: wroong turn type";
+    else
+    {
+        QString err = "ERROR: wrong turn type: " + QString::number(m_WhoseTurn);
+        return err;
+    }
 }

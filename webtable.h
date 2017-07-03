@@ -17,22 +17,20 @@ class WebTable: public QObject
 
 private:
     //zamienniki mysqla
-    bool m_bGameInProgress;
     QString m_QStrNameWhite; // nazwa białego- startowo "Biały"
     QString m_QStrNameBlack; // nazwa czarnego- startowo "Czarny"
 
 public:
     WebTable();
 
+    void checkWebsocketMsg(QString QstrWebsocketMsg);
+
 //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     QString getNameWhite() const          { return m_QStrNameWhite; }
     QString getNameBlack() const          { return m_QStrNameBlack; }
 
-    void setNameWhite(QString QSNameWhite)           { m_QStrNameWhite = QSNameWhite; }
-    void setNameBlack(QString QSNameBlack)           { m_QStrNameBlack = QSNameBlack; }
-
-public slots:
-    void checkWebsocketMsg(QString QstrWebsocketMsg);
+    void setNameWhite(QString QStrWhite)  { m_QStrNameWhite = QStrWhite; }
+    void setNameBlack(QString QStrBlack)  { m_QStrNameBlack = QStrBlack; }
 };
 
 #endif // WEBTABLE_H

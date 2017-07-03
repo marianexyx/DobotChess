@@ -1,7 +1,6 @@
 #include "webtable.h"
 
 WebTable::WebTable():
-    m_bGameInProgress(false),
     m_QStrNameWhite("White"),
     m_QStrNameBlack("Black")
 {
