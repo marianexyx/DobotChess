@@ -38,6 +38,9 @@ Chessboard::Chessboard():
     double h8_x = 314.0; double h8_y = -85.5; double h8_z = -16.3;
     //                                      "z" to pozycje na styku chwytaka z szachownicą
 
+    std::vector<double> v{ a1_z, a8_z, h1_z, h8_z };
+    m_nMaxBoardZ = *std::max_element( v.begin(), v.end() );
+
     for (int digit = 0; digit <= 7; digit++)
     {
         for (int letter = 0; letter <= 7; letter++)

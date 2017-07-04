@@ -390,9 +390,9 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_calibrateBtn_clicked()
 {
-    if (ui->xLabel->text().toInt() == _pDobotArm->HomeChess.x &&
-            ui->yLabel->text().toInt() == _pDobotArm->HomeChess.y &&
-            ui->zLabel->text().toInt() == _pDobotArm->HomeChess.z)
+    if (ui->xLabel->text().toInt() == _pDobotArm->getHomePos('x') &&
+            ui->yLabel->text().toInt() == _pDobotArm->getHomePos('y') &&
+            ui->zLabel->text().toInt() == _pDobotArm->getHomePos('z'))
     {
         _pDobotArm->addCmdToList(HOME);
     }
@@ -406,9 +406,9 @@ void MainWindow::on_calibrateBtn_clicked()
 void MainWindow::on_homeBtn_clicked()
 {
     _pDobotArm->addCmdToList(TO_POINT, SERVICE,
-                             _pDobotArm->HomeChess.x,
-                             _pDobotArm->HomeChess.y,
-                             _pDobotArm->HomeChess.z);
+                             _pDobotArm->getHomePos('x'),
+                             _pDobotArm->getHomePos('y'),
+                             _pDobotArm->getHomePos('z'));
 }
 
 void MainWindow::on_upBtn_clicked()
@@ -556,23 +556,28 @@ void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawićî jako stałe z xmla
     qDebug() << "Placing arm above the chessboard.";
     _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->HomeChess.x, _pDobotArm->HomeChess.y,
-                             _pDobotArm->HomeChess.z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
+                             _pDobotArm->getHomePos('z'));
     //todo: te liczby nazwać tym gdzie i czy są
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 144, -103, 10);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 260, -10, 65);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
+                             _pDobotArm->getmiddleAboveBoardPos('y'),
+                             _pDobotArm->getmiddleAboveBoardPos('z'));
 }
+//retreatYPlus, retreatYMinus, middleAboveBoard;
 
 void MainWindow::on_startDtPosBtn_clicked()
 {
     qDebug() << "Returning safely to the HOME positions.";
     _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 260, -10, 65);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
+                             _pDobotArm->getmiddleAboveBoardPos('y'),
+                             _pDobotArm->getmiddleAboveBoardPos('z'));
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, 140, -103, 10);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->HomeChess.x, _pDobotArm->HomeChess.y,
-                             _pDobotArm->HomeChess.z);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
+                             _pDobotArm->getHomePos('z'));
 }
 
 void MainWindow::on_SimulateFromUsbBtn_clicked()

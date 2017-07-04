@@ -27,7 +27,7 @@ void WebChess::BadMove(QString msg)
     qDebug() << "Bad move:" << msg << ". Sending to WS: badMove";
     emit this->addTextToConsole("Bad move: " + msg + "\n", CORE);
 
-    _pWebsockets->sendMsg("badMove " + msg);
+    _pWebsockets->sendMsg("badMove " + msg + " " + _pChessboard->getStrWhoseTurn());
 }
 
 void WebChess::GameInProgress()

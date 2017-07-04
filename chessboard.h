@@ -4,6 +4,7 @@
 #include "QString"
 #include "QObject"
 #include "qdebug.h"
+#include <vector>
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "vars/dobot_moves.h"
@@ -85,6 +86,7 @@ public:
 
     const int m_nMaxPieceHeight;
     const int m_nMaxRemovedPieceH; //todo: powinna to być jedna wartość z powyższą?
+    int m_nMaxBoardZ;
 
     //metody dostępowe
     void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
@@ -104,6 +106,7 @@ public:
     QString getCastlings()                      { return m_QStrCastlings; }
     QString getEnpassant()                      { return m_QStrEnpassant; }
     QStringList getLegalMoves()                 { return m_legalMoves; }
+    double getMaxBoardZ()                       { return m_nMaxBoardZ; }
 
 signals:
     void addTextToConsole(QString);

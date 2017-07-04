@@ -29,7 +29,9 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGI
     }
 
     if (Type == RESTORE && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
-        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
+        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type); //TODO: pieceToDigit nie jest poprawną daną (przy...
+        //...zbijaniu czarnego z b7 (głębsza linia zbitych) ramię najpierw poszło nad białe pole zbite, a potem nad...
+        //...czarne, by chyba znowu próbować wyjśc przez białe)
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
 
@@ -53,7 +55,7 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGI
 
     if (Type == REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
-    else _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
+    else if (Type != REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
 }
 
 void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
@@ -61,17 +63,32 @@ void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
     qDebug() << "goToSafeRemovedField. digitTo=" << digitTo;
     _pDobot->writeMoveTypeInConsole(INDIRECT, sequence);
 
+    int nRemPieceType;
+    DIGIT remPieceDestDigit;
+    if (sequence == REMOVING) //TODO: kod skopiowany praktycznie z Dobot::pieceFromTo. nie wiem czy zadziala
+    {
+        nRemPieceType = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
+        remPieceDestDigit = static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemPieceType, COLUMN));
+    }
+    else if (sequence == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
+        //...być podana wprost do pieceFromTo()
+    {
+        //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
+        remPieceDestDigit = digitTo;
+    }
     DIGIT indirectFieldDigit;
-    if (digitTo == D_1 || digitTo == D_2) indirectFieldDigit = D_2;
-    else if (digitTo == D_3 || digitTo == D_4) indirectFieldDigit = D_3;
+    if (remPieceDestDigit == D_1 || remPieceDestDigit == D_2) indirectFieldDigit = D_2;
+    else if (remPieceDestDigit == D_3 || remPieceDestDigit == D_4) indirectFieldDigit = D_3;
     else qDebug() << "ERROR: unknown pieceToDigit value =" << digitTo;
+
+    qDebug() << "goToSafeRemovedField. indirectFieldDigit=" << indirectFieldDigit;
 
     float fIndirect_x = _pChessboard->adRemovedPiecesPositions_x[L_D][indirectFieldDigit];
     float fIndirect_y = _pChessboard->adRemovedPiecesPositions_y[L_D][indirectFieldDigit];
     float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
 
     _pDobot->addCmdToList(TO_POINT, REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
-                          _pChessboard->getMaxRemovedPieceHeight(), ACTUAL_POS);
+                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //getMaxRemovedPieceHeight?
 }
 
 void Chess::legalOk(QString msg)

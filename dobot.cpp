@@ -9,8 +9,6 @@
 Dobot::Dobot(Chessboard *pChessboard):
     m_fGripOpened(6.9f),
     m_fGripClosed(7.55f)
-    //m_fGripOpened(30.f), testy
-    //m_fGripClosed(70.f)
 {
     _pChessboard = pChessboard;
     
@@ -20,6 +18,11 @@ Dobot::Dobot(Chessboard *pChessboard):
     m_PtpCmdActualVal.y = 0;
     m_PtpCmdActualVal.z = 25;
     m_PtpCmdActualVal.r = 0;
+
+    HomeChess.x = 140;
+    HomeChess.y = 0;
+    HomeChess.z = 10; //niżej by waliło w szachownicę
+    HomeChess.r = 0;
 
     m_gripperServo.address = 4;
     m_gripperServo.frequency = 50;
@@ -35,10 +38,20 @@ Dobot::Dobot(Chessboard *pChessboard):
     lastPosId.index = 0;
     takenPosId.index = 0;
 
-    retreatId.x = 260; //TODO: sprawdzić te wartości na chacie
-    retreatId.y = -110;
-    retreatId.z = 65; //todo: za wysoko?
-    retreatId.r = 0;
+    middleAboveBoard.x = 260; //mniej wiecej srodek planszy w osi x
+    middleAboveBoard.y = HomeChess.y;
+    middleAboveBoard.z = _pChessboard->getMaxBoardZ() + _pChessboard->getMaxPieceHeight();
+    middleAboveBoard.r = 0;
+
+    retreatYPlus.x = 180;
+    retreatYPlus.y = HomeChess.y + 100;
+    retreatYPlus.z = _pChessboard->getMaxBoardZ() + _pChessboard->getMaxPieceHeight();;
+    retreatYPlus.r = 0;
+
+    retreatYMinus.x = 180;
+    retreatYMinus.y = HomeChess.y - 100;
+    retreatYMinus.z = _pChessboard->getMaxBoardZ() + _pChessboard->getMaxPieceHeight();;
+    retreatYMinus.r = 0;
 }
 
 void Dobot::onPeriodicTaskTimer()
@@ -51,7 +64,6 @@ void Dobot::onPeriodicTaskTimer()
 void Dobot::onGetPoseTimer()
 {
     QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
-    Pose pose;
     GetPose(&pose);
     
     emit JointLabelText(QString::number(pose.jointAngle[0]), 1);
@@ -156,12 +168,15 @@ void Dobot::QueuedIdList()
                     break;
                 }
             } 
-            else if (m_ullRetreatIndex <= m_ullDobotQueuedCmdIndex)
-            {
-                //todo: aktualnie to się bodajże zapętli whuj wrzucając tą komendę w nieskonczoność
-                addCmdToList(TO_POINT, NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
-            }
         }
+    }
+    if (m_ullRetreatIndex <= m_ullDobotQueuedCmdIndex)
+    {
+        qDebug() << "Dobot::QueuedIdList(): retreat";
+        PtpCmdActualVal retreatId;
+        retreatId = (pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
+        addCmdToList(TO_POINT, NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
+        m_ullRetreatIndex = 10000000; //jakas duza liczba
     }
 }
 
@@ -295,10 +310,6 @@ void Dobot::initDobot()
     ptpJumpParams.zLimit = 150;
     SetPTPJumpParams(&ptpJumpParams, false, NULL);
     
-    HomeChess.x = 140;
-    HomeChess.y = 0;
-    HomeChess.z = 10; //niżej by waliło w szachownicę
-    HomeChess.r = 0;
     SetHOMEParams(&HomeChess, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 

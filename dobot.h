@@ -49,7 +49,9 @@ private:
     IOPWM m_gripperServo;
     const float m_fGripOpened, m_fGripClosed;
 
-    PtpCmdActualVal m_PtpCmdActualVal;
+    HOMEParams HomeChess;
+    Pose pose;
+    PtpCmdActualVal m_PtpCmdActualVal, retreatYPlus, retreatYMinus, middleAboveBoard;
     PTPCmd ptpCmd;
     WAITCmd gripperMoveDelay; //komenda mówiąca dobotowi, że ma nic nie robić przez chwilę...
     //...podczas gdy musi się do końca wykonać komenda zamykania chwytaka zanim ruszy dalej
@@ -62,14 +64,11 @@ private:
     ArmPosForCurrentCmdQueuedIndex m_posIdx; //dane ramienia przypisane do danego indexu dobota
     QList<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
     ArmPosForCurrentCmdQueuedIndex firstPosId, lastPosId, takenPosId;
-    PtpCmdActualVal retreatId;
 
     void checkPWM();
 
 public:
     Dobot(Chessboard *pChessboard);
-
-    HOMEParams HomeChess;
 
     void refreshBtn();
     void initDobot();
@@ -90,11 +89,6 @@ public:
     void QueuedIdList();
 
     //metody dostępowe do pól
-    unsigned long long getCoreQueuedCmdIndex() const {return m_ullCoreQueuedCmdIndex;}
-    unsigned long long  getDobotQueuedCmdIndex() const {return m_ullDobotQueuedCmdIndex;}
-    unsigned long long  getRetreatIndex() const {return m_ullRetreatIndex;}
-    unsigned int getQueuedCmdLeftSpace() const {return m_uiQueuedCmdLeftSpace;}
-
     void setCoreQueuedCmdIndex(unsigned long long ullCoreQueuedCmdIndex)
     {m_ullCoreQueuedCmdIndex = ullCoreQueuedCmdIndex;}
     void setDobotQueuedCmdIndex(unsigned long long ullDobotQueuedCmdIndex)
@@ -103,6 +97,19 @@ public:
     {m_ullRetreatIndex = ullRetreatIndex;}
     void setQueuedCmdLeftSpace(unsigned int uiQueuedCmdLeftSpace)
     {m_uiQueuedCmdLeftSpace = uiQueuedCmdLeftSpace;}
+
+    unsigned long long getCoreQueuedCmdIndex() const    { return m_ullCoreQueuedCmdIndex; }
+    unsigned long long  getDobotQueuedCmdIndex() const  { return m_ullDobotQueuedCmdIndex; }
+    unsigned long long  getRetreatIndex() const         { return m_ullRetreatIndex; }
+    unsigned int getQueuedCmdLeftSpace() const          { return m_uiQueuedCmdLeftSpace; }
+    float getHomePos(char ch)                           { if (ch == 'x') return HomeChess.x;
+                                                          else if (ch == 'y') return HomeChess.y;
+                                                          else if (ch == 'z') return HomeChess.z;
+                                                          else return HomeChess.r; }
+    float getmiddleAboveBoardPos(char ch)               { if (ch == 'x') return middleAboveBoard.x;
+                                                          else if (ch == 'y') return middleAboveBoard.y;
+                                                          else if (ch == 'z') return middleAboveBoard.z;
+                                                          else return middleAboveBoard.r; }
 
 public slots:
     void onConnectDobot();
