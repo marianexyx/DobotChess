@@ -161,6 +161,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->closeGripperBtn->setEnabled(false);
         ui->homeBtn->setEnabled(false);
         ui->directTcpMsgCheckBox->setEnabled(false);
+        ui->moveRestrictionsCheckBox->setEnabled(false);
     }
     else
     {
@@ -196,6 +197,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->closeGripperBtn->setEnabled(true);
         ui->homeBtn->setEnabled(true);
         ui->directTcpMsgCheckBox->setEnabled(true);
+        ui->moveRestrictionsCheckBox->setEnabled(true);
     }
 }
 
@@ -559,8 +561,8 @@ void MainWindow::on_startGmPosBtn_clicked()
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
     //todo: te liczby nazwać tym gdzie i czy są
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 144, -103, 10);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
                              _pDobotArm->getmiddleAboveBoardPos('y'),
                              _pDobotArm->getmiddleAboveBoardPos('z'));
@@ -574,8 +576,8 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
                              _pDobotArm->getmiddleAboveBoardPos('y'),
                              _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 145, -103, 45);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, 140, -103, 10);
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
+    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
     _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
 }

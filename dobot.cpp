@@ -327,49 +327,78 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
 {
     float f_xFromTo, f_yFromTo, f_zFromTo, f_rFromTo;
 
-    if ((Type == REMOVING && partOfSequence == TO) || (Type == RESTORE && partOfSequence == FROM))
-    {
-        int nRemPieceType;
-        LETTER remPieceDestLetter;
-        DIGIT remPieceDestDigit;
-        if (Type == REMOVING)
+    if (letter >=0 && letter <=7 && digit >=0 && digit <=7)
+    { //todo: powtórzony kod zabezpieczeń z Dobot::armUpDown
+        if ((Type == REMOVING && partOfSequence == TO) || (Type == RESTORE && partOfSequence == FROM))
         {
-            nRemPieceType = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
-            remPieceDestLetter = static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nRemPieceType, ROW));
-            remPieceDestDigit = static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemPieceType, COLUMN));
+            int nRemPieceType;
+            LETTER remPieceDestLetter;
+            DIGIT remPieceDestDigit;
+            if (Type == REMOVING)
+            {
+                if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
+                {
+                    nRemPieceType = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
+                    remPieceDestLetter = static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nRemPieceType, ROW));
+                    remPieceDestDigit = static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemPieceType, COLUMN));
+                }
+                else
+                {
+                    qDebug() << "ERROR: Dobot::pieceFromTo: REMOVING: wrong _pChessboard->nGripperPiece value:" <<
+                                _pChessboard->nGripperPiece;
+                    return;
+                }
+            }
+            else if (Type == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
+                //...być podana wprost do pieceFromTo()
+            {
+                //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
+                remPieceDestLetter = letter;
+                remPieceDestDigit = digit;
+            }
+
+            f_xFromTo = _pChessboard->adRemovedPiecesPositions_x[remPieceDestLetter][remPieceDestDigit];
+            f_yFromTo = _pChessboard->adRemovedPiecesPositions_y[remPieceDestLetter][remPieceDestDigit];
+            f_zFromTo = _pChessboard->adRemovedPiecesPositions_z[remPieceDestLetter][remPieceDestDigit];
+            f_rFromTo = ACTUAL_POS;
         }
-        else if (Type == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
-            //...być podana wprost do pieceFromTo()
+        else //ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
         {
-            //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
-            remPieceDestLetter = letter;
-            remPieceDestDigit = digit;
+            f_xFromTo = _pChessboard->adChessboardPositions_x[letter][digit];
+            f_yFromTo = _pChessboard->adChessboardPositions_y[letter][digit];
+            f_zFromTo = _pChessboard->adChessboardPositions_z[letter][digit];
+            f_rFromTo = ACTUAL_POS;
         }
-        f_xFromTo = _pChessboard->adRemovedPiecesPositions_x[remPieceDestLetter][remPieceDestDigit];
-        f_yFromTo = _pChessboard->adRemovedPiecesPositions_y[remPieceDestLetter][remPieceDestDigit];
-        f_zFromTo = _pChessboard->adRemovedPiecesPositions_z[remPieceDestLetter][remPieceDestDigit];
-        f_rFromTo = ACTUAL_POS;
     }
-    else //ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
-    {
-        f_xFromTo = _pChessboard->adChessboardPositions_x[letter][digit];
-        f_yFromTo = _pChessboard->adChessboardPositions_y[letter][digit];
-        f_zFromTo = _pChessboard->adChessboardPositions_z[letter][digit];
-        f_rFromTo = ACTUAL_POS;
+    else qDebug() << "ERROR: Dobot::pieceFromTo: wrong letter/digit value=" <<
+                     letter << "," << digit;
+    
+    if (f_xFromTo > 130.f && f_xFromTo < 350.f && f_yFromTo > -200 && f_yFromTo < 200 && f_zFromTo > -22.f &&
+            f_zFromTo < 100.f)
+    { //todo: warunki wpisać tak by się dostosowywały wartosci do zmian. można w funckję zamknąć
+        ArmPosForCurrentCmdQueuedIndex actualPosIdx;
+        actualPosIdx = QueuedCmdIndexList.first();
+        qDebug() << "Previous move parameteres: x y z=" << actualPosIdx.x << actualPosIdx.y << actualPosIdx.z;
+        if (f_zFromTo != actualPosIdx.z && (f_xFromTo != actualPosIdx.x || f_yFromTo != actualPosIdx.y))
+        {
+            this->addCmdToList(TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo +
+                               _pChessboard->getMaxPieceHeight(), f_rFromTo);
+
+            this->writeMoveTypeInConsole(TO_POINT, Type);
+            QString QstrMoveType;
+            partOfSequence == FROM ? QstrMoveType = ": piece from " : QstrMoveType = ": piece to ";
+            qDebug() << "Dobot::pieceFromTo:" << QstrMoveType << "nLetter ="
+                     << letter << ", nDigit =" << digit << ", Type =" << Type;
+            emit this->addTextToConsole(QstrMoveType + _pChessboard->findPieceLetterPos(letter)
+                                        + QString::number(digit+1) + "\n", NOTHING);
+            //todo: naprzemiennie używam writeMoveTypeInConsole() i addTextToConsole() - ?
+        }
+        else qDebug() << "ERROR: Dobot::pieceFromTo: trying to move Z axis with X or Y axis";
     }
+    else qDebug() << "ERROR: Dobot::pieceFromTo: out of XYZ wornking range: x=" << f_xFromTo <<
+                     ", y=" << f_yFromTo << ", z=" << f_zFromTo;
     
-    this->writeMoveTypeInConsole(TO_POINT, Type);
-    
-    QString QstrMoveType;
-    partOfSequence == FROM ? QstrMoveType = ": piece from " : QstrMoveType = ": piece to ";
-    qDebug() << "Dobot::pieceFromTo:" << QstrMoveType << "nLetter ="
-             << letter << ", nDigit =" << digit << ", Type =" << Type;
-    emit this->addTextToConsole(QstrMoveType + _pChessboard->findPieceLetterPos(letter)
-                                + QString::number(digit+1) + "\n", NOTHING);
-    
-    this->addCmdToList(TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo + _pChessboard->getMaxPieceHeight(), f_rFromTo);
-    
-    _pChessboard->PieceActualPos.Letter = letter;
+    _pChessboard->PieceActualPos.Letter = letter; //todo: wrzucić to do warunków na letter/digit
     _pChessboard->PieceActualPos.Digit = digit;
 }
 
@@ -397,52 +426,94 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
         //TODO: ten zapis fieldNrToFieldPos działa, ale zmienić jakoś nazewnictwo funkcji, bo jest...
         //...nieadekwatna w tym przypadku.
         //TODO2: zastrukturyzować, spakować w funkcję
-        f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
-        f_yUpDown = _pChessboard->adRemovedPiecesPositions_y
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
-        if (armDestination == UP) f_zUpDown = _pChessboard->getMaxRemovedPieceHeight();
-        else if (armDestination == DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
-                [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
-        f_rUpDown = ACTUAL_POS;
+        //todo: uporządkować kod zabezpieczeń
+
+        if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
+        {
+            qDebug() << "Dobot::armUpDown: nGripperPiece =" << _pChessboard->nGripperPiece
+                     << ", isArmGoingUp?: " << (armDestination == UP ? "up" : "down");
+
+            f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
+                    [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
+                    [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
+            f_yUpDown = _pChessboard->adRemovedPiecesPositions_y
+                    [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
+                    [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
+            if (armDestination == UP) f_zUpDown = _pChessboard->getMaxRemovedPieceHeight();
+            else if (armDestination == DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
+                    [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
+                    [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
+            f_rUpDown = ACTUAL_POS;
+        }
+        else
+        {
+            qDebug() << "ERROR: Dobot::armUpDown: REMOVING: wrong _pChessboard->nGripperPiece value:" <<
+                         _pChessboard->nGripperPiece;
+            return;
+        }
     }
     else if (Type == RESTORE && partOfSequence == FROM) //...lub pochwycamy bierkę z obszaru zbitych
     {
-        qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->PieceActualPos.Letter
-                 << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?: " << (armDestination == UP ? "up" : "down");
-        f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_yUpDown = _pChessboard->adRemovedPiecesPositions_y
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        if (armDestination == UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adRemovedPiecesPositions_z
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        else if (armDestination == DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_rUpDown = ACTUAL_POS;
+        if (_pChessboard->PieceActualPos.Letter >=0 && _pChessboard->PieceActualPos.Letter <=7 &&
+                _pChessboard->PieceActualPos.Digit >=0 && _pChessboard->PieceActualPos.Digit <=7)
+        {
+            qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->PieceActualPos.Letter
+                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?: " << (armDestination == UP ? "up" : "down");
+
+            f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            f_yUpDown = _pChessboard->adRemovedPiecesPositions_y
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            if (armDestination == UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adRemovedPiecesPositions_z
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            else if (armDestination == DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            f_rUpDown = ACTUAL_POS;
+        }
+        else qDebug() << "ERROR: Dobot::armUpDown: RESTORE: wrong _pChessboard->PieceActualPos value:" <<
+                         _pChessboard->PieceActualPos.Letter << "," << _pChessboard->PieceActualPos.Digit;
     }
     else //pozycje na szachownicy
     {
-        qDebug() << "Dobot::armUpDown: PieceActualPos =" << _pChessboard->PieceActualPos.Letter
-                 << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << (armDestination == UP ? "up" : "down");
-        f_xUpDown = _pChessboard->adChessboardPositions_x
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_yUpDown = _pChessboard->adChessboardPositions_y
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        if (armDestination == UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adChessboardPositions_z
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        else if (armDestination == DOWN) f_zUpDown = _pChessboard->adChessboardPositions_z
-                [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-        f_rUpDown = ACTUAL_POS;
+        if (_pChessboard->PieceActualPos.Letter >=0 && _pChessboard->PieceActualPos.Letter <=7 &&
+                _pChessboard->PieceActualPos.Digit >=0 && _pChessboard->PieceActualPos.Digit <=7)
+        {
+            qDebug() << "Dobot::armUpDown: PieceActualPos =" << _pChessboard->PieceActualPos.Letter
+                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << (armDestination == UP ? "up" : "down");
+
+            f_xUpDown = _pChessboard->adChessboardPositions_x
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            f_yUpDown = _pChessboard->adChessboardPositions_y
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            if (armDestination == UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adChessboardPositions_z
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            else if (armDestination == DOWN) f_zUpDown = _pChessboard->adChessboardPositions_z
+                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
+            f_rUpDown = ACTUAL_POS;
+        }
+        else qDebug() << "ERROR: Dobot::armUpDown: NORMAL: wrong _pChessboard->PieceActualPos value:" <<
+                         _pChessboard->PieceActualPos.Letter << "," << _pChessboard->PieceActualPos.Digit;
     }
-    this->addCmdToList(TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
-    
-    this->writeMoveTypeInConsole(armDestination, Type);
+
+    if (f_xUpDown > 130.f && f_xUpDown < 350.f && f_yUpDown > -200 && f_yUpDown < 200 && f_zUpDown > -22.f &&
+            f_zUpDown < 100.f)
+    { //todo: warunki wpisać tak by się dostosowywały wartosci do zmian. można w funckję zamknąć
+        ArmPosForCurrentCmdQueuedIndex actualPosIdx;
+        actualPosIdx = QueuedCmdIndexList.first();
+        qDebug() << "Previous move parameteres: x y z=" << actualPosIdx.x << actualPosIdx.y << actualPosIdx.z;
+        if (f_zUpDown != actualPosIdx.z && (f_xUpDown != actualPosIdx.x || f_yUpDown != actualPosIdx.y))
+        {
+            this->addCmdToList(TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
+            this->writeMoveTypeInConsole(armDestination, Type);
+        }
+        else qDebug() << "ERROR: Dobot::armUpDown: trying to move Z axis with X or Y axis";
+    }
+    else qDebug() << "ERROR: Dobot::armUpDown: out of XYZ wornking range: x=" << f_xUpDown <<
+                     ", y=" << f_yUpDown << ", z=" << f_zUpDown;
 }
 
-//TODO: chyba to się niczym nie różni od Dobot::pieceFromTo oprócz szachownicy/usuniętych
+//TODO: chyba to się niczym nie różni od Dobot::pieceFromTo oprócz szachownicy/usuniętych...
+//... - używam tego tylko w funkcji serwisowej- pozbyć się tego
 void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
 {
     float f_xRemove = _pChessboard->adRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
@@ -452,13 +523,15 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
                 _pChessboard->getMaxRemovedPieceHeight() << ", r =" << f_rRemove;
     
-    //z_max = 40 dla x = 275, a najwyższe z na styku z podłogą to z = -16.5
+    //z_max = 40 dla x = 275, a najwyższe z na styku z podłogą to z = -16.5 - stare info?
+
     this->addCmdToList(TO_POINT, REMOVING, f_xRemove, f_yRemove, _pChessboard->getMaxRemovedPieceHeight(), f_rRemove);
 }
 /// END OF: TYPY RUCHÓW PO PLANSZY
 
 void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float y, float z, float r)
 {
+    //todo: usuwać z tablicy wiadomości na dobota wiadomości te które już poszły (może minus 1)
     m_ullCoreQueuedCmdIndex += 1; //aktualne id ruchu = +1 większe od ostatniego
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
     m_posIdx.sequence = sequence;
