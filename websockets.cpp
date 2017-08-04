@@ -97,7 +97,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             _pChessboard->setWhoseTurn(NO_TURN);
             _pWebTable->setNameWhite(QStrPlayerName);
 
-            if (QStrPlayerName == "White") m_pWhitePiecesSocket = nullptr; //todo: zastąpić white/black stałą string
+            if (QStrPlayerName == "WHITE") m_pWhitePiecesSocket = nullptr; //todo: zastąpić white/black stałą string
             else m_pWhitePiecesSocket = pClient; //skojarzenie siadającego gracza białego z gniazdem bierek białych
 
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
@@ -111,7 +111,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             _pChessboard->setWhoseTurn(NO_TURN);
             _pWebTable->setNameBlack(QStrPlayerName);
 
-            if (QStrPlayerName == "Black") m_pBlackPiecesSocket = nullptr;
+            if (QStrPlayerName == "BLACK") m_pBlackPiecesSocket = nullptr;
             else m_pBlackPiecesSocket = pClient; //skojarzenie siadającego gracza czarnego z gniazdem bierek czarnych
 
             Q_FOREACH (QWebSocket *pNextClient, m_clients)

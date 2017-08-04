@@ -88,7 +88,7 @@ void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
     float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
 
     _pDobot->addCmdToList(TO_POINT, REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
-                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //getMaxRemovedPieceHeight?
+                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //TODO: getMaxRemovedPieceHeight?
 }
 
 void Chess::legalOk(QString msg)

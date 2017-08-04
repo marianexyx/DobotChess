@@ -50,7 +50,8 @@ void WebChess::EndOfGame(QString msg)
     qDebug() << "Sending to WS: moveOk " << _pChessboard->getPiecieFromTo() << " nt " << whoWon;
 
     _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + whoWon);
-
+    //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
+    //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
     this->reset();
 }
 

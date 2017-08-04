@@ -1,8 +1,8 @@
 #include "webtable.h"
 
 WebTable::WebTable():
-    m_QStrNameWhite("White"),
-    m_QStrNameBlack("Black")
+    m_QStrNameWhite("WHITE"),
+    m_QStrNameBlack("BLACK")
 {
 
 }
