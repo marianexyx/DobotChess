@@ -9,6 +9,7 @@
 #include "chessboard.h"
 #include "webtable.h"
 #include "vars/log.h"
+#include "vars/board_data_labels.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -32,7 +33,7 @@ public:
     Websockets(Chessboard *pChessboard, WebTable *pWebTable, quint16 port, QObject *parent = Q_NULLPTR);
 
     QWebSocketServer *m_pWebSocketServer;
-    QList<QWebSocket *> m_clients; //kontener z aktywnymi połączeniami websocketowymi
+    QList<QWebSocket *> m_clients; //lista z aktywnymi połączeniami (socketami) websocketowymi
 
     void sendToChess(QString QsMsgForChessClass);
     void sendMsg(QString QStrWsMsg);
@@ -46,6 +47,7 @@ public Q_SLOTS:
 signals:
     void addTextToConsole(QString, LOG);
     void MsgFromWebsocketsToChess(QString QStrMsgFromWebsockets);
+    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
 };
 
 #endif // Websockets_H

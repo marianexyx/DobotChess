@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-enum LOG
+enum LOG //todo: we wszystkich wyliczanakch dodać prefix, np LOG_NOTHING
 {
     NOTHING,
     CORE,

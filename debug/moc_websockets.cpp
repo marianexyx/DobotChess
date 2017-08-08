@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Websockets_t {
-    QByteArrayData data[10];
-    char stringdata0[147];
+    QByteArrayData data[12];
+    char stringdata0[184];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,14 +35,17 @@ QT_MOC_LITERAL(2, 28, 0), // ""
 QT_MOC_LITERAL(3, 29, 3), // "LOG"
 QT_MOC_LITERAL(4, 33, 24), // "MsgFromWebsocketsToChess"
 QT_MOC_LITERAL(5, 58, 21), // "QStrMsgFromWebsockets"
-QT_MOC_LITERAL(6, 80, 18), // "socketDisconnected"
-QT_MOC_LITERAL(7, 99, 11), // "receivedMsg"
-QT_MOC_LITERAL(8, 111, 19), // "QS_WbstMsgToProcess"
-QT_MOC_LITERAL(9, 131, 15) // "onNewConnection"
+QT_MOC_LITERAL(6, 80, 18), // "setBoardDataLabels"
+QT_MOC_LITERAL(7, 99, 17), // "BOARD_DATA_LABELS"
+QT_MOC_LITERAL(8, 117, 18), // "socketDisconnected"
+QT_MOC_LITERAL(9, 136, 11), // "receivedMsg"
+QT_MOC_LITERAL(10, 148, 19), // "QS_WbstMsgToProcess"
+QT_MOC_LITERAL(11, 168, 15) // "onNewConnection"
 
     },
     "Websockets\0addTextToConsole\0\0LOG\0"
     "MsgFromWebsocketsToChess\0QStrMsgFromWebsockets\0"
+    "setBoardDataLabels\0BOARD_DATA_LABELS\0"
     "socketDisconnected\0receivedMsg\0"
     "QS_WbstMsgToProcess\0onNewConnection"
 };
@@ -54,29 +57,31 @@ static const uint qt_meta_data_Websockets[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       2,       // signalCount
+       3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    2,   39,    2, 0x06 /* Public */,
-       4,    1,   44,    2, 0x06 /* Public */,
+       1,    2,   44,    2, 0x06 /* Public */,
+       4,    1,   49,    2, 0x06 /* Public */,
+       6,    2,   52,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       6,    0,   47,    2, 0x08 /* Private */,
-       7,    1,   48,    2, 0x0a /* Public */,
-       9,    0,   51,    2, 0x0a /* Public */,
+       8,    0,   57,    2, 0x08 /* Private */,
+       9,    1,   58,    2, 0x0a /* Public */,
+      11,    0,   61,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
     QMetaType::Void, QMetaType::QString,    5,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 7,    2,    2,
 
  // slots: parameters
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,    8,
+    QMetaType::Void, QMetaType::QString,   10,
     QMetaType::Void,
 
        0        // eod
@@ -90,9 +95,10 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 1: _t->MsgFromWebsocketsToChess((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 2: _t->socketDisconnected(); break;
-        case 3: _t->receivedMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 4: _t->onNewConnection(); break;
+        case 2: _t->setBoardDataLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABELS(*)>(_a[2]))); break;
+        case 3: _t->socketDisconnected(); break;
+        case 4: _t->receivedMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 5: _t->onNewConnection(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -109,6 +115,13 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             typedef void (Websockets::*_t)(QString );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Websockets::MsgFromWebsocketsToChess)) {
                 *result = 1;
+                return;
+            }
+        }
+        {
+            typedef void (Websockets::*_t)(QString , BOARD_DATA_LABELS );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Websockets::setBoardDataLabels)) {
+                *result = 2;
                 return;
             }
         }
@@ -140,13 +153,13 @@ int Websockets::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 6)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }
@@ -163,5 +176,12 @@ void Websockets::MsgFromWebsocketsToChess(QString _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
+}
+
+// SIGNAL 2
+void Websockets::setBoardDataLabels(QString _t1, BOARD_DATA_LABELS _t2)
+{
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 QT_END_MOC_NAMESPACE

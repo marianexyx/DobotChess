@@ -47,6 +47,18 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     connect(_pArduinoUsb, SIGNAL(addTextToConsole(QString,LOG)),
             this, SLOT(writeInConsole(QString,LOG)));
 
+    connect(_pWebSockets, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
+             this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
+    connect(_pDobotArm, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
+             this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
+    connect(_pChessboard, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
+             this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
+    connect(_pChessboard, SIGNAL(showBoard(QString)),
+            this, SLOT(showBoard(QString)));
+    connect(_pChessboard, SIGNAL(showLegalMoves(QStringList)),
+            this, SLOT(showLegalMoves(QStringList)));
+
+
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobotArm, SIGNAL(AxisLabelText(QString, char)),
@@ -76,6 +88,9 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
 
     //init JOG control
     this->initControl(); //dobot
+
+    //todo: narobić tych tooltipów
+    ui->directTcpMsgCheckBox->setToolTip("enable to send multiple moves");
 }
 
 MainWindow::~MainWindow()
@@ -644,3 +659,55 @@ void MainWindow::changeWindowtitle(QString title)
 }
 
 
+void MainWindow::setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType)
+{
+    switch(labelType)
+    {
+    case BDL_SOCKETS_ONLINE:
+        ui->socketsLbl->setText(QStrLabel);
+        break;
+    case BDL_WHITE_NAME:
+        ui->whiteNameLbl->setText(QStrLabel);
+        break;
+    case BDL_BLACK_NAME:
+        ui->blackNameLbl->setText(QStrLabel);
+        break;
+    case BDL_TURN:
+        ui->turnLbl->setText(QStrLabel);
+        break;
+    case BDL_GAME_STATUS:
+        ui->gameStatusLbl->setText(QStrLabel);
+        break;
+    case BDL_MOVES:
+        ui->movesLbl->setText(QStrLabel);
+        break;
+    case BDL_CASTLINGS:
+        ui->castlingsLbl->setText(QStrLabel);
+        break;
+    case BDL_ENPASSANT:
+        ui->enpassantLbl->setText(QStrLabel);
+        break;
+    case BDL_WHITE_TIME:
+        ui->whiteTimeLbl->setText(QStrLabel);
+        break;
+    case BDL_BLACK_TIME:
+        ui->blackTimeLbl->setText(QStrLabel);
+        break;
+    default:
+        qDebug() << "ERROR: unknown MainWindow::setBoardDataLabels labelType";
+        break;
+    }
+}
+
+void MainWindow::showBoard(QString QStrBoard)
+{
+    ui->boardPTE->clear();
+    ui->boardPTE->setPlainText(QStrBoard);
+}
+
+void MainWindow::showLegalMoves(QStringList legalMoves)
+{
+    QString legal = legalMoves.join(" ");
+    ui->legalPTE->clear();
+    ui->legalPTE->setPlainText(legal);
+}

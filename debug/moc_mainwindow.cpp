@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[60];
-    char stringdata0[1088];
+    QByteArrayData data[68];
+    char stringdata0[1191];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -45,50 +45,58 @@ QT_MOC_LITERAL(12, 158, 3), // "LOG"
 QT_MOC_LITERAL(13, 162, 7), // "msgType"
 QT_MOC_LITERAL(14, 170, 17), // "changeWindowtitle"
 QT_MOC_LITERAL(15, 188, 5), // "title"
-QT_MOC_LITERAL(16, 194, 18), // "setDobotValidators"
-QT_MOC_LITERAL(17, 213, 17), // "setJointLabelText"
-QT_MOC_LITERAL(18, 231, 16), // "QSJointLabelText"
-QT_MOC_LITERAL(19, 248, 6), // "sJoint"
-QT_MOC_LITERAL(20, 255, 16), // "setAxisLabelText"
-QT_MOC_LITERAL(21, 272, 15), // "QSAxisLabelText"
-QT_MOC_LITERAL(22, 288, 6), // "chAxis"
-QT_MOC_LITERAL(23, 295, 21), // "setDobotButtonsStates"
-QT_MOC_LITERAL(24, 317, 19), // "bDobotButtonsStates"
-QT_MOC_LITERAL(25, 337, 15), // "setDeviceLabels"
-QT_MOC_LITERAL(26, 353, 10), // "QSdeviceSN"
-QT_MOC_LITERAL(27, 364, 12), // "QSdeviceName"
-QT_MOC_LITERAL(28, 377, 15), // "QSdeviceVersion"
-QT_MOC_LITERAL(29, 393, 20), // "showDobotErrorMsgBox"
-QT_MOC_LITERAL(30, 414, 39), // "on_emulatePlayerMsgLineEdit_t..."
-QT_MOC_LITERAL(31, 454, 11), // "textChanged"
-QT_MOC_LITERAL(32, 466, 30), // "on_sendSimulatedMsgBtn_clicked"
-QT_MOC_LITERAL(33, 497, 14), // "setQueueLabels"
-QT_MOC_LITERAL(34, 512, 6), // "nSpace"
-QT_MOC_LITERAL(35, 519, 8), // "nDobotId"
-QT_MOC_LITERAL(36, 528, 10), // "nCoreMaxId"
-QT_MOC_LITERAL(37, 539, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(38, 551, 10), // "CoreNextId"
-QT_MOC_LITERAL(39, 562, 23), // "on_calibrateBtn_clicked"
-QT_MOC_LITERAL(40, 586, 16), // "on_upBtn_clicked"
-QT_MOC_LITERAL(41, 603, 18), // "on_downBtn_clicked"
-QT_MOC_LITERAL(42, 622, 29), // "on_resetDobotIndexBtn_clicked"
-QT_MOC_LITERAL(43, 652, 33), // "on_executeDobotComandsBtn_cli..."
-QT_MOC_LITERAL(44, 686, 16), // "on_AIBtn_clicked"
-QT_MOC_LITERAL(45, 703, 25), // "on_AIEnemySendBtn_clicked"
-QT_MOC_LITERAL(46, 729, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(47, 749, 9), // "nUsbPorst"
-QT_MOC_LITERAL(48, 759, 36), // "on_portsComboBox_currentIndex..."
-QT_MOC_LITERAL(49, 796, 25), // "on_reloadPortsBtn_clicked"
-QT_MOC_LITERAL(50, 822, 21), // "on_sendUsbBtn_clicked"
-QT_MOC_LITERAL(51, 844, 25), // "on_openGripperBtn_clicked"
-QT_MOC_LITERAL(52, 870, 26), // "on_closeGripperBtn_clicked"
-QT_MOC_LITERAL(53, 897, 24), // "on_startGmPosBtn_clicked"
-QT_MOC_LITERAL(54, 922, 24), // "on_startDtPosBtn_clicked"
-QT_MOC_LITERAL(55, 947, 29), // "on_SimulateFromUsbBtn_clicked"
-QT_MOC_LITERAL(56, 977, 21), // "on_sendTcpBtn_clicked"
-QT_MOC_LITERAL(57, 999, 30), // "on_sendTcpLineEdit_textChanged"
-QT_MOC_LITERAL(58, 1030, 38), // "on_SimulateFromUsbLineEdit_te..."
-QT_MOC_LITERAL(59, 1069, 18) // "on_homeBtn_clicked"
+QT_MOC_LITERAL(16, 194, 18), // "setBoardDataLabels"
+QT_MOC_LITERAL(17, 213, 9), // "QStrLabel"
+QT_MOC_LITERAL(18, 223, 17), // "BOARD_DATA_LABELS"
+QT_MOC_LITERAL(19, 241, 9), // "labelType"
+QT_MOC_LITERAL(20, 251, 9), // "showBoard"
+QT_MOC_LITERAL(21, 261, 9), // "QStrBoard"
+QT_MOC_LITERAL(22, 271, 14), // "showLegalMoves"
+QT_MOC_LITERAL(23, 286, 10), // "legalMoves"
+QT_MOC_LITERAL(24, 297, 18), // "setDobotValidators"
+QT_MOC_LITERAL(25, 316, 17), // "setJointLabelText"
+QT_MOC_LITERAL(26, 334, 16), // "QSJointLabelText"
+QT_MOC_LITERAL(27, 351, 6), // "sJoint"
+QT_MOC_LITERAL(28, 358, 16), // "setAxisLabelText"
+QT_MOC_LITERAL(29, 375, 15), // "QSAxisLabelText"
+QT_MOC_LITERAL(30, 391, 6), // "chAxis"
+QT_MOC_LITERAL(31, 398, 21), // "setDobotButtonsStates"
+QT_MOC_LITERAL(32, 420, 19), // "bDobotButtonsStates"
+QT_MOC_LITERAL(33, 440, 15), // "setDeviceLabels"
+QT_MOC_LITERAL(34, 456, 10), // "QSdeviceSN"
+QT_MOC_LITERAL(35, 467, 12), // "QSdeviceName"
+QT_MOC_LITERAL(36, 480, 15), // "QSdeviceVersion"
+QT_MOC_LITERAL(37, 496, 20), // "showDobotErrorMsgBox"
+QT_MOC_LITERAL(38, 517, 39), // "on_emulatePlayerMsgLineEdit_t..."
+QT_MOC_LITERAL(39, 557, 11), // "textChanged"
+QT_MOC_LITERAL(40, 569, 30), // "on_sendSimulatedMsgBtn_clicked"
+QT_MOC_LITERAL(41, 600, 14), // "setQueueLabels"
+QT_MOC_LITERAL(42, 615, 6), // "nSpace"
+QT_MOC_LITERAL(43, 622, 8), // "nDobotId"
+QT_MOC_LITERAL(44, 631, 10), // "nCoreMaxId"
+QT_MOC_LITERAL(45, 642, 11), // "nCoreIdLeft"
+QT_MOC_LITERAL(46, 654, 10), // "CoreNextId"
+QT_MOC_LITERAL(47, 665, 23), // "on_calibrateBtn_clicked"
+QT_MOC_LITERAL(48, 689, 16), // "on_upBtn_clicked"
+QT_MOC_LITERAL(49, 706, 18), // "on_downBtn_clicked"
+QT_MOC_LITERAL(50, 725, 29), // "on_resetDobotIndexBtn_clicked"
+QT_MOC_LITERAL(51, 755, 33), // "on_executeDobotComandsBtn_cli..."
+QT_MOC_LITERAL(52, 789, 16), // "on_AIBtn_clicked"
+QT_MOC_LITERAL(53, 806, 25), // "on_AIEnemySendBtn_clicked"
+QT_MOC_LITERAL(54, 832, 19), // "updatePortsComboBox"
+QT_MOC_LITERAL(55, 852, 9), // "nUsbPorst"
+QT_MOC_LITERAL(56, 862, 36), // "on_portsComboBox_currentIndex..."
+QT_MOC_LITERAL(57, 899, 25), // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(58, 925, 21), // "on_sendUsbBtn_clicked"
+QT_MOC_LITERAL(59, 947, 25), // "on_openGripperBtn_clicked"
+QT_MOC_LITERAL(60, 973, 26), // "on_closeGripperBtn_clicked"
+QT_MOC_LITERAL(61, 1000, 24), // "on_startGmPosBtn_clicked"
+QT_MOC_LITERAL(62, 1025, 24), // "on_startDtPosBtn_clicked"
+QT_MOC_LITERAL(63, 1050, 29), // "on_SimulateFromUsbBtn_clicked"
+QT_MOC_LITERAL(64, 1080, 21), // "on_sendTcpBtn_clicked"
+QT_MOC_LITERAL(65, 1102, 30), // "on_sendTcpLineEdit_textChanged"
+QT_MOC_LITERAL(66, 1133, 38), // "on_SimulateFromUsbLineEdit_te..."
+QT_MOC_LITERAL(67, 1172, 18) // "on_homeBtn_clicked"
 
     },
     "MainWindow\0checkMsgFromChenard\0\0"
@@ -96,7 +104,10 @@ QT_MOC_LITERAL(59, 1069, 18) // "on_homeBtn_clicked"
     "onJOGCtrlBtnPressed\0index\0"
     "onJOGCtrlBtnReleased\0onPTPsendBtnClicked\0"
     "writeInConsole\0QStrMsg\0LOG\0msgType\0"
-    "changeWindowtitle\0title\0setDobotValidators\0"
+    "changeWindowtitle\0title\0setBoardDataLabels\0"
+    "QStrLabel\0BOARD_DATA_LABELS\0labelType\0"
+    "showBoard\0QStrBoard\0showLegalMoves\0"
+    "legalMoves\0setDobotValidators\0"
     "setJointLabelText\0QSJointLabelText\0"
     "sJoint\0setAxisLabelText\0QSAxisLabelText\0"
     "chAxis\0setDobotButtonsStates\0"
@@ -132,7 +143,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      36,   14, // methods
+      39,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -140,42 +151,45 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    2,  194,    2, 0x0a /* Public */,
-       5,    0,  199,    2, 0x08 /* Private */,
-       6,    1,  200,    2, 0x08 /* Private */,
-       8,    0,  203,    2, 0x08 /* Private */,
-       9,    0,  204,    2, 0x08 /* Private */,
-      10,    2,  205,    2, 0x08 /* Private */,
-      14,    1,  210,    2, 0x08 /* Private */,
-      16,    0,  213,    2, 0x08 /* Private */,
-      17,    2,  214,    2, 0x08 /* Private */,
-      20,    2,  219,    2, 0x08 /* Private */,
-      23,    1,  224,    2, 0x08 /* Private */,
-      25,    3,  227,    2, 0x08 /* Private */,
-      29,    0,  234,    2, 0x08 /* Private */,
-      30,    1,  235,    2, 0x08 /* Private */,
-      32,    0,  238,    2, 0x08 /* Private */,
-      33,    5,  239,    2, 0x08 /* Private */,
-      39,    0,  250,    2, 0x08 /* Private */,
-      40,    0,  251,    2, 0x08 /* Private */,
-      41,    0,  252,    2, 0x08 /* Private */,
-      42,    0,  253,    2, 0x08 /* Private */,
-      43,    0,  254,    2, 0x08 /* Private */,
-      44,    0,  255,    2, 0x08 /* Private */,
-      45,    0,  256,    2, 0x08 /* Private */,
-      46,    1,  257,    2, 0x08 /* Private */,
-      48,    1,  260,    2, 0x08 /* Private */,
-      49,    0,  263,    2, 0x08 /* Private */,
-      50,    0,  264,    2, 0x08 /* Private */,
-      51,    0,  265,    2, 0x08 /* Private */,
-      52,    0,  266,    2, 0x08 /* Private */,
-      53,    0,  267,    2, 0x08 /* Private */,
-      54,    0,  268,    2, 0x08 /* Private */,
-      55,    0,  269,    2, 0x08 /* Private */,
-      56,    0,  270,    2, 0x08 /* Private */,
-      57,    1,  271,    2, 0x08 /* Private */,
-      58,    1,  274,    2, 0x08 /* Private */,
-      59,    0,  277,    2, 0x08 /* Private */,
+       1,    2,  209,    2, 0x0a /* Public */,
+       5,    0,  214,    2, 0x08 /* Private */,
+       6,    1,  215,    2, 0x08 /* Private */,
+       8,    0,  218,    2, 0x08 /* Private */,
+       9,    0,  219,    2, 0x08 /* Private */,
+      10,    2,  220,    2, 0x08 /* Private */,
+      14,    1,  225,    2, 0x08 /* Private */,
+      16,    2,  228,    2, 0x08 /* Private */,
+      20,    1,  233,    2, 0x08 /* Private */,
+      22,    1,  236,    2, 0x08 /* Private */,
+      24,    0,  239,    2, 0x08 /* Private */,
+      25,    2,  240,    2, 0x08 /* Private */,
+      28,    2,  245,    2, 0x08 /* Private */,
+      31,    1,  250,    2, 0x08 /* Private */,
+      33,    3,  253,    2, 0x08 /* Private */,
+      37,    0,  260,    2, 0x08 /* Private */,
+      38,    1,  261,    2, 0x08 /* Private */,
+      40,    0,  264,    2, 0x08 /* Private */,
+      41,    5,  265,    2, 0x08 /* Private */,
+      47,    0,  276,    2, 0x08 /* Private */,
+      48,    0,  277,    2, 0x08 /* Private */,
+      49,    0,  278,    2, 0x08 /* Private */,
+      50,    0,  279,    2, 0x08 /* Private */,
+      51,    0,  280,    2, 0x08 /* Private */,
+      52,    0,  281,    2, 0x08 /* Private */,
+      53,    0,  282,    2, 0x08 /* Private */,
+      54,    1,  283,    2, 0x08 /* Private */,
+      56,    1,  286,    2, 0x08 /* Private */,
+      57,    0,  289,    2, 0x08 /* Private */,
+      58,    0,  290,    2, 0x08 /* Private */,
+      59,    0,  291,    2, 0x08 /* Private */,
+      60,    0,  292,    2, 0x08 /* Private */,
+      61,    0,  293,    2, 0x08 /* Private */,
+      62,    0,  294,    2, 0x08 /* Private */,
+      63,    0,  295,    2, 0x08 /* Private */,
+      64,    0,  296,    2, 0x08 /* Private */,
+      65,    1,  297,    2, 0x08 /* Private */,
+      66,    1,  300,    2, 0x08 /* Private */,
+      67,    0,  303,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void, QMetaType::QString, QMetaType::QString,    3,    4,
@@ -185,23 +199,26 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString, 0x80000000 | 12,   11,   13,
     QMetaType::Void, QMetaType::QString,   15,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 18,   17,   19,
+    QMetaType::Void, QMetaType::QString,   21,
+    QMetaType::Void, QMetaType::QStringList,   23,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::Short,   18,   19,
-    QMetaType::Void, QMetaType::QString, QMetaType::Char,   21,   22,
-    QMetaType::Void, QMetaType::Bool,   24,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString,   26,   27,   28,
+    QMetaType::Void, QMetaType::QString, QMetaType::Short,   26,   27,
+    QMetaType::Void, QMetaType::QString, QMetaType::Char,   29,   30,
+    QMetaType::Void, QMetaType::Bool,   32,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString, QMetaType::QString,   34,   35,   36,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   31,
+    QMetaType::Void, QMetaType::QString,   39,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   34,   35,   36,   37,   38,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   42,   43,   44,   45,   46,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   47,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   55,
     QMetaType::Void, QMetaType::Int,    7,
     QMetaType::Void,
     QMetaType::Void,
@@ -211,8 +228,8 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   31,
-    QMetaType::Void, QMetaType::QString,   31,
+    QMetaType::Void, QMetaType::QString,   39,
+    QMetaType::Void, QMetaType::QString,   39,
     QMetaType::Void,
 
        0        // eod
@@ -231,35 +248,38 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 4: _t->onPTPsendBtnClicked(); break;
         case 5: _t->writeInConsole((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 6: _t->changeWindowtitle((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 7: _t->setDobotValidators(); break;
-        case 8: _t->setJointLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< short(*)>(_a[2]))); break;
-        case 9: _t->setAxisLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
-        case 10: _t->setDobotButtonsStates((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 11: _t->setDeviceLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3]))); break;
-        case 12: _t->showDobotErrorMsgBox(); break;
-        case 13: _t->on_emulatePlayerMsgLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 14: _t->on_sendSimulatedMsgBtn_clicked(); break;
-        case 15: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
-        case 16: _t->on_calibrateBtn_clicked(); break;
-        case 17: _t->on_upBtn_clicked(); break;
-        case 18: _t->on_downBtn_clicked(); break;
-        case 19: _t->on_resetDobotIndexBtn_clicked(); break;
-        case 20: _t->on_executeDobotComandsBtn_clicked(); break;
-        case 21: _t->on_AIBtn_clicked(); break;
-        case 22: _t->on_AIEnemySendBtn_clicked(); break;
-        case 23: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 24: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 25: _t->on_reloadPortsBtn_clicked(); break;
-        case 26: _t->on_sendUsbBtn_clicked(); break;
-        case 27: _t->on_openGripperBtn_clicked(); break;
-        case 28: _t->on_closeGripperBtn_clicked(); break;
-        case 29: _t->on_startGmPosBtn_clicked(); break;
-        case 30: _t->on_startDtPosBtn_clicked(); break;
-        case 31: _t->on_SimulateFromUsbBtn_clicked(); break;
-        case 32: _t->on_sendTcpBtn_clicked(); break;
-        case 33: _t->on_sendTcpLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 34: _t->on_SimulateFromUsbLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 35: _t->on_homeBtn_clicked(); break;
+        case 7: _t->setBoardDataLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABELS(*)>(_a[2]))); break;
+        case 8: _t->showBoard((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 9: _t->showLegalMoves((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
+        case 10: _t->setDobotValidators(); break;
+        case 11: _t->setJointLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< short(*)>(_a[2]))); break;
+        case 12: _t->setAxisLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
+        case 13: _t->setDobotButtonsStates((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 14: _t->setDeviceLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3]))); break;
+        case 15: _t->showDobotErrorMsgBox(); break;
+        case 16: _t->on_emulatePlayerMsgLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 17: _t->on_sendSimulatedMsgBtn_clicked(); break;
+        case 18: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
+        case 19: _t->on_calibrateBtn_clicked(); break;
+        case 20: _t->on_upBtn_clicked(); break;
+        case 21: _t->on_downBtn_clicked(); break;
+        case 22: _t->on_resetDobotIndexBtn_clicked(); break;
+        case 23: _t->on_executeDobotComandsBtn_clicked(); break;
+        case 24: _t->on_AIBtn_clicked(); break;
+        case 25: _t->on_AIEnemySendBtn_clicked(); break;
+        case 26: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 27: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 28: _t->on_reloadPortsBtn_clicked(); break;
+        case 29: _t->on_sendUsbBtn_clicked(); break;
+        case 30: _t->on_openGripperBtn_clicked(); break;
+        case 31: _t->on_closeGripperBtn_clicked(); break;
+        case 32: _t->on_startGmPosBtn_clicked(); break;
+        case 33: _t->on_startDtPosBtn_clicked(); break;
+        case 34: _t->on_SimulateFromUsbBtn_clicked(); break;
+        case 35: _t->on_sendTcpBtn_clicked(); break;
+        case 36: _t->on_sendTcpLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 37: _t->on_SimulateFromUsbLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 38: _t->on_homeBtn_clicked(); break;
         default: ;
         }
     }
@@ -290,13 +310,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 36)
+        if (_id < 39)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 36;
+        _id -= 39;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 36)
+        if (_id < 39)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 36;
+        _id -= 39;
     }
     return _id;
 }

@@ -8,6 +8,7 @@
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "vars/dobot_moves.h"
+#include "vars/board_data_labels.h"
 
 struct ArmPosition
 {
@@ -55,6 +56,7 @@ public:
     bool compareArrays(int nArray1[][8], int nArray2[][8]);
     void saveStatusData(QString status);
     void showBoardInDebug();
+    QString arrayBoardToQStr(QString QStrBoard[8][8]);
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
@@ -91,7 +93,7 @@ public:
     //metody dostępowe
     void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
     void setMoveType (SEQUENCE_TYPE Type)       { m_moveType = Type; }
-    void setLegalMoves(QStringList legalMoves)  { m_legalMoves = legalMoves; }
+    void setLegalMoves(QStringList legalMoves)  { m_legalMoves = legalMoves; emit showLegalMoves(legalMoves);}
 
     void clearLegalMoves()                      { m_legalMoves.clear(); }
 
@@ -111,6 +113,9 @@ public:
 signals:
     void addTextToConsole(QString);
     void changeWindowTitle(QString);
+    void showBoard(QString);
+    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
+    void showLegalMoves(QStringList);
 };
 
 #endif // CHESSBOARD_H

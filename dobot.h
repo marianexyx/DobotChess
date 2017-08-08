@@ -15,6 +15,7 @@
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "vars/dobot_moves.h"
+#include "vars/board_data_labels.h"
 
 //todo: oddzielić wszystko co związane z szachami od klasy dobota
 
@@ -125,6 +126,7 @@ signals:
     void deviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
     void DobotErrorMsgBox();
     void QueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
+    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
 
 };
 

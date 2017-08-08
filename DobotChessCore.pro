@@ -44,7 +44,8 @@ HEADERS  +=  webtable.h \
     vars/log.h \
     vars/basic_vars.h \
     vars/board_axis.h \
-    vars/dobot_moves.h
+    vars/dobot_moves.h \
+    vars/board_data_labels.h
 
 FORMS    += mainwindow.ui
 

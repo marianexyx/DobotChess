@@ -96,6 +96,7 @@ void Chess::legalOk(QString msg)
     QStringList legalMoves = msg.split(QRegExp("\\s"));
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
+    //
     if (!legalMoves.isEmpty())
     {
         QString QStrLastLegalMove = legalMoves.last();
@@ -108,8 +109,6 @@ void Chess::legalOk(QString msg)
 
 void Chess::wrongTcpAnswer(QString msgType, QString respond)
 {
-     emit this->addTextToConsole("ERROR: Chess::wrongTcpAnswer(): unknown tcpRespond = " +
-                                  respond + "for tcpMsgType = " + msgType + "\n", CORE);
     qDebug() << "ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " <<
                 respond << "for tcpMsgType = " << msgType;
 }

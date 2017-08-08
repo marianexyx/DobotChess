@@ -306,26 +306,31 @@ void Chessboard::saveStatusData(QString status)
 
     if (QStrFENRecord.size() == 7)
     {
-        qDebug() << "QStrFENRecord.size() == 7";
         m_QStrGameStatus = QStrFENRecord.at(0);
         qDebug() << "QStrGameStatus =" << m_QStrGameStatus;
+        emit setBoardDataLabels(m_QStrGameStatus, BDL_GAME_STATUS);
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "QStrFENBoard =" << QStrFENBoard;
         FENToBoard(QStrFENBoard);
+        emit showBoard(arrayBoardToQStr(m_QStrBoard));
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "QStrWhoseTurn =" << QStrWhoseTurn;
         this->setWhoseTurn(whoseTurn(QStrWhoseTurn));
+        emit setBoardDataLabels(this->getStrWhoseTurn(), BDL_TURN);
 
         m_QStrCastlings = QStrFENRecord.at(3);
         qDebug() << "QStrCastlings =" << m_QStrCastlings;
+        emit setBoardDataLabels(m_QStrCastlings, BDL_CASTLINGS);
 
         m_QStrEnpassant = QStrFENRecord.at(4);
         qDebug() << "QStrEnpassant =" << m_QStrEnpassant;
+        emit setBoardDataLabels(m_QStrEnpassant, BDL_ENPASSANT);
 
-        //QString QStrHalfmoveClock = QStrFENRecord.at(5); //przyda sie na przyszlosc
-        //QString QStrFullmoveNumber = QStrFENRecord.at(6);
+        QString QStrHalfmoveClock = QStrFENRecord.at(5);
+        QString QStrFullmoveNumber = QStrFENRecord.at(6);
+        emit setBoardDataLabels(QStrHalfmoveClock + "/" + QStrFullmoveNumber , BDL_MOVES);
     }
     else
     {
@@ -413,4 +418,18 @@ QString Chessboard::getStrWhoseTurn()
         QString err = "ERROR: wrong turn type: " + QString::number(m_WhoseTurn);
         return err;
     }
+}
+
+QString Chessboard::arrayBoardToQStr(QString QStrBoard[8][8])
+{
+    QString board = "";
+    for (int i=0; i<=7; ++i)
+    {
+        for (int j=0; j<=7; ++j)
+        {
+            board += QStrBoard[i][j] + " ";
+        }
+        board += "\n";
+    }
+    return board;
 }
