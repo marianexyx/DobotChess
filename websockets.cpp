@@ -236,3 +236,9 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
     char const *pchar = s.c_str();
     emit setBoardDataLabels(pchar, BDL_SOCKETS_ONLINE);
 }
+
+
+void Websockets::msgFromChessboardToWebsockets(QString QStrWsMsg)
+{
+    this->sendMsg(QStrWsMsg);
+}

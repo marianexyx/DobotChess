@@ -19,7 +19,12 @@ void WebChess::GameStarted()
     _pWebsockets->addTextToConsole("newGame\n", WEBSOCKET);
     qDebug() << "Sending 'newOk' to site";
 
-    if (!_bServiceTests)_pWebsockets->sendMsg("newOk");
+    if (!_bServiceTests)
+    {
+        _pChessboard->resetTimers();
+        _pChessboard->startGameTimer();
+        _pWebsockets->sendMsg("newOk");
+    }
 }
 
 void WebChess::BadMove(QString msg)
@@ -36,6 +41,7 @@ void WebChess::GameInProgress()
                 _pChessboard->getPiecieFromTo() <<
                 _pChessboard->getStrWhoseTurn() << "continue";
 
+    _pChessboard->switchPlayersTimers();
     _pWebsockets->sendMsg("moveOk " + _pChessboard->getSiteMoveRequest() + " " +
                           _pChessboard->getStrWhoseTurn() + " continue");
 }
@@ -52,6 +58,8 @@ void WebChess::EndOfGame(QString msg)
     _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + whoWon);
     //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
     //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
+    //todo: stworzyć funkcję czyszczącą masę rzeczy przy różnych warunkach jak koniec gry
+    _pChessboard->resetTimers();
     this->reset();
 }
 
@@ -62,7 +70,7 @@ void WebChess::PromoteToWhat(QString moveForFuturePromote)
     qDebug() << "Sending to WS: moveOk" << moveForFuturePromote <<
                 _pChessboard->getStrWhoseTurn() << "promote";
 
-
+    _pChessboard->switchPlayersTimers();
     _pWebsockets->sendMsg("moveOk " + moveForFuturePromote + " " +
                                       _pChessboard->getStrWhoseTurn() + " promote");
 }

@@ -982,7 +982,7 @@
           <item row="3" column="3">
            <widget class="QLabel" name="whiteTimeLbl">
             <property name="text">
-             <string>-1</string>
+             <string>30:00</string>
             </property>
            </widget>
           </item>
@@ -996,7 +996,7 @@
           <item row="4" column="3">
            <widget class="QLabel" name="blackTimeLbl">
             <property name="text">
-             <string>-1</string>
+             <string>30:00</string>
             </property>
            </widget>
           </item>
@@ -1159,7 +1159,7 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>300</width>
+        <width>350</width>
         <height>0</height>
        </size>
       </property>

@@ -1000,7 +1000,7 @@ public:
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(log->sizePolicy().hasHeightForWidth());
         log->setSizePolicy(sizePolicy2);
-        log->setMinimumSize(QSize(300, 0));
+        log->setMinimumSize(QSize(350, 0));
         log->setBaseSize(QSize(500, 0));
         log->setLayoutDirection(Qt::LeftToRight);
         gridLayout_18 = new QGridLayout(log);
@@ -1152,9 +1152,9 @@ public:
         label_28->setText(QApplication::translate("MainWindow", "Halfmove/fullmove", 0));
         movesLbl->setText(QApplication::translate("MainWindow", "-1/-1", 0));
         label_30->setText(QApplication::translate("MainWindow", "White time", 0));
-        whiteTimeLbl->setText(QApplication::translate("MainWindow", "-1", 0));
+        whiteTimeLbl->setText(QApplication::translate("MainWindow", "30:00", 0));
         label_31->setText(QApplication::translate("MainWindow", "Black  time", 0));
-        blackTimeLbl->setText(QApplication::translate("MainWindow", "-1", 0));
+        blackTimeLbl->setText(QApplication::translate("MainWindow", "30:00", 0));
         resetAllDataBtn->setText(QApplication::translate("MainWindow", "Reset all data", 0));
         groupBox_3->setTitle(QApplication::translate("MainWindow", "Board", 0));
         groupBox_4->setTitle(QApplication::translate("MainWindow", "Chessboard", 0));

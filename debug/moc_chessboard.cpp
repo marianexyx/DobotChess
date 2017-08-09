@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Chessboard_t {
-    QByteArrayData data[8];
-    char stringdata0[109];
+    QByteArrayData data[12];
+    char stringdata0[182];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,13 +36,18 @@ QT_MOC_LITERAL(3, 29, 17), // "changeWindowTitle"
 QT_MOC_LITERAL(4, 47, 9), // "showBoard"
 QT_MOC_LITERAL(5, 57, 18), // "setBoardDataLabels"
 QT_MOC_LITERAL(6, 76, 17), // "BOARD_DATA_LABELS"
-QT_MOC_LITERAL(7, 94, 14) // "showLegalMoves"
+QT_MOC_LITERAL(7, 94, 14), // "showLegalMoves"
+QT_MOC_LITERAL(8, 109, 29), // "msgFromChessboardToWebsockets"
+QT_MOC_LITERAL(9, 139, 12), // "timeOutWhite"
+QT_MOC_LITERAL(10, 152, 12), // "timeOutBlack"
+QT_MOC_LITERAL(11, 165, 16) // "updateTimeLabels"
 
     },
     "Chessboard\0addTextToConsole\0\0"
     "changeWindowTitle\0showBoard\0"
     "setBoardDataLabels\0BOARD_DATA_LABELS\0"
-    "showLegalMoves"
+    "showLegalMoves\0msgFromChessboardToWebsockets\0"
+    "timeOutWhite\0timeOutBlack\0updateTimeLabels"
 };
 #undef QT_MOC_LITERAL
 
@@ -52,19 +57,25 @@ static const uint qt_meta_data_Chessboard[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       9,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       5,       // signalCount
+       6,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   39,    2, 0x06 /* Public */,
-       3,    1,   42,    2, 0x06 /* Public */,
-       4,    1,   45,    2, 0x06 /* Public */,
-       5,    2,   48,    2, 0x06 /* Public */,
-       7,    1,   53,    2, 0x06 /* Public */,
+       1,    1,   59,    2, 0x06 /* Public */,
+       3,    1,   62,    2, 0x06 /* Public */,
+       4,    1,   65,    2, 0x06 /* Public */,
+       5,    2,   68,    2, 0x06 /* Public */,
+       7,    1,   73,    2, 0x06 /* Public */,
+       8,    1,   76,    2, 0x06 /* Public */,
+
+ // slots: name, argc, parameters, tag, flags
+       9,    0,   79,    2, 0x08 /* Private */,
+      10,    0,   80,    2, 0x08 /* Private */,
+      11,    0,   81,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    2,
@@ -72,6 +83,12 @@ static const uint qt_meta_data_Chessboard[] = {
     QMetaType::Void, QMetaType::QString,    2,
     QMetaType::Void, QMetaType::QString, 0x80000000 | 6,    2,    2,
     QMetaType::Void, QMetaType::QStringList,    2,
+    QMetaType::Void, QMetaType::QString,    2,
+
+ // slots: parameters
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -87,6 +104,10 @@ void Chessboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 2: _t->showBoard((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 3: _t->setBoardDataLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABELS(*)>(_a[2]))); break;
         case 4: _t->showLegalMoves((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
+        case 5: _t->msgFromChessboardToWebsockets((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 6: _t->timeOutWhite(); break;
+        case 7: _t->timeOutBlack(); break;
+        case 8: _t->updateTimeLabels(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -127,6 +148,13 @@ void Chessboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
                 return;
             }
         }
+        {
+            typedef void (Chessboard::*_t)(QString );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::msgFromChessboardToWebsockets)) {
+                *result = 5;
+                return;
+            }
+        }
     }
 }
 
@@ -155,13 +183,13 @@ int Chessboard::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 9;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 9)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 5;
+        _id -= 9;
     }
     return _id;
 }
@@ -199,5 +227,12 @@ void Chessboard::showLegalMoves(QStringList _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
+}
+
+// SIGNAL 5
+void Chessboard::msgFromChessboardToWebsockets(QString _t1)
+{
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 5, _a);
 }
 QT_END_MOC_NAMESPACE

@@ -1,6 +1,8 @@
 #ifndef CHESSBOARD_H
 #define CHESSBOARD_H
 
+#include <QTimer>
+#include <QtMath>
 #include "QString"
 #include "QObject"
 #include "qdebug.h"
@@ -34,11 +36,17 @@ private:
     QString m_QStrEnpassant;
     QStringList m_legalMoves;
     SEQUENCE_TYPE m_moveType;
+    QTimer *m_whiteTimer;
+    QTimer *m_blackTimer;
+    QTimer *m_updateLabelTimer;
+    int m_nRemainingWhiteTime;
+    int m_nRemainingBlackTime;
 
     void changeWindowTitle();
 
     void FENToBoard(QString FENBoard);
-    WHOSE_TURN whoseTurn(QString whoseTurn); //TODO: to samo co w _pWebTable
+    WHOSE_TURN whoseTurn(QString whoseTurn);
+    const long lTimersStartTime;
 
 public:
     Chessboard();
@@ -57,6 +65,12 @@ public:
     void saveStatusData(QString status);
     void showBoardInDebug();
     QString arrayBoardToQStr(QString QStrBoard[8][8]);
+
+    void startGameTimer();
+    void resetTimers();
+    QString milisecToClockTime(long lMilis);
+    void stopBoardTimers();
+    void switchPlayersTimers();
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
@@ -110,12 +124,18 @@ public:
     QStringList getLegalMoves()                 { return m_legalMoves; }
     double getMaxBoardZ()                       { return m_nMaxBoardZ; }
 
+private slots:
+    void timeOutWhite();
+    void timeOutBlack();
+    void updateTimeLabels();
+
 signals:
     void addTextToConsole(QString);
     void changeWindowTitle(QString);
     void showBoard(QString);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showLegalMoves(QStringList);
+    void msgFromChessboardToWebsockets(QString); //todo: znowu odwoływanie się w górę do rodzica
 };
 
 #endif // CHESSBOARD_H

@@ -23,7 +23,8 @@ Chessboard::Chessboard():
     m_nMaxPieceHeight(52), // dla pola h8 max wysokość bierki to 46
     m_nMaxRemovedPieceH(44.5),
     m_QStrSiteMoveRequest(""),
-    m_WhoseTurn(NO_TURN)
+    m_WhoseTurn(NO_TURN),
+    lTimersStartTime(1000*60*30) //1000ms (1s) * 60s * 30min
 {
     memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard
@@ -75,6 +76,21 @@ Chessboard::Chessboard():
             adRemovedPiecesPositions_z[row][column] = -20.4 - row*((-4.6)/7.f); //(-20.4 - (-15.8) = -4.6
         }
     }
+
+    m_whiteTimer = new QTimer();
+    m_blackTimer = new QTimer();
+    m_updateLabelTimer = new QTimer();
+    m_whiteTimer->setInterval(lTimersStartTime);
+    m_blackTimer->setInterval(lTimersStartTime);
+    m_updateLabelTimer->setInterval(1000);
+    m_whiteTimer->setSingleShot(true);
+    m_blackTimer->setSingleShot(true);
+    m_updateLabelTimer->setSingleShot(false);
+    connect(m_whiteTimer, SIGNAL(timeout()), this, SLOT(timeOutWhite()));
+    connect(m_blackTimer, SIGNAL(timeout()), this, SLOT(timeOutBlack()));
+    connect(m_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
+    m_nRemainingWhiteTime = lTimersStartTime;
+    m_nRemainingBlackTime = lTimersStartTime;
 }
 
 void Chessboard::findBoardPos(QString QStrPiecePositions)
@@ -379,7 +395,7 @@ void Chessboard::FENToBoard(QString FENBoard)
     }
     else
     {
-        qDebug() << "ERROR: IgorBot::checkMsgFromChenard: boardRows.size() != 8. Size = " << QStrFENBoardRows.size();
+        qDebug() << "ERROR: Chessboard::FENToBoard: boardRows.size() != 8. Size = " << QStrFENBoardRows.size();
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
@@ -394,7 +410,7 @@ WHOSE_TURN Chessboard::whoseTurn(QString whoseTurn)
     else
     {
         return NO_TURN;
-        qDebug () << "ERROR: Chessboard::checkMsgFromChenard- unknown turn type from status";
+        qDebug () << "ERROR: Chessboard::whoseTurn- unknown turn type from status";
     }
 }
 
@@ -432,4 +448,84 @@ QString Chessboard::arrayBoardToQStr(QString QStrBoard[8][8])
         board += "\n";
     }
     return board;
+}
+
+void Chessboard::startGameTimer()
+{
+    m_whiteTimer->start();
+    m_updateLabelTimer->start();
+    m_updateLabelTimer->start();
+}
+
+void Chessboard::stopBoardTimers()
+{
+    m_whiteTimer->stop();
+    m_blackTimer->stop();
+    m_updateLabelTimer->stop();
+}
+
+void Chessboard::timeOutWhite()
+{
+    this->stopBoardTimers();
+    emit msgFromChessboardToWebsockets("timeOutWhite");
+}
+
+void Chessboard::timeOutBlack()
+{
+    this->stopBoardTimers();
+    emit msgFromChessboardToWebsockets("timeOutBlack");
+}
+
+void Chessboard::resetTimers()
+{
+    this->stopBoardTimers();
+    m_whiteTimer->setInterval(lTimersStartTime);
+    m_blackTimer->setInterval(lTimersStartTime);
+    m_nRemainingWhiteTime = m_whiteTimer->remainingTime();
+    m_nRemainingBlackTime = m_blackTimer->remainingTime();
+    emit setBoardDataLabels(milisecToClockTime(lTimersStartTime), BDL_WHITE_TIME);
+    emit setBoardDataLabels(milisecToClockTime(lTimersStartTime), BDL_BLACK_TIME);
+}
+
+QString Chessboard::milisecToClockTime(long lMilis)
+{
+    if (lMilis > 0)
+    {
+        int nAllSecs = lMilis / 1000;
+        int nMins = qFloor(nAllSecs / 60);
+        int nSecs = qFloor(nAllSecs % 60);
+        QString QStrMinsPrefix, QStrSecsPrefix;
+        nMins >= 10 ? QStrMinsPrefix == "" : QStrMinsPrefix == "0";
+        nSecs >= 10 ? QStrSecsPrefix == "" : QStrSecsPrefix == "0";
+        return QStrMinsPrefix + QString::number(nMins) + ":" + QStrSecsPrefix + QString::number(nSecs);
+    }
+    else return "00:00";
+}
+
+void Chessboard::updateTimeLabels()
+{
+    emit setBoardDataLabels(milisecToClockTime(m_nRemainingWhiteTime), BDL_WHITE_TIME);
+    emit setBoardDataLabels(milisecToClockTime(m_nRemainingBlackTime), BDL_BLACK_TIME);
+}
+
+void Chessboard::switchPlayersTimers()
+{
+    if (getWhoseTurn() == WHITE_TURN)
+    {
+        m_nRemainingBlackTime = m_blackTimer->remainingTime();
+        m_blackTimer->stop();
+
+        m_whiteTimer->setInterval(m_nRemainingWhiteTime);
+        m_whiteTimer->start();
+    }
+    else if (getWhoseTurn() == BLACK_TURN)
+    {
+        m_nRemainingWhiteTime = m_whiteTimer->remainingTime();
+        m_whiteTimer->stop();
+
+        m_blackTimer->setInterval(m_nRemainingBlackTime);
+        m_blackTimer->start();
+    }
+    else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
+                     "white or black.  it's' ==" << getWhoseTurn();
 }

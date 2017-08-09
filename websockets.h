@@ -40,9 +40,12 @@ public:
 
     ~Websockets();
 
-public Q_SLOTS:
+public Q_SLOTS: //todo: jaka jest różnica między zwykłym slots?
     void receivedMsg(QString QS_WbstMsgToProcess);
     void onNewConnection();
+
+public slots:
+    void msgFromChessboardToWebsockets(QString QStrWsMsg);
 
 signals:
     void addTextToConsole(QString, LOG);

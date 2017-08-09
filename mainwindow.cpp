@@ -85,6 +85,8 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
             this, SLOT(checkMsgFromChenard(QString, QString)));  //...na Arduino przez klasę SI.
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z ...
             _pWebChess, SLOT(checkMsgForChenard(QString))); //...websocketów na silnk gry.
+    connect(_pChessboard, SIGNAL(msgFromChessboardToWebsockets(QString)),
+            _pWebSockets, SLOT(msgFromChessboardToWebsockets(QString)));
 
     //init JOG control
     this->initControl(); //dobot
