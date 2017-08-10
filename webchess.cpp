@@ -190,6 +190,7 @@ void WebChess::TcpMoveOk()
 void WebChess::reset()
 {
     _pWebsockets->sendMsg("reseting");
+    _pChessboard->resetTimers();
     this->resetPiecePositions();
 }
 

@@ -173,9 +173,11 @@ void Websockets::sendMsg(QString QStrWsMsg)
                 pNextClient->sendTextMessage(QStrWsMsg);
         }
     }
-    else if (QStrWsMsg.left(8) == "promoted" || QStrWsMsg == "reseting" || QStrWsMsg == "ready")
+    else if (QStrWsMsg.left(8) == "promoted" || QStrWsMsg == "reseting" || QStrWsMsg == "ready" ||
+             QStrWsMsg == "timeOutWhite" || QStrWsMsg == "timeOutBlack")
     {
-        if (QStrWsMsg == "reseting" || QStrWsMsg == "ready") _pChessboard->setWhoseTurn(NO_TURN);
+        if (QStrWsMsg == "reseting" || QStrWsMsg == "ready")
+            _pChessboard->setWhoseTurn(NO_TURN); //todo: niech tym zajmie się jakaś funckja po drodze od tego
         Q_FOREACH (QWebSocket *pNextClient, m_clients)
             pNextClient->sendTextMessage(QStrWsMsg);
     }
@@ -227,6 +229,7 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
 
             emit MsgFromWebsocketsToChess("reset");
         }
+        //todo: wyświetla mi się disconnectw dzinym miejscu
         else emit addTextToConsole("non-player disconnected\n", WEBSOCKET);
 
         m_clients.removeAll(pClient);

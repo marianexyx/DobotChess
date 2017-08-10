@@ -454,7 +454,6 @@ void Chessboard::startGameTimer()
 {
     m_whiteTimer->start();
     m_updateLabelTimer->start();
-    m_updateLabelTimer->start();
 }
 
 void Chessboard::stopBoardTimers()
@@ -481,8 +480,8 @@ void Chessboard::resetTimers()
     this->stopBoardTimers();
     m_whiteTimer->setInterval(lTimersStartTime);
     m_blackTimer->setInterval(lTimersStartTime);
-    m_nRemainingWhiteTime = m_whiteTimer->remainingTime();
-    m_nRemainingBlackTime = m_blackTimer->remainingTime();
+    m_nRemainingWhiteTime = m_whiteTimer->interval();
+    m_nRemainingBlackTime = m_blackTimer->interval();
     emit setBoardDataLabels(milisecToClockTime(lTimersStartTime), BDL_WHITE_TIME);
     emit setBoardDataLabels(milisecToClockTime(lTimersStartTime), BDL_BLACK_TIME);
 }
@@ -495,8 +494,8 @@ QString Chessboard::milisecToClockTime(long lMilis)
         int nMins = qFloor(nAllSecs / 60);
         int nSecs = qFloor(nAllSecs % 60);
         QString QStrMinsPrefix, QStrSecsPrefix;
-        nMins >= 10 ? QStrMinsPrefix == "" : QStrMinsPrefix == "0";
-        nSecs >= 10 ? QStrSecsPrefix == "" : QStrSecsPrefix == "0";
+        nMins >= 10 ? QStrMinsPrefix = "" : QStrMinsPrefix = "0";
+        nSecs >= 10 ? QStrSecsPrefix = "" : QStrSecsPrefix = "0";
         return QStrMinsPrefix + QString::number(nMins) + ":" + QStrSecsPrefix + QString::number(nSecs);
     }
     else return "00:00";
@@ -504,8 +503,10 @@ QString Chessboard::milisecToClockTime(long lMilis)
 
 void Chessboard::updateTimeLabels()
 {
-    emit setBoardDataLabels(milisecToClockTime(m_nRemainingWhiteTime), BDL_WHITE_TIME);
-    emit setBoardDataLabels(milisecToClockTime(m_nRemainingBlackTime), BDL_BLACK_TIME);
+    if (m_whiteTimer->isActive())
+        emit setBoardDataLabels(milisecToClockTime(m_whiteTimer->remainingTime()), BDL_WHITE_TIME);
+    else if (m_blackTimer->isActive())
+        emit setBoardDataLabels(milisecToClockTime(m_blackTimer->remainingTime()), BDL_BLACK_TIME);
 }
 
 void Chessboard::switchPlayersTimers()
