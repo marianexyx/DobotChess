@@ -46,6 +46,7 @@ public Q_SLOTS: //todo: jaka jest różnica między zwykłym slots?
 
 public slots:
     void msgFromChessboardToWebsockets(QString QStrWsMsg);
+    void sendTableDataToWeb(QWebSocket *pClient, bool bCheckPlayers = false);
 
 signals:
     void addTextToConsole(QString, LOG);

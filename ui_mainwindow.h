@@ -143,25 +143,29 @@ public:
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout_9;
     QLabel *gameStatusLbl;
-    QLabel *enpassantLbl;
-    QLabel *label_26;
-    QLabel *label_27;
-    QLabel *label_25;
     QLabel *whiteNameLbl;
     QLabel *label_13;
+    QLabel *label_25;
     QLabel *labelx;
-    QLabel *socketsLbl;
     QLabel *label_24;
-    QLabel *blackNameLbl;
     QLabel *turnLbl;
+    QLabel *blackNameLbl;
+    QLabel *socketsLbl;
     QLabel *label_23;
-    QLabel *castlingsLbl;
     QLabel *label_28;
     QLabel *movesLbl;
+    QLabel *label_26;
+    QLabel *castlingsLbl;
+    QLabel *label_27;
+    QLabel *enpassantLbl;
     QLabel *label_30;
     QLabel *whiteTimeLbl;
     QLabel *label_31;
     QLabel *blackTimeLbl;
+    QLabel *label_29;
+    QLabel *queuedPlayersLbl;
+    QLabel *label_33;
+    QLabel *queueTimeLbl;
     QPushButton *resetAllDataBtn;
     QGroupBox *groupBox_3;
     QGridLayout *gridLayout_17;
@@ -777,26 +781,6 @@ public:
 
         gridLayout_9->addWidget(gameStatusLbl, 4, 1, 1, 1);
 
-        enpassantLbl = new QLabel(groupBox_2);
-        enpassantLbl->setObjectName(QStringLiteral("enpassantLbl"));
-
-        gridLayout_9->addWidget(enpassantLbl, 2, 3, 1, 1);
-
-        label_26 = new QLabel(groupBox_2);
-        label_26->setObjectName(QStringLiteral("label_26"));
-
-        gridLayout_9->addWidget(label_26, 1, 2, 1, 1);
-
-        label_27 = new QLabel(groupBox_2);
-        label_27->setObjectName(QStringLiteral("label_27"));
-
-        gridLayout_9->addWidget(label_27, 2, 2, 1, 1);
-
-        label_25 = new QLabel(groupBox_2);
-        label_25->setObjectName(QStringLiteral("label_25"));
-
-        gridLayout_9->addWidget(label_25, 4, 0, 1, 1);
-
         whiteNameLbl = new QLabel(groupBox_2);
         whiteNameLbl->setObjectName(QStringLiteral("whiteNameLbl"));
 
@@ -807,70 +791,110 @@ public:
 
         gridLayout_9->addWidget(label_13, 1, 0, 1, 1);
 
+        label_25 = new QLabel(groupBox_2);
+        label_25->setObjectName(QStringLiteral("label_25"));
+
+        gridLayout_9->addWidget(label_25, 4, 0, 1, 1);
+
         labelx = new QLabel(groupBox_2);
         labelx->setObjectName(QStringLiteral("labelx"));
 
         gridLayout_9->addWidget(labelx, 0, 0, 1, 1);
-
-        socketsLbl = new QLabel(groupBox_2);
-        socketsLbl->setObjectName(QStringLiteral("socketsLbl"));
-
-        gridLayout_9->addWidget(socketsLbl, 0, 1, 1, 1);
 
         label_24 = new QLabel(groupBox_2);
         label_24->setObjectName(QStringLiteral("label_24"));
 
         gridLayout_9->addWidget(label_24, 3, 0, 1, 1);
 
+        turnLbl = new QLabel(groupBox_2);
+        turnLbl->setObjectName(QStringLiteral("turnLbl"));
+
+        gridLayout_9->addWidget(turnLbl, 3, 1, 1, 1);
+
         blackNameLbl = new QLabel(groupBox_2);
         blackNameLbl->setObjectName(QStringLiteral("blackNameLbl"));
 
         gridLayout_9->addWidget(blackNameLbl, 2, 1, 1, 1);
 
-        turnLbl = new QLabel(groupBox_2);
-        turnLbl->setObjectName(QStringLiteral("turnLbl"));
+        socketsLbl = new QLabel(groupBox_2);
+        socketsLbl->setObjectName(QStringLiteral("socketsLbl"));
 
-        gridLayout_9->addWidget(turnLbl, 3, 1, 1, 1);
+        gridLayout_9->addWidget(socketsLbl, 0, 1, 1, 1);
 
         label_23 = new QLabel(groupBox_2);
         label_23->setObjectName(QStringLiteral("label_23"));
 
         gridLayout_9->addWidget(label_23, 2, 0, 1, 1);
 
-        castlingsLbl = new QLabel(groupBox_2);
-        castlingsLbl->setObjectName(QStringLiteral("castlingsLbl"));
-
-        gridLayout_9->addWidget(castlingsLbl, 1, 3, 1, 1);
-
         label_28 = new QLabel(groupBox_2);
         label_28->setObjectName(QStringLiteral("label_28"));
 
-        gridLayout_9->addWidget(label_28, 0, 2, 1, 1);
+        gridLayout_9->addWidget(label_28, 5, 0, 1, 1);
 
         movesLbl = new QLabel(groupBox_2);
         movesLbl->setObjectName(QStringLiteral("movesLbl"));
 
-        gridLayout_9->addWidget(movesLbl, 0, 3, 1, 1);
+        gridLayout_9->addWidget(movesLbl, 5, 1, 1, 1);
+
+        label_26 = new QLabel(groupBox_2);
+        label_26->setObjectName(QStringLiteral("label_26"));
+
+        gridLayout_9->addWidget(label_26, 0, 2, 1, 1);
+
+        castlingsLbl = new QLabel(groupBox_2);
+        castlingsLbl->setObjectName(QStringLiteral("castlingsLbl"));
+
+        gridLayout_9->addWidget(castlingsLbl, 0, 3, 1, 1);
+
+        label_27 = new QLabel(groupBox_2);
+        label_27->setObjectName(QStringLiteral("label_27"));
+
+        gridLayout_9->addWidget(label_27, 1, 2, 1, 1);
+
+        enpassantLbl = new QLabel(groupBox_2);
+        enpassantLbl->setObjectName(QStringLiteral("enpassantLbl"));
+
+        gridLayout_9->addWidget(enpassantLbl, 1, 3, 1, 1);
 
         label_30 = new QLabel(groupBox_2);
         label_30->setObjectName(QStringLiteral("label_30"));
 
-        gridLayout_9->addWidget(label_30, 3, 2, 1, 1);
+        gridLayout_9->addWidget(label_30, 2, 2, 1, 1);
 
         whiteTimeLbl = new QLabel(groupBox_2);
         whiteTimeLbl->setObjectName(QStringLiteral("whiteTimeLbl"));
 
-        gridLayout_9->addWidget(whiteTimeLbl, 3, 3, 1, 1);
+        gridLayout_9->addWidget(whiteTimeLbl, 2, 3, 1, 1);
 
         label_31 = new QLabel(groupBox_2);
         label_31->setObjectName(QStringLiteral("label_31"));
 
-        gridLayout_9->addWidget(label_31, 4, 2, 1, 1);
+        gridLayout_9->addWidget(label_31, 3, 2, 1, 1);
 
         blackTimeLbl = new QLabel(groupBox_2);
         blackTimeLbl->setObjectName(QStringLiteral("blackTimeLbl"));
 
-        gridLayout_9->addWidget(blackTimeLbl, 4, 3, 1, 1);
+        gridLayout_9->addWidget(blackTimeLbl, 3, 3, 1, 1);
+
+        label_29 = new QLabel(groupBox_2);
+        label_29->setObjectName(QStringLiteral("label_29"));
+
+        gridLayout_9->addWidget(label_29, 4, 2, 1, 1);
+
+        queuedPlayersLbl = new QLabel(groupBox_2);
+        queuedPlayersLbl->setObjectName(QStringLiteral("queuedPlayersLbl"));
+
+        gridLayout_9->addWidget(queuedPlayersLbl, 4, 3, 1, 1);
+
+        label_33 = new QLabel(groupBox_2);
+        label_33->setObjectName(QStringLiteral("label_33"));
+
+        gridLayout_9->addWidget(label_33, 5, 2, 1, 1);
+
+        queueTimeLbl = new QLabel(groupBox_2);
+        queueTimeLbl->setObjectName(QStringLiteral("queueTimeLbl"));
+
+        gridLayout_9->addWidget(queueTimeLbl, 5, 3, 1, 1);
 
         labelx->raise();
         socketsLbl->raise();
@@ -880,18 +904,22 @@ public:
         blackNameLbl->raise();
         label_24->raise();
         turnLbl->raise();
-        label_26->raise();
-        castlingsLbl->raise();
-        label_27->raise();
-        enpassantLbl->raise();
         label_25->raise();
         gameStatusLbl->raise();
         label_28->raise();
         movesLbl->raise();
+        label_26->raise();
+        castlingsLbl->raise();
+        label_27->raise();
+        enpassantLbl->raise();
         label_30->raise();
         whiteTimeLbl->raise();
         label_31->raise();
         blackTimeLbl->raise();
+        label_29->raise();
+        queuedPlayersLbl->raise();
+        label_33->raise();
+        queueTimeLbl->raise();
 
         gridLayout_8->addWidget(groupBox_2, 0, 0, 1, 1);
 
@@ -1136,25 +1164,29 @@ public:
         groupBox->setTitle(QApplication::translate("MainWindow", "Board data", 0));
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Game", 0));
         gameStatusLbl->setText(QApplication::translate("MainWindow", "-1", 0));
-        enpassantLbl->setText(QApplication::translate("MainWindow", "-1", 0));
-        label_26->setText(QApplication::translate("MainWindow", "Castlings", 0));
-        label_27->setText(QApplication::translate("MainWindow", "Enpassant ", 0));
-        label_25->setText(QApplication::translate("MainWindow", "Game status", 0));
         whiteNameLbl->setText(QApplication::translate("MainWindow", "WHITE", 0));
         label_13->setText(QApplication::translate("MainWindow", "White name", 0));
+        label_25->setText(QApplication::translate("MainWindow", "Game status", 0));
         labelx->setText(QApplication::translate("MainWindow", "Sockets online", 0));
-        socketsLbl->setText(QApplication::translate("MainWindow", "0", 0));
         label_24->setText(QApplication::translate("MainWindow", "Turn", 0));
-        blackNameLbl->setText(QApplication::translate("MainWindow", "BLACK", 0));
         turnLbl->setText(QApplication::translate("MainWindow", "nt", 0));
+        blackNameLbl->setText(QApplication::translate("MainWindow", "BLACK", 0));
+        socketsLbl->setText(QApplication::translate("MainWindow", "0", 0));
         label_23->setText(QApplication::translate("MainWindow", "Black name", 0));
-        castlingsLbl->setText(QApplication::translate("MainWindow", "-1", 0));
         label_28->setText(QApplication::translate("MainWindow", "Halfmove/fullmove", 0));
         movesLbl->setText(QApplication::translate("MainWindow", "-1/-1", 0));
+        label_26->setText(QApplication::translate("MainWindow", "Castlings", 0));
+        castlingsLbl->setText(QApplication::translate("MainWindow", "-1", 0));
+        label_27->setText(QApplication::translate("MainWindow", "Enpassant ", 0));
+        enpassantLbl->setText(QApplication::translate("MainWindow", "-1", 0));
         label_30->setText(QApplication::translate("MainWindow", "White time", 0));
         whiteTimeLbl->setText(QApplication::translate("MainWindow", "30:00", 0));
         label_31->setText(QApplication::translate("MainWindow", "Black  time", 0));
         blackTimeLbl->setText(QApplication::translate("MainWindow", "30:00", 0));
+        label_29->setText(QApplication::translate("MainWindow", "Queued plrs", 0));
+        queuedPlayersLbl->setText(QApplication::translate("MainWindow", "0", 0));
+        label_33->setText(QApplication::translate("MainWindow", "Queue timer", 0));
+        queueTimeLbl->setText(QApplication::translate("MainWindow", "2:00", 0));
         resetAllDataBtn->setText(QApplication::translate("MainWindow", "Reset all data", 0));
         groupBox_3->setTitle(QApplication::translate("MainWindow", "Board", 0));
         groupBox_4->setTitle(QApplication::translate("MainWindow", "Chessboard", 0));

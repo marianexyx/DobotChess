@@ -24,7 +24,8 @@ Chessboard::Chessboard():
     m_nMaxRemovedPieceH(44.5),
     m_QStrSiteMoveRequest(""),
     m_WhoseTurn(NO_TURN),
-    lTimersStartTime(1000*60*30) //1000ms (1s) * 60s * 30min
+    lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
+    lTimersStartQueue(1000*60*2)
 {
     memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
     memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard
@@ -80,15 +81,19 @@ Chessboard::Chessboard():
     m_whiteTimer = new QTimer();
     m_blackTimer = new QTimer();
     m_updateLabelTimer = new QTimer();
+    m_startQueueTimer = new QTimer();
     m_whiteTimer->setInterval(lTimersStartTime);
     m_blackTimer->setInterval(lTimersStartTime);
     m_updateLabelTimer->setInterval(1000);
+    m_startQueueTimer->setInterval(lTimersStartQueue);
     m_whiteTimer->setSingleShot(true);
     m_blackTimer->setSingleShot(true);
     m_updateLabelTimer->setSingleShot(false);
+    m_startQueueTimer->setSingleShot(true);
     connect(m_whiteTimer, SIGNAL(timeout()), this, SLOT(timeOutWhite()));
     connect(m_blackTimer, SIGNAL(timeout()), this, SLOT(timeOutBlack()));
     connect(m_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
+    connect(m_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
     m_nRemainingWhiteTime = lTimersStartTime;
     m_nRemainingBlackTime = lTimersStartTime;
 }
@@ -190,7 +195,7 @@ int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać t
 
 bool Chessboard::isMoveRemoving()
 {
-    if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != "0")
+    if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != ".")
     {
         qDebug() << "m_QStrBoard[PieceTo.Letter:" << PieceTo.Letter << "][PieceTo.Digit:" <<
                     PieceTo.Digit << "] =" << m_QStrBoard[PieceTo.Letter][PieceTo.Digit];
@@ -385,7 +390,7 @@ void Chessboard::FENToBoard(QString FENBoard)
                 {
                     for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
                     {
-                        m_QStrBoard[nColumn][nRow] = "0";
+                        m_QStrBoard[nColumn][nRow] = ".";
                         if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn > 8 =" << nColumn;
                         ++nColumn;
                     }
@@ -475,7 +480,7 @@ void Chessboard::timeOutBlack()
     emit msgFromChessboardToWebsockets("timeOutBlack");
 }
 
-void Chessboard::resetTimers()
+void Chessboard::resetGameTimers()
 {
     this->stopBoardTimers();
     m_whiteTimer->setInterval(lTimersStartTime);
@@ -507,6 +512,10 @@ void Chessboard::updateTimeLabels()
         emit setBoardDataLabels(milisecToClockTime(m_whiteTimer->remainingTime()), BDL_WHITE_TIME);
     else if (m_blackTimer->isActive())
         emit setBoardDataLabels(milisecToClockTime(m_blackTimer->remainingTime()), BDL_BLACK_TIME);
+
+    if (m_startQueueTimer->isActive())
+        emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
+    else setBoardDataLabels(milisecToClockTime(lTimersStartQueue), BDL_QUEUE_TIME);
 }
 
 void Chessboard::switchPlayersTimers()
@@ -529,4 +538,29 @@ void Chessboard::switchPlayersTimers()
     }
     else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
                      "white or black.  it's' ==" << getWhoseTurn();
+}
+
+void Chessboard::startQueueTimer() //todo: zmienić nazewnictwo na "start" z wszystkich metod "queue"
+{
+    qDebug() << "Chessboard::startQueueTimer()";
+    m_startQueueTimer->stop();
+    m_startQueueTimer->setInterval(lTimersStartQueue);
+    emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
+    m_startQueueTimer->start();
+    m_updateLabelTimer->start();
+}
+
+void Chessboard::stopQueueTimer()
+{
+    qDebug() << "Chessboard::stopQueueTimer()";
+    m_startQueueTimer->stop();
+    m_updateLabelTimer->stop();
+    this->updateTimeLabels();
+}
+
+void Chessboard::timeOutStartQueue()
+{
+    this->stopQueueTimer();
+
+    emit msgFromChessboardToWebsockets("timeOutStartQueue");
 }

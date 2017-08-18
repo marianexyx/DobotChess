@@ -21,7 +21,7 @@ void WebChess::GameStarted()
 
     if (!_bServiceTests)
     {
-        _pChessboard->resetTimers();
+        _pChessboard->resetGameTimers();
         _pChessboard->startGameTimer();
         _pWebsockets->sendMsg("newOk");
     }
@@ -59,7 +59,7 @@ void WebChess::EndOfGame(QString msg)
     //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
     //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
     //todo: stworzyć funkcję czyszczącą masę rzeczy przy różnych warunkach jak koniec gry
-    _pChessboard->resetTimers();
+    _pChessboard->resetGameTimers();
     this->reset();
 }
 
@@ -82,7 +82,7 @@ void WebChess::PromoteToWhat(QString moveForFuturePromote)
 void WebChess::checkMsgForChenard(QString msgFromWs)
 {
     qDebug() << "WebChess::checkMsgForChenard: received: " << msgFromWs;
-    if (msgFromWs == "newGame") this->NewGame();
+    if (msgFromWs.left(7) == "newGame") this->playerClickedStart(msgFromWs.mid(8));
     else if (msgFromWs.left(4) == "move") this->handleMove(msgFromWs.mid(5));
     else if (msgFromWs.left(9) == "promoteTo") this->Promote(msgFromWs.right(1));
     else if (msgFromWs.left(5) == "reset") this->reset();
@@ -147,11 +147,35 @@ void WebChess::Promote(QString msg)
     _pChessboard->QStrFuturePromote.clear();
 }
 
+void WebChess::playerClickedStart(QString QStrWhoClicked)
+{
+    if (QStrWhoClicked == "WHITE")
+    {
+        _pWebTable->setIsWhiteStartClicked(true);
+        qDebug() << "white player clicked start";
+    }
+    else if (QStrWhoClicked == "BLACK")
+    {
+        _pWebTable->setIsBlackStartClicked(true);
+        qDebug() << "black player clicked start";
+    }
+    else qDebug() << "ERROR:unknown playerClickedStart val:" << QStrWhoClicked;
+
+    if (_pWebTable->getIsWhiteStartClicked() == true && _pWebTable->getIsBlackStartClicked() == true)
+    {
+        qDebug() << "both players have clicked start. try to start game";
+        _pChessboard->stopQueueTimer();
+        this->NewGame();
+        _pWebTable->setIsWhiteStartClicked(false);
+        _pWebTable->setIsBlackStartClicked(false);
+    }
+}
+
 void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
 {
-    if ((_pWebTable->getNameWhite() != "Biały" && _pWebTable->getNameBlack() != "Czarny" && //zabezpieczenie:
-         !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) || //jeżeli obaj gracze siedzą przy stole
-            _bServiceTests) //albo mamy do czynienia z zapytaniem serwisowym
+    if ((_pWebTable->getNameWhite() != "WHITE" && _pWebTable->getNameBlack() != "BLACK" &&
+         !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) ||
+            _bServiceTests)
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
         _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", WEBSOCKET);
@@ -190,7 +214,7 @@ void WebChess::TcpMoveOk()
 void WebChess::reset()
 {
     _pWebsockets->sendMsg("reseting");
-    _pChessboard->resetTimers();
+    _pChessboard->resetGameTimers();
     this->resetPiecePositions();
 }
 

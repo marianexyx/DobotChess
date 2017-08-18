@@ -6,11 +6,12 @@
 
 //TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian tylko kalibracyjnych
 
-Dobot::Dobot(Chessboard *pChessboard):
+Dobot::Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb):
     m_fGripOpened(6.9f),
     m_fGripClosed(7.55f)
 {
     _pChessboard = pChessboard;
+    _pArduinoUsb = pArduinoUsb;
     
     connectStatus = false;
 
@@ -102,7 +103,17 @@ void Dobot::QueuedIdList()
                            m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
                            firstPosId.index); //todo: zastrukturyzować
 
-    if (!QueuedCmdIndexList.isEmpty()) //jeżeli kontener nie jest pusty
+    if (!arduinoGripperStateList.isEmpty())
+    {
+        if (arduinoGripperStateList.last().index <= m_ullDobotQueuedCmdIndex)
+        {
+            QString QStrServoState = arduinoGripperStateList.last().isGripperOpen ? "Open" : "Close";
+            _pArduinoUsb->sendDataToUsb("servo" + QStrServoState);
+            arduinoGripperStateList.removeLast();
+        }
+    }
+
+    if (!QueuedCmdIndexList.isEmpty())
     {
         QListIterator<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexIter(QueuedCmdIndexList);
 
@@ -170,6 +181,7 @@ void Dobot::QueuedIdList()
             } 
         }
     }
+
     if (m_ullRetreatIndex <= m_ullDobotQueuedCmdIndex)
     {
         qDebug() << "Dobot::QueuedIdList(): retreat";
@@ -374,7 +386,7 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
                      letter << "," << digit;
     
     if (f_xFromTo > 130.f && f_xFromTo < 350.f && f_yFromTo > -200 && f_yFromTo < 200 && f_zFromTo > -22.f &&
-            f_zFromTo < 100.f)
+            f_zFromTo < 100.f) //zabezpieczenia odległościowe. todo: da się je ustawić jako alarmy w odobcie?
     { //todo: warunki wpisać tak by się dostosowywały wartosci do zmian. można w funckję zamknąć
         ArmPosForCurrentCmdQueuedIndex actualPosIdx;
         actualPosIdx = QueuedCmdIndexList.first();
@@ -518,7 +530,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
 {
     float f_xRemove = _pChessboard->adRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
     float f_yRemove = _pChessboard->adRemovedPiecesPositions_y[nPieceRowPos][nPieceColumnPos];
-    //float f_zRemove = _pChessboard->adRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];//unused
+    //float f_zRemove = _pChessboard->adRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos]; //unused
     float f_rRemove = ACTUAL_POS;
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
                 _pChessboard->getMaxRemovedPieceHeight() << ", r =" << f_rRemove;
@@ -541,6 +553,14 @@ void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float
     m_posIdx.z = (z != ACTUAL_POS) ? z : m_PtpCmdActualVal.z;
     m_posIdx.r = (r != ACTUAL_POS) ? r : m_PtpCmdActualVal.r;
     QueuedCmdIndexList << m_posIdx;
+
+    if (move == OPEN || move == CLOSE)
+    {
+        ServoArduino servoState;
+        servoState.index = m_ullCoreQueuedCmdIndex;
+        servoState.isGripperOpen = (move == OPEN) ? true : false;
+        arduinoGripperStateList << servoState;
+    }
 }
 
 void Dobot::checkPWM()

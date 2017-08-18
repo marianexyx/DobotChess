@@ -11,6 +11,7 @@
 #include "DobotDll.h"
 #include "DobotType.h"
 #include "chessboard.h"
+#include "arduinousb.h"
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
@@ -38,12 +39,19 @@ struct PtpCmdActualVal
     float r;
 };
 
+struct ServoArduino
+{
+    unsigned long long index;
+    bool isGripperOpen;
+};
+
 class Dobot: public QObject
 {
     Q_OBJECT
 
 private:
     Chessboard *_pChessboard;
+    ArduinoUsb *_pArduinoUsb;
 
     bool connectStatus;
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
@@ -66,10 +74,12 @@ private:
     QList<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
     ArmPosForCurrentCmdQueuedIndex firstPosId, lastPosId, takenPosId;
 
+    QList<ServoArduino> arduinoGripperStateList;
+
     void checkPWM();
 
 public:
-    Dobot(Chessboard *pChessboard);
+    Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb);
 
     void refreshBtn();
     void initDobot();

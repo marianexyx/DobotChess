@@ -49,7 +49,7 @@ public:
 
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
     void setAI(bool bAI)                { m_bAI = bAI; } //todo: wszystkie nazwy "AI" zamienić na "Igor"
-    void setAIAsPlayer2(bool bIsAIAsP2)   { m_bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
+    void setAIAsPlayer2(bool bIsAIAsP2) { m_bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
 
     bool getAIAsPlayer2()               { return m_bIsIgorsAiSimulatedAsPlayer2; }
     bool getAI()                        { return m_bAI; }

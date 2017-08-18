@@ -30,11 +30,12 @@ public:
     void Promote(QString msg);
     void AskForLegalMoves();
 
-    //-----------------FUNKCJE SZACHOWE-----------------//
+    //-----------------FUNKCJE WEWNĘTRZNE-----------------//
     void TcpMoveOk();
     SEQUENCE_TYPE checkMoveType(QString move);
     void reset();
     void resetBoardCompleted();
+    void playerClickedStart(QString QStrWhoClicked);
 
 signals:
     void addTextToConsole(QString, LOG);

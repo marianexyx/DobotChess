@@ -36,9 +36,11 @@ private:
     QString m_QStrEnpassant;
     QStringList m_legalMoves;
     SEQUENCE_TYPE m_moveType;
+
     QTimer *m_whiteTimer;
     QTimer *m_blackTimer;
     QTimer *m_updateLabelTimer;
+    QTimer *m_startQueueTimer;
     int m_nRemainingWhiteTime;
     int m_nRemainingBlackTime;
 
@@ -47,6 +49,7 @@ private:
     void FENToBoard(QString FENBoard);
     WHOSE_TURN whoseTurn(QString whoseTurn);
     const long lTimersStartTime;
+    const long lTimersStartQueue;
 
 public:
     Chessboard();
@@ -67,10 +70,12 @@ public:
     QString arrayBoardToQStr(QString QStrBoard[8][8]);
 
     void startGameTimer();
-    void resetTimers();
+    void resetGameTimers();
     QString milisecToClockTime(long lMilis);
     void stopBoardTimers();
     void switchPlayersTimers();
+    void startQueueTimer();
+    void stopQueueTimer();
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
@@ -128,6 +133,7 @@ private slots:
     void timeOutWhite();
     void timeOutBlack();
     void updateTimeLabels();
+    void timeOutStartQueue();
 
 signals:
     void addTextToConsole(QString);

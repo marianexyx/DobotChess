@@ -48,6 +48,24 @@ void Websockets::onNewConnection() //nowe połączenia
 //na korzyść: "for (QWebSocket *pClient : qAsConst(m_clients))"
 //TODO2: komendy serwisowe do wejdą tutaj- jak to się ma do nich?
 
+void Websockets::sendTableDataToWeb(QWebSocket *pClient, bool bCheckPlayers)
+{
+    if (bCheckPlayers)
+    {
+        if(!_pWebTable->getIsWhiteStartClicked()) _pWebTable->setNameWhite("WHITE");
+        if(!_pWebTable->getIsBlackStartClicked()) _pWebTable->setNameBlack("BLACK");
+    }
+
+    QString QStrTableData =
+            _pWebTable->getNameWhite() + " " +
+            _pWebTable->getNameBlack() + " " +
+            _pChessboard->getStrWhoseTurn() + " " +
+            _pWebTable->getQueuedPlayers();
+    emit addTextToConsole("sent: checkedTableData " + QStrTableData + "\n", WEBSOCKET);
+    pClient->sendTextMessage("checkedTableData " + QStrTableData);
+    qDebug() << "Websockets sent: checkedTableData " << QStrTableData;
+}
+
 void Websockets::receivedMsg(QString QStrWsMsg)
 {
     if (QStrWsMsg != "keepConnected")
@@ -60,7 +78,14 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     //chyba dzięki temu mogę się odwoływać do gniazda które przysłało wiadomość
 
     if (QStrWsMsg == "keepConnected") {  qDebug() <<"connectionOnline"; }
-    else if (QStrWsMsg == "newGame") { this->sendToChess(QStrWsMsg); }
+    else if (QStrWsMsg == "newGame")
+    {
+        QString QStrWhoSent = "";
+        if (pClient == m_pWhitePiecesSocket) QStrWhoSent = "WHITE";
+        else if (pClient == m_pBlackPiecesSocket) QStrWhoSent = "BLACK";
+
+        this->sendToChess(QStrWsMsg + " " + QStrWhoSent);
+    }
     else if (QStrWsMsg.left(4) == "move") { this->sendToChess(QStrWsMsg); }
     else if (QStrWsMsg == "reset") { this->sendToChess(QStrWsMsg); }
     else if (QStrWsMsg.left(5) == "check")
@@ -86,11 +111,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
         }
         else if  (QStrWsMsg == "tableData")
         {
-            QString QStrTableData = _pWebTable->getNameWhite() + " " +
-                    _pWebTable->getNameBlack() + " " + _pChessboard->getStrWhoseTurn();
-            emit addTextToConsole("sent: checkedTableData " + QStrTableData + "\n", WEBSOCKET);
-            pClient->sendTextMessage("checkedTableData " + QStrTableData);
-            qDebug() << "Websockets sent: checkedTableData " << QStrTableData;
+            this->sendTableDataToWeb(pClient);
         }
         else  qDebug() << "ERROR: Websockets::receivedMsg(): wrong check parameter: " << QStrWsMsg;
     }
@@ -100,27 +121,34 @@ void Websockets::receivedMsg(QString QStrWsMsg)
         QString QStrPlayerType = QStrWsMsg.left(11);
         QString QStrPlayerName = QStrWsMsg.mid(12);
 
+        _pChessboard->setWhoseTurn(NO_TURN);
+
         if (QStrPlayerType == "whitePlayer")
         {
-            _pChessboard->setWhoseTurn(NO_TURN);
             _pWebTable->setNameWhite(QStrPlayerName);
+            qDebug() << "newWhite:" << _pWebTable->getNameWhite();
+            this->addTextToConsole("New white player: " + _pWebTable->getNameWhite() + "\n", WEBSOCKET);
             emit setBoardDataLabels(_pWebTable->getNameWhite(), BDL_WHITE_NAME);
 
             if (QStrPlayerName == "WHITE") m_pWhitePiecesSocket = nullptr; //todo: zastąpić white/black stałą string
-            else m_pWhitePiecesSocket = pClient; //skojarzenie siadającego gracza białego z gniazdem bierek białych
+            else  m_pWhitePiecesSocket = pClient; //skojarzenie siadającego gracza białego z gniazdem bierek białych
 
+            QString QStrNewWhite = "newWhite " + _pWebTable->getNameWhite();
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
-                pNextClient->sendTextMessage("newWhite " + _pWebTable->getNameWhite());
+                pNextClient->sendTextMessage(QStrNewWhite);
 
-            qDebug() << "newWhite:" << _pWebTable->getNameWhite();
-            this->addTextToConsole("New white player: " + _pWebTable->getNameWhite() + "\n", WEBSOCKET);
-
-            if (QStrPlayerName == "WHITE") emit MsgFromWebsocketsToChess("reset");
+            if (QStrPlayerName == "WHITE")
+            {
+                _pWebTable->setIsWhiteStartClicked(false);
+                _pWebTable->setIsBlackStartClicked(false);
+                emit MsgFromWebsocketsToChess("reset");
+            }
         }
         else if (QStrPlayerType.left(11) == "blackPlayer")
         {
-            _pChessboard->setWhoseTurn(NO_TURN);
             _pWebTable->setNameBlack(QStrPlayerName);
+            qDebug() << "newBlack:" << _pWebTable->getNameBlack();
+            this->addTextToConsole("New black player: " + _pWebTable->getNameBlack() + "\n", WEBSOCKET);
             emit setBoardDataLabels(_pWebTable->getNameBlack(), BDL_BLACK_NAME);
 
             if (QStrPlayerName == "BLACK") m_pBlackPiecesSocket = nullptr;
@@ -129,12 +157,17 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
                 pNextClient->sendTextMessage("newBlack " + _pWebTable->getNameBlack());
 
-            qDebug() << "newBlack:" << _pWebTable->getNameBlack();
-            this->addTextToConsole("New black player: " + _pWebTable->getNameBlack() + "\n", WEBSOCKET);
-
-            if (QStrPlayerName == "BLACK") emit MsgFromWebsocketsToChess("reset");
+            if (QStrPlayerName == "BLACK")
+            {
+                _pWebTable->setIsWhiteStartClicked(false);
+                _pWebTable->setIsBlackStartClicked(false);
+                emit MsgFromWebsocketsToChess("reset");
+            }
         }
         else  qDebug() << "ERROR: Websockets::receivedMsg(): wrong change parameter: " << QStrWsMsg;
+
+        if (_pWebTable->getNameWhite() != "WHITE" && _pWebTable->getNameBlack() != "BLACK")
+            _pChessboard->startQueueTimer();
     }
     else if (QStrWsMsg.left(9) == "promoteTo") { this->sendToChess(QStrWsMsg); }
     else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWsMsg;
@@ -181,6 +214,14 @@ void Websockets::sendMsg(QString QStrWsMsg)
         Q_FOREACH (QWebSocket *pNextClient, m_clients)
             pNextClient->sendTextMessage(QStrWsMsg);
     }
+    else if (QStrWsMsg == "timeOutStartQueue" )
+    {
+        Q_FOREACH (QWebSocket *pNextClient, m_clients)
+            this->sendTableDataToWeb(pNextClient, true);
+            //pNextClient->sendTextMessage("newOk");
+
+
+    }
     else qDebug() << "ERRROR: uknown Websockets::sendMsg() parameter:" << QStrWsMsg;
 }
 
@@ -208,7 +249,7 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
                 pNextClient->sendTextMessage("newWhite WHITE");
 
-            qDebug() << "newWhite: WHITE" << _pWebTable->getNameWhite();
+            qDebug() << "newWhite: WHITE";
             this->addTextToConsole("New white player: WHITE\n", WEBSOCKET);
 
             emit MsgFromWebsocketsToChess("reset");
@@ -224,7 +265,7 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
             Q_FOREACH (QWebSocket *pNextClient, m_clients)
                 pNextClient->sendTextMessage("newBlack BLACK");
 
-            qDebug() << "newBlack: BLACK" << _pWebTable->getNameBlack();
+            qDebug() << "newBlack: BLACK";
             this->addTextToConsole("New black player: BLACK\n", WEBSOCKET);
 
             emit MsgFromWebsocketsToChess("reset");
@@ -232,6 +273,7 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
         //todo: wyświetla mi się disconnectw dzinym miejscu
         else emit addTextToConsole("non-player disconnected\n", WEBSOCKET);
 
+        //_pWebTable->removePlayerFromQueue(pClient);
         m_clients.removeAll(pClient);
         pClient->deleteLater();
     }
@@ -239,7 +281,6 @@ void Websockets::socketDisconnected() //rozłączanie websocketa
     char const *pchar = s.c_str();
     emit setBoardDataLabels(pchar, BDL_SOCKETS_ONLINE);
 }
-
 
 void Websockets::msgFromChessboardToWebsockets(QString QStrWsMsg)
 {

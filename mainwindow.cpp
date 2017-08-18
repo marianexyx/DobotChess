@@ -695,6 +695,12 @@ void MainWindow::setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelTy
     case BDL_BLACK_TIME:
         ui->blackTimeLbl->setText(QStrLabel);
         break;
+    case BDL_QUEUE_PLAYERS:
+        ui->queuedPlayersLbl->setText(QStrLabel);
+        break;
+    case BDL_QUEUE_TIME:
+        ui->queueTimeLbl->setText(QStrLabel);
+        break;
     default:
         qDebug() << "ERROR: unknown MainWindow::setBoardDataLabels labelType";
         break;
