@@ -4,13 +4,11 @@ INPUT(
 ./debug\chess.o
 ./debug\dobot.o
 ./debug\tcpmsgs.o
-./debug\webtable.o
 ./debug\chessboard.o
 ./debug\websockets.o
 ./debug\arduinousb.o
 ./debug\igorbot.o
 ./debug\webchess.o
-./debug\moc_webtable.o
 ./debug\moc_websockets.o
 ./debug\moc_tcpmsgs.o
 ./debug\moc_chessboard.o

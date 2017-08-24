@@ -3,12 +3,11 @@
 
 Chess::Chess() {} //czysto wirtualne klasy muszą mieć pusty konstruktor
 
-Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable)
+Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs)
 {
     _pTCPMsgs = pTCPMsgs;
     _pDobot = pDobot;
     _pChessboard = pChessboard;
-    _pWebTable = pWebTable;
 
     _bServiceTests = false;
 }

@@ -1,6 +1,8 @@
 #ifndef WEBCHESS_H
 #define WEBCHESS_H
 
+#pragma once
+
 #include "websockets.h"
 #include "chess.h"
 #include "vars/basic_vars.h"
@@ -13,8 +15,7 @@ class WebChess : public Chess
     Websockets *_pWebsockets; //reszta wskaznikow dziedziczona 
 
 public:
-    WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-             WebTable *pWebTable, Websockets *pWebsockets);
+    WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, Websockets *pWebsockets);
 
     //----------KOMUNIKACJA Z WWW----------//
     void GameStarted();

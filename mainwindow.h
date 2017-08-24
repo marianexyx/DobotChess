@@ -27,7 +27,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
+    explicit MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
                         TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                         IgorBot *pIgorBot, WebChess *pWebChess, QWidget *parent = 0);
 
@@ -44,7 +44,6 @@ private:
     Ui::MainWindow *ui;
 
     Dobot *_pDobotArm;
-    WebTable *_pWebTable;
     Websockets *_pWebSockets;
     Chessboard *_pChessboard;
     TCPMsgs *_pTCPmsg;

@@ -21,8 +21,7 @@ private:
     void checkAI();
 
 public:
-    IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-            WebTable *pWebTable, ArduinoUsb *pArduinoUsb);
+    IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, ArduinoUsb *pArduinoUsb);
 
     //----------KOMUNIKACJA Z ARDUINO----------//
     void GameStarted();

@@ -3,7 +3,7 @@
 
 QT_USE_NAMESPACE
 
-MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard *pChessboard,
+MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                        IgorBot *pIgorBot, WebChess *pWebChess, QWidget *parent) :
     QMainWindow(parent),
@@ -14,7 +14,6 @@ MainWindow::MainWindow(WebTable *pWebTable, Websockets *pWebSockets, Chessboard 
     this->setWindowTitle("Awaiting for new game");
 
     _pDobotArm = pDobotArm;
-    _pWebTable = pWebTable;
     _pWebSockets = pWebSockets;
     _pChessboard = pChessboard;
     _pTCPmsg = pTCPmsg;

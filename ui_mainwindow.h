@@ -183,6 +183,9 @@ public:
     QGroupBox *groupBox_10;
     QGridLayout *gridLayout_20;
     QPlainTextEdit *queuedPTE;
+    QGroupBox *groupBox_11;
+    QGridLayout *gridLayout_21;
+    QPlainTextEdit *servoQueuePTE;
     QGroupBox *log;
     QGridLayout *gridLayout_18;
     QPlainTextEdit *debug_log;
@@ -194,7 +197,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1074, 713);
+        MainWindow->resize(1180, 713);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_4 = new QGridLayout(centralWidget);
@@ -1010,10 +1013,22 @@ public:
 
         gridLayout_20->addWidget(queuedPTE, 0, 0, 1, 1);
 
-        queuedPTE->raise();
-        queuedPTE->raise();
 
         gridLayout_19->addWidget(groupBox_10, 1, 1, 1, 1);
+
+        groupBox_11 = new QGroupBox(groupBox_9);
+        groupBox_11->setObjectName(QStringLiteral("groupBox_11"));
+        gridLayout_21 = new QGridLayout(groupBox_11);
+        gridLayout_21->setSpacing(6);
+        gridLayout_21->setContentsMargins(11, 11, 11, 11);
+        gridLayout_21->setObjectName(QStringLiteral("gridLayout_21"));
+        servoQueuePTE = new QPlainTextEdit(groupBox_11);
+        servoQueuePTE->setObjectName(QStringLiteral("servoQueuePTE"));
+
+        gridLayout_21->addWidget(servoQueuePTE, 0, 0, 1, 1);
+
+
+        gridLayout_19->addWidget(groupBox_11, 1, 2, 1, 1);
 
 
         gridLayout_8->addWidget(groupBox_9, 2, 0, 1, 1);
@@ -1051,7 +1066,7 @@ public:
         groupBox->raise();
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1074, 21));
+        menuBar->setGeometry(QRect(0, 0, 1180, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -1195,6 +1210,7 @@ public:
         groupBox_9->setTitle(QApplication::translate("MainWindow", "Moves", 0));
         groupBox_8->setTitle(QApplication::translate("MainWindow", "History", 0));
         groupBox_10->setTitle(QApplication::translate("MainWindow", "Queued", 0));
+        groupBox_11->setTitle(QApplication::translate("MainWindow", "ServoQueue", 0));
         log->setTitle(QApplication::translate("MainWindow", "Log", 0));
     } // retranslateUi
 

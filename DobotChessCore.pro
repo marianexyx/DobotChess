@@ -21,14 +21,13 @@ SOURCES += main.cpp\
     chess.cpp \
     dobot.cpp \
     tcpmsgs.cpp \
-    webtable.cpp \
     chessboard.cpp \
     websockets.cpp \
     arduinousb.cpp \
     igorbot.cpp \
     webchess.cpp
 
-HEADERS  +=  webtable.h \
+HEADERS  +=  \
     websockets.h \
     tcpmsgs.h \
     chessboard.h \
@@ -45,7 +44,8 @@ HEADERS  +=  webtable.h \
     vars/basic_vars.h \
     vars/board_axis.h \
     vars/dobot_moves.h \
-    vars/board_data_labels.h
+    vars/board_data_labels.h \
+    vars/players_types.h
 
 FORMS    += mainwindow.ui
 

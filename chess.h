@@ -8,7 +8,6 @@
 #include "dobot.h"
 #include "chessboard.h"
 #include "tcpmsgs.h"
-#include "webtable.h"
 #include "vars/board_axis.h"
 
 //TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami wejsciowymi (arduino/website)
@@ -21,7 +20,6 @@ protected:
     TCPMsgs *_pTCPMsgs;
     Dobot *_pDobot;
     Chessboard *_pChessboard;
-    WebTable *_pWebTable;
 
     bool _bServiceTests;
 
@@ -66,7 +64,7 @@ public slots:
 
 public:
     Chess(); //czysto wirtualne klasy muszą mieć pusty konstruktor
-    Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, WebTable *pWebTable);
+    Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs);
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void pieceMovingSequence(SEQUENCE_TYPE Type,

@@ -1,12 +1,11 @@
 #include "igorbot.h"
 
 IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-                 WebTable *pWebTable, ArduinoUsb *pArduinoUsb)
+                 ArduinoUsb *pArduinoUsb)
 {
     _pDobot = pDobot;
     _pChessboard = pChessboard;
     _pTCPMsgs = pTCPMsgs;
-    _pWebTable = pWebTable;
     _pArduinoUsb = pArduinoUsb;
 
     m_bAI = false;

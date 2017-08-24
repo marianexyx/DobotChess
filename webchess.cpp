@@ -1,12 +1,11 @@
 #include "webchess.h"
 
 WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
-                   WebTable *pWebTable, Websockets *pWebsockets)
+                   Websockets *pWebsockets)
 {
     _pDobot = pDobot;
     _pChessboard = pChessboard;
     _pTCPMsgs = pTCPMsgs;
-    _pWebTable = pWebTable;
     _pWebsockets = pWebsockets;
 }
 
@@ -151,31 +150,32 @@ void WebChess::playerClickedStart(QString QStrWhoClicked)
 {
     if (QStrWhoClicked == "WHITE")
     {
-        _pWebTable->setIsWhiteStartClicked(true);
+        _pWebsockets->setClientStateByType(PT_WHITE, CS_CLICKED_START);
         qDebug() << "white player clicked start";
     }
     else if (QStrWhoClicked == "BLACK")
     {
-        _pWebTable->setIsBlackStartClicked(true);
+        _pWebsockets->setPlayerType(_pWebsockets->getPlayerSocket(PT_BLACK), PT_NONE);
         qDebug() << "black player clicked start";
     }
     else qDebug() << "ERROR:unknown playerClickedStart val:" << QStrWhoClicked;
 
-    if (_pWebTable->getIsWhiteStartClicked() == true && _pWebTable->getIsBlackStartClicked() == true)
+    if (_pWebsockets->getClientStateByType(PT_WHITE) == CS_CLICKED_START &&
+            _pWebsockets->getClientStateByType(PT_BLACK) == CS_CLICKED_START)
     {
         qDebug() << "both players have clicked start. try to start game";
         _pChessboard->stopQueueTimer();
         this->NewGame();
-        _pWebTable->setIsWhiteStartClicked(false);
-        _pWebTable->setIsBlackStartClicked(false);
+        _pWebsockets->setClientStateByType(PT_WHITE, CS_NONE);
+        _pWebsockets->setClientStateByType(PT_BLACK, CS_NONE);
     }
 }
 
 void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
 {
-    if ((_pWebTable->getNameWhite() != "WHITE" && _pWebTable->getNameBlack() != "BLACK" &&
-         !_pWebTable->getNameWhite().isEmpty() && !_pWebTable->getNameBlack().isEmpty()) ||
-            _bServiceTests)
+
+    if ((!_pWebsockets->isPlayerChairEmpty(PT_WHITE) && !_pWebsockets->isPlayerChairEmpty(PT_BLACK)) ||
+            _bServiceTests) //todo: bool zmienić na isService... or smtg
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
         _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", WEBSOCKET);
