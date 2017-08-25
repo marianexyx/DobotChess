@@ -155,7 +155,7 @@ void WebChess::playerClickedStart(QString QStrWhoClicked)
     }
     else if (QStrWhoClicked == "BLACK")
     {
-        _pWebsockets->setPlayerType(_pWebsockets->getPlayerSocket(PT_BLACK), PT_NONE);
+        _pWebsockets->setClientStateByType(PT_BLACK, CS_CLICKED_START);
         qDebug() << "black player clicked start";
     }
     else qDebug() << "ERROR:unknown playerClickedStart val:" << QStrWhoClicked;
