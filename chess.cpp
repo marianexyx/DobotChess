@@ -12,22 +12,23 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs)
     _bServiceTests = false;
 }
 
-void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
+void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
                                 LETTER pieceToLetter, DIGIT pieceToDigit)
 {
-    //jeżeli nie podano skąd i/lub dokąd, to jest to ruch z aktualnego pola szachownicy nad którym wisi ramie
+    //jeżeli nie podano skąd i/lub dokąd ramię ma się przemieścić, to jest to ruch ramienia z aktualnego pola szachownicy nad którym ono wisi
     if (pieceFromLetter == L_X) pieceFromLetter = static_cast<LETTER>(_pChessboard->PieceFrom.Letter);
     if (pieceFromDigit == D_X) pieceFromDigit = static_cast<DIGIT>(_pChessboard->PieceFrom.Digit);
     if (pieceToLetter == L_X) pieceToLetter = static_cast<LETTER>(_pChessboard->PieceTo.Letter);
     if (pieceToDigit == D_X) pieceToDigit = static_cast<DIGIT>(_pChessboard->PieceTo.Digit);
 
-    if (Type == REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
+
+    if (Type == ST_REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
     {
         pieceFromLetter = pieceToLetter; //przy usuwaniu bierka "from" to ta...
         pieceFromDigit = pieceToDigit; //...która w każdym innym ruchu jest jako "to"
     }
 
-    if (Type == RESTORE && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+    if (Type == ST_RESTORE && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type); //TODO: pieceToDigit nie jest poprawną daną (przy...
         //...zbijaniu czarnego z b7 (głębsza linia zbitych) ramię najpierw poszło nad białe pole zbite, a potem nad...
         //...czarne, by chyba znowu próbować wyjśc przez białe)
@@ -42,7 +43,7 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGI
     _pDobot->armUpDown(UP, FROM, Type);
     _pChessboard->pieceStateChanged(FROM, pieceFromLetter, pieceFromDigit, Type);
 
-    if ((Type == REMOVING || Type == RESTORE) && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+    if ((Type == ST_REMOVING || Type == ST_RESTORE) && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
 
     _pDobot->pieceFromTo(TO, pieceToLetter, pieceToDigit, Type);
@@ -52,9 +53,9 @@ void Chess::pieceMovingSequence(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGI
     _pDobot->armUpDown(UP, TO, Type);
     _pChessboard->pieceStateChanged(TO, pieceToLetter, pieceToDigit, Type);
 
-    if (Type == REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+    if (Type == ST_REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
-    else if (Type != REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
+    else if (Type != ST_REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
 }
 
 void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
@@ -64,15 +65,15 @@ void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
 
     int nRemPieceType;
     DIGIT remPieceDestDigit;
-    if (sequence == REMOVING) //TODO: kod skopiowany praktycznie z Dobot::pieceFromTo. nie wiem czy zadziala
+    if (sequence == ST_REMOVING)
     {
-        nRemPieceType = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
+        nRemPieceType = _pChessboard->nGripperPiece;
         remPieceDestDigit = static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemPieceType, COLUMN));
     }
-    else if (sequence == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
+    else if (sequence == ST_RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
         //...być podana wprost do pieceFromTo()
     {
-        //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
+        //dla ST_RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
         remPieceDestDigit = digitTo;
     }
     DIGIT indirectFieldDigit;
@@ -86,7 +87,7 @@ void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
     float fIndirect_y = _pChessboard->adRemovedPiecesPositions_y[L_D][indirectFieldDigit];
     float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
 
-    _pDobot->addCmdToList(TO_POINT, REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
+    _pDobot->addCmdToList(TO_POINT, ST_REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
                           _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //TODO: getMaxRemovedPieceHeight?
 }
 
@@ -114,21 +115,21 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
 
 void Chess::castlingMovingSequence()
 {
-    this->pieceMovingSequence(CASTLING_KING); //wykonaj przemieszczenie królem
+    this->listMovesForDobot(ST_CASTLING_KING); //wykonaj przemieszczenie królem
     _pChessboard->castlingFindRookToMove(); //podmień pozycje ruszonego króla na pozycję wieży
-    this->pieceMovingSequence(CASTLING_ROOK); //wykonaj przemieszczenie wieżą
+    this->listMovesForDobot(ST_CASTLING_ROOK); //wykonaj przemieszczenie wieżą
 }
 
 void Chess::enpassantMovingSequence()
 {
     //wykonaj normalny ruch. enpassant to jedyny przypadek bicia, gdzie mogę zbić po normalnym ruchu.
-    this->pieceMovingSequence(ENPASSANT);
+    this->listMovesForDobot(ST_ENPASSANT);
 
     DIGIT tempDigitPos = _pChessboard->PieceTo.Digit; //w razie czego zapaiętaj oryginalną wartość pola (cyfry) bijącego
     if (_pChessboard->getWhoseTurn() == WHITE_TURN)
     {
         //pozycja zbijanego czarnego pionka przez pionka białego w jego turze (białego)
-        _pChessboard->PieceTo.Digit = static_cast<DIGIT>((int)_pChessboard->PieceTo.Digit - 1); //todo: sprawdzi czy dziala
+        _pChessboard->PieceTo.Digit = static_cast<DIGIT>((int)_pChessboard->PieceTo.Digit - 1); //todo: sprawdzić czy dziala
     }
     else if (_pChessboard->getWhoseTurn() == BLACK_TURN)
     {
@@ -144,7 +145,7 @@ void Chess::enpassantMovingSequence()
         return;
     }
     //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
-    this->pieceMovingSequence(REMOVING); //usuń pionka bitego ze  zmienioną pozycją.
+    this->listMovesForDobot(ST_REMOVING); //usuń pionka bitego ze  zmienioną pozycją.
     _pChessboard->PieceTo.Digit = tempDigitPos; //wróć prewencyjnie w pamięci do normalnej pozycji
 }
 
@@ -202,7 +203,7 @@ void Chess::resetPiecePositions()
                     if(nRemovedFieldPieceType > 0) //jeżeli na polu zbitych jest bierka, która startowo stoi na aktualnie sprawdzanym polu
                     {
                         //qDebug() << "Chess::resetPiecePositions(): put piece back on its empty checked field from removed area";
-                        this->pieceMovingSequence(RESTORE, //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
+                        this->listMovesForDobot(ST_RESTORE, //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
                                                   static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, ROW)),
                                                   static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nRemovedFieldPieceType, COLUMN)),
                                                   static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
@@ -219,7 +220,7 @@ void Chess::resetPiecePositions()
                                 //...na obcym polu startowym)
                             {
                                 //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                                this->pieceMovingSequence(REGULAR,
+                                this->listMovesForDobot(ST_REGULAR,
                                                           static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nField, ROW)),
                                                           static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nField, COLUMN)),
                                                           static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
@@ -236,7 +237,7 @@ void Chess::resetPiecePositions()
                     if (nPieceOrigPos == 0) //czy startowe pole bierki jest puste, by tam można było ją odstawić
                     {
                         //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                        this->pieceMovingSequence(REGULAR,
+                        this->listMovesForDobot(ST_REGULAR,
                                                   static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
                                                   static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)),
                                                   static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW)),
@@ -259,21 +260,21 @@ void Chess::resetPiecePositions()
                             qDebug() << "Chess::resetPiecePositions(): 2 pieces on each other start field. Remove 2nd, move 1st, restore 2nd.";
 
                             //to przenieś ją na chwilę na jej miejsce na obszarze bierek zbitych.
-                            this->pieceMovingSequence(REMOVING,
+                            this->listMovesForDobot(ST_REMOVING,
                                                       static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW)),
                                                       static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN)),
                                                       static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW)),
                                                       static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN)));
 
                             //teraz przenieś bierkę z pola aktualnie sprawdzanego, na pole bierki dopiero co odłożonej na obszar bierek zbitych
-                            this->pieceMovingSequence(REGULAR,
+                            this->listMovesForDobot(ST_REGULAR,
                                                       static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
                                                       static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, COLUMN)),
                                                       static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, ROW)),
                                                       static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nPieceOrigPos, COLUMN)));
 
                             //na końcu bierkę odłożoną poza planszę przywróć na pole bierki wcześniej przestawionej
-                            this->pieceMovingSequence(RESTORE,
+                            this->listMovesForDobot(ST_RESTORE,
                                                       static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, ROW)),
                                                       static_cast<DIGIT>(_pChessboard->fieldNrToFieldPos(nNrOf2ndPieceOn1stPieceOrigPos, COLUMN)),
                                                       static_cast<LETTER>(_pChessboard->fieldNrToFieldPos(nCurentlyCheckedField, ROW)),
@@ -338,50 +339,50 @@ void Chess::handleMove(QString move)
     qDebug() << "Chess::handleMove =" << move;
     _pChessboard->findBoardPos(move);
 
-    _pChessboard->setMoveType(this->checkMoveType(move));
+    _pChessboard->setMoveType(this->findMoveType(move));
     qDebug() << "move type =" << _pChessboard->getMoveType();
 
     switch(_pChessboard->getMoveType())
     {
-    case PROMOTE_TO_WHAT:
+    case ST_PROMOTE_TO_WHAT:
         this->PromoteToWhat(move);
         break;
-    case ENPASSANT:
+    case ST_ENPASSANT:
         this->enpassantMovingSequence();
         this->MoveTcpPiece("move " + move);
         break;
-    case CASTLING:
+    case ST_CASTLING:
         this->castlingMovingSequence();
         this->MoveTcpPiece("move " + move);
         break;
-    case REMOVING:
-        this->pieceMovingSequence(REMOVING);
-        this->pieceMovingSequence(REGULAR);
+    case ST_REMOVING:
+        this->listMovesForDobot(ST_REMOVING);
+        this->listMovesForDobot(ST_REGULAR);
         this->MoveTcpPiece("move " + move);
         break;
-    case REGULAR:
-        this->pieceMovingSequence(REGULAR); //TODO: to wygląda jakby to robił dobot wszystko, ten ruch tj.
+    case ST_REGULAR:
+        this->listMovesForDobot(ST_REGULAR); //TODO: to wygląda jakby to robił dobot wszystko, ten ruch tj.
         this->MoveTcpPiece("move " + move);
         break;
-    case BADMOVE:
+    case ST_BADMOVE:
         this->BadMove(move);
         break;
-    case NONE:
+    case ST_NONE:
     default:
         qDebug() << "ERROR: Chess::handleMove: wrong MoveType :" << _pChessboard->getMoveType();
         break;
     }
 }
 
-SEQUENCE_TYPE Chess::checkMoveType(QString move) //TODO: check --> find ?
+SEQUENCE_TYPE Chess::findMoveType(QString move)
 {
-    if (_pChessboard->getLegalMoves().contains(move + "q")) return PROMOTE_TO_WHAT;
+    if (_pChessboard->getLegalMoves().contains(move + "q")) return ST_PROMOTE_TO_WHAT;
     else if (_pChessboard->getLegalMoves().contains(move))
     {
-        if (_pChessboard->isMoveEnpassant(move)) return ENPASSANT;
-        else if (_pChessboard->isMoveCastling(move)) return CASTLING;
-        else if (_pChessboard->isMoveRemoving()) return REMOVING;
-        else return REGULAR;
+        if (_pChessboard->isMoveEnpassant(move)) return ST_ENPASSANT;
+        else if (_pChessboard->isMoveCastling(move)) return ST_CASTLING;
+        else if (_pChessboard->isMoveRemoving()) return ST_REMOVING;
+        else return ST_REGULAR;
     }
-    else return BADMOVE;
+    else return ST_BADMOVE;
 }

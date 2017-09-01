@@ -33,7 +33,7 @@ public:
 
     //-----------------FUNKCJE WEWNĘTRZNE-----------------//
     void TcpMoveOk();
-    SEQUENCE_TYPE checkMoveType(QString move);
+    SEQUENCE_TYPE findMoveType(QString move);
     void reset();
     void resetBoardCompleted();
     void playerClickedStart(QString QStrWhoClicked);

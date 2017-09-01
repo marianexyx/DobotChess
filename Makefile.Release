@@ -105,7 +105,9 @@ DIST          = DobotDll/DobotDll.lib \
 		vars\board_axis.h \
 		vars\dobot_moves.h \
 		vars\board_data_labels.h \
-		vars\players_types.h main.cpp \
+		vars\players_types.h \
+		vars\sequence_types.h \
+		vars\end_of_game_types.h main.cpp \
 		mainwindow.cpp \
 		chess.cpp \
 		dobot.cpp \
@@ -268,8 +270,10 @@ release/moc_websockets.cpp: ../Qt/5.6/mingw49_32/include/QtWebSockets/QWebSocket
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
 		vars/players_types.h \
+		vars/end_of_game_types.h \
 		websockets.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore websockets.h -o release\moc_websockets.cpp
 
@@ -425,6 +429,7 @@ release/moc_chessboard.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QTimer \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		chessboard.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore chessboard.h -o release\moc_chessboard.cpp
 
@@ -555,6 +560,7 @@ release/moc_dobot.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QObject \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		arduinousb.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
@@ -775,6 +781,7 @@ release/moc_chess.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		arduinousb.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
@@ -951,8 +958,10 @@ release/moc_mainwindow.cpp: ../Qt/5.6/mingw49_32/include/QtWidgets/QMainWindow \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
 		vars/players_types.h \
+		vars/end_of_game_types.h \
 		dobot.h \
 		../Qt/5.6/mingw49_32/include/QtGui/QValidator \
 		../Qt/5.6/mingw49_32/include/QtGui/qvalidator.h \
@@ -1111,6 +1120,7 @@ release/moc_igorbot.cpp: arduinousb.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		tcpmsgs.h \
 		../Qt/5.6/mingw49_32/include/QtNetwork/QTcpSocket \
 		../Qt/5.6/mingw49_32/include/QtNetwork/qtcpsocket.h \
@@ -1231,8 +1241,10 @@ release/moc_webchess.cpp: websockets.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
 		vars/players_types.h \
+		vars/end_of_game_types.h \
 		chess.h \
 		../Qt/5.6/mingw49_32/include/QtWidgets/QScrollBar \
 		../Qt/5.6/mingw49_32/include/QtWidgets/qscrollbar.h \
@@ -1477,8 +1489,10 @@ release/main.o: main.cpp mainwindow.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
 		vars/players_types.h \
+		vars/end_of_game_types.h \
 		dobot.h \
 		../Qt/5.6/mingw49_32/include/QtGui/QValidator \
 		../Qt/5.6/mingw49_32/include/QtGui/qvalidator.h \
@@ -1666,8 +1680,10 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
 		vars/players_types.h \
+		vars/end_of_game_types.h \
 		dobot.h \
 		../Qt/5.6/mingw49_32/include/QtGui/QValidator \
 		../Qt/5.6/mingw49_32/include/QtGui/qvalidator.h \
@@ -1683,7 +1699,74 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QRegularExpression \
 		tcpmsgs.h \
 		webchess.h \
-		ui_mainwindow.h
+		ui_mainwindow.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QAction \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qaction.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qactiongroup.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QApplication \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qapplication.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcoreapplication.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qeventloop.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qdesktopwidget.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qguiapplication.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qinputmethod.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QButtonGroup \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qbuttongroup.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QCheckBox \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qcheckbox.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qabstractbutton.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QComboBox \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qcombobox.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qabstractitemdelegate.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qstyleoption.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qabstractspinbox.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qslider.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qstyle.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qtabbar.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qrubberband.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qframe.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qabstractitemmodel.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QGridLayout \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qgridlayout.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qlayout.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qlayoutitem.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qboxlayout.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QGroupBox \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qgroupbox.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QHeaderView \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qheaderview.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qabstractitemview.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qabstractscrollarea.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qitemselectionmodel.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QLabel \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qlabel.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QLineEdit \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qlineedit.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtextcursor.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtextformat.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpen.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtextoption.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QMenuBar \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qmenubar.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qmenu.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QPlainTextEdit \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qplaintextedit.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qtextedit.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtextdocument.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qabstracttextdocumentlayout.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtextlayout.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qglyphrun.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qrawfont.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfontdatabase.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QPushButton \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qpushbutton.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QRadioButton \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qradiobutton.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QStatusBar \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qstatusbar.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QToolBar \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qtoolbar.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QWidget
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\mainwindow.o mainwindow.cpp
 
 release/chess.o: chess.cpp chess.h \
@@ -1819,6 +1902,7 @@ release/chess.o: chess.cpp chess.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		arduinousb.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
@@ -1960,6 +2044,7 @@ release/dobot.o: dobot.cpp dobot.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		arduinousb.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
@@ -2123,7 +2208,8 @@ release/chessboard.o: chessboard.cpp chessboard.h \
 		vars/basic_vars.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
-		vars/board_data_labels.h
+		vars/board_data_labels.h \
+		vars/sequence_types.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\chessboard.o chessboard.cpp
 
 release/websockets.o: websockets.cpp websockets.h \
@@ -2239,8 +2325,10 @@ release/websockets.o: websockets.cpp websockets.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
-		vars/players_types.h
+		vars/players_types.h \
+		vars/end_of_game_types.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\websockets.o websockets.cpp
 
 release/arduinousb.o: arduinousb.cpp arduinousb.h \
@@ -2462,6 +2550,7 @@ release/igorbot.o: igorbot.cpp igorbot.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		tcpmsgs.h \
 		../Qt/5.6/mingw49_32/include/QtNetwork/QTcpSocket \
 		../Qt/5.6/mingw49_32/include/QtNetwork/qtcpsocket.h \
@@ -2582,8 +2671,10 @@ release/webchess.o: webchess.cpp webchess.h \
 		vars/board_axis.h \
 		vars/dobot_moves.h \
 		vars/board_data_labels.h \
+		vars/sequence_types.h \
 		vars/log.h \
 		vars/players_types.h \
+		vars/end_of_game_types.h \
 		chess.h \
 		../Qt/5.6/mingw49_32/include/QtWidgets/QScrollBar \
 		../Qt/5.6/mingw49_32/include/QtWidgets/qscrollbar.h \

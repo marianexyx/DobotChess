@@ -161,8 +161,8 @@ void IgorBot::Status()
 
 void IgorBot::Promote(QString msg)
 {
-     this->pieceMovingSequence(PROMOTION);
-    _pChessboard->setMoveType(PROMOTION);
+     this->listMovesForDobot(ST_PROMOTION);
+    _pChessboard->setMoveType(ST_PROMOTION);
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "move " + _pChessboard->QStrFuturePromote + msg);
     _pChessboard->QStrFuturePromote.clear();
 }

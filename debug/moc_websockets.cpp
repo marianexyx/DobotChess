@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Websockets_t {
-    QByteArrayData data[18];
-    char stringdata0[277];
+    QByteArrayData data[15];
+    char stringdata0[237];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -43,10 +43,7 @@ QT_MOC_LITERAL(10, 148, 19), // "QS_WbstMsgToProcess"
 QT_MOC_LITERAL(11, 168, 15), // "onNewConnection"
 QT_MOC_LITERAL(12, 184, 29), // "msgFromChessboardToWebsockets"
 QT_MOC_LITERAL(13, 214, 9), // "QStrWsMsg"
-QT_MOC_LITERAL(14, 224, 18), // "sendTableDataToWeb"
-QT_MOC_LITERAL(15, 243, 11), // "QWebSocket*"
-QT_MOC_LITERAL(16, 255, 7), // "pClient"
-QT_MOC_LITERAL(17, 263, 13) // "bCheckPlayers"
+QT_MOC_LITERAL(14, 224, 12) // "getTableData"
 
     },
     "Websockets\0addTextToConsole\0\0LOG\0"
@@ -55,8 +52,7 @@ QT_MOC_LITERAL(17, 263, 13) // "bCheckPlayers"
     "socketDisconnected\0receivedMsg\0"
     "QS_WbstMsgToProcess\0onNewConnection\0"
     "msgFromChessboardToWebsockets\0QStrWsMsg\0"
-    "sendTableDataToWeb\0QWebSocket*\0pClient\0"
-    "bCheckPlayers"
+    "getTableData"
 };
 #undef QT_MOC_LITERAL
 
@@ -66,7 +62,7 @@ static const uint qt_meta_data_Websockets[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+       8,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -74,17 +70,16 @@ static const uint qt_meta_data_Websockets[] = {
        3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    2,   59,    2, 0x06 /* Public */,
-       4,    1,   64,    2, 0x06 /* Public */,
-       6,    2,   67,    2, 0x06 /* Public */,
+       1,    2,   54,    2, 0x06 /* Public */,
+       4,    1,   59,    2, 0x06 /* Public */,
+       6,    2,   62,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       8,    0,   72,    2, 0x08 /* Private */,
-       9,    1,   73,    2, 0x0a /* Public */,
-      11,    0,   76,    2, 0x0a /* Public */,
-      12,    1,   77,    2, 0x0a /* Public */,
-      14,    2,   80,    2, 0x0a /* Public */,
-      14,    1,   85,    2, 0x2a /* Public | MethodCloned */,
+       8,    0,   67,    2, 0x08 /* Private */,
+       9,    1,   68,    2, 0x0a /* Public */,
+      11,    0,   71,    2, 0x0a /* Public */,
+      12,    1,   72,    2, 0x0a /* Public */,
+      14,    0,   75,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -96,8 +91,7 @@ static const uint qt_meta_data_Websockets[] = {
     QMetaType::Void, QMetaType::QString,   10,
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,   13,
-    QMetaType::Void, 0x80000000 | 15, QMetaType::Bool,   16,   17,
-    QMetaType::Void, 0x80000000 | 15,   16,
+    QMetaType::QString,
 
        0        // eod
 };
@@ -115,27 +109,9 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 4: _t->receivedMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 5: _t->onNewConnection(); break;
         case 6: _t->msgFromChessboardToWebsockets((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 7: _t->sendTableDataToWeb((*reinterpret_cast< QWebSocket*(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
-        case 8: _t->sendTableDataToWeb((*reinterpret_cast< QWebSocket*(*)>(_a[1]))); break;
+        case 7: { QString _r = _t->getTableData();
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
         default: ;
-        }
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        switch (_id) {
-        default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-        case 7:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWebSocket* >(); break;
-            }
-            break;
-        case 8:
-            switch (*reinterpret_cast<int*>(_a[1])) {
-            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
-            case 0:
-                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QWebSocket* >(); break;
-            }
-            break;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
@@ -189,13 +165,13 @@ int Websockets::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 8;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
-            qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        if (_id < 8)
+            *reinterpret_cast<int*>(_a[0]) = -1;
+        _id -= 8;
     }
     return _id;
 }

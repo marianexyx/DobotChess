@@ -45,7 +45,9 @@ HEADERS  +=  \
     vars/board_axis.h \
     vars/dobot_moves.h \
     vars/board_data_labels.h \
-    vars/players_types.h
+    vars/players_types.h \
+    vars/sequence_types.h \
+    vars/end_of_game_types.h
 
 FORMS    += mainwindow.ui
 

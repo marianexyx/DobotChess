@@ -11,6 +11,7 @@
 #include "vars/board_axis.h"
 #include "vars/dobot_moves.h"
 #include "vars/board_data_labels.h"
+#include "vars/sequence_types.h"
 
 struct ArmPosition
 {
@@ -19,8 +20,7 @@ struct ArmPosition
 };
 
 enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //todo: do zewnętrznych plików dać to też
-enum SEQUENCE_TYPE { NONE, BADMOVE, REGULAR, PROMOTE_TO_WHAT, PROMOTION, ENPASSANT, CASTLING,
-                  CASTLING_KING, CASTLING_ROOK, REMOVING, RESTORE, SERVICE };
+
 
 //TODO: chessboard powinien być obiektem klasy chess
 class Chessboard: public QObject
@@ -128,6 +128,8 @@ public:
     QString getEnpassant()                      { return m_QStrEnpassant; }
     QStringList getLegalMoves()                 { return m_legalMoves; }
     double getMaxBoardZ()                       { return m_nMaxBoardZ; }
+    int getWhiteTimeLeft()                      { return m_nRemainingWhiteTime; }
+    int getBlackTimeLeft()                      { return m_nRemainingBlackTime; }
 
 private slots:
     void timeOutWhite();

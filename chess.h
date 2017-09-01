@@ -48,7 +48,7 @@ protected:
     void goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-    SEQUENCE_TYPE checkMoveType(QString move);
+    SEQUENCE_TYPE findMoveType(QString move);
     void handleMove(QString move);
 
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
@@ -67,7 +67,7 @@ public:
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs);
 
     //---------------STEROWANIE RAMIENIEM--------------//
-    void pieceMovingSequence(SEQUENCE_TYPE Type,
+    void listMovesForDobot(SEQUENCE_TYPE Type,
                              LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
                              LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
 

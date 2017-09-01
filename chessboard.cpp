@@ -242,7 +242,7 @@ void Chessboard::castlingFindRookToMove()
 void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                                    DIGIT digit, SEQUENCE_TYPE Type)
 {
-    if (Type == RESTORE && partOfSequence == FROM) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
+    if (Type == ST_RESTORE && partOfSequence == FROM) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
         nGripperPiece = anRemoved[letter][digit];
         //...to w chwytaku jest bierka z obszaru zbitych
@@ -251,7 +251,7 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                     "aanRemoved[letter][digit]; = "
                  << anRemoved[letter][digit];
     }
-    else if (Type == REMOVING && partOfSequence == TO) //jeżeli bierka została przemieszczona na...
+    else if (Type == ST_REMOVING && partOfSequence == TO) //jeżeli bierka została przemieszczona na...
         //...obszar bierek zbitych z szachownicy...
     {
         //nPieceLetter i nPieceDigit nie moga być podawane jako parametry pozycji bierki na...
@@ -561,6 +561,5 @@ void Chessboard::stopQueueTimer()
 void Chessboard::timeOutStartQueue()
 {
     this->stopQueueTimer();
-
     emit msgFromChessboardToWebsockets("timeOutStartQueue");
 }

@@ -7,6 +7,8 @@ WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
     _pChessboard = pChessboard;
     _pTCPMsgs = pTCPMsgs;
     _pWebsockets = pWebsockets;
+
+    //_pWebsockets->testQueuedClients(); //test jednostkowy
 }
 
 //---------------------------------------------------------------------------//
@@ -47,14 +49,32 @@ void WebChess::GameInProgress()
 
 void WebChess::EndOfGame(QString msg)
 {
-    QString whoWon;
-    if (msg.left(3) == "1-0") whoWon = "whiteWon";
-    else if (msg.left(3) == "0-1") whoWon = "blackWon";
-    else if (msg.left(7) == "1/2-1/2") whoWon = "draw";
+    QString QStrWhoWon;
+    END_TYPE ETWhoWon;
+    if (msg.left(3) == "1-0")
+    {
+        QStrWhoWon = "whiteWon";
+        ETWhoWon = ET_WHIE_WON;
+    }
+    else if (msg.left(3) == "0-1")
+    {
+        QStrWhoWon = "blackWon";
+        ETWhoWon = ET_BLACK_WON;
+    }
+    else if (msg.left(7) == "1/2-1/2")
+    {
+        QStrWhoWon = "draw";
+        ETWhoWon = ET_DRAW;
+    }
 
-    qDebug() << "Sending to WS: moveOk " << _pChessboard->getPiecieFromTo() << " nt " << whoWon;
+    _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
 
-    _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + whoWon);
+    qDebug() << "Sending to WS: moveOk " << _pChessboard->getPiecieFromTo() << " nt " <<
+                QStrWhoWon << " " << _pWebsockets->getTableData();
+
+    //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
+    _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + QStrWhoWon +
+                          " " + _pWebsockets->getTableData());
     //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
     //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
     //todo: stworzyć funkcję czyszczącą masę rzeczy przy różnych warunkach jak koniec gry
@@ -98,6 +118,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
         if (tcpRespond == "OK\n" || tcpRespond == "OK")
         {
+            //pierwszy legal i status wyglądają zawsze tak samo:
             _pChessboard->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
             this->legalOk("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
                           "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
@@ -211,8 +232,10 @@ void WebChess::TcpMoveOk()
 
     this->Status();
 }
-void WebChess::reset()
+void WebChess::reset() //todo: przemyśleć co tu musi być
 {
+    _pChessboard->setWhoseTurn(NO_TURN);
+    _pWebsockets->resetPlayersStartConfirmInfo();
     _pWebsockets->sendMsg("reseting");
     _pChessboard->resetGameTimers();
     this->resetPiecePositions();
@@ -220,6 +243,8 @@ void WebChess::reset()
 
 void WebChess::resetBoardCompleted()
 {
-    //TODO: prewencyjnie ustawić wszystkie wartości na startowe (rozpisać to: jakie, które i po co)
+    //TODO: prewencyjnie ustawić wszystkie wartości na startowe (rozpisać to: jakie, które i ...
+    //...po co w sumie- tj. czy to nie występuje zawsze w otoczeniu WebChess::reset()?)
+
     _pWebsockets->sendMsg("ready");
 }

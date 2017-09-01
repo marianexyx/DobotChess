@@ -105,11 +105,14 @@ void Dobot::QueuedIdList()
 
     if (!arduinoGripperStateList.isEmpty())
     {
-        if (arduinoGripperStateList.last().index <= m_ullDobotQueuedCmdIndex)
+        qDebug() << "arduinoGripperStateList size=" << arduinoGripperStateList.size();
+        if (arduinoGripperStateList.first().index <= m_ullDobotQueuedCmdIndex)
         {
-            QString QStrServoState = arduinoGripperStateList.last().isGripperOpen ? "Open" : "Close";
+            QString QStrServoState = arduinoGripperStateList.first().isGripperOpen ? "Open" : "Close";
+            qDebug() << "servo" << QStrServoState << ", servoListLastIndex =" << arduinoGripperStateList.first().index
+                     << ", dobotActualIndex =" << m_ullDobotQueuedCmdIndex;
             _pArduinoUsb->sendDataToUsb("servo" + QStrServoState);
-            arduinoGripperStateList.removeLast();
+            arduinoGripperStateList.removeFirst();
         }
     }
 
@@ -187,7 +190,7 @@ void Dobot::QueuedIdList()
         qDebug() << "Dobot::QueuedIdList(): retreat";
         PtpCmdActualVal retreatId;
         retreatId = (pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
-        addCmdToList(TO_POINT, NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
+        addCmdToList(TO_POINT, ST_NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
         m_ullRetreatIndex = 10000000; //jakas duza liczba
     }
 }
@@ -341,12 +344,12 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
 
     if (letter >=0 && letter <=7 && digit >=0 && digit <=7)
     { //todo: powtórzony kod zabezpieczeń z Dobot::armUpDown
-        if ((Type == REMOVING && partOfSequence == TO) || (Type == RESTORE && partOfSequence == FROM))
+        if ((Type == ST_REMOVING && partOfSequence == TO) || (Type == ST_RESTORE && partOfSequence == FROM))
         {
             int nRemPieceType;
             LETTER remPieceDestLetter;
             DIGIT remPieceDestDigit;
-            if (Type == REMOVING)
+            if (Type == ST_REMOVING)
             {
                 if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
                 {
@@ -356,15 +359,15 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
                 }
                 else
                 {
-                    qDebug() << "ERROR: Dobot::pieceFromTo: REMOVING: wrong _pChessboard->nGripperPiece value:" <<
+                    qDebug() << "ERROR: Dobot::pieceFromTo: ST_REMOVING: wrong _pChessboard->nGripperPiece value:" <<
                                 _pChessboard->nGripperPiece;
                     return;
                 }
             }
-            else if (Type == RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
+            else if (Type == ST_RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
                 //...być podana wprost do pieceFromTo()
             {
-                //dla RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
+                //dla ST_RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
                 remPieceDestLetter = letter;
                 remPieceDestDigit = digit;
             }
@@ -433,7 +436,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
 { //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     //pozycje obszaru bierek usuniętych
-    if (Type == REMOVING && partOfSequence == TO) //jeżeli odstawiamy bierkę na obszar zbitych...
+    if (Type == ST_REMOVING && partOfSequence == TO) //jeżeli odstawiamy bierkę na obszar zbitych...
     {
         //TODO: ten zapis fieldNrToFieldPos działa, ale zmienić jakoś nazewnictwo funkcji, bo jest...
         //...nieadekwatna w tym przypadku.
@@ -459,12 +462,12 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
         }
         else
         {
-            qDebug() << "ERROR: Dobot::armUpDown: REMOVING: wrong _pChessboard->nGripperPiece value:" <<
+            qDebug() << "ERROR: Dobot::armUpDown: ST_REMOVING: wrong _pChessboard->nGripperPiece value:" <<
                          _pChessboard->nGripperPiece;
             return;
         }
     }
-    else if (Type == RESTORE && partOfSequence == FROM) //...lub pochwycamy bierkę z obszaru zbitych
+    else if (Type == ST_RESTORE && partOfSequence == FROM) //...lub pochwycamy bierkę z obszaru zbitych
     {
         if (_pChessboard->PieceActualPos.Letter >=0 && _pChessboard->PieceActualPos.Letter <=7 &&
                 _pChessboard->PieceActualPos.Digit >=0 && _pChessboard->PieceActualPos.Digit <=7)
@@ -482,7 +485,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_rUpDown = ACTUAL_POS;
         }
-        else qDebug() << "ERROR: Dobot::armUpDown: RESTORE: wrong _pChessboard->PieceActualPos value:" <<
+        else qDebug() << "ERROR: Dobot::armUpDown: ST_RESTORE: wrong _pChessboard->PieceActualPos value:" <<
                          _pChessboard->PieceActualPos.Letter << "," << _pChessboard->PieceActualPos.Digit;
     }
     else //pozycje na szachownicy
@@ -537,7 +540,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
     
     //z_max = 40 dla x = 275, a najwyższe z na styku z podłogą to z = -16.5 - stare info?
 
-    this->addCmdToList(TO_POINT, REMOVING, f_xRemove, f_yRemove, _pChessboard->getMaxRemovedPieceHeight(), f_rRemove);
+    this->addCmdToList(TO_POINT, ST_REMOVING, f_xRemove, f_yRemove, _pChessboard->getMaxRemovedPieceHeight(), f_rRemove);
 }
 /// END OF: TYPY RUCHÓW PO PLANSZY
 
@@ -559,6 +562,7 @@ void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float
         ServoArduino servoState;
         servoState.index = m_ullCoreQueuedCmdIndex;
         servoState.isGripperOpen = (move == OPEN) ? true : false;
+        qDebug() << "add command to arduinoGripperStateList:" << move;
         arduinoGripperStateList << servoState;
     }
 }
@@ -596,14 +600,14 @@ void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence)
     QString QsConsoleMsg;
     switch(sequence)
     {
-    case REGULAR: QsConsoleMsg = "normal"; break;
-    case CASTLING_KING: QsConsoleMsg = "castling(king)"; break;
-    case CASTLING_ROOK: QsConsoleMsg = "castling(rook)"; break;
-    case ENPASSANT: QsConsoleMsg = "enpassant"; break;
-    case PROMOTION: QsConsoleMsg = "promotion"; break;
-    case REMOVING: QsConsoleMsg = "remove"; break;
-    case RESTORE: QsConsoleMsg = "restore"; break;
-    case SERVICE: QsConsoleMsg = "service"; break;
+    case ST_REGULAR: QsConsoleMsg = "normal"; break;
+    case ST_CASTLING_KING: QsConsoleMsg = "castling(king)"; break;
+    case ST_CASTLING_ROOK: QsConsoleMsg = "castling(rook)"; break;
+    case ST_ENPASSANT: QsConsoleMsg = "enpassant"; break;
+    case ST_PROMOTION: QsConsoleMsg = "promotion"; break;
+    case ST_REMOVING: QsConsoleMsg = "remove"; break;
+    case ST_RESTORE: QsConsoleMsg = "restore"; break;
+    case ST_SERVICE: QsConsoleMsg = "service"; break;
     default: QsConsoleMsg = "ERROR. Dobot::writeMoveTypeInConsole: Wrong movement type: " +
                 static_cast<QString>(sequence) + "\n"; break;
     }

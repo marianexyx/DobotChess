@@ -13,7 +13,8 @@
 #include "vars/log.h"
 #include "vars/board_data_labels.h"
 #include "vars/players_types.h"
-#include "typeinfo" //todo: testy
+#include "vars/end_of_game_types.h"
+#include "typeinfo"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -27,7 +28,7 @@ struct Clients
     QString name;
     PLAYERS_TYPES type;
     CLIENT_STATE state;
-    uint64_t queue;
+    int64_t queue;
 
     //operator potrzebny do usuwania struktur z list
     bool operator ==(const struct Clients& st)
@@ -59,6 +60,8 @@ public:
     void sendToChess(QString QsMsgForChessClass);
     void sendMsg(QString QStrWsMsg);
 
+    void endOfGame(END_TYPE EndType, QWebSocket *clientToClear = nullptr);
+
     //todo: wszystko poniżej jako prywatne?
     void newClientSocket(QWebSocket *playerSocket);
     void setClientName(QWebSocket *playerSocket, QString name);
@@ -69,6 +72,8 @@ public:
     void addClientToQueue(QWebSocket *playerSocket);
     void removeClient(QWebSocket *playerSocket);
     void removeClientFromQueueBySocket(QWebSocket *playerSocket);
+    void resetPlayersStartConfirmInfo();
+    void moveClientsFromQueueToTableIfExists(PLAYERS_TYPES chair);
 
     Clients getClientBySocket(QWebSocket *playerSocket);
     QWebSocket *getClientSocketByName(QString playerName);
@@ -77,11 +82,14 @@ public:
     QString getQueuedClients();
     PLAYERS_TYPES getClientTypeBySocket(QWebSocket *playerSocket);
     bool isPlayerChairEmpty(PLAYERS_TYPES type);
-    uint64_t getQueuedClientByName(QString name);
-    uint64_t getQueuedClientBySocket(QWebSocket *playerSocket);
+    int64_t getQueuedClientByName(QString name);
+    int64_t getQueuedClientBySocket(QWebSocket *playerSocket);
     QWebSocket *getPlayerSocket(PLAYERS_TYPES type);
     CLIENT_STATE getClientStateByType(PLAYERS_TYPES type);
     QString getPlayerNameByType(PLAYERS_TYPES type);
+    bool isClientInQueue(QWebSocket *playerSocket);
+
+    //void testQueuedClients(); //test jednostkowy
 
     ~Websockets();
 
@@ -91,7 +99,7 @@ public Q_SLOTS: //todo: jaka jest różnica między zwykłym slots?
 
 public slots:
     void msgFromChessboardToWebsockets(QString QStrWsMsg);
-    void sendTableDataToWeb(QWebSocket *pClient, bool bCheckPlayers = false);
+    QString getTableData();
 
 signals:
     void addTextToConsole(QString, LOG);

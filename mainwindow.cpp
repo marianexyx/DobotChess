@@ -234,7 +234,7 @@ void MainWindow::onPTPsendBtnClicked()
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
     if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0) // dla wygody zera są zabronione
-        _pDobotArm->addCmdToList(TO_POINT, SERVICE, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+        _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
     float fServoDutyCycle = ui->servoGripperEdit->text().toFloat();
     if (fServoDutyCycle !=0)
@@ -389,7 +389,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 float fService_y = _pChessboard->adChessboardPositions_y[serviceLetterPos][serviceDigitPos];
                 float fService_z = _pChessboard->adChessboardPositions_z[serviceLetterPos][serviceDigitPos];
 
-                _pDobotArm->addCmdToList(TO_POINT, REMOVING, fService_x, fService_y, fService_z +
+                _pDobotArm->addCmdToList(TO_POINT, ST_REMOVING, fService_x, fService_y, fService_z +
                                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
                 _pChessboard->PieceActualPos.Letter = serviceLetterPos;
                 _pChessboard->PieceActualPos.Digit = serviceDigitPos;
@@ -423,7 +423,7 @@ void MainWindow::on_calibrateBtn_clicked()
 
 void MainWindow::on_homeBtn_clicked()
 {
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE,
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE,
                              _pDobotArm->getHomePos('x'),
                              _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
@@ -431,12 +431,12 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobotArm->armUpDown(UP, FROM, SERVICE);
+    _pDobotArm->armUpDown(UP, FROM, ST_SERVICE);
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobotArm->armUpDown(UP, FROM, SERVICE);
+    _pDobotArm->armUpDown(UP, FROM, ST_SERVICE);
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
@@ -561,25 +561,25 @@ void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
 
 void MainWindow::on_openGripperBtn_clicked()
 {
-    _pDobotArm->gripperState(OPEN, SERVICE);
+    _pDobotArm->gripperState(OPEN, ST_SERVICE);
 }
 
 
 void MainWindow::on_closeGripperBtn_clicked()
 {
-    _pDobotArm->gripperState(CLOSE, SERVICE);
+    _pDobotArm->gripperState(CLOSE, ST_SERVICE);
 }
 
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawićî jako stałe z xmla
     qDebug() << "Placing arm above the chessboard.";
     _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
     //todo: te liczby nazwać tym gdzie i czy są
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
                              _pDobotArm->getmiddleAboveBoardPos('y'),
                              _pDobotArm->getmiddleAboveBoardPos('z'));
 }
@@ -589,12 +589,12 @@ void MainWindow::on_startDtPosBtn_clicked()
 {
     qDebug() << "Returning safely to the HOME positions.";
     _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
                              _pDobotArm->getmiddleAboveBoardPos('y'),
                              _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
+    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
 }
 

@@ -91,12 +91,12 @@ public:
     void pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void wait(int nMs, SEQUENCE_TYPE sequence);
-    void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = NONE,
+    void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = ST_NONE,
                       float x = ACTUAL_POS, float y = ACTUAL_POS,
                       float z = ACTUAL_POS, float r = ACTUAL_POS);
     void armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void removePiece(int nPieceRowPos, int nPieceColumnPos); //todo: do chessboardu?
-    void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = NONE);
+    void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = ST_NONE);
     void QueuedIdList();
 
     //metody dostępowe do pól
