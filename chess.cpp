@@ -330,7 +330,7 @@ void Chess::resetPiecePositions()
 
         qDebug() << "End of: Chess::resetPiecePositions()";
     }
-    qDebug() << "Chess::resetBoardCompleted().";
+    qDebug() << "Chess::resetBoardCompleted()";
     this->resetBoardCompleted();
 }
 

@@ -563,3 +563,16 @@ void Chessboard::timeOutStartQueue()
     this->stopQueueTimer();
     emit msgFromChessboardToWebsockets("timeOutStartQueue");
 }
+
+int Chessboard::getWhiteTimeLeft()
+{
+    if (m_whiteTimer->remainingTime() != -1)
+        return m_whiteTimer->remainingTime();
+    else return m_nRemainingWhiteTime;
+}
+int Chessboard::getBlackTimeLeft()
+{
+    if (m_blackTimer->remainingTime() != -1)
+        return m_blackTimer->remainingTime();
+    else return m_nRemainingBlackTime;
+}

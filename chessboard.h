@@ -128,8 +128,8 @@ public:
     QString getEnpassant()                      { return m_QStrEnpassant; }
     QStringList getLegalMoves()                 { return m_legalMoves; }
     double getMaxBoardZ()                       { return m_nMaxBoardZ; }
-    int getWhiteTimeLeft()                      { return m_nRemainingWhiteTime; }
-    int getBlackTimeLeft()                      { return m_nRemainingBlackTime; }
+    int getWhiteTimeLeft();
+    int getBlackTimeLeft();
 
 private slots:
     void timeOutWhite();

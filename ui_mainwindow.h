@@ -970,7 +970,7 @@ public:
         gridLayout_15->setObjectName(QStringLiteral("gridLayout_15"));
         legalPTE = new QPlainTextEdit(groupBox_7);
         legalPTE->setObjectName(QStringLiteral("legalPTE"));
-        legalPTE->setMinimumSize(QSize(120, 0));
+        legalPTE->setMinimumSize(QSize(125, 0));
         legalPTE->setFont(font);
 
         gridLayout_15->addWidget(legalPTE, 0, 0, 1, 1);
