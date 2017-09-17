@@ -73,7 +73,8 @@ public:
     void removeClient(QWebSocket *playerSocket);
     void removeClientFromQueueBySocket(QWebSocket *playerSocket);
     void resetPlayersStartConfirmInfo();
-    void moveClientsFromQueueToTableIfExists(PLAYERS_TYPES chair);
+    void moveNextClientFromQueueToTableIfExists(PLAYERS_TYPES chair);
+    void clearBothPlayersStates();
 
     Clients getClientBySocket(QWebSocket *playerSocket);
     QWebSocket *getClientSocketByName(QString playerName);

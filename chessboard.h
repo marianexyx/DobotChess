@@ -130,6 +130,8 @@ public:
     double getMaxBoardZ()                       { return m_nMaxBoardZ; }
     int getWhiteTimeLeft();
     int getBlackTimeLeft();
+    int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
+    bool isStartTimerRunning()                  { return m_startQueueTimer->isActive(); }
 
 private slots:
     void timeOutWhite();

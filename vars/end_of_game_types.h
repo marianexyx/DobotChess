@@ -7,6 +7,7 @@ enum END_TYPE
     ET_WHIE_WON,
     ET_BLACK_WON,
     ET_DRAW,
+    ET_STAND_UP,
     ET_GIVE_UP,
     ET_SOCKET_LOST,
     ET_TIMEOUT_START

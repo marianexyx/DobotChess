@@ -75,6 +75,9 @@ void WebChess::EndOfGame(QString msg)
     //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
     _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + QStrWhoWon +
                           " " + _pWebsockets->getTableData());
+    //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość informacji...
+    //...leci od websocketów? sprawdzić, jeżeli tak to zobaczyć czy da się wysyłanie każdego rodzaju inforacji...
+    //...upchać w websocketach dla porządku i czy jest taka potrzeba
     //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
     //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
     //todo: stworzyć funkcję czyszczącą masę rzeczy przy różnych warunkach jak koniec gry
@@ -246,5 +249,6 @@ void WebChess::resetBoardCompleted()
     //TODO: prewencyjnie ustawić wszystkie wartości na startowe (rozpisać to: jakie, które i ...
     //...po co w sumie- tj. czy to nie występuje zawsze w otoczeniu WebChess::reset()?)
 
-    _pWebsockets->sendMsg("ready");
+    //todo: raz wiadomość jest cała sklejana w websockecie, a raz geTableData jest doklejane w tym pliku
+    _pWebsockets->sendMsg("resetComplited");
 }

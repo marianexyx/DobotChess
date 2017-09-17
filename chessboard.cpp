@@ -470,13 +470,13 @@ void Chessboard::stopBoardTimers()
 
 void Chessboard::timeOutWhite()
 {
-    this->stopBoardTimers();
+    this->resetGameTimers();
     emit msgFromChessboardToWebsockets("timeOutWhite");
 }
 
 void Chessboard::timeOutBlack()
 {
-    this->stopBoardTimers();
+    this->resetGameTimers();
     emit msgFromChessboardToWebsockets("timeOutBlack");
 }
 
@@ -570,9 +570,11 @@ int Chessboard::getWhiteTimeLeft()
         return m_whiteTimer->remainingTime();
     else return m_nRemainingWhiteTime;
 }
+
 int Chessboard::getBlackTimeLeft()
 {
     if (m_blackTimer->remainingTime() != -1)
         return m_blackTimer->remainingTime();
     else return m_nRemainingBlackTime;
 }
+
