@@ -27,8 +27,8 @@ Chessboard::Chessboard():
     lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
     lTimersStartQueue(1000*60*2)
 {
-    memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anBoard = anStartBoard
-    memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //pseudooperator anTempBoard = anStartBoard
+    memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //todo: pseudooperator anBoard == anStartBoard
+    memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //todo: pseudooperator anTempBoard == anStartBoard
 
     QsPiecieFromTo = "";
     nGripperPiece = 0;

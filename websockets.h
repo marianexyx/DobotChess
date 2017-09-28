@@ -60,7 +60,7 @@ public:
     void sendToChess(QString QsMsgForChessClass);
     void sendMsg(QString QStrWsMsg);
 
-    void endOfGame(END_TYPE EndType, QWebSocket *clientToClear = nullptr);
+    void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
 
     //todo: wszystko poniżej jako prywatne?
     void newClientSocket(QWebSocket *playerSocket);
@@ -89,6 +89,7 @@ public:
     CLIENT_STATE getClientStateByType(PLAYERS_TYPES type);
     QString getPlayerNameByType(PLAYERS_TYPES type);
     bool isClientInQueue(QWebSocket *playerSocket);
+    bool isClientNameExists(QString name);
 
     //void testQueuedClients(); //test jednostkowy
 

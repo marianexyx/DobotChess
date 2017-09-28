@@ -217,9 +217,21 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     }
     else if (QStrWsMsg.left(3) == "im ")
     {
-        //todo: jeżeli pojawi się nick, który już jest w liście, to tego co jest wyrzuć i wszystko zresetuj
-        this->setClientName(pClient, QStrWsMsg.mid(3));
-        pClient->sendTextMessage(this->getTableData());
+        QString QStrName = QStrWsMsg.mid(3);
+        if (this->isClientNameExists(QStrName))
+        {
+            this->getClientSocketByName(QStrName)->sendTextMessage("logout:doubleLogin");
+            this->endOfGame(ET_SOCKET_LOST, pClient);
+            this->setClientName(pClient, QStrName);
+            Q_FOREACH (Clients client, m_clients)
+                client.socket->sendTextMessage(this->getTableData());
+            //todo: brak info o tym dlaczego gra się zakończyła
+        }
+        else
+        {
+            this->setClientName(pClient, QStrName);
+            pClient->sendTextMessage(this->getTableData());
+        }
     }
     else if (QStrWsMsg.left(9) == "promoteTo") { this->sendToChess(QStrWsMsg); }
     else if (QStrWsMsg == "queueMe")
@@ -317,39 +329,19 @@ void Websockets::socketDisconnected()
     {
         if (pClient == this->getPlayerSocket(PT_WHITE))
         {
-            qDebug() << "Websockets::socketDisconnected(): white player disconnected";
             this->endOfGame(ET_SOCKET_LOST, pClient);
-            qDebug() << "Websockets::socketDisconnected(): setBoardDataLabels new white name ="
-                     << this->getPlayerNameByType(PT_BLACK);
-            emit setBoardDataLabels(this->getPlayerNameByType(PT_WHITE), BDL_WHITE_NAME);
 
             Q_FOREACH (Clients client, m_clients)
-            {
-                qDebug() << "Websockets::socketDisconnected(): send new tableData to each client";
                 client.socket->sendTextMessage(this->getTableData());
-            }
-
-            qDebug() << "Websockets::socketDisconnected(): newWhite: WHITE";
-            this->addTextToConsole("New white player: WHITE\n", WEBSOCKET);
 
             emit MsgFromWebsocketsToChess("reset");
         }
         else if (pClient == this->getPlayerSocket(PT_BLACK))
         {
-            qDebug() << "Websockets::socketDisconnected(): black player disconnected";
             this->endOfGame(ET_SOCKET_LOST, pClient);
-            qDebug() << "Websockets::socketDisconnected(): setBoardDataLabels new black name ="
-                     << this->getPlayerNameByType(PT_BLACK);
-            emit setBoardDataLabels(this->getPlayerNameByType(PT_BLACK), BDL_BLACK_NAME);
 
             Q_FOREACH (Clients client, m_clients)
-            {
-                qDebug() << "Websockets::socketDisconnected(): send new tableData to each client";
                 client.socket->sendTextMessage(this->getTableData());
-            }
-
-            qDebug() << "Websockets::socketDisconnected(): newBlack: BLACK";
-            this->addTextToConsole("New black player: BLACK\n", WEBSOCKET);
 
             emit MsgFromWebsocketsToChess("reset");
         }
@@ -406,9 +398,10 @@ void Websockets::moveNextClientFromQueueToTableIfExists(PLAYERS_TYPES chair)
 }
 
 //todo: funkcja w sumie nic nie mówi o tym co dokładnie robi
-void Websockets::endOfGame(END_TYPE EndType, QWebSocket *clientToClear)
+void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
 {
     //todo: zastanowić się na spokojnie jakie czyszczenia jeszcze tu upchać
+    //todo: ...po czym zamknąć je w przystępnej funkcji
     this->resetPlayersStartConfirmInfo();
     _pChessboard->stopQueueTimer();
     _pChessboard->stopBoardTimers();
@@ -430,17 +423,23 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *clientToClear)
     case ET_STAND_UP:
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
-        if (this->getClientTypeBySocket(clientToClear) == PT_WHITE)
+        if (this->getClientTypeBySocket(playerToClear) == PT_WHITE)
         {
             this->clearPlayerType(PT_WHITE);
+            qDebug() << "Websockets::endOfGame():ET_SOCKET_LOST- white player disconnected";
             this->moveNextClientFromQueueToTableIfExists(PT_WHITE);
+            qDebug() << "Websockets::endOfGame():ET_SOCKET_LOST- setBoardDataLabels new white name ="
+                     << this->getPlayerNameByType(PT_WHITE);
         }
-        else if (this->getClientTypeBySocket(clientToClear) == PT_BLACK)
+        else if (this->getClientTypeBySocket(playerToClear) == PT_BLACK)
         {
             this->clearPlayerType(PT_BLACK);
+            qDebug() << "Websockets::endOfGame():ET_SOCKET_LOST- black player disconnected";
             this->moveNextClientFromQueueToTableIfExists(PT_BLACK);
+            qDebug() << "Websockets::socketDisconnected(): setBoardDataLabels new black name ="
+                     << this->getPlayerNameByType(PT_BLACK);
         }
-        else qDebug() << "ERROR: Websockets::endOfGame: wrong player type:" << EndType;
+        else qDebug() << "ERROR: Websockets::endOfGame():ET_SOCKET_LOST- wrong player type:" << EndType;
         break;
 
     case ET_TIMEOUT_START:
@@ -453,7 +452,6 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *clientToClear)
                         this->getPlayerNameByType(PT_WHITE);
             emit this->addTextToConsole("New white player: " + this->getPlayerNameByType(PT_WHITE) +
                                         "\n", WEBSOCKET);
-            emit setBoardDataLabels(this->getPlayerNameByType(PT_WHITE), BDL_WHITE_NAME);
         }
         if (this->getClientStateByType(PT_BLACK) != CS_CLICKED_START)
         {
@@ -464,8 +462,10 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *clientToClear)
                         this->getPlayerNameByType(PT_BLACK);
             emit this->addTextToConsole("New white player: " + this->getPlayerNameByType(PT_BLACK) +
                                         "\n", WEBSOCKET);
-            emit setBoardDataLabels(this->getPlayerNameByType(PT_BLACK), BDL_BLACK_NAME);
         }
+
+        emit setBoardDataLabels(this->getPlayerNameByType(PT_WHITE), BDL_WHITE_NAME);
+        emit setBoardDataLabels(this->getPlayerNameByType(PT_BLACK), BDL_BLACK_NAME);
 
         if (!this->isPlayerChairEmpty(PT_WHITE) && !this->isPlayerChairEmpty(PT_BLACK))
             _pChessboard->startQueueTimer();
@@ -673,9 +673,7 @@ void Websockets::removeClientFromQueueBySocket(QWebSocket *playerSocket)
 
             int nClientpos = m_clients.indexOf(client);
             if (nClientpos >= 0 && nClientpos < m_clients.size())
-            {
                 m_clients.replace(nClientpos, changedClient);
-            }
             else qDebug() << "ERROR: Websockets::removeClientFromQueueBySocket: iteration error. iter val ="
                           << nClientpos;
 
@@ -695,9 +693,7 @@ Clients Websockets::getClientBySocket(QWebSocket *playerSocket)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.socket == playerSocket)
-        {
             return client;
-        }
     }
     qDebug() << "ERROR: Websockets::getClientBySocket(): client not found";
     Clients errorClient;
@@ -709,11 +705,8 @@ QWebSocket *Websockets::getClientSocketByName(QString playerName)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.name == playerName)
-        {
             return client.socket;
-        }
     }
-    qDebug() << "ERROR: Websockets::getClientSocketByName(): client not found";
     return nullptr;
 }
 
@@ -722,9 +715,7 @@ QString Websockets::getClientNameBySocket(QWebSocket *playerSocket)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.socket == playerSocket)
-        {
             return client.name;
-        }
     }
     qDebug() << "ERROR: Websockets::getClientNameBySocket(): client not found";
     return "";
@@ -951,5 +942,15 @@ bool Websockets::isClientInQueue(QWebSocket *playerSocket)
         }
     }
     qDebug() << "ERROR: Websockets::isClientInQueue(): client not found";
+    return false;
+}
+
+bool Websockets::isClientNameExists(QString name)
+{
+    Q_FOREACH (Clients client, m_clients)
+    {
+        if (client.name == name)
+            return true;
+    }
     return false;
 }
