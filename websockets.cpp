@@ -61,6 +61,7 @@ QString Websockets::getTableData() //as JSON
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + this->getPlayerNameByType(PT_WHITE) +
             "\",\"bplr\":\"" + this->getPlayerNameByType(PT_BLACK) +
             "\",\"turn\":\"" + _pChessboard->getStrWhoseTurn() +
+            "\",\"history\":\"" + _pChessboard->() + //todo: history
             "\",\"wtime\":" + QString::number(_pChessboard->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pChessboard->getBlackTimeLeft()) +
             ",\"queue\":\"" + this->getQueuedClients();
@@ -301,6 +302,7 @@ void Websockets::sendMsg(QString QStrWsMsg)
         //todo: ogarnąć w końcu funkcję czyszczenia danych przy końcach...
         //...gry- w sumie Websockets::endOfGame daje chyba radę- ogarnąć na spokojnie
         this->endOfGame(QStrWsMsg.right(5) == "White" ? ET_WHIE_WON : ET_BLACK_WON);
+        //todo: doklejać info z którego wiemy że nadszedł timeOut (najlepiej jako argument do getTableData)
         Q_FOREACH (Clients client, m_clients)
             client.socket->sendTextMessage(this->getTableData());
     }

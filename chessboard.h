@@ -35,6 +35,7 @@ private:
     QString m_QStrCastlings;
     QString m_QStrEnpassant;
     QStringList m_legalMoves;
+    QStringList m_historyMoves;
     SEQUENCE_TYPE m_moveType;
 
     QTimer *m_whiteTimer;
@@ -110,24 +111,28 @@ public:
     int m_nMaxBoardZ;
 
     //metody dostępowe
-    void setWhoseTurn (WHOSE_TURN Turn)         { m_WhoseTurn = Turn; this->changeWindowTitle(); } //todo: zabrać to?
-    void setMoveType (SEQUENCE_TYPE Type)       { m_moveType = Type; }
-    void setLegalMoves(QStringList legalMoves)  { m_legalMoves = legalMoves; emit showLegalMoves(legalMoves);}
+    void setWhoseTurn(WHOSE_TURN Turn)              { m_WhoseTurn = Turn;
+                                                      this->changeWindowTitle(); } //todo: zabrać to?
+    void setMoveType(SEQUENCE_TYPE Type)            { m_moveType = Type; }
+    void setLegalMoves(QStringList legalMoves)      { m_legalMoves = legalMoves;
+                                                        emit showLegalMoves(legalMoves); }
+    void setHistoryMoves(QStringList historyMoves)  { m_historyMoves = historyMoves;
+                                                        emit showHistoryMoves(historyMoves); }
 
-    void clearLegalMoves()                      { m_legalMoves.clear(); }
+    void clearLegalMoves()                          { m_legalMoves.clear(); }
 
-    QString getSiteMoveRequest()                { return m_QStrSiteMoveRequest; }
+    QString getSiteMoveRequest()                    { return m_QStrSiteMoveRequest; }
     QString getPiecieFromTo();
-    int getMaxPieceHeight() const               { return m_nMaxPieceHeight; }
-    int getMaxRemovedPieceHeight() const        { return m_nMaxRemovedPieceH; }
-    QString getGameStatus()                     { return m_QStrGameStatus; }
-    WHOSE_TURN getWhoseTurn()                   { return m_WhoseTurn; }
+    int getMaxPieceHeight() const                   { return m_nMaxPieceHeight; }
+    int getMaxRemovedPieceHeight() const            { return m_nMaxRemovedPieceH; }
+    QString getGameStatus()                         { return m_QStrGameStatus; }
+    WHOSE_TURN getWhoseTurn()                       { return m_WhoseTurn; }
     QString getStrWhoseTurn();
-    SEQUENCE_TYPE getMoveType()                 { return m_moveType; }
-    QString getCastlings()                      { return m_QStrCastlings; }
-    QString getEnpassant()                      { return m_QStrEnpassant; }
-    QStringList getLegalMoves()                 { return m_legalMoves; }
-    double getMaxBoardZ()                       { return m_nMaxBoardZ; }
+    SEQUENCE_TYPE getMoveType()                     { return m_moveType; }
+    QString getCastlings()                          { return m_QStrCastlings; }
+    QString getEnpassant()                          { return m_QStrEnpassant; }
+    QStringList getLegalMoves()                     { return m_legalMoves; }
+    double getMaxBoardZ()                           { return m_nMaxBoardZ; }
     int getWhiteTimeLeft();
     int getBlackTimeLeft();
     int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
@@ -145,6 +150,7 @@ signals:
     void showBoard(QString);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showLegalMoves(QStringList);
+    void showHistoryMoves(QStringList);
     void msgFromChessboardToWebsockets(QString); //todo: znowu odwoływanie się w górę do rodzica
 };
 

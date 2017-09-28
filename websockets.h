@@ -63,6 +63,8 @@ public:
     void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
 
     //todo: wszystko poniżej jako prywatne?
+    //todo: nie trzeba dopisywać "byType"- funkcje mogą mieć takie same nazwy i przyjmować...
+    //...różne parametry
     void newClientSocket(QWebSocket *playerSocket);
     void setClientName(QWebSocket *playerSocket, QString name);
     void setPlayerType(QWebSocket *playerSocket, PLAYERS_TYPES type);

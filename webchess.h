@@ -30,6 +30,7 @@ public:
     void Status();
     void Promote(QString msg);
     void AskForLegalMoves();
+    void AskForHistoryMoves();
 
     //-----------------FUNKCJE WEWNĘTRZNE-----------------//
     void TcpMoveOk();

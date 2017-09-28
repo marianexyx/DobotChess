@@ -96,7 +96,7 @@ void Chess::legalOk(QString msg)
     QStringList legalMoves = msg.split(QRegExp("\\s"));
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
-    //
+
     if (!legalMoves.isEmpty())
     {
         QString QStrLastLegalMove = legalMoves.last();
@@ -105,6 +105,22 @@ void Chess::legalOk(QString msg)
         legalMoves.last() = QStrLastLegalMove;
     }
     _pChessboard->setLegalMoves(legalMoves);
+}
+
+void Chess::historyOk(QString msg)
+{
+    QStringList historyMoves = msg.split(QRegExp("\\s"));
+    if (!historyMoves.isEmpty()) historyMoves.removeFirst(); //remove "ok"
+    if (!historyMoves.isEmpty()) historyMoves.removeFirst(); //remove np. "20"
+
+    if (!historyMoves.isEmpty()) //whipe CR, LF, spacebars etc
+    {
+        QString QStrLastHistoryMove = historyMoves.last();
+        QStrLastHistoryMove = QStrLastHistoryMove.simplified();
+        QStrLastHistoryMove = QStrLastHistoryMove.replace( " ", "" ); //remove np. "\n"
+        historyMoves.last() = QStrLastHistoryMove;
+    }
+    _pChessboard->setHistoryMoves(historyMoves);
 }
 
 void Chess::wrongTcpAnswer(QString msgType, QString respond)

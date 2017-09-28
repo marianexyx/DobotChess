@@ -36,7 +36,9 @@ protected:
     virtual void Status() = 0;
     virtual void Promote(QString msg) = 0;
     virtual void AskForLegalMoves() = 0;
+    virtual void AskForHistoryMoves() = 0;
     void legalOk(QString msg);
+    void historyOk(QString msg);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     virtual void TcpMoveOk() = 0;

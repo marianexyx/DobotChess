@@ -56,7 +56,8 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(showBoard(QString)));
     connect(_pChessboard, SIGNAL(showLegalMoves(QStringList)),
             this, SLOT(showLegalMoves(QStringList)));
-
+    connect(_pChessboard, SIGNAL(showHistoryMoves(QStringList)),
+            this, SLOT(showHistoryMoves(QStringList)));
 
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
@@ -717,4 +718,22 @@ void MainWindow::showLegalMoves(QStringList legalMoves)
     QString legal = legalMoves.join(" ");
     ui->legalPTE->clear();
     ui->legalPTE->setPlainText(legal);
+}
+
+void MainWindow::showHistoryMoves(QStringList historyMoves)
+{
+    ui->historyPTE->clear();
+    QString history;
+    int turn = 1;
+    do
+    {
+        if (!historyMoves.isEmpty())
+        {
+            history += QString::number(turn) + ". " + historyMoves.takeFirst();
+            if (!historyMoves.isEmpty()) history += "\t" + historyMoves.takeFirst();
+            turn++;
+        }
+    } while (historyMoves.isEmpty());
+
+    ui->historyPTE->setPlainText(history);
 }

@@ -143,7 +143,7 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 
         if (_pChessboard->getGameStatus().left(1) == "*")
         {
-            this->AskForLegalMoves();
+            this->AskForHistoryMoves();
             this->GameInProgress(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi na legal..
             //...wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął blokadę przed kojenym ruchem)
         }
@@ -157,7 +157,13 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         else
             this->wrongTcpAnswer(tcpMsgType, _pChessboard->getGameStatus());
     }
-    else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
+    else if (tcpMsgType.contains("history") && tcpRespond.contains("OK "))
+    {
+        this->historyOk(tcpRespond);
+        this->AskForLegalMoves();
+        //todo: jeszcze odpowiedź na site
+    }
+    else if (tcpMsgType == "legal" && tcpRespond.left(3) == "OK ")
     {
         this->legalOk(tcpRespond);
     }
@@ -221,6 +227,11 @@ void WebChess::Status()
     _pWebsockets->addTextToConsole("Sending to tcp: status\n", CORE);
     qDebug() << "Sending to tcp: status";
     _pTCPMsgs->TcpQueueMsg(WEBSITE, "status");
+}
+
+void WebChess::AskForHistoryMoves()
+{
+    _pTCPMsgs->TcpQueueMsg(WEBSITE, "history pgn");
 }
 
 void WebChess::AskForLegalMoves()
