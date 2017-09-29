@@ -115,11 +115,12 @@ void IgorBot::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         _pChessboard->saveStatusData(tcpRespond);
         if (_pChessboard->getGameStatus() == "*")
         {
-            this->AskForLegalMoves();
+            this->AskForHistoryMoves();
         }
         else
         {
             _pChessboard->clearLegalMoves();
+            _pChessboard->clearHistoryMoves();
             this->EndOfGame(tcpRespond);
         }
     }
@@ -170,6 +171,11 @@ void IgorBot::Promote(QString msg)
 void IgorBot::AskForLegalMoves()
 {
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "legal");
+}
+
+void IgorBot::AskForHistoryMoves()
+{
+    _pTCPMsgs->TcpQueueMsg(WEBSITE, "history pgn");
 }
 
 void IgorBot::Think5000()

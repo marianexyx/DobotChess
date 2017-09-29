@@ -61,7 +61,6 @@ QString Websockets::getTableData() //as JSON
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + this->getPlayerNameByType(PT_WHITE) +
             "\",\"bplr\":\"" + this->getPlayerNameByType(PT_BLACK) +
             "\",\"turn\":\"" + _pChessboard->getStrWhoseTurn() +
-            "\",\"history\":\"" + _pChessboard->() + //todo: history
             "\",\"wtime\":" + QString::number(_pChessboard->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pChessboard->getBlackTimeLeft()) +
             ",\"queue\":\"" + this->getQueuedClients();
@@ -72,6 +71,11 @@ QString Websockets::getTableData() //as JSON
         QString QStrBlackClickedStart = (this->getClientStateByType(PT_BLACK) == CS_CLICKED_START) ? "b" : "x";
         QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
                 QString::number(_pChessboard->getStartTimeLeft());
+    }
+
+    if (!_pChessboard->getHisotyMoves().isEmpty())
+    {
+        QStrTableData += "\",\"history\":\"" + _pChessboard->getHisotyMovesAsQStr();
     }
 
     QStrTableData += "\"}";
@@ -250,15 +254,15 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWsMsg;
 }
 
-void Websockets::sendMsg(QString QStrWsMsg)
+void Websockets::sendMsg(QString QStrWsMsg) //todo: ta funkcja to syf
 {
     qDebug() << "Websockets::sendMsg() received:" << QStrWsMsg;
     emit addTextToConsole("sent: " + QStrWsMsg + "\n", WEBSOCKET);
 
-    if (QStrWsMsg == "newOk")
+    if (QStrWsMsg == "newOk" || QStrWsMsg.left(8) == "history ")
     {
         Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage("newOk");
+            client.socket->sendTextMessage(QStrWsMsg);
     }
     else if (QStrWsMsg.left(6) == "moveOk" || QStrWsMsg.left(7) == "badMove")
     {
@@ -409,6 +413,8 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
     _pChessboard->stopBoardTimers();
     this->clearBothPlayersStates();
     _pChessboard->setWhoseTurn(NO_TURN);
+    _pChessboard->clearLegalMoves();
+    _pChessboard->clearHistoryMoves();
 
     switch(EndType)
     {

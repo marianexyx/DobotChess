@@ -68,6 +68,7 @@ private slots:
     void setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType);
     void showBoard(QString QStrBoard);
     void showLegalMoves(QStringList legalMoves);
+    void showHistoryMoves(QStringList historyMoves);
 
     //dobot slots
     void setDobotValidators();

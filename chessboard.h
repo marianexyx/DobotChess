@@ -115,11 +115,14 @@ public:
                                                       this->changeWindowTitle(); } //todo: zabrać to?
     void setMoveType(SEQUENCE_TYPE Type)            { m_moveType = Type; }
     void setLegalMoves(QStringList legalMoves)      { m_legalMoves = legalMoves;
-                                                        emit showLegalMoves(legalMoves); }
+                                                      emit showLegalMoves(legalMoves); }
     void setHistoryMoves(QStringList historyMoves)  { m_historyMoves = historyMoves;
-                                                        emit showHistoryMoves(historyMoves); }
+                                                      emit showHistoryMoves(historyMoves); }
 
-    void clearLegalMoves()                          { m_legalMoves.clear(); }
+    void clearLegalMoves()                          { m_legalMoves.clear();
+                                                      emit showLegalMoves(m_legalMoves);}
+    void clearHistoryMoves()                        { m_historyMoves.clear();
+                                                      emit showHistoryMoves(m_historyMoves); }
 
     QString getSiteMoveRequest()                    { return m_QStrSiteMoveRequest; }
     QString getPiecieFromTo();
@@ -132,6 +135,8 @@ public:
     QString getCastlings()                          { return m_QStrCastlings; }
     QString getEnpassant()                          { return m_QStrEnpassant; }
     QStringList getLegalMoves()                     { return m_legalMoves; }
+    QStringList getHisotyMoves()                    { return m_historyMoves; }
+    QString getHisotyMovesAsQStr()                  { return m_historyMoves.join(" "); }
     double getMaxBoardZ()                           { return m_nMaxBoardZ; }
     int getWhiteTimeLeft();
     int getBlackTimeLeft();

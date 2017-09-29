@@ -715,25 +715,29 @@ void MainWindow::showBoard(QString QStrBoard)
 
 void MainWindow::showLegalMoves(QStringList legalMoves)
 {
-    QString legal = legalMoves.join(" ");
+    QString legal = "";
+    if (!legalMoves.isEmpty()) legal = legalMoves.join(" ");
     ui->legalPTE->clear();
     ui->legalPTE->setPlainText(legal);
 }
 
 void MainWindow::showHistoryMoves(QStringList historyMoves)
 {
+    QString history = "";
     ui->historyPTE->clear();
-    QString history;
-    int turn = 1;
-    do
+    if (!historyMoves.isEmpty())
     {
-        if (!historyMoves.isEmpty())
+        int turn = 1;
+        do
         {
-            history += QString::number(turn) + ". " + historyMoves.takeFirst();
-            if (!historyMoves.isEmpty()) history += "\t" + historyMoves.takeFirst();
-            turn++;
-        }
-    } while (historyMoves.isEmpty());
+            if (!historyMoves.isEmpty())
+            {
+                history += QString::number(turn) + ". " + historyMoves.takeFirst();
+                if (!historyMoves.isEmpty()) history += "  " + historyMoves.takeFirst() + "\n";
+                ++turn;
+            }
+        } while (!historyMoves.isEmpty());
+    }
 
     ui->historyPTE->setPlainText(history);
 }

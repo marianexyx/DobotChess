@@ -152,14 +152,17 @@ void WebChess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
                  _pChessboard->getGameStatus().left(7) == "1/2-1/2")
         {
             _pChessboard->clearLegalMoves();
+            _pChessboard->clearHistoryMoves();
             this->EndOfGame(tcpRespond);
         }
         else
             this->wrongTcpAnswer(tcpMsgType, _pChessboard->getGameStatus());
     }
-    else if (tcpMsgType.contains("history") && tcpRespond.contains("OK "))
+    else if (tcpMsgType.left(7) == "history" && tcpRespond.left(3) == "OK ")
     {
+        qDebug() << "manage history tcp answer";
         this->historyOk(tcpRespond);
+        _pWebsockets->sendMsg("history " + _pChessboard->getHisotyMovesAsQStr());
         this->AskForLegalMoves();
         //todo: jeszcze odpowiedź na site
     }

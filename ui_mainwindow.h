@@ -1000,7 +1000,7 @@ public:
         gridLayout_16->addWidget(historyPTE, 1, 0, 1, 1);
 
 
-        gridLayout_19->addWidget(groupBox_8, 1, 0, 1, 1);
+        gridLayout_19->addWidget(groupBox_8, 0, 0, 2, 1);
 
         groupBox_10 = new QGroupBox(groupBox_9);
         groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
@@ -1014,7 +1014,7 @@ public:
         gridLayout_20->addWidget(queuedPTE, 0, 0, 1, 1);
 
 
-        gridLayout_19->addWidget(groupBox_10, 1, 1, 1, 1);
+        gridLayout_19->addWidget(groupBox_10, 0, 1, 1, 1);
 
         groupBox_11 = new QGroupBox(groupBox_9);
         groupBox_11->setObjectName(QStringLiteral("groupBox_11"));
@@ -1028,7 +1028,7 @@ public:
         gridLayout_21->addWidget(servoQueuePTE, 0, 0, 1, 1);
 
 
-        gridLayout_19->addWidget(groupBox_11, 1, 2, 1, 1);
+        gridLayout_19->addWidget(groupBox_11, 1, 1, 1, 1);
 
 
         gridLayout_8->addWidget(groupBox_9, 2, 0, 1, 1);

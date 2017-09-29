@@ -91,7 +91,7 @@ void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
                           _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //TODO: getMaxRemovedPieceHeight?
 }
 
-void Chess::legalOk(QString msg)
+void Chess::legalOk(QString msg) //todo: nazwy tych funkcji 'ok' nie mówią co robią
 {
     QStringList legalMoves = msg.split(QRegExp("\\s"));
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
@@ -120,6 +120,7 @@ void Chess::historyOk(QString msg)
         QStrLastHistoryMove = QStrLastHistoryMove.replace( " ", "" ); //remove np. "\n"
         historyMoves.last() = QStrLastHistoryMove;
     }
+
     _pChessboard->setHistoryMoves(historyMoves);
 }
 

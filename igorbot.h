@@ -36,6 +36,7 @@ public:
     void Status();
     void Promote(QString msg);
     void AskForLegalMoves();
+    void AskForHistoryMoves();
 
     void Think5000();
     void UndoOk();
