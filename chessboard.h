@@ -152,6 +152,7 @@ private slots:
 signals:
     void addTextToConsole(QString);
     void changeWindowTitle(QString);
+    void clearBoard();
     void showBoard(QString);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showLegalMoves(QStringList);

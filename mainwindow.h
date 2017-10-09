@@ -67,6 +67,7 @@ private slots:
     void changeWindowtitle(QString title);
     void setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType);
     void showBoard(QString QStrBoard);
+    void clearBoard();
     void showLegalMoves(QStringList legalMoves);
     void showHistoryMoves(QStringList historyMoves);
 

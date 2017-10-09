@@ -52,6 +52,8 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
     connect(_pChessboard, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
+    connect(_pChessboard, SIGNAL(clearBoard()),
+            this, SLOT(clearBoard()));
     connect(_pChessboard, SIGNAL(showBoard(QString)),
             this, SLOT(showBoard(QString)));
     connect(_pChessboard, SIGNAL(showLegalMoves(QStringList)),
@@ -705,6 +707,11 @@ void MainWindow::setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelTy
         qDebug() << "ERROR: unknown MainWindow::setBoardDataLabels labelType";
         break;
     }
+}
+
+void MainWindow::clearBoard()
+{
+    ui->boardPTE->clear();
 }
 
 void MainWindow::showBoard(QString QStrBoard)

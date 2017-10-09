@@ -407,7 +407,7 @@ void Websockets::moveNextClientFromQueueToTableIfExists(PLAYERS_TYPES chair)
 void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
 {
     //todo: zastanowić się na spokojnie jakie czyszczenia jeszcze tu upchać
-    //todo: ...po czym zamknąć je w przystępnej funkcji
+    //todo: ...po czym zamknąć je w przystępnej funkcji (w innej klasie)
     this->resetPlayersStartConfirmInfo();
     _pChessboard->stopQueueTimer();
     _pChessboard->stopBoardTimers();
@@ -415,6 +415,7 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
     _pChessboard->setWhoseTurn(NO_TURN);
     _pChessboard->clearLegalMoves();
     _pChessboard->clearHistoryMoves();
+    _pChessboard->clearBoard();
 
     switch(EndType)
     {

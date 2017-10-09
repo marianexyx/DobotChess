@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Chessboard_t {
-    QByteArrayData data[14];
-    char stringdata0[217];
+    QByteArrayData data[15];
+    char stringdata0[228];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,20 +33,21 @@ QT_MOC_LITERAL(0, 0, 10), // "Chessboard"
 QT_MOC_LITERAL(1, 11, 16), // "addTextToConsole"
 QT_MOC_LITERAL(2, 28, 0), // ""
 QT_MOC_LITERAL(3, 29, 17), // "changeWindowTitle"
-QT_MOC_LITERAL(4, 47, 9), // "showBoard"
-QT_MOC_LITERAL(5, 57, 18), // "setBoardDataLabels"
-QT_MOC_LITERAL(6, 76, 17), // "BOARD_DATA_LABELS"
-QT_MOC_LITERAL(7, 94, 14), // "showLegalMoves"
-QT_MOC_LITERAL(8, 109, 16), // "showHistoryMoves"
-QT_MOC_LITERAL(9, 126, 29), // "msgFromChessboardToWebsockets"
-QT_MOC_LITERAL(10, 156, 12), // "timeOutWhite"
-QT_MOC_LITERAL(11, 169, 12), // "timeOutBlack"
-QT_MOC_LITERAL(12, 182, 16), // "updateTimeLabels"
-QT_MOC_LITERAL(13, 199, 17) // "timeOutStartQueue"
+QT_MOC_LITERAL(4, 47, 10), // "clearBoard"
+QT_MOC_LITERAL(5, 58, 9), // "showBoard"
+QT_MOC_LITERAL(6, 68, 18), // "setBoardDataLabels"
+QT_MOC_LITERAL(7, 87, 17), // "BOARD_DATA_LABELS"
+QT_MOC_LITERAL(8, 105, 14), // "showLegalMoves"
+QT_MOC_LITERAL(9, 120, 16), // "showHistoryMoves"
+QT_MOC_LITERAL(10, 137, 29), // "msgFromChessboardToWebsockets"
+QT_MOC_LITERAL(11, 167, 12), // "timeOutWhite"
+QT_MOC_LITERAL(12, 180, 12), // "timeOutBlack"
+QT_MOC_LITERAL(13, 193, 16), // "updateTimeLabels"
+QT_MOC_LITERAL(14, 210, 17) // "timeOutStartQueue"
 
     },
     "Chessboard\0addTextToConsole\0\0"
-    "changeWindowTitle\0showBoard\0"
+    "changeWindowTitle\0clearBoard\0showBoard\0"
     "setBoardDataLabels\0BOARD_DATA_LABELS\0"
     "showLegalMoves\0showHistoryMoves\0"
     "msgFromChessboardToWebsockets\0"
@@ -61,33 +62,35 @@ static const uint qt_meta_data_Chessboard[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       7,       // signalCount
+       8,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   69,    2, 0x06 /* Public */,
-       3,    1,   72,    2, 0x06 /* Public */,
-       4,    1,   75,    2, 0x06 /* Public */,
-       5,    2,   78,    2, 0x06 /* Public */,
-       7,    1,   83,    2, 0x06 /* Public */,
-       8,    1,   86,    2, 0x06 /* Public */,
-       9,    1,   89,    2, 0x06 /* Public */,
+       1,    1,   74,    2, 0x06 /* Public */,
+       3,    1,   77,    2, 0x06 /* Public */,
+       4,    0,   80,    2, 0x06 /* Public */,
+       5,    1,   81,    2, 0x06 /* Public */,
+       6,    2,   84,    2, 0x06 /* Public */,
+       8,    1,   89,    2, 0x06 /* Public */,
+       9,    1,   92,    2, 0x06 /* Public */,
+      10,    1,   95,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      10,    0,   92,    2, 0x08 /* Private */,
-      11,    0,   93,    2, 0x08 /* Private */,
-      12,    0,   94,    2, 0x08 /* Private */,
-      13,    0,   95,    2, 0x08 /* Private */,
+      11,    0,   98,    2, 0x08 /* Private */,
+      12,    0,   99,    2, 0x08 /* Private */,
+      13,    0,  100,    2, 0x08 /* Private */,
+      14,    0,  101,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    2,
     QMetaType::Void, QMetaType::QString,    2,
+    QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    2,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 6,    2,    2,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 7,    2,    2,
     QMetaType::Void, QMetaType::QStringList,    2,
     QMetaType::Void, QMetaType::QStringList,    2,
     QMetaType::Void, QMetaType::QString,    2,
@@ -109,15 +112,16 @@ void Chessboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->addTextToConsole((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 1: _t->changeWindowTitle((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 2: _t->showBoard((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 3: _t->setBoardDataLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABELS(*)>(_a[2]))); break;
-        case 4: _t->showLegalMoves((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
-        case 5: _t->showHistoryMoves((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
-        case 6: _t->msgFromChessboardToWebsockets((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 7: _t->timeOutWhite(); break;
-        case 8: _t->timeOutBlack(); break;
-        case 9: _t->updateTimeLabels(); break;
-        case 10: _t->timeOutStartQueue(); break;
+        case 2: _t->clearBoard(); break;
+        case 3: _t->showBoard((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 4: _t->setBoardDataLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABELS(*)>(_a[2]))); break;
+        case 5: _t->showLegalMoves((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
+        case 6: _t->showHistoryMoves((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
+        case 7: _t->msgFromChessboardToWebsockets((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 8: _t->timeOutWhite(); break;
+        case 9: _t->timeOutBlack(); break;
+        case 10: _t->updateTimeLabels(); break;
+        case 11: _t->timeOutStartQueue(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -138,37 +142,44 @@ void Chessboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
+            typedef void (Chessboard::*_t)();
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::clearBoard)) {
+                *result = 2;
+                return;
+            }
+        }
+        {
             typedef void (Chessboard::*_t)(QString );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::showBoard)) {
-                *result = 2;
+                *result = 3;
                 return;
             }
         }
         {
             typedef void (Chessboard::*_t)(QString , BOARD_DATA_LABELS );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::setBoardDataLabels)) {
-                *result = 3;
-                return;
-            }
-        }
-        {
-            typedef void (Chessboard::*_t)(QStringList );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::showLegalMoves)) {
                 *result = 4;
                 return;
             }
         }
         {
             typedef void (Chessboard::*_t)(QStringList );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::showHistoryMoves)) {
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::showLegalMoves)) {
                 *result = 5;
+                return;
+            }
+        }
+        {
+            typedef void (Chessboard::*_t)(QStringList );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::showHistoryMoves)) {
+                *result = 6;
                 return;
             }
         }
         {
             typedef void (Chessboard::*_t)(QString );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chessboard::msgFromChessboardToWebsockets)) {
-                *result = 6;
+                *result = 7;
                 return;
             }
         }
@@ -200,13 +211,13 @@ int Chessboard::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 12;
     }
     return _id;
 }
@@ -226,37 +237,43 @@ void Chessboard::changeWindowTitle(QString _t1)
 }
 
 // SIGNAL 2
-void Chessboard::showBoard(QString _t1)
+void Chessboard::clearBoard()
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    QMetaObject::activate(this, &staticMetaObject, 2, _a);
+    QMetaObject::activate(this, &staticMetaObject, 2, Q_NULLPTR);
 }
 
 // SIGNAL 3
-void Chessboard::setBoardDataLabels(QString _t1, BOARD_DATA_LABELS _t2)
+void Chessboard::showBoard(QString _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);
 }
 
 // SIGNAL 4
-void Chessboard::showLegalMoves(QStringList _t1)
+void Chessboard::setBoardDataLabels(QString _t1, BOARD_DATA_LABELS _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 
 // SIGNAL 5
-void Chessboard::showHistoryMoves(QStringList _t1)
+void Chessboard::showLegalMoves(QStringList _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 5, _a);
 }
 
 // SIGNAL 6
-void Chessboard::msgFromChessboardToWebsockets(QString _t1)
+void Chessboard::showHistoryMoves(QStringList _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 6, _a);
+}
+
+// SIGNAL 7
+void Chessboard::msgFromChessboardToWebsockets(QString _t1)
+{
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 7, _a);
 }
 QT_END_MOC_NAMESPACE
