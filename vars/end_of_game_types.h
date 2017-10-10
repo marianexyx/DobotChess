@@ -1,6 +1,8 @@
 #ifndef END_OF_GAME_TYPES_H
 #define END_OF_GAME_TYPES_H
 
+#pragma once
+#include <QString>
 
 enum END_TYPE
 {
@@ -12,5 +14,26 @@ enum END_TYPE
     ET_SOCKET_LOST,
     ET_TIMEOUT_START
 };
+
+inline QString endTypeAsQstr(END_TYPE ET)
+{
+    QString QStrEndType;
+    switch(ET)
+    {
+    case ET_WHIE_WON: QStrEndType = "whiteWon" ; break;
+    case ET_BLACK_WON: QStrEndType = "blackWon" ; break;
+    case ET_DRAW: QStrEndType = "draw" ; break;
+    case ET_STAND_UP: QStrEndType = "standUp" ; break;
+    case ET_GIVE_UP: QStrEndType = "giveUp" ; break;
+    case ET_SOCKET_LOST: QStrEndType = "socketLost" ; break;
+    case ET_TIMEOUT_START: QStrEndType = "timeoutStart" ; break;
+    default:
+        QStrEndType = "ERROR: wrong endTypeAsQstr arg = " + ET;
+        qDebug() << QStrEndType;
+        break;
+    }
+
+    return QStrEndType;
+}
 
 #endif // END_OF_GAME_TYPES_H

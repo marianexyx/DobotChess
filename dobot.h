@@ -137,6 +137,8 @@ signals:
     void DobotErrorMsgBox();
     void QueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
+    void showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex>);
+    void showArduinoGripperStateList(QList<ServoArduino>);
 
 };
 

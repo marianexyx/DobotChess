@@ -56,8 +56,6 @@ public:
     Chessboard();
 
     void findBoardPos(QString QStrPiecePositions);
-    LETTER findPieceLetterPos(QString QsLetter);
-    QString findPieceLetterPos(LETTER letter);
     int fieldNrToFieldPos(int nfieldNr, bool bRow);
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);

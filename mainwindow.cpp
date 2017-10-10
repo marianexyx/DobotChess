@@ -34,7 +34,7 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(int, QString)), _pTCPmsg, SLOT(TcpQueueMsg(int, QString)));
     connect(_pArduinoUsb, SIGNAL(reset()), _pIgorBot, SLOT(resetPiecePositions()));
 
-    //dzięki tym connectom można wywołać funkcję typu "ui" z innej klasy
+    //ui connects
     connect(_pDobotArm, SIGNAL(addTextToConsole(QString,LOG)),
             this, SLOT(writeInConsole(QString,LOG)));
     connect(_pTCPmsg, SIGNAL(addTextToConsole(QString,LOG)),
@@ -60,7 +60,8 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(showLegalMoves(QStringList)));
     connect(_pChessboard, SIGNAL(showHistoryMoves(QStringList)),
             this, SLOT(showHistoryMoves(QStringList)));
-
+    connect(_pWebSockets, SIGNAL(showClientsList(QList<Clients>)),
+            this, SLOT(showClientsList(QList<Clients>)));
     connect(_pDobotArm, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobotArm, SIGNAL(AxisLabelText(QString, char)),
@@ -77,8 +78,11 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(updatePortsComboBox(int)));
     connect(_pChessboard, SIGNAL(changeWindowTitle(QString)),
             this, SLOT(changeWindowtitle(QString)));
+    connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
+            this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
+    connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
+            this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
 
-    //connecty komunikujące klasy z sobą
     connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)), //przesyłanie odpowiedzi z chenard...
             _pWebChess, SLOT(checkMsgFromChenard(QString, QString)));  //...na WWW przez silnk gry.
     connect(_pTCPmsg, SIGNAL(msgFromTcpToArd(QString, QString)), //przesyłanie odpowiedzi z chenard...
@@ -237,7 +241,7 @@ void MainWindow::onPTPsendBtnClicked()
     int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
     int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
     if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0) // dla wygody zera są zabronione
-        _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+        _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
 
     float fServoDutyCycle = ui->servoGripperEdit->text().toFloat();
     if (fServoDutyCycle !=0)
@@ -253,28 +257,10 @@ void MainWindow::showDobotErrorMsgBox()
 //TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich...
 //...qDebug, by nie robić tego wszędzie.
 //TODO3: dodać przed każdą komendą czas jej wywołania
-void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = NOTHING)
+void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = LOG_NOTHING)
 {
-    QString QsLogType;
-    switch(msgType)
-    {
-    case NOTHING: QsLogType.clear(); break;
-    case CORE: QsLogType = "<Core>: "; break;
-    case DOBOT: QsLogType = "<Dobot>: "; break;
-    case TCP: QsLogType = "<TCP>: "; break;
-    case WEBSOCKET: QsLogType = "<Websockets>: "; break;
-    case MAINWINDOW: QsLogType = "<Mainwindow>: "; break;
-    case USB: QsLogType = "<USB>: "; break;
-    case USB_SENT: QsLogType = "<USB> Sent: "; break;
-    case USB_RECEIVED: QsLogType = "<USB> Received: "; break;
-    default:
-        QString QsChar = static_cast<QString>(msgType);
-        QsLogType = "<ERROR: Wrong log type>: " + QsChar + ": ";
-        break;
-    }
-
+    QString QsLogType = "<" + logAsQstr(msgType) + ">: ";
     if(QStrMsg.isEmpty()) return;
-
     if(QStrMsg == "/clear")
     {
         ui->debug_log->clear();
@@ -383,7 +369,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             if (QStrServiceMsg.left(4) == "move") //przyjmij tylko docelową pozycję z polecenia np. "move e2e4r", tj. "e4r"
                 QStrServiceMsg = QStrServiceMsg.mid(7);
 
-            LETTER serviceLetterPos = _pChessboard->findPieceLetterPos(QStrServiceMsg.left(1));
+            LETTER serviceLetterPos = pieceLetterPos(QStrServiceMsg.left(1));
             DIGIT serviceDigitPos = static_cast<DIGIT>(QStrServiceMsg.mid(1,1).toInt() - 1);
 
             if (QStrServiceMsg.right(1) != "r")
@@ -392,7 +378,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 float fService_y = _pChessboard->adChessboardPositions_y[serviceLetterPos][serviceDigitPos];
                 float fService_z = _pChessboard->adChessboardPositions_z[serviceLetterPos][serviceDigitPos];
 
-                _pDobotArm->addCmdToList(TO_POINT, ST_REMOVING, fService_x, fService_y, fService_z +
+                _pDobotArm->addCmdToList(DM_TO_POINT, ST_REMOVING, fService_x, fService_y, fService_z +
                                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
                 _pChessboard->PieceActualPos.Letter = serviceLetterPos;
                 _pChessboard->PieceActualPos.Digit = serviceDigitPos;
@@ -415,18 +401,18 @@ void MainWindow::on_calibrateBtn_clicked()
             ui->yLabel->text().toInt() == _pDobotArm->getHomePos('y') &&
             ui->zLabel->text().toInt() == _pDobotArm->getHomePos('z'))
     {
-        _pDobotArm->addCmdToList(HOME);
+        _pDobotArm->addCmdToList(DM_HOME);
     }
     else
     {
         qDebug() << "ERROR: Dobot not in home positions";
-        this->writeInConsole("ERROR: Arm not in home positions", DOBOT);
+        this->writeInConsole("ERROR: Arm not in home positions", LOG_DOBOT);
     }
 }
 
 void MainWindow::on_homeBtn_clicked()
 {
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE,
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE,
                              _pDobotArm->getHomePos('x'),
                              _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
@@ -434,12 +420,12 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobotArm->armUpDown(UP, FROM, ST_SERVICE);
+    _pDobotArm->armUpDown(DM_UP, DM_FROM, ST_SERVICE);
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobotArm->armUpDown(UP, FROM, ST_SERVICE);
+    _pDobotArm->armUpDown(DM_UP, DM_FROM, ST_SERVICE);
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
@@ -447,13 +433,13 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
     int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToConsole("Cleared Dobot Queued Cmds.\n", DOBOT);
+        _pDobotArm->addTextToConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", DOBOT);
+        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", LOG_DOBOT);
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.", DOBOT);
+        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.", LOG_DOBOT);
     else _pDobotArm->addTextToConsole("ERROR: wrong result in "
-                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n", DOBOT);
+                                           "MainWindow::on_resetDobotIndexBtn_clicked().\n", LOG_DOBOT);
 }
 
 void MainWindow::on_executeDobotComandsBtn_clicked()
@@ -461,13 +447,13 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
     int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
 
     if (result == DobotCommunicate_NoError)
-        _pDobotArm->addTextToConsole("Start executing dobot queued cmds.\n", DOBOT);
+        _pDobotArm->addTextToConsole("Start executing dobot queued cmds.\n", LOG_DOBOT);
     else if (result == DobotCommunicate_BufferFull)
-        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", DOBOT);
+        _pDobotArm->addTextToConsole("ERROR: Dobot buffer is full.\n", LOG_DOBOT);
     else if (result == DobotCommunicate_Timeout)
-        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.\n", DOBOT);
+        _pDobotArm->addTextToConsole("ERROR: Dobot communicate timeout.\n", LOG_DOBOT);
     else _pDobotArm->addTextToConsole("ERROR: wrong result in "
-                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n", DOBOT);
+                                           "MainWindow::on_executeDobotComandsBtn_clicked().\n", LOG_DOBOT);
 }
 
 void MainWindow::on_AIBtn_clicked()
@@ -475,7 +461,7 @@ void MainWindow::on_AIBtn_clicked()
     if (ui->botOffRadioBtn->isChecked()) //po prostu odstawi bierki i włączy nową grę
     {
         _pIgorBot->setAI(false);
-        this->writeInConsole("Turned off Igors AI\n", MAINWINDOW);
+        this->writeInConsole("Turned off Igors AI\n", LOG_MAINWINDOW);
         ui->AIEnemySendBtn->setEnabled(false);
         ui->AIEnemyLineEdit->setEnabled(false);
     }
@@ -483,7 +469,7 @@ void MainWindow::on_AIBtn_clicked()
     {
         _pIgorBot->setAI(true); //spowoduje, że bot wymyśli ruch, poczeka aż gracz kliknie start i...
         //...wtedy ruszy z ruchem swoim
-        this->writeInConsole("Turned on Igors AI\n", MAINWINDOW);
+        this->writeInConsole("Turned on Igors AI\n", LOG_MAINWINDOW);
         ui->AIEnemySendBtn->setEnabled(true);
         ui->AIEnemyLineEdit->setEnabled(true);
     }
@@ -495,7 +481,7 @@ void MainWindow::on_AIEnemySendBtn_clicked()
 {
     _pIgorBot->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
     QString QsAIEnemySend = this->checkMoveForTcp(ui->AIEnemyLineEdit->text());
-    this->writeInConsole(QsAIEnemySend, MAINWINDOW);
+    this->writeInConsole(QsAIEnemySend, LOG_MAINWINDOW);
     qDebug() << QsAIEnemySend;
 }
 
@@ -529,7 +515,7 @@ void MainWindow::updatePortsComboBox(int nUsbPorst)
 {
     QString QSUsbPorst = QString::number(nUsbPorst)
             + (nUsbPorst == 1 ? " port is ready to use\n" : " ports are ready to use\n");
-    this->writeInConsole(QSUsbPorst, USB); //pokaż ile znaleziono portów
+    this->writeInConsole(QSUsbPorst, LOG_USB); //pokaż ile znaleziono portów
 
     //aktualizacja listy portów
     ui->portsComboBox->clear();
@@ -554,7 +540,7 @@ void MainWindow::on_reloadPortsBtn_clicked()
 void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
 {
     if(_pArduinoUsb->usbInfo == NULL) //by coś wysyłać musi istnieć wybrany jakiś port
-        this->writeInConsole("None port selected\n", USB);
+        this->writeInConsole("None port selected\n", LOG_USB);
     else
     {
         _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text()); //wyślij na usb wiadomość z pola textowego
@@ -564,25 +550,25 @@ void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
 
 void MainWindow::on_openGripperBtn_clicked()
 {
-    _pDobotArm->gripperState(OPEN, ST_SERVICE);
+    _pDobotArm->gripperState(DM_OPEN, ST_SERVICE);
 }
 
 
 void MainWindow::on_closeGripperBtn_clicked()
 {
-    _pDobotArm->gripperState(CLOSE, ST_SERVICE);
+    _pDobotArm->gripperState(DM_CLOSE, ST_SERVICE);
 }
 
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawićî jako stałe z xmla
     qDebug() << "Placing arm above the chessboard.";
-    _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
+    _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
     //todo: te liczby nazwać tym gdzie i czy są
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
                              _pDobotArm->getmiddleAboveBoardPos('y'),
                              _pDobotArm->getmiddleAboveBoardPos('z'));
 }
@@ -590,14 +576,14 @@ void MainWindow::on_startGmPosBtn_clicked()
 
 void MainWindow::on_startDtPosBtn_clicked()
 {
-    qDebug() << "Returning safely to the HOME positions.";
-    _pDobotArm->addTextToConsole("Returning safely to the HOME positions.\n", DOBOT);
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
+    qDebug() << "Returning safely to the DM_HOME positions.";
+    _pDobotArm->addTextToConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
                              _pDobotArm->getmiddleAboveBoardPos('y'),
                              _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
-    _pDobotArm->addCmdToList(TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
+    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
                              _pDobotArm->getHomePos('z'));
 }
 
@@ -662,6 +648,66 @@ void MainWindow::changeWindowtitle(QString title)
     this->setWindowTitle(title);
 }
 
+void MainWindow::showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex> list)
+{
+    QString QStrQueuedList;
+    ArmPosForCurrentCmdQueuedIndex item;
+
+    for(int i=0; i<list.count(); ++i)
+    {
+       item = list.at(i);
+       QStrQueuedList += QString::number(item.index) + ". " +  dobotMoveAsQstr(item.move) +
+               " " + sequenceTypeAsQstr(item.sequence) + QString::number(item.x) + " " +
+               QString::number(item.y) + " " + QString::number(item.z) + "\n";
+    }
+    ui->queuedPTE->clear();
+    ui->queuedPTE->setPlainText(QStrQueuedList);
+}
+
+void MainWindow::showArduinoGripperStateList(QList<ServoArduino> list)
+{
+    QString QStrQueuedList;
+    ServoArduino item;
+
+    for(int i=0; i<list.count(); ++i)
+    {
+       item = list.at(i);
+       QString QStrState = item.isGripperOpen ? "open" : "close";
+       QStrQueuedList += QString::number(item.index) + ". " + QStrState + "\n";
+    }
+    ui->servoQueuePTE->clear();
+    ui->servoQueuePTE->setPlainText(QStrQueuedList);
+}
+
+void MainWindow::showClientsList(QList<Clients> list)
+{
+    QString QStrClientsList;
+    Clients item;
+
+    for(int i=0; i<list.count(); ++i)
+    {
+       item = list.at(i);
+       QStrClientsList += QString::number(i+1) + ". ";
+
+       QString QStrName = "-";
+       if (!item.name.isNull())
+           QStrName = item.name;
+       QStrClientsList += QStrName;
+
+       if (item.type != PT_NONE)
+       {
+           QString QStrPlayerType = playerTypeAsQStr(item.type);
+           QString QStrStartState = item.isStartClickedByPlayer ? "1" : "0";
+           QStrClientsList += ", plr: " + QStrPlayerType + ", st:" + QStrStartState;
+       }
+       else if (item.queue != -1)
+           QStrClientsList += ", q:" + QString::number(item.queue);
+
+       QStrClientsList += "\n";
+    }
+    ui->clientsPTE->clear();
+    ui->clientsPTE->setPlainText(QStrClientsList);
+}
 
 void MainWindow::setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType)
 {

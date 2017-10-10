@@ -102,10 +102,10 @@ void Chessboard::findBoardPos(QString QStrPiecePositions)
 {
     m_QStrSiteMoveRequest = QStrPiecePositions; //niezbędne aktualnie powtórzenie
 
-    PieceFrom.Letter = this->findPieceLetterPos(QStrPiecePositions.left(1)); //todo: czy uzywana jest dobra z dwóch dostepnych funkcji?
+    PieceFrom.Letter = pieceLetterPos(QStrPiecePositions.left(1));
     PieceFrom.Digit = static_cast<DIGIT>(QStrPiecePositions.mid(1,1).toInt() - 1);
 
-    PieceTo.Letter = this->findPieceLetterPos(QStrPiecePositions.mid(2,1));
+    PieceTo.Letter = pieceLetterPos(QStrPiecePositions.mid(2,1));
     PieceTo.Digit = static_cast<DIGIT>(QStrPiecePositions.mid(3,1).toInt() - 1);
     qDebug() << "Chessboard::findBoardPos: PieceFrom.Letter =" << PieceFrom.Letter <<
                 ", PieceFrom.Digit =" << PieceFrom.Digit <<
@@ -113,50 +113,10 @@ void Chessboard::findBoardPos(QString QStrPiecePositions)
                 ", PieceTo.Digit =" << PieceTo.Digit;
 }
 
-LETTER Chessboard::findPieceLetterPos(QString QsLetter)
-{
-    LETTER letter;
-
-    if (QsLetter == "a" || QsLetter == "A") {letter = L_A; }
-    else if (QsLetter == "b" || QsLetter == "B") {letter = L_B;}
-    else if (QsLetter == "c" || QsLetter == "C") {letter = L_C;}
-    else if (QsLetter == "d" || QsLetter == "D") {letter = L_D;}
-    else if (QsLetter == "e" || QsLetter == "E") {letter = L_E;}
-    else if (QsLetter == "f" || QsLetter == "F") {letter = L_F;}
-    else if (QsLetter == "g" || QsLetter == "G") {letter = L_G;}
-    else if (QsLetter == "h" || QsLetter == "H") {letter = L_H;}
-    else qDebug() << "ERROR: Chessboard::findPieceLetterPos(QString QsLetter): "
-                     "Unknown QsLetter value.";
-
-    return letter;
-}
-
-QString Chessboard::findPieceLetterPos(LETTER letter)
-{
-    QString QstrLetter;
-
-    switch(letter)
-    {
-    case L_A: QstrLetter = "a"; break;
-    case L_B: QstrLetter = "b"; break;
-    case L_C: QstrLetter = "c"; break;
-    case L_D: QstrLetter = "d"; break;
-    case L_E: QstrLetter = "e"; break;
-    case L_F: QstrLetter = "f"; break;
-    case L_G: QstrLetter = "g"; break;
-    case L_H: QstrLetter = "h"; break;
-    default:
-        qDebug() << "ERROR: Chessboard::findPieceLetterPos(LETTER letter): Unknown letter value.";
-        break;
-    }
-
-    return QstrLetter;
-}
-
 QString Chessboard::getPiecieFromTo()
 {
-    QString piecieFromTo = findPieceLetterPos(PieceFrom.Letter) + QString::number(PieceFrom.Digit+1) +
-            findPieceLetterPos(PieceTo.Letter) + QString::number(PieceTo.Digit+1);
+    QString piecieFromTo = pieceLetterPos(PieceFrom.Letter) + QString::number(PieceFrom.Digit+1) +
+            pieceLetterPos(PieceTo.Letter) + QString::number(PieceTo.Digit+1);
 
     return piecieFromTo;
 }
@@ -242,7 +202,7 @@ void Chessboard::castlingFindRookToMove()
 void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                                    DIGIT digit, SEQUENCE_TYPE Type)
 {
-    if (Type == ST_RESTORE && partOfSequence == FROM) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
+    if (Type == ST_RESTORE && partOfSequence == DM_FROM) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
     {
         nGripperPiece = anRemoved[letter][digit];
         //...to w chwytaku jest bierka z obszaru zbitych
@@ -251,7 +211,7 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                     "aanRemoved[letter][digit]; = "
                  << anRemoved[letter][digit];
     }
-    else if (Type == ST_REMOVING && partOfSequence == TO) //jeżeli bierka została przemieszczona na...
+    else if (Type == ST_REMOVING && partOfSequence == DM_TO) //jeżeli bierka została przemieszczona na...
         //...obszar bierek zbitych z szachownicy...
     {
         //nPieceLetter i nPieceDigit nie moga być podawane jako parametry pozycji bierki na...
@@ -266,7 +226,7 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                  << anRemoved[remPieceDestLetter][remPieceDestDigit];
         nGripperPiece = 0; //...a chwytak nie trzyma już żadnej bierki
     }
-    else if (partOfSequence == FROM) //...a jeżeli bierka została pochwycona z szachownicy...
+    else if (partOfSequence == DM_FROM) //...a jeżeli bierka została pochwycona z szachownicy...
         //...(jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
     {
         nGripperPiece = anBoard[letter][digit]; //...to w chwytaku jest bierka...
@@ -274,7 +234,7 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
         anBoard[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
     }
 
-    else if (partOfSequence == TO)//lecz jeżeli bierka została przemieszczona na szachownicę
+    else if (partOfSequence == DM_TO)//lecz jeżeli bierka została przemieszczona na szachownicę
         //...(jest to każde inne polecenie ruchu w stylu 'pieceTo')...
     {
         anBoard[letter][digit] = nGripperPiece; //...to docelowe pole na...

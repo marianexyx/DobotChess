@@ -13,7 +13,7 @@ Websockets::Websockets(Chessboard *pChessboard, quint16 port, QObject *parent):
                 this, &Websockets::onNewConnection);
 
         qDebug() << "WebSocket server listening on port" << port;
-        emit addTextToConsole("WebSocket server listening on port" + port, WEBSOCKET);
+        emit addTextToConsole("WebSocket server listening on port" + port, LOG_WEBSOCKET);
     }
 
     _pChessboard = pChessboard;
@@ -26,7 +26,7 @@ Websockets::~Websockets()
     //jednen obiekt/ramię to nie jest mi to potrzebne
 }
 
-void Websockets::onNewConnection() //nowe połączenia
+void Websockets::onNewConnection()
 {
     qDebug() << "Websockets::onNewConnection()";
     QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
@@ -34,11 +34,12 @@ void Websockets::onNewConnection() //nowe połączenia
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
     this->newClientSocket(pSocket);
-    emit addTextToConsole("New connection \n", WEBSOCKET);
+    emit addTextToConsole("New connection \n", LOG_WEBSOCKET);
 
     std::string s = std::to_string(m_clients.size());
     char const *pchar = s.c_str();
     emit setBoardDataLabels(pchar, BDL_SOCKETS_ONLINE);
+    emit showClientsList(m_clients);
 }
 
 //TODO: Q_FOREACH (QWebSocket *pNextClient, m_clients) ma być depreciated
@@ -49,13 +50,13 @@ void Websockets::onNewConnection() //nowe połączenia
 void Websockets::resetPlayersStartConfirmInfo()
 {
     qDebug() << "Websockets::resetPlayersStartConfirmInfo()";
-    if (this->getClientStateByType(PT_WHITE) != CS_CLICKED_START)
-           this->setClientStateByType(PT_WHITE, CS_NONE);
-    if (this->getClientStateByType(PT_BLACK) != CS_CLICKED_START)
-        this->setClientStateByType(PT_BLACK, CS_NONE);
+    if (!this->isStartClickedByPlayerType(PT_WHITE))
+           this->setClientStateByType(PT_WHITE, false);
+    if (!this->isStartClickedByPlayerType(PT_BLACK))
+        this->setClientStateByType(PT_BLACK, false);
 }
 
-QString Websockets::getTableData() //as JSON
+QString Websockets::getTableDataAsJSON()
 {
     //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt","wtime":345581,"btime":300000,"queue":"empty"}
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + this->getPlayerNameByType(PT_WHITE) +
@@ -63,12 +64,12 @@ QString Websockets::getTableData() //as JSON
             "\",\"turn\":\"" + _pChessboard->getStrWhoseTurn() +
             "\",\"wtime\":" + QString::number(_pChessboard->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pChessboard->getBlackTimeLeft()) +
-            ",\"queue\":\"" + this->getQueuedClients();
+            ",\"queue\":\"" + this->getQueuedClientsListAsQStr();
 
     if (_pChessboard->isStartTimerRunning())
     {
-        QString QStrWhiteClickedStart = (this->getClientStateByType(PT_WHITE) == CS_CLICKED_START) ? "w" : "x";
-        QString QStrBlackClickedStart = (this->getClientStateByType(PT_BLACK) == CS_CLICKED_START) ? "b" : "x";
+        QString QStrWhiteClickedStart = this->isStartClickedByPlayerType(PT_WHITE) ? "w" : "x";
+        QString QStrBlackClickedStart = this->isStartClickedByPlayerType(PT_BLACK) ? "b" : "x";
         QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
                 QString::number(_pChessboard->getStartTimeLeft());
     }
@@ -80,7 +81,7 @@ QString Websockets::getTableData() //as JSON
 
     QStrTableData += "\"}";
 
-    qDebug() << "Websockets::getTableData(): QStrTableData =" << QStrTableData;
+    qDebug() << "Websockets::getTableDataAsJSON(): QStrTableData =" << QStrTableData;
     return QStrTableData;
 }
 
@@ -89,7 +90,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     if (QStrWsMsg != "keepConnected")
     {
         qDebug() << "Websockets::receivedMsg (from site):" << QStrWsMsg;
-        emit addTextToConsole("received: " + QStrWsMsg + "\n", WEBSOCKET);
+        emit addTextToConsole("received: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
     }
 
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -112,7 +113,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     else if (QStrWsMsg.left(4) == "move") { this->sendToChess(QStrWsMsg); }
     //todo: kto decyduje o tym komunikacie (reset)? oby nei gracze
     else if (QStrWsMsg == "reset") { this->sendToChess(QStrWsMsg); }
-    else if (QStrWsMsg == "getTableData") pClient->sendTextMessage(this->getTableData());
+    else if (QStrWsMsg == "getTableDataAsJSON") pClient->sendTextMessage(this->getTableDataAsJSON());
     else if (QStrWsMsg == "giveUp")
     {
         if (pClient) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam gdzie są...
@@ -122,12 +123,12 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             if (pClient == this->getPlayerSocket(PT_WHITE))
             {
                 qDebug() << "Websockets::receivedMsg(): giveUp white player";
-                this->addTextToConsole("Player has logouted. New white: WHITE\n", WEBSOCKET);
+                this->addTextToConsole("Player has logouted. New white: WHITE\n", LOG_WEBSOCKET);
                 this->endOfGame(ET_GIVE_UP, pClient);
                 emit setBoardDataLabels(this->getPlayerNameByType(PT_WHITE), BDL_WHITE_NAME);
 
                 Q_FOREACH (Clients client, m_clients)
-                    client.socket->sendTextMessage("givedUpWhite " + this->getTableData());
+                    client.socket->sendTextMessage("givedUpWhite " + this->getTableDataAsJSON());
                 //todo: tu się wyślą wszystkie ifnromacje, ale nie opcja startu gry- czy to dobrze?
 
                 emit MsgFromWebsocketsToChess("reset");
@@ -135,12 +136,12 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             else if (pClient == this->getPlayerSocket(PT_BLACK))
             {
                 qDebug() << "Websockets::receivedMsg(): logout black player";
-                this->addTextToConsole("Player has logouted. New black: BLACK\n", WEBSOCKET);
+                this->addTextToConsole("Player has logouted. New black: BLACK\n", LOG_WEBSOCKET);
                 this->endOfGame(ET_GIVE_UP, pClient);
                 emit setBoardDataLabels(this->getPlayerNameByType(PT_BLACK), BDL_BLACK_NAME);
 
                 Q_FOREACH (Clients client, m_clients)
-                    client.socket->sendTextMessage("givedUpBlack " + this->getTableData());
+                    client.socket->sendTextMessage("givedUpBlack " + this->getTableDataAsJSON());
 
                 emit MsgFromWebsocketsToChess("reset");
             }
@@ -181,7 +182,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
         qDebug() << "Websockets::receivedMsg(): new" << QStrPlayerType << "player:" <<
                     this->getPlayerNameByType(playerChair);
         emit this->addTextToConsole("New white player: " + this->getPlayerNameByType(playerChair) +
-                                    "\n", WEBSOCKET);
+                                    "\n", LOG_WEBSOCKET);
         emit setBoardDataLabels(this->getPlayerNameByType(playerChair),
                                 playerChair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
 
@@ -189,7 +190,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             _pChessboard->startQueueTimer();
 
         Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableData());
+            client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
     else if (QStrWsMsg == "standUp")
     {
@@ -204,12 +205,12 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             qDebug() << "Websockets::receivedMsg(): new" << QStrPlayer << "player:" <<
                         this->getPlayerNameByType(chairToClear);
             emit this->addTextToConsole("New " + QStrPlayer + " player: " + this->getPlayerNameByType(chairToClear) +
-                                        "\n", WEBSOCKET);
+                                        "\n", LOG_WEBSOCKET);
             emit setBoardDataLabels(this->getPlayerNameByType(chairToClear),
                                     chairToClear == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
 
             Q_FOREACH (Clients client, m_clients)
-                client.socket->sendTextMessage(this->getTableData());
+                client.socket->sendTextMessage(this->getTableDataAsJSON());
 
             emit MsgFromWebsocketsToChess("reset");
         }
@@ -229,13 +230,13 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             this->endOfGame(ET_SOCKET_LOST, pClient);
             this->setClientName(pClient, QStrName);
             Q_FOREACH (Clients client, m_clients)
-                client.socket->sendTextMessage(this->getTableData());
+                client.socket->sendTextMessage(this->getTableDataAsJSON());
             //todo: brak info o tym dlaczego gra się zakończyła
         }
         else
         {
             this->setClientName(pClient, QStrName);
-            pClient->sendTextMessage(this->getTableData());
+            pClient->sendTextMessage(this->getTableDataAsJSON());
         }
     }
     else if (QStrWsMsg.left(9) == "promoteTo") { this->sendToChess(QStrWsMsg); }
@@ -243,21 +244,23 @@ void Websockets::receivedMsg(QString QStrWsMsg)
     {
         this->addClientToQueue(pClient);
         Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableData());
+            client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
     else if (QStrWsMsg == "leaveQueue")
     {
         this->removeClientFromQueueBySocket(pClient);
         Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableData());
+            client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
     else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWsMsg;
+
+    emit showClientsList(m_clients);
 }
 
 void Websockets::sendMsg(QString QStrWsMsg) //todo: ta funkcja to syf
 {
     qDebug() << "Websockets::sendMsg() received:" << QStrWsMsg;
-    emit addTextToConsole("sent: " + QStrWsMsg + "\n", WEBSOCKET);
+    emit addTextToConsole("sent: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
 
     if (QStrWsMsg == "newOk" || QStrWsMsg.left(8) == "history ")
     {
@@ -296,7 +299,7 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: ta funkcja to syf
 
             if (!this->isPlayerChairEmpty(PT_WHITE) && !this->isPlayerChairEmpty(PT_BLACK))
                 _pChessboard->startQueueTimer(); //todo: to też
-            QStrWsMsg = QStrWsMsg + " " + this->getTableData();
+            QStrWsMsg = QStrWsMsg + " " + this->getTableDataAsJSON();
         }
         Q_FOREACH (Clients client, m_clients)
             client.socket->sendTextMessage(QStrWsMsg);
@@ -306,15 +309,15 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: ta funkcja to syf
         //todo: ogarnąć w końcu funkcję czyszczenia danych przy końcach...
         //...gry- w sumie Websockets::endOfGame daje chyba radę- ogarnąć na spokojnie
         this->endOfGame(QStrWsMsg.right(5) == "White" ? ET_WHIE_WON : ET_BLACK_WON);
-        //todo: doklejać info z którego wiemy że nadszedł timeOut (najlepiej jako argument do getTableData)
+        //todo: doklejać info z którego wiemy że nadszedł timeOut (najlepiej jako argument do getTableDataAsJSON)
         Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableData());
+            client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
     else if (QStrWsMsg == "timeOutStartQueue" )
     {
         this->endOfGame(ET_TIMEOUT_START);
         Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableData());
+            client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
     else qDebug() << "ERRROR: uknown Websockets::sendMsg() parameter:" << QStrWsMsg;
 }
@@ -322,7 +325,7 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: ta funkcja to syf
 void Websockets::sendToChess(QString QsMsgForChessClass)
 {
     qDebug() << "Sending to 'chess' class: " << QsMsgForChessClass;
-    emit this->addTextToConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", WEBSOCKET);
+    emit this->addTextToConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", LOG_WEBSOCKET);
     emit this->MsgFromWebsocketsToChess(QsMsgForChessClass);
 }
 
@@ -338,7 +341,7 @@ void Websockets::socketDisconnected()
             this->endOfGame(ET_SOCKET_LOST, pClient);
 
             Q_FOREACH (Clients client, m_clients)
-                client.socket->sendTextMessage(this->getTableData());
+                client.socket->sendTextMessage(this->getTableDataAsJSON());
 
             emit MsgFromWebsocketsToChess("reset");
         }
@@ -347,7 +350,7 @@ void Websockets::socketDisconnected()
             this->endOfGame(ET_SOCKET_LOST, pClient);
 
             Q_FOREACH (Clients client, m_clients)
-                client.socket->sendTextMessage(this->getTableData());
+                client.socket->sendTextMessage(this->getTableDataAsJSON());
 
             emit MsgFromWebsocketsToChess("reset");
         }
@@ -355,7 +358,7 @@ void Websockets::socketDisconnected()
         else
         {
             qDebug() << "non-player disconnected";
-            emit addTextToConsole("non-player disconnected\n", WEBSOCKET);
+            emit addTextToConsole("non-player disconnected\n", LOG_WEBSOCKET);
         }
 
         pClient->deleteLater();
@@ -373,6 +376,7 @@ void Websockets::socketDisconnected()
     std::string s = std::to_string(m_clients.size());
     char const *pchar = s.c_str();
     emit setBoardDataLabels(pchar, BDL_SOCKETS_ONLINE);
+    emit showClientsList(m_clients);
 }
 
 void Websockets::msgFromChessboardToWebsockets(QString QStrWsMsg) //todo: niepotrzebne to przejście
@@ -382,24 +386,12 @@ void Websockets::msgFromChessboardToWebsockets(QString QStrWsMsg) //todo: niepot
 
 void Websockets::moveNextClientFromQueueToTableIfExists(PLAYERS_TYPES chair)
 {
-    qDebug() << "inside Websockets::moveNextClientFromQueueToTableIfExists()";
-    if (this->getQueuedClients() != "queueEmpty")
+    if (this->getQueuedClientsListAsQStr() != "queueEmpty")
     {
-        qDebug() << "Websockets::moveNextClientFromQueueToTableIfExists(): "
-                    "next queued client exists";
-
         Clients nextQueuedClient = this->getClientBySocket(this->getNextQueuedClientsSocket());
-        qDebug() << "Websockets::moveNextClientFromQueueToTableIfExists(): move client:" <<
-                     nextQueuedClient.name << "from queue to table";
-
         this->removeClientFromQueueBySocket(nextQueuedClient.socket);
-
         this->setPlayerType(nextQueuedClient.socket, chair);
-        QString QStrType = (nextQueuedClient.type == PT_WHITE) ? "white" : "black";
-        qDebug() << "Websockets::moveNextClientFromQueueToTableIfExists(): "
-                    "client from queue new type:" << QStrType;
-
-        this->setClientStateBySocket(nextQueuedClient.socket, CS_NONE);
+        this->setClientStateBySocket(nextQueuedClient.socket, false);
     }
 }
 
@@ -452,25 +444,25 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
         break;
 
     case ET_TIMEOUT_START:
-        if (this->getClientStateByType(PT_WHITE) != CS_CLICKED_START)
+        if (!this->isStartClickedByPlayerType(PT_WHITE))
         {
             this->clearPlayerType(PT_WHITE);
             this->moveNextClientFromQueueToTableIfExists(PT_WHITE);
             //todo: funkcje informacyjne powinny wykonywać się wewnątrz funkcji zmieniającej nazwy
-            qDebug() << "Websockets::receivedMsg(): new white player:" <<
+            qDebug() << "Websockets::endOfGame(): new white player:" <<
                         this->getPlayerNameByType(PT_WHITE);
             emit this->addTextToConsole("New white player: " + this->getPlayerNameByType(PT_WHITE) +
-                                        "\n", WEBSOCKET);
+                                        "\n", LOG_WEBSOCKET);
         }
-        if (this->getClientStateByType(PT_BLACK) != CS_CLICKED_START)
+        if (!this->isStartClickedByPlayerType(PT_BLACK))
         {
             this->clearPlayerType(PT_BLACK);
             this->moveNextClientFromQueueToTableIfExists(PT_BLACK);
             //todo: funkcje informacyjne powinny wykonywać się wewnątrz funkcji zmieniającej nazwy
-            qDebug() << "Websockets::receivedMsg(): new black player:" <<
+            qDebug() << "Websockets::endOfGame(): new black player:" <<
                         this->getPlayerNameByType(PT_BLACK);
             emit this->addTextToConsole("New white player: " + this->getPlayerNameByType(PT_BLACK) +
-                                        "\n", WEBSOCKET);
+                                        "\n", LOG_WEBSOCKET);
         }
 
         emit setBoardDataLabels(this->getPlayerNameByType(PT_WHITE), BDL_WHITE_NAME);
@@ -494,10 +486,11 @@ void Websockets::newClientSocket(QWebSocket *playerSocket)
     newClient.socket = playerSocket;
     newClient.name.clear();
     newClient.queue = -1;
-    newClient.state = CS_NONE;
+    newClient.isStartClickedByPlayer = false;
     newClient.type = PT_NONE;
 
     //todo: sprawdzać czy któreś dane się w liście nie powtarzają
+    //todo: zabezpieczać się przed mozliwością nadawania kolejki jeżeli gracz jest w grze i na odwrót
 
     m_clients << newClient;
 }
@@ -566,7 +559,7 @@ void Websockets::clearPlayerType(PLAYERS_TYPES type)
             {
                 Clients changedClient = client;
                 changedClient.type = PT_NONE;
-                changedClient.state = CS_NONE;
+                changedClient.isStartClickedByPlayer = false;
 
                 int nClientpos = m_clients.indexOf(client);
                 if (nClientpos >= 0 && nClientpos < m_clients.size())
@@ -584,22 +577,24 @@ void Websockets::clearPlayerType(PLAYERS_TYPES type)
     else qDebug() << "WARNING: Websockets::clearPlayerType- already clear";
 }
 
-void Websockets::setClientStateBySocket(QWebSocket *playerSocket, CLIENT_STATE state)
+void Websockets::setClientStateBySocket(QWebSocket *playerSocket, bool state)
 {
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.socket == playerSocket)
         {
             Clients changedClient = client;
-            changedClient.state = state;
+            changedClient.isStartClickedByPlayer = state;
 
             int nClientpos = m_clients.indexOf(client);
             if (nClientpos >= 0 && nClientpos < m_clients.size())
             {
                 m_clients.replace(nClientpos, changedClient);
-                qDebug() << "Websockets::setClientStateBySocket: new state =" << m_clients.at(nClientpos).state;
+                qDebug() << "Websockets::setClientStateBySocket: new state =" <<
+                            m_clients.at(nClientpos).isStartClickedByPlayer;
             }
-            else qDebug() << "ERROR: Websockets::setClientStateBySocket: iteration error. iter val =" << nClientpos;
+            else qDebug() << "ERROR: Websockets::setClientStateBySocket: iteration error. iter val =" <<
+                             nClientpos;
 
             return;
         }
@@ -607,22 +602,24 @@ void Websockets::setClientStateBySocket(QWebSocket *playerSocket, CLIENT_STATE s
     qDebug() << "ERROR: Websockets::setClientStateBySocket- client not found";
 }
 
-void Websockets::setClientStateByType(PLAYERS_TYPES type, CLIENT_STATE state)
+void Websockets::setClientStateByType(PLAYERS_TYPES type, bool state)
 {
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.type == type)
         {
             Clients changedClient = client;
-            changedClient.state = state;
+            changedClient.isStartClickedByPlayer = state;
 
             int nClientpos = m_clients.indexOf(client);
             if (nClientpos >= 0 && nClientpos < m_clients.size())
             {
                 m_clients.replace(nClientpos, changedClient);
-                qDebug() << "Websockets::setClientStateByType: new state =" << m_clients.at(nClientpos).state;
+                qDebug() << "Websockets::setClientStateByType: new state =" <<
+                            m_clients.at(nClientpos).isStartClickedByPlayer;
             }
-            else qDebug() << "ERROR: Websockets::setClientStateByType: iteration error. iter val =" << nClientpos;
+            else qDebug() << "ERROR: Websockets::setClientStateByType: iteration error. iter val =" <<
+                             nClientpos;
 
             return;
         }
@@ -653,9 +650,11 @@ void Websockets::addClientToQueue(QWebSocket *playerSocket)
             }
             else qDebug() << "ERROR: Websockets::addClientToQueue: iteration error. iter val =" << nClientpos;
 
+            emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
             return;
         }
     }
+    emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
 void Websockets::removeClient(QWebSocket *playerSocket)
@@ -686,15 +685,17 @@ void Websockets::removeClientFromQueueBySocket(QWebSocket *playerSocket)
             else qDebug() << "ERROR: Websockets::removeClientFromQueueBySocket: iteration error. iter val ="
                           << nClientpos;
 
+            emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
             return;
         }
     }
+    emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
 void Websockets::clearBothPlayersStates()
 {
-    this->setClientStateByType(PT_WHITE, CS_NONE);
-    this->setClientStateByType(PT_BLACK, CS_NONE);
+    this->setClientStateByType(PT_WHITE, false);
+    this->setClientStateByType(PT_BLACK, false);
 }
 
 Clients Websockets::getClientBySocket(QWebSocket *playerSocket)
@@ -752,7 +753,7 @@ QWebSocket *Websockets::getNextQueuedClientsSocket()
     return nullptr;
 }
 
-QString Websockets::getQueuedClients()
+QString Websockets::getQueuedClientsListAsQStr()
 {
     QString QStrQueuedClients;
     QStrQueuedClients.clear();
@@ -764,7 +765,6 @@ QString Websockets::getQueuedClients()
         if (minQueue > client.queue && client.queue > 0)
             minQueue = client.queue;
     }
-    //qDebug() << "minQueue =" << minQueue;
     int nNumberOFClients = m_clients.size();
     int nLoopBreakingCounter = 0;
     if (minQueue != 0 && minQueue != std::numeric_limits<int64_t>::max())
@@ -778,26 +778,22 @@ QString Websockets::getQueuedClients()
             }
 
             lastBigggestQueue = maxQueue;
-            //qDebug() << "new lastBigggestQueue =" << lastBigggestQueue;
 
             Q_FOREACH (Clients client, m_clients)
             {
                 if (client.queue == maxQueue)
                 {
                     QStrQueuedClients = client.name + "," + QStrQueuedClients;
-                    /*qDebug() << "found last queued client:" << client.queue
-                         << ", new queue list =" << QStrQueuedClients;*/
                     maxQueue = 0;
                 }
             }
             if (nLoopBreakingCounter > nNumberOFClients + 1)
             {
-                qDebug() << "ERROR: Websockets::getQueuedClients: incorrect loop break. nLoopBreakingCounter ="
+                qDebug() << "ERROR: Websockets::getQueuedClientsListAsQStr: incorrect loop break. nLoopBreakingCounter ="
                          << nLoopBreakingCounter << ", nNumberOFClients =" << nNumberOFClients+1;
                 break;
             }
             nLoopBreakingCounter++;
-            //qDebug() << "lastBigggestQueue =" << lastBigggestQueue << ", minQueue =" << minQueue;
         } while (lastBigggestQueue != minQueue);
     }
     if (QStrQueuedClients.isEmpty()) QStrQueuedClients = "queueEmpty";
@@ -816,14 +812,14 @@ QString Websockets::getQueuedClients()
         testClient.queue = i;
         qDebug() << "client" << testClient.name << "queue =" << testClient.queue;
         testClient.socket = nullptr;
-        testClient.state = CS_NONE;
+        testClient.isStartClickedByPlayer = false;
         testClient.type = PT_NONE;
 
         m_clients << testClient;
     }
 
     qDebug() << "Websockets::testQueuedClients(): m_clients.size =" << m_clients.size();
-    QString QStrQueuedClients = this->getQueuedClients();
+    QString QStrQueuedClients = this->getQueuedClientsListAsQStr();
     qDebug() << "Websockets::testQueuedClients(): QStrQueuedClients =" << QStrQueuedClients;
 }*/
 
@@ -832,9 +828,7 @@ PLAYERS_TYPES Websockets::getClientTypeBySocket(QWebSocket *playerSocket)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.socket == playerSocket)
-        {
             return client.type;
-        }
     }
     qDebug() << "ERROR: Websockets::getClientTypeBySocket(): socket not found";
     return PT_NONE;
@@ -845,9 +839,7 @@ bool Websockets::isPlayerChairEmpty(PLAYERS_TYPES type)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.type == type)
-        {
             return false;
-        }
     }
     return true;
 }
@@ -857,9 +849,7 @@ int64_t Websockets::getQueuedClientByName(QString name)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.name == name)
-        {
             return client.queue;
-        }
     }
     qDebug() << "ERROR: Websockets::getQueuedClientByName(): client not found";
     return -1;
@@ -870,9 +860,7 @@ int64_t Websockets::getQueuedClientBySocket(QWebSocket *playerSocket)
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.socket == playerSocket)
-        {
             return client.queue;
-        }
     }
     qDebug() << "ERROR: Websockets::getQueuedClientBySocket(): client not found";
     return -1;
@@ -885,9 +873,7 @@ QWebSocket *Websockets::getPlayerSocket(PLAYERS_TYPES type)
         Q_FOREACH (Clients client, m_clients)
         {
             if (client.type == type)
-            {
                 return client.socket;
-            }
         }
         return nullptr;
     }
@@ -899,24 +885,22 @@ QWebSocket *Websockets::getPlayerSocket(PLAYERS_TYPES type)
     }
 }
 
-CLIENT_STATE Websockets::getClientStateByType(PLAYERS_TYPES type) //todo: zamienić na bool
+bool Websockets::isStartClickedByPlayerType(PLAYERS_TYPES type)
 {
     if (type != PT_NONE)
     {
         Q_FOREACH (Clients client, m_clients)
         {
             if (client.type == type)
-            {
-                return client.state;
-            }
+                return client.isStartClickedByPlayer;
         }
-        return CS_NONE;
+        return false;
     }
     else
     {
-        qDebug() << "ERROR: Websockets::getClientStateByType- wrong parameter:"
+        qDebug() << "ERROR: Websockets::isStartClickedByPlayerType- wrong parameter:"
                   << type;
-        return CS_NONE;
+        return false;
     }
 }
 
@@ -929,9 +913,7 @@ QString Websockets::getPlayerNameByType(PLAYERS_TYPES type) //todo: źle ta funk
         Q_FOREACH (Clients client, m_clients)
         {
             if (client.type == type)
-            {
                 return client.name;
-            }
         }
         qDebug() << "ERROR: Websockets::getPlayerNameByType- player not found:"
                   << playerTypeAsQStr(type);
@@ -962,4 +944,28 @@ bool Websockets::isClientNameExists(QString name)
             return true;
     }
     return false;
+}
+
+int Websockets::getAmountOfQueuedClients()
+{
+    int64_t maxQueue = 0;
+    Q_FOREACH (Clients client, m_clients)
+    {
+        if (maxQueue < client.queue && client.queue > 0)
+            maxQueue = client.queue;
+    }
+
+    if (maxQueue > 0)
+    {
+        int64_t minQueue = std::numeric_limits<int64_t>::max();
+        Q_FOREACH (Clients client, m_clients)
+        {
+            if (minQueue > client.queue && client.queue > 0)
+                minQueue = client.queue;
+        }
+        int nAmountOfQueuedClients = 1 + maxQueue - minQueue;
+
+        return nAmountOfQueuedClients;
+    }
+    else return 0;
 }

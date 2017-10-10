@@ -81,6 +81,8 @@ private slots:
     void on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged);
     void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
+    void showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex> list);
+    void showArduinoGripperStateList(QList<ServoArduino> list);
 
     //websocket slots
     void on_calibrateBtn_clicked();
@@ -90,6 +92,7 @@ private slots:
     void on_executeDobotComandsBtn_clicked();
     void on_AIBtn_clicked();
     void on_AIEnemySendBtn_clicked();
+    void showClientsList(QList<Clients> list);
 
     //arduino usb slots
     void updatePortsComboBox(int nUsbPorst);

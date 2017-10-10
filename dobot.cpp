@@ -114,6 +114,7 @@ void Dobot::QueuedIdList()
             _pArduinoUsb->sendDataToUsb("servo" + QStrServoState);
             arduinoGripperStateList.removeFirst();
         }
+        emit showArduinoGripperStateList(arduinoGripperStateList);
     }
 
     if (!QueuedCmdIndexList.isEmpty())
@@ -129,43 +130,44 @@ void Dobot::QueuedIdList()
             {
                 takenPosId = QueuedCmdIndexList.takeFirst(); //wypchnij na dobota kolejny id...
                 //...ruchu z kontenera. najstarszy wpis w kontenerze znajduje się na jego początku.
+
                 switch(takenPosId.move)
                 {
-                case TO_POINT:
+                case DM_TO_POINT:
                     ptpCmd.x = takenPosId.x;
                     ptpCmd.y = takenPosId.y;
                     ptpCmd.z = takenPosId.z;
                     ptpCmd.r = takenPosId.r;
                     SetPTPCmd(&ptpCmd, true, &takenPosId.index);
                     break;
-                case WAIT:
+                case DM_WAIT:
                     SetWAITCmd(&gripperMoveDelay, true, &takenPosId.index);
                     break;
-                case OPEN:
+                case DM_OPEN:
                 {
                     m_gripperServo.dutyCycle = m_fGripOpened;
                     int openGripResult = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
                     if (openGripResult != DobotCommunicate_NoError)
                     {
                         qDebug() << "ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong";
-                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", DOBOT);
+                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", LOG_DOBOT);
                     }
                 }
                     break;
-                case CLOSE:
+                case DM_CLOSE:
                 {
                     m_gripperServo.dutyCycle = m_fGripClosed;
                     int closeGripResult = SetIOPWM(&m_gripperServo, true, &takenPosId.index);
                     if (closeGripResult != DobotCommunicate_NoError)
                     {
                         qDebug() << "ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong";
-                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", DOBOT);
+                        this->addTextToConsole("ERROR: Dobot::QueuedIdList(): SetIOPWM gone wrong\n", LOG_DOBOT);
                     }
                 }
                     break;
-                case HOME:
+                case DM_HOME:
                 {
-                    this->addTextToConsole("HomeCmd: recalibrating arm...\n", DOBOT);
+                    this->addTextToConsole("HomeCmd: recalibrating arm...\n", LOG_DOBOT);
                     HOMECmd HOMEChess;
                     HOMEChess.reserved = 1; //todo: jak się to ma do innych indexów?
                     int result = SetHOMECmd(&HOMEChess, true, &takenPosId.index);
@@ -173,15 +175,16 @@ void Dobot::QueuedIdList()
                         qDebug() << "ERROR: SetHOMECmd result != DobotCommunicate_NoError";
                 }
                     break;
-                case UP:
-                case DOWN:
+                case DM_UP:
+                case DM_DOWN:
                 default:
                     qDebug() << "ERROR: Dobot::QueuedIdList(): wrong takenPosId.type:" << takenPosId.sequence;
                     this->addTextToConsole("ERROR: Dobot::QueuedIdList(): wrong takenPosId.type:"
-                                           + takenPosId.sequence, DOBOT);
+                                           + takenPosId.sequence, LOG_DOBOT);
                     break;
                 }
             } 
+        emit showActualDobotQueuedCmdIndexList(QueuedCmdIndexList);
         }
     }
 
@@ -190,7 +193,7 @@ void Dobot::QueuedIdList()
         qDebug() << "Dobot::QueuedIdList(): retreat";
         PtpCmdActualVal retreatId;
         retreatId = (pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
-        addCmdToList(TO_POINT, ST_NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
+        addCmdToList(DM_TO_POINT, ST_NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
         m_ullRetreatIndex = 10000000; //jakas duza liczba
     }
 }
@@ -202,7 +205,7 @@ void Dobot::onConnectDobot()
         if (ConnectDobot(0, 115200) != DobotConnect_NoError) emit DobotErrorMsgBox();
         connectStatus = true;
         qDebug() << "Dobot connection success";
-        this->addTextToConsole("Dobot connected \n", DOBOT);
+        this->addTextToConsole("Dobot connected \n", LOG_DOBOT);
 
         QTimer *periodicTaskTimer = new QTimer(this);
         periodicTaskTimer->setObjectName("periodicTaskTimer");
@@ -233,7 +236,7 @@ void Dobot::onConnectDobot()
         {
             qDebug() << "ERROR: Dobot::onConnectDobot(): GetQueuedCmdCurrentIndex gone wrong";
             this->addTextToConsole("ERROR: Dobot::onConnectDobot(): "
-                                   "GetQueuedCmdCurrentIndex gone wrong \n", DOBOT);
+                                   "GetQueuedCmdCurrentIndex gone wrong \n", LOG_DOBOT);
         }
 
         m_ullCoreQueuedCmdIndex = m_ullDobotQueuedCmdIndex; //jeśli dobot przed aktualnym uruchomieniem programu...
@@ -344,7 +347,7 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
 
     if (letter >=0 && letter <=7 && digit >=0 && digit <=7)
     { //todo: powtórzony kod zabezpieczeń z Dobot::armUpDown
-        if ((Type == ST_REMOVING && partOfSequence == TO) || (Type == ST_RESTORE && partOfSequence == FROM))
+        if ((Type == ST_REMOVING && partOfSequence == DM_TO) || (Type == ST_RESTORE && partOfSequence == DM_FROM))
         {
             int nRemPieceType;
             LETTER remPieceDestLetter;
@@ -396,16 +399,16 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
         qDebug() << "Previous move parameteres: x y z=" << actualPosIdx.x << actualPosIdx.y << actualPosIdx.z;
         if (f_zFromTo != actualPosIdx.z && (f_xFromTo != actualPosIdx.x || f_yFromTo != actualPosIdx.y))
         {
-            this->addCmdToList(TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo +
+            this->addCmdToList(DM_TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo +
                                _pChessboard->getMaxPieceHeight(), f_rFromTo);
 
-            this->writeMoveTypeInConsole(TO_POINT, Type);
+            this->writeMoveTypeInConsole(DM_TO_POINT, Type);
             QString QstrMoveType;
-            partOfSequence == FROM ? QstrMoveType = ": piece from " : QstrMoveType = ": piece to ";
+            partOfSequence == DM_FROM ? QstrMoveType = ": piece from " : QstrMoveType = ": piece to ";
             qDebug() << "Dobot::pieceFromTo:" << QstrMoveType << "nLetter ="
                      << letter << ", nDigit =" << digit << ", Type =" << Type;
-            emit this->addTextToConsole(QstrMoveType + _pChessboard->findPieceLetterPos(letter)
-                                        + QString::number(digit+1) + "\n", NOTHING);
+            emit this->addTextToConsole(QstrMoveType + pieceLetterPos(letter)
+                                        + QString::number(digit+1) + "\n", LOG_NOTHING);
             //todo: naprzemiennie używam writeMoveTypeInConsole() i addTextToConsole() - ?
         }
         else qDebug() << "ERROR: Dobot::pieceFromTo: trying to move Z axis with X or Y axis";
@@ -419,7 +422,7 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
 
 void Dobot::gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type)
 {
-    qDebug() << "Dobot::gripperState:" << (state == OPEN ? "open" : "close");
+    qDebug() << "Dobot::gripperState:" << (state == DM_OPEN ? "open" : "close");
     this->addCmdToList(state, Type);
     this->writeMoveTypeInConsole(state, Type);
 }
@@ -428,15 +431,15 @@ void Dobot::wait(int nMs, SEQUENCE_TYPE sequence)
 {
     gripperMoveDelay.timeout = nMs; //czekaj chwilę po dojściu na pozycję by silniki...
     //...chwytaka zdążyły się ruszyć, zanim ramię zacznie wykonywać kolejny ruch
-    this->addCmdToList(WAIT, sequence);
-    this->writeMoveTypeInConsole(WAIT, sequence);
+    this->addCmdToList(DM_WAIT, sequence);
+    this->writeMoveTypeInConsole(DM_WAIT, sequence);
 }
 
 void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type)
 { //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     //pozycje obszaru bierek usuniętych
-    if (Type == ST_REMOVING && partOfSequence == TO) //jeżeli odstawiamy bierkę na obszar zbitych...
+    if (Type == ST_REMOVING && partOfSequence == DM_TO) //jeżeli odstawiamy bierkę na obszar zbitych...
     {
         //TODO: ten zapis fieldNrToFieldPos działa, ale zmienić jakoś nazewnictwo funkcji, bo jest...
         //...nieadekwatna w tym przypadku.
@@ -446,7 +449,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
         if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
         {
             qDebug() << "Dobot::armUpDown: nGripperPiece =" << _pChessboard->nGripperPiece
-                     << ", isArmGoingUp?: " << (armDestination == UP ? "up" : "down");
+                     << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
 
             f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
                     [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
@@ -454,8 +457,8 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
             f_yUpDown = _pChessboard->adRemovedPiecesPositions_y
                     [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
                     [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
-            if (armDestination == UP) f_zUpDown = _pChessboard->getMaxRemovedPieceHeight();
-            else if (armDestination == DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
+            if (armDestination == DM_UP) f_zUpDown = _pChessboard->getMaxRemovedPieceHeight();
+            else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
                     [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, ROW)]
                     [_pChessboard->fieldNrToFieldPos(_pChessboard->nGripperPiece, COLUMN)];
             f_rUpDown = ACTUAL_POS;
@@ -467,21 +470,21 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
             return;
         }
     }
-    else if (Type == ST_RESTORE && partOfSequence == FROM) //...lub pochwycamy bierkę z obszaru zbitych
+    else if (Type == ST_RESTORE && partOfSequence == DM_FROM) //...lub pochwycamy bierkę z obszaru zbitych
     {
         if (_pChessboard->PieceActualPos.Letter >=0 && _pChessboard->PieceActualPos.Letter <=7 &&
                 _pChessboard->PieceActualPos.Digit >=0 && _pChessboard->PieceActualPos.Digit <=7)
         {
             qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << _pChessboard->PieceActualPos.Letter
-                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?: " << (armDestination == UP ? "up" : "down");
+                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
 
             f_xUpDown = _pChessboard->adRemovedPiecesPositions_x
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_yUpDown = _pChessboard->adRemovedPiecesPositions_y
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            if (armDestination == UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adRemovedPiecesPositions_z
+            if (armDestination == DM_UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adRemovedPiecesPositions_z
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            else if (armDestination == DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
+            else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->adRemovedPiecesPositions_z
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_rUpDown = ACTUAL_POS;
         }
@@ -494,15 +497,15 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
                 _pChessboard->PieceActualPos.Digit >=0 && _pChessboard->PieceActualPos.Digit <=7)
         {
             qDebug() << "Dobot::armUpDown: PieceActualPos =" << _pChessboard->PieceActualPos.Letter
-                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << (armDestination == UP ? "up" : "down");
+                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?:" << (armDestination == DM_UP ? "up" : "down");
 
             f_xUpDown = _pChessboard->adChessboardPositions_x
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_yUpDown = _pChessboard->adChessboardPositions_y
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            if (armDestination == UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adChessboardPositions_z
+            if (armDestination == DM_UP) f_zUpDown = _pChessboard->getMaxPieceHeight() + _pChessboard->adChessboardPositions_z
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            else if (armDestination == DOWN) f_zUpDown = _pChessboard->adChessboardPositions_z
+            else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->adChessboardPositions_z
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_rUpDown = ACTUAL_POS;
         }
@@ -518,7 +521,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
         qDebug() << "Previous move parameteres: x y z=" << actualPosIdx.x << actualPosIdx.y << actualPosIdx.z;
         if (f_zUpDown != actualPosIdx.z && (f_xUpDown != actualPosIdx.x || f_yUpDown != actualPosIdx.y))
         {
-            this->addCmdToList(TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
+            this->addCmdToList(DM_TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
             this->writeMoveTypeInConsole(armDestination, Type);
         }
         else qDebug() << "ERROR: Dobot::armUpDown: trying to move Z axis with X or Y axis";
@@ -540,7 +543,7 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
     
     //z_max = 40 dla x = 275, a najwyższe z na styku z podłogą to z = -16.5 - stare info?
 
-    this->addCmdToList(TO_POINT, ST_REMOVING, f_xRemove, f_yRemove, _pChessboard->getMaxRemovedPieceHeight(), f_rRemove);
+    this->addCmdToList(DM_TO_POINT, ST_REMOVING, f_xRemove, f_yRemove, _pChessboard->getMaxRemovedPieceHeight(), f_rRemove);
 }
 /// END OF: TYPY RUCHÓW PO PLANSZY
 
@@ -557,11 +560,11 @@ void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float
     m_posIdx.r = (r != ACTUAL_POS) ? r : m_PtpCmdActualVal.r;
     QueuedCmdIndexList << m_posIdx;
 
-    if (move == OPEN || move == CLOSE)
+    if (move == DM_OPEN || move == DM_CLOSE)
     {
         ServoArduino servoState;
         servoState.index = m_ullCoreQueuedCmdIndex;
-        servoState.isGripperOpen = (move == OPEN) ? true : false;
+        servoState.isGripperOpen = (move == DM_OPEN) ? true : false;
         qDebug() << "add command to arduinoGripperStateList:" << move;
         arduinoGripperStateList << servoState;
     }
@@ -578,19 +581,19 @@ void Dobot::checkPWM()
         {
             qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" << gripperControl.address;
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" +
-                                   QString::number(gripperControl.address) + "\n", DOBOT);
+                                   QString::number(gripperControl.address) + "\n", LOG_DOBOT);
         }
         if (gripperControl.frequency != 50)
         {
             qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" << gripperControl.address;
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" +
-                                   QString::number(gripperControl.frequency) + "\n", DOBOT);
+                                   QString::number(gripperControl.frequency) + "\n", LOG_DOBOT);
         }
         if (gripperControl.dutyCycle != m_fGripOpened && gripperControl.dutyCycle != m_fGripClosed)
         {
             qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" << gripperControl.dutyCycle;
             this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" +
-                                   QString::number(gripperControl.dutyCycle) + "\n", DOBOT);
+                                   QString::number(gripperControl.dutyCycle) + "\n", LOG_DOBOT);
         }
     }
 }
@@ -615,19 +618,19 @@ void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence)
     QString QsSecondMsg;
     switch(moveState)
     {
-    case TO_POINT: QsSecondMsg = ""; break;
-    case WAIT: QsSecondMsg = ": wait " + QString::number(gripperMoveDelay.timeout) + " ms\n"; break;
-    case OPEN: QsSecondMsg = ": gripper opened\n"; break;
-    case CLOSE: QsSecondMsg = ": gripper closed\n"; break;
-    case UP: QsSecondMsg = ": arm up\n"; break;
-    case DOWN: QsSecondMsg = ": arm down\n"; break;
-    case INDIRECT: QsSecondMsg = ": indirect\n"; break;
+    case DM_TO_POINT: QsSecondMsg = ""; break;
+    case DM_WAIT: QsSecondMsg = ": wait " + QString::number(gripperMoveDelay.timeout) + " ms\n"; break;
+    case DM_OPEN: QsSecondMsg = ": gripper opened\n"; break;
+    case DM_CLOSE: QsSecondMsg = ": gripper closed\n"; break;
+    case DM_UP: QsSecondMsg = ": arm up\n"; break;
+    case DM_DOWN: QsSecondMsg = ": arm down\n"; break;
+    case DM_INDIRECT: QsSecondMsg = ": indirect\n"; break;
     default:
         QsSecondMsg = "ERROR. Dobot::writeMoveTypeInConsole: Wrong movement state: " +
                 static_cast<QString>(moveState) + "\n"; break;
     }
 
-    emit this->addTextToConsole(QsConsoleMsg + " piece move" + QsSecondMsg, DOBOT);
+    emit this->addTextToConsole(QsConsoleMsg + " piece move" + QsSecondMsg, LOG_DOBOT);
 }
 
 void Dobot::closeEvent(QCloseEvent *)

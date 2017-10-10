@@ -35,23 +35,23 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
 
-    _pDobot->gripperState(OPEN, Type);
-    _pDobot->pieceFromTo(FROM, pieceFromLetter, pieceFromDigit, Type);
-    _pDobot->armUpDown(DOWN, FROM, Type);
-    _pDobot->gripperState(CLOSE, Type);
+    _pDobot->gripperState(DM_OPEN, Type);
+    _pDobot->pieceFromTo(DM_FROM, pieceFromLetter, pieceFromDigit, Type);
+    _pDobot->armUpDown(DM_DOWN, DM_FROM, Type);
+    _pDobot->gripperState(DM_CLOSE, Type);
     _pDobot->wait(400, Type);
-    _pDobot->armUpDown(UP, FROM, Type);
-    _pChessboard->pieceStateChanged(FROM, pieceFromLetter, pieceFromDigit, Type);
+    _pDobot->armUpDown(DM_UP, DM_FROM, Type);
+    _pChessboard->pieceStateChanged(DM_FROM, pieceFromLetter, pieceFromDigit, Type);
 
     if ((Type == ST_REMOVING || Type == ST_RESTORE) && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
 
-    _pDobot->pieceFromTo(TO, pieceToLetter, pieceToDigit, Type);
-    _pDobot->armUpDown(DOWN, TO, Type);
-    _pDobot->gripperState(OPEN, Type);
+    _pDobot->pieceFromTo(DM_TO, pieceToLetter, pieceToDigit, Type);
+    _pDobot->armUpDown(DM_DOWN, DM_TO, Type);
+    _pDobot->gripperState(DM_OPEN, Type);
     _pDobot->wait(400, Type);
-    _pDobot->armUpDown(UP, TO, Type);
-    _pChessboard->pieceStateChanged(TO, pieceToLetter, pieceToDigit, Type);
+    _pDobot->armUpDown(DM_UP, DM_TO, Type);
+    _pChessboard->pieceStateChanged(DM_TO, pieceToLetter, pieceToDigit, Type);
 
     if (Type == ST_REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
@@ -61,7 +61,7 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
 void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
 {
     qDebug() << "goToSafeRemovedField. digitTo=" << digitTo;
-    _pDobot->writeMoveTypeInConsole(INDIRECT, sequence);
+    _pDobot->writeMoveTypeInConsole(DM_INDIRECT, sequence);
 
     int nRemPieceType;
     DIGIT remPieceDestDigit;
@@ -87,7 +87,7 @@ void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
     float fIndirect_y = _pChessboard->adRemovedPiecesPositions_y[L_D][indirectFieldDigit];
     float fIndirect_z = _pChessboard->adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
 
-    _pDobot->addCmdToList(TO_POINT, ST_REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
+    _pDobot->addCmdToList(DM_TO_POINT, ST_REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
                           _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //TODO: getMaxRemovedPieceHeight?
 }
 
@@ -156,7 +156,7 @@ void Chess::enpassantMovingSequence()
     else
     {
         emit _pDobot->addTextToConsole("Error03!: Wrong turn in enpassant statement: "
-                                            + (QString)_pChessboard->getWhoseTurn() + "/n", DOBOT);
+                                            + (QString)_pChessboard->getWhoseTurn() + "/n", LOG_DOBOT);
         qDebug() << "Error03!: Chess::enpassantMovingSequence(): Unknown turn type: "
                  << _pChessboard->getWhoseTurn() << "/n";
         return;

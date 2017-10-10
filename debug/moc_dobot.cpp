@@ -9,6 +9,7 @@
 #include "../dobot.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
+#include <QtCore/QList>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'dobot.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
@@ -19,8 +20,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Dobot_t {
-    QByteArrayData data[28];
-    char stringdata0[364];
+    QByteArrayData data[32];
+    char stringdata0[484];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -54,9 +55,13 @@ QT_MOC_LITERAL(21, 254, 11), // "nCoreIdLeft"
 QT_MOC_LITERAL(22, 266, 10), // "CoreNextId"
 QT_MOC_LITERAL(23, 277, 18), // "setBoardDataLabels"
 QT_MOC_LITERAL(24, 296, 17), // "BOARD_DATA_LABELS"
-QT_MOC_LITERAL(25, 314, 14), // "onConnectDobot"
-QT_MOC_LITERAL(26, 329, 19), // "onPeriodicTaskTimer"
-QT_MOC_LITERAL(27, 349, 14) // "onGetPoseTimer"
+QT_MOC_LITERAL(25, 314, 33), // "showActualDobotQueuedCmdIndex..."
+QT_MOC_LITERAL(26, 348, 37), // "QList<ArmPosForCurrentCmdQueu..."
+QT_MOC_LITERAL(27, 386, 27), // "showArduinoGripperStateList"
+QT_MOC_LITERAL(28, 414, 19), // "QList<ServoArduino>"
+QT_MOC_LITERAL(29, 434, 14), // "onConnectDobot"
+QT_MOC_LITERAL(30, 449, 19), // "onPeriodicTaskTimer"
+QT_MOC_LITERAL(31, 469, 14) // "onGetPoseTimer"
 
     },
     "Dobot\0addTextToConsole\0\0LOG\0JointLabelText\0"
@@ -67,7 +72,10 @@ QT_MOC_LITERAL(27, 349, 14) // "onGetPoseTimer"
     "DobotErrorMsgBox\0QueueLabels\0nSpace\0"
     "nDobotId\0nCoreMaxId\0nCoreIdLeft\0"
     "CoreNextId\0setBoardDataLabels\0"
-    "BOARD_DATA_LABELS\0onConnectDobot\0"
+    "BOARD_DATA_LABELS\0showActualDobotQueuedCmdIndexList\0"
+    "QList<ArmPosForCurrentCmdQueuedIndex>\0"
+    "showArduinoGripperStateList\0"
+    "QList<ServoArduino>\0onConnectDobot\0"
     "onPeriodicTaskTimer\0onGetPoseTimer"
 };
 #undef QT_MOC_LITERAL
@@ -78,27 +86,29 @@ static const uint qt_meta_data_Dobot[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      13,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       8,       // signalCount
+      10,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    2,   69,    2, 0x06 /* Public */,
-       4,    2,   74,    2, 0x06 /* Public */,
-       7,    2,   79,    2, 0x06 /* Public */,
-      10,    1,   84,    2, 0x06 /* Public */,
-      12,    3,   87,    2, 0x06 /* Public */,
-      16,    0,   94,    2, 0x06 /* Public */,
-      17,    5,   95,    2, 0x06 /* Public */,
-      23,    2,  106,    2, 0x06 /* Public */,
+       1,    2,   79,    2, 0x06 /* Public */,
+       4,    2,   84,    2, 0x06 /* Public */,
+       7,    2,   89,    2, 0x06 /* Public */,
+      10,    1,   94,    2, 0x06 /* Public */,
+      12,    3,   97,    2, 0x06 /* Public */,
+      16,    0,  104,    2, 0x06 /* Public */,
+      17,    5,  105,    2, 0x06 /* Public */,
+      23,    2,  116,    2, 0x06 /* Public */,
+      25,    1,  121,    2, 0x06 /* Public */,
+      27,    1,  124,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      25,    0,  111,    2, 0x0a /* Public */,
-      26,    0,  112,    2, 0x0a /* Public */,
-      27,    0,  113,    2, 0x0a /* Public */,
+      29,    0,  127,    2, 0x0a /* Public */,
+      30,    0,  128,    2, 0x0a /* Public */,
+      31,    0,  129,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -109,6 +119,8 @@ static const uint qt_meta_data_Dobot[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   18,   19,   20,   21,   22,
     QMetaType::Void, QMetaType::QString, 0x80000000 | 24,    2,    2,
+    QMetaType::Void, 0x80000000 | 26,    2,
+    QMetaType::Void, 0x80000000 | 28,    2,
 
  // slots: parameters
     QMetaType::Void,
@@ -132,9 +144,11 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 5: _t->DobotErrorMsgBox(); break;
         case 6: _t->QueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
         case 7: _t->setBoardDataLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABELS(*)>(_a[2]))); break;
-        case 8: _t->onConnectDobot(); break;
-        case 9: _t->onPeriodicTaskTimer(); break;
-        case 10: _t->onGetPoseTimer(); break;
+        case 8: _t->showActualDobotQueuedCmdIndexList((*reinterpret_cast< QList<ArmPosForCurrentCmdQueuedIndex>(*)>(_a[1]))); break;
+        case 9: _t->showArduinoGripperStateList((*reinterpret_cast< QList<ServoArduino>(*)>(_a[1]))); break;
+        case 10: _t->onConnectDobot(); break;
+        case 11: _t->onPeriodicTaskTimer(); break;
+        case 12: _t->onGetPoseTimer(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -196,6 +210,20 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
                 return;
             }
         }
+        {
+            typedef void (Dobot::*_t)(QList<ArmPosForCurrentCmdQueuedIndex> );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::showActualDobotQueuedCmdIndexList)) {
+                *result = 8;
+                return;
+            }
+        }
+        {
+            typedef void (Dobot::*_t)(QList<ServoArduino> );
+            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::showArduinoGripperStateList)) {
+                *result = 9;
+                return;
+            }
+        }
     }
 }
 
@@ -224,13 +252,13 @@ int Dobot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 13;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 13)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 13;
     }
     return _id;
 }
@@ -288,5 +316,19 @@ void Dobot::setBoardDataLabels(QString _t1, BOARD_DATA_LABELS _t2)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 7, _a);
+}
+
+// SIGNAL 8
+void Dobot::showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex> _t1)
+{
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 8, _a);
+}
+
+// SIGNAL 9
+void Dobot::showArduinoGripperStateList(QList<ServoArduino> _t1)
+{
+    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    QMetaObject::activate(this, &staticMetaObject, 9, _a);
 }
 QT_END_MOC_NAMESPACE
