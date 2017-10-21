@@ -21,8 +21,6 @@ protected:
     Dobot *_pDobot;
     Chessboard *_pChessboard;
 
-    bool _bServiceTests;
-
     //----------------KOMUNIKACJA Z GRACZEM-------------//
     virtual void GameStarted() = 0;
     virtual void BadMove(QString msg) = 0;
@@ -62,6 +60,8 @@ public slots:
     virtual void checkMsgForChenard(QString msg) = 0; //protected slot?
 
     //---------------STEROWANIE RAMIENIEM--------------//
+    short findInitialPieceNrOnGivenField(short sField);
+    short findInitialFieldOfGivenPiece(short sPiece);
     void resetPiecePositions();
 
 public:
@@ -72,10 +72,6 @@ public:
     void listMovesForDobot(SEQUENCE_TYPE Type,
                              LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
                              LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
-
-    //-------------METODY DOSTĘPOWE DO PÓL-------------//
-    bool getServiceTests() const                { return _bServiceTests; }
-    void setServiceTests(bool bServiceTests)    { _bServiceTests = bServiceTests; }
 
 signals:
     void addTextToConsole(QString, char);

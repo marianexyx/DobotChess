@@ -1,7 +1,7 @@
 #include "chessboard.h"
 
 Chessboard::Chessboard():
-    anStartBoard{
+    m_anBoardStart{
 {1, 9, 0, 0, 0, 0, 17, 25} ,
 {2, 10, 0, 0, 0, 0, 18, 26} ,
 {3, 11, 0, 0, 0, 0, 19, 27} ,
@@ -11,7 +11,7 @@ Chessboard::Chessboard():
 {7, 15, 0, 0, 0, 0, 23, 31} ,
 {8, 16, 0, 0, 0, 0, 24, 32}},
 
-    anRemoved{
+    m_asBoardRemoved{
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
@@ -24,11 +24,11 @@ Chessboard::Chessboard():
     m_nMaxRemovedPieceH(44.5),
     m_QStrSiteMoveRequest(""),
     m_WhoseTurn(NO_TURN),
-    lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
-    lTimersStartQueue(1000*60*2)
+    m_lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
+    m_lTimersStartQueue(1000*60*2)
 {
-    memcpy(anBoard, anStartBoard, sizeof(anStartBoard)); //todo: pseudooperator anBoard == anStartBoard
-    memcpy(anTempBoard, anStartBoard, sizeof(anStartBoard)); //todo: pseudooperator anTempBoard == anStartBoard
+    memcpy(m_asBoardMain, m_anBoardStart, sizeof(m_anBoardStart)); //todo: pseudooperator m_asBoardMain == m_anBoardStart
+    memcpy(m_asBoardTemp, m_anBoardStart, sizeof(m_anBoardStart)); //todo: pseudooperator m_asBoardTemp == m_anBoardStart
 
     QsPiecieFromTo = "";
     nGripperPiece = 0;
@@ -47,13 +47,13 @@ Chessboard::Chessboard():
     {
         for (int letter = 0; letter <= 7; letter++)
         {
-            adChessboardPositions_x[letter][digit] = a1_x +
+            m_adChessboardPositions_x[letter][digit] = a1_x +
                     digit*(((a8_x-a1_x)/7.f)+((letter/14.f)*(((a1_x-h1_x)/7.f)-((a8_x-h8_x)/7.f))))-
                     letter*(((a1_x-h1_x)/7.f)-((digit/14.f)*(((h8_x-h1_x)/7.f)-((a8_x-a1_x)/7.f))));
-            adChessboardPositions_y[letter][digit] = a1_y +
+            m_adChessboardPositions_y[letter][digit] = a1_y +
                     digit*(((a8_y-a1_y)/7.f)+((letter/14.f)*(((a1_y-h1_y)/7.f)-((a8_y-h8_y)/7.f))))-
                     letter*(((a1_y-h1_y)/7.f)-((digit/14.f)*(((h8_y-h1_y)/7.f)-((a8_y-a1_y)/7.f))));
-            adChessboardPositions_z[letter][digit] = a1_z +
+            m_adChessboardPositions_z[letter][digit] = a1_z +
                     digit*(((a8_z-a1_z)/7.f)+((letter/14.f)*(((a1_z-h1_z)/7.f)-((a8_z-h8_z)/7.f))))-
                     letter*(((a1_z-h1_z)/7.f)-((digit/14.f)*(((h8_z-h1_z)/7.f)-((a8_z-a1_z)/7.f))));
         }
@@ -63,18 +63,18 @@ Chessboard::Chessboard():
     {
         for (int row = 0; row <= 7; row++)
         {
-            adRemovedPiecesPositions_x[row][column] = 115.f + row*((266.7-115.f)/7.f);
-            adRemovedPiecesPositions_y[row][column] = 177.f - column*21.2 + (-7.8/7.f)*row; //169.2-177= -7.8
-            adRemovedPiecesPositions_z[row][column] = -21.f - row*((-21.f + 20.f)/7.f);
+            m_adRemovedPiecesPositions_x[row][column] = 115.f + row*((266.7-115.f)/7.f);
+            m_adRemovedPiecesPositions_y[row][column] = 177.f - column*21.2 + (-7.8/7.f)*row; //169.2-177= -7.8
+            m_adRemovedPiecesPositions_z[row][column] = -21.f - row*((-21.f + 20.f)/7.f);
         }
     }
     for (int column = 2; column <= 3; column++)
     {
         for (int row = 0; row <= 7; row++)
         {
-            adRemovedPiecesPositions_x[row][column] = 118.7 + row*((271.5-118.7)/7.f);
-            adRemovedPiecesPositions_y[row][column] = -160.7 + ((column-2)*(-20.3)) + (10.f/7.f)*row; //-181-(-160.7) = -20.3
-            adRemovedPiecesPositions_z[row][column] = -20.4 - row*((-4.6)/7.f); //(-20.4 - (-15.8) = -4.6
+            m_adRemovedPiecesPositions_x[row][column] = 118.7 + row*((271.5-118.7)/7.f);
+            m_adRemovedPiecesPositions_y[row][column] = -160.7 + ((column-2)*(-20.3)) + (10.f/7.f)*row; //-181-(-160.7) = -20.3
+            m_adRemovedPiecesPositions_z[row][column] = -20.4 - row*((-4.6)/7.f); //(-20.4 - (-15.8) = -4.6
         }
     }
 
@@ -82,10 +82,10 @@ Chessboard::Chessboard():
     m_blackTimer = new QTimer();
     m_updateLabelTimer = new QTimer();
     m_startQueueTimer = new QTimer();
-    m_whiteTimer->setInterval(lTimersStartTime);
-    m_blackTimer->setInterval(lTimersStartTime);
+    m_whiteTimer->setInterval(m_lTimersStartTime);
+    m_blackTimer->setInterval(m_lTimersStartTime);
     m_updateLabelTimer->setInterval(1000);
-    m_startQueueTimer->setInterval(lTimersStartQueue);
+    m_startQueueTimer->setInterval(m_lTimersStartQueue);
     m_whiteTimer->setSingleShot(true);
     m_blackTimer->setSingleShot(true);
     m_updateLabelTimer->setSingleShot(false);
@@ -94,8 +94,8 @@ Chessboard::Chessboard():
     connect(m_blackTimer, SIGNAL(timeout()), this, SLOT(timeOutBlack()));
     connect(m_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
     connect(m_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
-    m_nRemainingWhiteTime = lTimersStartTime;
-    m_nRemainingBlackTime = lTimersStartTime;
+    m_nRemainingWhiteTime = m_lTimersStartTime;
+    m_nRemainingBlackTime = m_lTimersStartTime;
 }
 
 void Chessboard::findBoardPos(QString QStrPiecePositions)
@@ -121,36 +121,51 @@ QString Chessboard::getPiecieFromTo()
     return piecieFromTo;
 }
 
-
-int Chessboard::fieldNrToFieldPos(int nfieldNr, bool bRow) //będzie działać też dla bierek...
-{ //...zbitych jako PieceToRemoveToRemovedPiecePos (0-32)
-    if (nfieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika
+short Chessboard::fieldLinesPosToFieldNr(FieldLinesPos fieldLines)
+{
+    short sFieldNr = static_cast<short>(fieldLines.Letter) +
+            static_cast<short>(fieldLines.Digit)*8;
+    if (sFieldNr < 1 || sFieldNr > 64)
     {
-        int nfieldNrColumn, nfieldNrRow; //tablica[nfieldNrRow][nfieldNrColumn];
+        qDebug() << "ERROR: Chessboard::fieldLinesPosToFieldNr: sFieldNr out of range <1,64>:"
+                 << sFieldNr;
+        return 0;
+    }
+    else return sFieldNr;
+}
 
-        if (nfieldNr % 8 != 0) //wszystkie prócz liczb (tj. bierek nr) 8, 16, 24 i 32.
+FieldLinesPos Chessboard::fieldNrToFieldLinesPos(short sFieldNr) //będzie działać też dla bierek...
+{ //...zbitych jako PieceToRemoveToRemovedPiecePos (0-32)
+    FieldLinesPos fieldLines;
+
+    if (sFieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika
+    {
+        short sFieldNrColumn, sFieldNrRow; //tablica[nfieldNrRow][nfieldNrColumn];
+
+        if (sFieldNr % 8 != 0) //wszystkie prócz liczb 8, 16, 24, 32, 40, 48, 56 i 64.
         {
-            nfieldNrColumn = nfieldNr / 8;
-            nfieldNrRow  = (nfieldNr - 1) - (nfieldNrColumn * 8);
+            sFieldNrColumn = sFieldNr / 8;
+            sFieldNrRow  = (sFieldNr - 1) - (sFieldNrColumn * 8);
         }
-        else //dla liczb (tj. bierek nr) 8, 16, 24 i 32.
+        else //dla liczb 8, 16, 24, 32, 40, 48, 56 i 64.
         {
-            nfieldNrColumn = (nfieldNr / 8) - 1;
-            nfieldNrRow = 7;
+            sFieldNrColumn = (sFieldNr / 8) - 1;
+            sFieldNrRow = 7;
         }
 
-        if (bRow) return nfieldNrRow ;
-        else return nfieldNrColumn;
+        fieldLines.Letter = static_cast<LETTER>(sFieldNrRow);
+        fieldLines.Digit = static_cast<DIGIT>(sFieldNrColumn);
     }
     else
     {
-        emit this->addTextToConsole("ERROR. Chess::fieldNrToFieldPos: próba"
+        emit this->addTextToConsole("ERROR. Chess::fieldNrToFieldLinesPos: próba"
                                     " dzielenia przez zero.  nfieldNr = " +
-                                    (QString)nfieldNr + ", bRow = " + bRow + "\n");
-        qDebug() << "ERROR. Chess::fieldNrToFieldPos: proba dzielenia przez zero. nfieldNr =" <<
-                    nfieldNr << ", bRow =" << bRow;
-        return 0; //coś trzeba zwrócić
+                                    QString::number(sFieldNr) + "\n");
+        qDebug() << "ERROR: Chessboard::fieldNrToFieldLinesPos: proba dzielenia przez zero. nfieldNr =" <<
+                    sFieldNr;
     }
+
+    return fieldLines;
 }
 
 bool Chessboard::isMoveRemoving()
@@ -202,53 +217,46 @@ void Chessboard::castlingFindRookToMove()
 void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                                    DIGIT digit, SEQUENCE_TYPE Type)
 {
-    if (Type == ST_RESTORE && partOfSequence == DM_FROM) //jeżeli bierka została pochwycona z obszaru bierek zbitych...
+    if (Type == ST_RESTORE && partOfSequence == DM_FROM)
     {
-        nGripperPiece = anRemoved[letter][digit];
-        //...to w chwytaku jest bierka z obszaru zbitych
-        anRemoved[letter][digit] = 0; //miejsce ruszanego pionka jest już puste
-        qDebug() << "Chessboard::pieceStateChanged: restore: removed field value shall now be 0. "
-                    "aanRemoved[letter][digit]; = "
-                 << anRemoved[letter][digit];
+        nGripperPiece = m_asBoardRemoved[letter][digit];
+        qDebug() << "Chessboard::pieceStateChanged: 1) nGripperPiece =" << nGripperPiece;
+        m_asBoardRemoved[letter][digit] = 0;
     }
-    else if (Type == ST_REMOVING && partOfSequence == DM_TO) //jeżeli bierka została przemieszczona na...
-        //...obszar bierek zbitych z szachownicy...
+    else if (Type == ST_REMOVING && partOfSequence == DM_TO)
     {
-        //nPieceLetter i nPieceDigit nie moga być podawane jako parametry pozycji bierki na...
-        //...obszarze zbitych, bo są to pozycje na szachownicy. docelowe pozycje na obszarze...
-        //...zbitych trzeba wyznaczyć na podstawie bierki trzymanej w chwytaku
-        LETTER remPieceDestLetter = static_cast<LETTER>(this->fieldNrToFieldPos(nGripperPiece, ROW));
-        DIGIT remPieceDestDigit = static_cast<DIGIT>(this->fieldNrToFieldPos(nGripperPiece, COLUMN));
-
-        //...to pole tej bierki na obszarze bierek zbitych jest już przez nią zajęte...
-        anRemoved[remPieceDestLetter][remPieceDestDigit] =  nGripperPiece;
-        qDebug() << "Piece (>0) just placed on removed area ="
-                 << anRemoved[remPieceDestLetter][remPieceDestDigit];
-        nGripperPiece = 0; //...a chwytak nie trzyma już żadnej bierki
+        this->setPieceOnBoard(B_REMOVED, nGripperPiece, nGripperPiece);
+        qDebug() << "Piece just placed on removed area";
+        nGripperPiece = 0;
+        qDebug() << "Chessboard::pieceStateChanged: 2) nGripperPiece = 0";
     }
-    else if (partOfSequence == DM_FROM) //...a jeżeli bierka została pochwycona z szachownicy...
+    //todo: bierki poruszane ramieniem zapisywane są do tablicy m_asBoardMain. jeżeli bierki zostały poruszone tylko w...
+    //...pamięci bez udziału dobota (np. poprzez podane listy ruchów bezpośrednio do tcp) to system myśli że...
+    //...plansza nie była ruszana, a co innego zobaczy się z polecenia "status".
+    else if (partOfSequence == DM_FROM) //jeżeli bierka została pochwycona z szachownicy...
         //...(jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
     {
-        nGripperPiece = anBoard[letter][digit]; //...to w chwytaku jest bierka...
+        nGripperPiece = m_asBoardMain[letter][digit]; //...to w chwytaku jest bierka...
         //...pochwycona z szachownicy...
-        anBoard[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
+        qDebug() << "Chessboard::pieceStateChanged: 3) nGripperPiece =" << nGripperPiece;
+        m_asBoardMain[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
     }
-
     else if (partOfSequence == DM_TO)//lecz jeżeli bierka została przemieszczona na szachownicę
         //...(jest to każde inne polecenie ruchu w stylu 'pieceTo')...
     {
-        anBoard[letter][digit] = nGripperPiece; //...to docelowe pole na...
+        m_asBoardMain[letter][digit] = nGripperPiece; //...to docelowe pole na...
         //...szachownicy jest już zajęte...
         nGripperPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
+        qDebug() << "Chessboard::pieceStateChanged: 4) nGripperPiece = 0";
     }
     else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";
 }
 
-bool Chessboard::compareArrays(int nArray1[][8], int nArray2[][8])
+bool Chessboard::compareArrays(short nArray1[][8], short nArray2[][8])
 {
-    for (int i=0; i<8; i++)
+    for (short i=0; i<8; i++)
     {
-        for (int j=0; j<8; j++)
+        for (short j=0; j<8; j++)
         {
             if (nArray1[i][j] != nArray2[i][j])
                 return false;
@@ -443,12 +451,12 @@ void Chessboard::timeOutBlack()
 void Chessboard::resetGameTimers()
 {
     this->stopBoardTimers();
-    m_whiteTimer->setInterval(lTimersStartTime);
-    m_blackTimer->setInterval(lTimersStartTime);
+    m_whiteTimer->setInterval(m_lTimersStartTime);
+    m_blackTimer->setInterval(m_lTimersStartTime);
     m_nRemainingWhiteTime = m_whiteTimer->interval();
     m_nRemainingBlackTime = m_blackTimer->interval();
-    emit setBoardDataLabels(milisecToClockTime(lTimersStartTime), BDL_WHITE_TIME);
-    emit setBoardDataLabels(milisecToClockTime(lTimersStartTime), BDL_BLACK_TIME);
+    emit setBoardDataLabels(milisecToClockTime(m_lTimersStartTime), BDL_WHITE_TIME);
+    emit setBoardDataLabels(milisecToClockTime(m_lTimersStartTime), BDL_BLACK_TIME);
 }
 
 QString Chessboard::milisecToClockTime(long lMilis)
@@ -475,7 +483,7 @@ void Chessboard::updateTimeLabels()
 
     if (m_startQueueTimer->isActive())
         emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
-    else setBoardDataLabels(milisecToClockTime(lTimersStartQueue), BDL_QUEUE_TIME);
+    else setBoardDataLabels(milisecToClockTime(m_lTimersStartQueue), BDL_QUEUE_TIME);
 }
 
 void Chessboard::switchPlayersTimers()
@@ -504,7 +512,7 @@ void Chessboard::startQueueTimer() //todo: zmienić nazewnictwo na "start" z wsz
 {
     qDebug() << "Chessboard::startQueueTimer()";
     m_startQueueTimer->stop();
-    m_startQueueTimer->setInterval(lTimersStartQueue);
+    m_startQueueTimer->setInterval(m_lTimersStartQueue);
     emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
     m_startQueueTimer->start();
     m_updateLabelTimer->start();
@@ -538,3 +546,132 @@ int Chessboard::getBlackTimeLeft()
     else return m_nRemainingBlackTime;
 }
 
+/*short Chessboard::getBoardByItsType(BOARD boardType)
+{
+    short asBoard[8][8];
+    switch(boardType)
+    {
+    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
+    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
+    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
+    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+        break;
+    }
+
+    return asBoard; //todo: nie umiem zwrócić tej tablicy:
+    //https://stackoverflow.com/questions/720707/how-to-return-two-dimensional-char-array-c
+}*/
+
+//todo: templaty/szablony?
+void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, FieldLinesPos fieldLines)
+{
+    switch(boardType)
+    {
+    case B_MAIN: m_asBoardMain[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
+    case B_START: m_anBoardStart[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
+    case B_TEMP: m_asBoardTemp[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
+    case B_REMOVED: m_asBoardRemoved[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+        break;
+    }
+}
+
+void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, short sFieldNr)
+{
+    qDebug() << "fieldNrToFieldLinesPos10";
+    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
+}
+
+void Chessboard::setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, short sFieldNr)
+{
+    qDebug() << "fieldNrToFieldLinesPos11";
+    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    short sPieceNr = fieldLinesPosToFieldNr(pieceLines);
+    this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
+}
+
+void Chessboard::setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, FieldLinesPos fieldLines)
+{
+    short sPieceNr = fieldLinesPosToFieldNr(pieceLines);
+    this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
+}
+
+short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
+{
+    qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
+    short asBoard[8][8]; //= getBoardByItsType(boardType);
+    //todo: problem powtarzania kodu w/z getBoardByItsType
+    switch(boardType)
+    {
+    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
+    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
+    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
+    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+        break;
+    }
+
+    qDebug() << "fieldNrToFieldLinesPos12";
+    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
+                (short)fieldLines.Digit << ", asBoard[][] =" <<
+                asBoard[(short)fieldLines.Letter][(short)fieldLines.Digit] << ", f.e.: m_asBoardMain[][] =" <<
+                m_asBoardMain[(short)fieldLines.Letter][(short)fieldLines.Digit];
+    return asBoard[(short)fieldLines.Letter][(short)fieldLines.Digit];
+}
+
+short Chessboard::getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines)
+{
+    short asBoard[8][8]; //= getBoardByItsType(boardType);
+    switch(boardType)
+    {
+    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
+    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
+    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
+    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+        break;
+    }
+    return asBoard[fieldLines.Letter][fieldLines.Digit];
+}
+
+FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr)
+{
+    qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
+    short asBoard[8][8]; //= getBoardByItsType(boardType);
+    switch(boardType)
+    {
+    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
+    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
+    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
+    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+        break;
+    }
+    qDebug() << "fieldNrToFieldLinesPos13";
+    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    short sPieceNr = asBoard[fieldLines.Letter][fieldLines.Digit];
+    qDebug() << "fieldNrToFieldLinesPos14";
+    FieldLinesPos pieceLines = fieldNrToFieldLinesPos(sPieceNr);
+    return pieceLines;
+}
+
+FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos fieldLines)
+{
+    short asBoard[8][8]; //= getBoardByItsType(boardType);
+    switch(boardType)
+    {
+    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
+    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
+    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
+    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+        break;
+    }
+    short sPieceNr = asBoard[fieldLines.Letter][fieldLines.Digit];
+    qDebug() << "fieldNrToFieldLinesPos15";
+    FieldLinesPos pieceLines = fieldNrToFieldLinesPos(sPieceNr);
+    return pieceLines;
+}

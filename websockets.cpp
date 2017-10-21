@@ -85,36 +85,35 @@ QString Websockets::getTableDataAsJSON()
     return QStrTableData;
 }
 
-void Websockets::receivedMsg(QString QStrWsMsg)
-{
-    if (QStrWsMsg != "keepConnected")
+void Websockets::receivedMsg(QString QStrWbstMsgToProcess)
+{    
+    if (QStrWbstMsgToProcess != "keepConnected")
     {
-        qDebug() << "Websockets::receivedMsg (from site):" << QStrWsMsg;
-        emit addTextToConsole("received: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
+        qDebug() << "Websockets::receivedMsg (from site):" << QStrWbstMsgToProcess;
     }
 
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
 
-    if (QStrWsMsg == "keepConnected")
+    if (QStrWbstMsgToProcess == "keepConnected")
     {  //todo: używam tego kodu już 2gi raz takiego samego- zapakować w funkcję, ...
         //...poza tym ten kod tu istieje by było cokolwiek w tej opcji. może return dać jakoś?
         std::string s = std::to_string(m_clients.size());
         char const *pchar = s.c_str();
         emit setBoardDataLabels(pchar, BDL_SOCKETS_ONLINE);
     }
-    else if (QStrWsMsg == "newGame")
+    else if (QStrWbstMsgToProcess == "newGame" || QStrWbstMsgToProcess == "new")
     {
         QString QStrWhoSent = "";
         if (pClient == this->getPlayerSocket(PT_WHITE))  QStrWhoSent = "WHITE";
         else if (pClient == this->getPlayerSocket(PT_BLACK)) QStrWhoSent = "BLACK";
 
-        this->sendToChess(QStrWsMsg + " " + QStrWhoSent);
+        this->sendToChess(QStrWbstMsgToProcess + " " + QStrWhoSent);
     }
-    else if (QStrWsMsg.left(4) == "move") { this->sendToChess(QStrWsMsg); }
+    else if (QStrWbstMsgToProcess.left(4) == "move") { this->sendToChess(QStrWbstMsgToProcess); }
     //todo: kto decyduje o tym komunikacie (reset)? oby nei gracze
-    else if (QStrWsMsg == "reset") { this->sendToChess(QStrWsMsg); }
-    else if (QStrWsMsg == "getTableDataAsJSON") pClient->sendTextMessage(this->getTableDataAsJSON());
-    else if (QStrWsMsg == "giveUp")
+    else if (QStrWbstMsgToProcess == "reset") { this->sendToChess(QStrWbstMsgToProcess); }
+    else if (QStrWbstMsgToProcess == "getTableDataAsJSON") pClient->sendTextMessage(this->getTableDataAsJSON());
+    else if (QStrWbstMsgToProcess == "giveUp")
     {
         if (pClient) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam gdzie są...
             //...QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
@@ -149,7 +148,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
         }
         else qDebug() << "ERROR: Websockets::receivedMsg(): giveUp: !isset pClient";
     }
-    else if (QStrWsMsg.left(5) == "sitOn")
+    else if (QStrWbstMsgToProcess.left(5) == "sitOn")
     {
         if (this->getClientNameBySocket(pClient) == "-1")
         {
@@ -157,7 +156,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             return;
         }
 
-        QString QStrPlayerType = QStrWsMsg.mid(5);
+        QString QStrPlayerType = QStrWbstMsgToProcess.mid(5);
         PLAYERS_TYPES playerChair;
         if (QStrPlayerType == "White") playerChair = PT_WHITE;
         else if (QStrPlayerType == "Black") playerChair = PT_BLACK;
@@ -192,7 +191,7 @@ void Websockets::receivedMsg(QString QStrWsMsg)
         Q_FOREACH (Clients client, m_clients)
             client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
-    else if (QStrWsMsg == "standUp")
+    else if (QStrWbstMsgToProcess == "standUp")
     {
         if (pClient == this->getPlayerSocket(PT_WHITE) || pClient == this->getPlayerSocket(PT_BLACK))
         {
@@ -221,9 +220,9 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             return;
         }
     }
-    else if (QStrWsMsg.left(3) == "im ")
+    else if (QStrWbstMsgToProcess.left(3) == "im ")
     {
-        QString QStrName = QStrWsMsg.mid(3);
+        QString QStrName = QStrWbstMsgToProcess.mid(3);
         if (this->isClientNameExists(QStrName))
         {
             this->getClientSocketByName(QStrName)->sendTextMessage("logout:doubleLogin");
@@ -239,20 +238,20 @@ void Websockets::receivedMsg(QString QStrWsMsg)
             pClient->sendTextMessage(this->getTableDataAsJSON());
         }
     }
-    else if (QStrWsMsg.left(9) == "promoteTo") { this->sendToChess(QStrWsMsg); }
-    else if (QStrWsMsg == "queueMe")
+    else if (QStrWbstMsgToProcess.left(9) == "promoteTo") { this->sendToChess(QStrWbstMsgToProcess); }
+    else if (QStrWbstMsgToProcess == "queueMe")
     {
         this->addClientToQueue(pClient);
         Q_FOREACH (Clients client, m_clients)
             client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
-    else if (QStrWsMsg == "leaveQueue")
+    else if (QStrWbstMsgToProcess == "leaveQueue")
     {
         this->removeClientFromQueueBySocket(pClient);
         Q_FOREACH (Clients client, m_clients)
             client.socket->sendTextMessage(this->getTableDataAsJSON());
     }
-    else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWsMsg;
+    else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWbstMsgToProcess;
 
     emit showClientsList(m_clients);
 }
@@ -470,6 +469,10 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
 
         if (!this->isPlayerChairEmpty(PT_WHITE) && !this->isPlayerChairEmpty(PT_BLACK))
             _pChessboard->startQueueTimer();
+        break;
+    case ET_TIMEOUT_WHITE:
+    case ET_TIMEOUT_BLACK:
+        //todo
         break;
 
     default:

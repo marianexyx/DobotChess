@@ -21,7 +21,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Websockets_t {
     QByteArrayData data[17];
-    char stringdata0[274];
+    char stringdata0[275];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -42,11 +42,11 @@ QT_MOC_LITERAL(8, 117, 15), // "showClientsList"
 QT_MOC_LITERAL(9, 133, 14), // "QList<Clients>"
 QT_MOC_LITERAL(10, 148, 18), // "socketDisconnected"
 QT_MOC_LITERAL(11, 167, 11), // "receivedMsg"
-QT_MOC_LITERAL(12, 179, 19), // "QS_WbstMsgToProcess"
-QT_MOC_LITERAL(13, 199, 15), // "onNewConnection"
-QT_MOC_LITERAL(14, 215, 29), // "msgFromChessboardToWebsockets"
-QT_MOC_LITERAL(15, 245, 9), // "QStrWsMsg"
-QT_MOC_LITERAL(16, 255, 18) // "getTableDataAsJSON"
+QT_MOC_LITERAL(12, 179, 20), // "QStrWbstMsgToProcess"
+QT_MOC_LITERAL(13, 200, 15), // "onNewConnection"
+QT_MOC_LITERAL(14, 216, 29), // "msgFromChessboardToWebsockets"
+QT_MOC_LITERAL(15, 246, 9), // "QStrWsMsg"
+QT_MOC_LITERAL(16, 256, 18) // "getTableDataAsJSON"
 
     },
     "Websockets\0addTextToConsole\0\0LOG\0"
@@ -54,7 +54,7 @@ QT_MOC_LITERAL(16, 255, 18) // "getTableDataAsJSON"
     "setBoardDataLabels\0BOARD_DATA_LABELS\0"
     "showClientsList\0QList<Clients>\0"
     "socketDisconnected\0receivedMsg\0"
-    "QS_WbstMsgToProcess\0onNewConnection\0"
+    "QStrWbstMsgToProcess\0onNewConnection\0"
     "msgFromChessboardToWebsockets\0QStrWsMsg\0"
     "getTableDataAsJSON"
 };

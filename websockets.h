@@ -96,7 +96,7 @@ public:
     ~Websockets();
 
 public Q_SLOTS: //todo: jaka jest różnica między zwykłym slots?
-    void receivedMsg(QString QS_WbstMsgToProcess);
+    void receivedMsg(QString QStrWbstMsgToProcess);
     void onNewConnection();
 
 public slots:

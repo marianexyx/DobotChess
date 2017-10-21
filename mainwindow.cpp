@@ -94,11 +94,12 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
     connect(_pChessboard, SIGNAL(msgFromChessboardToWebsockets(QString)),
             _pWebSockets, SLOT(msgFromChessboardToWebsockets(QString)));
 
-    //init JOG control
-    this->initControl(); //dobot
+    this->initControl(); //init dobot JOG control
 
     //todo: narobić tych tooltipów
-    ui->directTcpMsgCheckBox->setToolTip("enable to send multiple moves");
+    ui->directTcpMsgCheckBox->setToolTip("//todo");
+    ui->serviceCheckBox->setToolTip("enable to write only chessboard destination field");
+    ui->emulatePlayerMsgLineEdit->setToolTip("send msg to Websockets::receivedMsg");
 }
 
 MainWindow::~MainWindow()
@@ -256,7 +257,6 @@ void MainWindow::showDobotErrorMsgBox()
 
 //TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich...
 //...qDebug, by nie robić tego wszędzie.
-//TODO3: dodać przed każdą komendą czas jej wywołania
 void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = LOG_NOTHING)
 {
     QString QsLogType = "<" + logAsQstr(msgType) + ">: ";
@@ -266,7 +266,7 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = LOG_NOTHING)
         ui->debug_log->clear();
         return;
     }
-    QStrMsg = QsLogType + QStrMsg;
+    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " + QsLogType + QStrMsg;
     ui->debug_log->setPlainText(ui->debug_log->toPlainText() + QStrMsg);
 
     //auto scroll
@@ -364,7 +364,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
     {
         if (ui->serviceCheckBox->isChecked()) //wprowadzać tylko wartości pola np. "e2" lub ew. usuwanie: "move xxe2r"
-        {
+        /*{ /todo: przywrócić to wtedy gdy bedę chciał się zająć zastrukturyzowaniem m_adRemovedPiecesPositions
             QString QStrServiceMsg = ui->emulatePlayerMsgLineEdit->text();
             if (QStrServiceMsg.left(4) == "move") //przyjmij tylko docelową pozycję z polecenia np. "move e2e4r", tj. "e4r"
                 QStrServiceMsg = QStrServiceMsg.mid(7);
@@ -374,9 +374,9 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
             if (QStrServiceMsg.right(1) != "r")
             {
-                float fService_x = _pChessboard->adChessboardPositions_x[serviceLetterPos][serviceDigitPos];
-                float fService_y = _pChessboard->adChessboardPositions_y[serviceLetterPos][serviceDigitPos];
-                float fService_z = _pChessboard->adChessboardPositions_z[serviceLetterPos][serviceDigitPos];
+                float fService_x = _pChessboard->m_adChessboardPositions_x[serviceLetterPos][serviceDigitPos];
+                float fService_y = _pChessboard->m_adChessboardPositions_y[serviceLetterPos][serviceDigitPos];
+                float fService_z = _pChessboard->m_adChessboardPositions_z[serviceLetterPos][serviceDigitPos];
 
                 _pDobotArm->addCmdToList(DM_TO_POINT, ST_REMOVING, fService_x, fService_y, fService_z +
                                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
@@ -385,12 +385,10 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             }
             if (QStrServiceMsg.right(1) == "r") _pDobotArm->removePiece(serviceLetterPos, serviceDigitPos);
         }
-        else
+        else*/
         {
-            _pWebChess->setServiceTests(true);
             _pWebSockets->receivedMsg(ui->emulatePlayerMsgLineEdit->text());
             ui->emulatePlayerMsgLineEdit->clear();
-            _pWebChess->setServiceTests(false);
         }
     }
 }
@@ -607,13 +605,9 @@ void MainWindow::on_sendTcpBtn_clicked()
     if (!ui->sendTcpLineEdit->text().isEmpty())
     {
         if (ui->directTcpMsgCheckBox->isChecked())
-        {
             _pTCPmsg->TcpQueueMsg(TEST, ui->sendTcpLineEdit->text());
-        }
         else
-        {
             _pTCPmsg->TcpQueueMsg(_pIgorBot->getAI() ? ARDUINO : WEBSITE, ui->sendTcpLineEdit->text());
-        }
         ui->sendTcpLineEdit->clear();
     }
 }
@@ -622,10 +616,6 @@ void MainWindow::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
     if (tcpRespond.left(2) == "OK")
     {
-        qDebug() << "direct TCP moves done:" << tcpRespond;
-
-         //wytnij tylko ostatni ruch. sprawdzi status, legal, turę i odeśle na stronę
-        //_pWebChess->checkMsgForChenard("move " + tcpMsgType.right(4));
         QString lastMove = tcpMsgType.right(4);
         _pChessboard->findBoardPos(lastMove);
         _pWebChess->TcpMoveOk();

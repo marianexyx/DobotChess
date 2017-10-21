@@ -13,12 +13,13 @@
 #include "vars/board_data_labels.h"
 #include "vars/sequence_types.h"
 
-struct ArmPosition
+struct FieldLinesPos
 {
     LETTER Letter = L_X;
     DIGIT Digit = D_X;
 };
 
+enum BOARD { B_MAIN, B_START, B_TEMP, B_REMOVED };
 enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //todo: do zewnętrznych plików dać to też
 
 
@@ -45,25 +46,30 @@ private:
     int m_nRemainingWhiteTime;
     int m_nRemainingBlackTime;
 
+    const int m_nMaxPieceHeight;
+    const int m_nMaxRemovedPieceH; //todo: powinna to być jedna wartość z powyższą?
+    int m_nMaxBoardZ;
+
     void changeWindowTitle();
 
     void FENToBoard(QString FENBoard);
     WHOSE_TURN whoseTurn(QString whoseTurn);
-    const long lTimersStartTime;
-    const long lTimersStartQueue;
+    const long m_lTimersStartTime;
+    const long m_lTimersStartQueue;
 
 public:
     Chessboard();
 
     void findBoardPos(QString QStrPiecePositions);
-    int fieldNrToFieldPos(int nfieldNr, bool bRow);
+    short fieldLinesPosToFieldNr(FieldLinesPos fieldLines);
+    FieldLinesPos fieldNrToFieldLinesPos(short sFieldNr);
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);
     bool isMoveEnpassant(QString moveToTest);
     void castlingFindRookToMove();
     void pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
                            DIGIT digit, SEQUENCE_TYPE Type);
-    bool compareArrays(int nArray1[][8], int nArray2[][8]);
+    bool compareArrays(short nArray1[][8], short nArray2[][8]);
     void saveStatusData(QString status);
     void showBoardInDebug();
     QString arrayBoardToQStr(QString QStrBoard[8][8]);
@@ -76,9 +82,24 @@ public:
     void startQueueTimer();
     void stopQueueTimer();
 
+    //todo: mam problemy z zwracaiem tablic do funckyj. nie marnować na...
+    //...to teraz czasu i dac jako public
+    short m_asBoardMain[8][8];
+    /*todo: const*/ short m_anBoardStart[8][8];
+    short m_asBoardTemp[8][8];
+    short m_asBoardRemoved[8][4];
+
+    //todo: na razie niech to będzie w public
+    double m_adChessboardPositions_x[8][8];
+    double m_adChessboardPositions_y[8][8];
+    double m_adChessboardPositions_z[8][8];
+    double m_adRemovedPiecesPositions_x[8][4];
+    double m_adRemovedPiecesPositions_y[8][4];
+    double m_adRemovedPiecesPositions_z[8][4];
+
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
-    ArmPosition PieceFrom, PieceTo, PieceActualPos;
+    FieldLinesPos PieceFrom, PieceTo, PieceActualPos;
 
     QString QsPiecieFromTo;             // f.e. "e2e4"
     QString QsAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
@@ -88,26 +109,6 @@ public:
 
     QString QStrFuturePromote;
 
-    /*const*/ int anStartBoard[8][8];       //do sprawdzania przy odkładaniu bierek na miejsce czy ...
-                                        //...szachownica osiągła swoje startowe ułożenie bierek.
-    int anBoard[8][8];                  //plansza jako tablica. liczby to zajęte pola.
-                                        //każda liczba to inna bierka.
-    int anTempBoard[8][8];              //pomocnicza tablica do sprawdzania czy udało się przywrócić...
-                                        //...bierki na szachownicy do oryginalnego/pierwotnego stanu.
-    int anRemoved[8][4];               //tablica usuniętych
-
-    double adChessboardPositions_x[8][8];
-    double adChessboardPositions_y[8][8];
-    double adChessboardPositions_z[8][8];
-
-    double adRemovedPiecesPositions_x[8][4];
-    double adRemovedPiecesPositions_y[8][4];
-    double adRemovedPiecesPositions_z[8][4];
-
-    const int m_nMaxPieceHeight;
-    const int m_nMaxRemovedPieceH; //todo: powinna to być jedna wartość z powyższą?
-    int m_nMaxBoardZ;
-
     //metody dostępowe
     void setWhoseTurn(WHOSE_TURN Turn)              { m_WhoseTurn = Turn;
                                                       this->changeWindowTitle(); } //todo: zabrać to?
@@ -116,6 +117,11 @@ public:
                                                       emit showLegalMoves(legalMoves); }
     void setHistoryMoves(QStringList historyMoves)  { m_historyMoves = historyMoves;
                                                       emit showHistoryMoves(historyMoves); }
+    //short getBoardByItsType(BOARD boardType);
+    void setPieceOnBoard(BOARD boardType, short sPieceNr, short sFieldNr);
+    void setPieceOnBoard(BOARD boardType, short sPieceNr, FieldLinesPos fieldLines);
+    void setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, short sFieldNr);
+    void setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, FieldLinesPos fieldLines);
 
     void clearLegalMoves()                          { m_legalMoves.clear();
                                                       emit showLegalMoves(m_legalMoves);}
@@ -140,6 +146,10 @@ public:
     int getBlackTimeLeft();
     int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
     bool isStartTimerRunning()                  { return m_startQueueTimer->isActive(); }
+    short getPieceOnBoardAsNr(BOARD boardType, short sFieldNr);
+    short getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines);
+    FieldLinesPos getPieceOnBoardAsLines(BOARD boardType, short sFieldNr);
+    FieldLinesPos getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos fieldLines);
 
 private slots:
     void timeOutWhite();

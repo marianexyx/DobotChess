@@ -20,12 +20,9 @@ void WebChess::GameStarted()
     _pWebsockets->addTextToConsole("newGame\n", LOG_WEBSOCKET);
     qDebug() << "Sending 'newOk' to site";
 
-    if (!_bServiceTests)
-    {
-        _pChessboard->resetGameTimers();
-        _pChessboard->startGameTimer();
-        _pWebsockets->sendMsg("newOk");
-    }
+    _pChessboard->resetGameTimers();
+    _pChessboard->startGameTimer();
+    _pWebsockets->sendMsg("newOk");
 }
 
 void WebChess::BadMove(QString msg)
@@ -200,8 +197,7 @@ void WebChess::playerClickedStart(QString QStrWhoClicked)
 void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
 {
 
-    if ((!_pWebsockets->isPlayerChairEmpty(PT_WHITE) && !_pWebsockets->isPlayerChairEmpty(PT_BLACK)) ||
-            _bServiceTests) //todo: bool zmienić na isService... or smtg
+    if (!_pWebsockets->isPlayerChairEmpty(PT_WHITE) && !_pWebsockets->isPlayerChairEmpty(PT_BLACK))
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
         _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", LOG_WEBSOCKET);
