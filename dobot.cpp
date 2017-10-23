@@ -390,8 +390,12 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
             f_rFromTo = ACTUAL_POS;
         }
     }
-    else qDebug() << "ERROR: Dobot::pieceFromTo: wrong letter/digit value=" <<
+    else
+    {
+        qDebug() << "ERROR: Dobot::pieceFromTo: wrong letter/digit value=" <<
                      letter << "," << digit;
+        return;
+    }
     
     if (f_xFromTo > 130.f && f_xFromTo < 350.f && f_yFromTo > -200 && f_yFromTo < 200 && f_zFromTo > -22.f &&
             f_zFromTo < 100.f) //zabezpieczenia odległościowe. todo: da się je ustawić jako alarmy w odobcie?
@@ -409,14 +413,22 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
             partOfSequence == DM_FROM ? QstrMoveType = ": piece from " : QstrMoveType = ": piece to ";
             qDebug() << "Dobot::pieceFromTo:" << QstrMoveType << "nLetter ="
                      << letter << ", nDigit =" << digit << ", Type =" << Type;
-            emit this->addTextToConsole(QstrMoveType + pieceLetterPos(letter)
+            emit this->addTextToConsole(QstrMoveType + pieceLetterPosAsQStr(letter)
                                         + QString::number(digit+1) + "\n", LOG_NOTHING);
             //todo: naprzemiennie używam writeMoveTypeInConsole() i addTextToConsole() - ?
         }
-        else qDebug() << "ERROR: Dobot::pieceFromTo: trying to move Z axis with X or Y axis";
+        else
+        {
+            qDebug() << "ERROR: Dobot::pieceFromTo: trying to move Z axis with X or Y axis";
+            return;
+        }
     }
-    else qDebug() << "ERROR: Dobot::pieceFromTo: out of XYZ wornking range: x=" << f_xFromTo <<
+    else
+    {
+        qDebug() << "ERROR: Dobot::pieceFromTo: out of XYZ wornking range: x=" << f_xFromTo <<
                      ", y=" << f_yFromTo << ", z=" << f_zFromTo;
+        return;
+    }
     
     _pChessboard->PieceActualPos.Letter = letter; //todo: wrzucić to do warunków na letter/digit
     _pChessboard->PieceActualPos.Digit = digit;

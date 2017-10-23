@@ -12,16 +12,14 @@
 #include "vars/dobot_moves.h"
 #include "vars/board_data_labels.h"
 #include "vars/sequence_types.h"
+#include "vars/board_types.h"
+#include "vars/turn_types.h"
 
 struct FieldLinesPos
 {
     LETTER Letter = L_X;
     DIGIT Digit = D_X;
 };
-
-enum BOARD { B_MAIN, B_START, B_TEMP, B_REMOVED };
-enum WHOSE_TURN { NO_TURN, WHITE_TURN, BLACK_TURN }; //todo: do zewnętrznych plików dać to też
-
 
 //TODO: chessboard powinien być obiektem klasy chess
 class Chessboard: public QObject

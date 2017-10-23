@@ -47,7 +47,9 @@ HEADERS  +=  \
     vars/board_data_labels.h \
     vars/players_types.h \
     vars/sequence_types.h \
-    vars/end_of_game_types.h
+    vars/end_of_game_types.h \
+    vars/board_types.h \
+    vars/turn_types.h
 
 FORMS    += mainwindow.ui
 

@@ -115,8 +115,8 @@ void Chessboard::findBoardPos(QString QStrPiecePositions)
 
 QString Chessboard::getPiecieFromTo()
 {
-    QString piecieFromTo = pieceLetterPos(PieceFrom.Letter) + QString::number(PieceFrom.Digit+1) +
-            pieceLetterPos(PieceTo.Letter) + QString::number(PieceTo.Digit+1);
+    QString piecieFromTo = pieceLetterPosAsQStr(PieceFrom.Letter) + QString::number(PieceFrom.Digit+1) +
+            pieceLetterPosAsQStr(PieceTo.Letter) + QString::number(PieceTo.Digit+1);
 
     return piecieFromTo;
 }
@@ -600,59 +600,123 @@ void Chessboard::setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, Fiel
 
 short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
 {
-    qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
-    short asBoard[8][8]; //= getBoardByItsType(boardType);
     //todo: problem powtarzania kodu w/z getBoardByItsType
+    qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
+
+    if (sFieldNr == 0) return 0;
+    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    short sPieceNr = 0;
+
     switch(boardType)
     {
-    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
-    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
-    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
-    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
-    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+    case B_MAIN:
+        sPieceNr = m_asBoardMain[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_START:
+        sPieceNr = m_anBoardStart[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_TEMP:
+        sPieceNr = m_asBoardTemp[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_REMOVED:
+        sPieceNr = m_asBoardRemoved[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    default:
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsNr: unknown BOARD val =" << boardType;
+        sPieceNr = 0;
         break;
     }
-
-    qDebug() << "fieldNrToFieldLinesPos12";
-    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
     qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
-                (short)fieldLines.Digit << ", asBoard[][] =" <<
-                asBoard[(short)fieldLines.Letter][(short)fieldLines.Digit] << ", f.e.: m_asBoardMain[][] =" <<
-                m_asBoardMain[(short)fieldLines.Letter][(short)fieldLines.Digit];
-    return asBoard[(short)fieldLines.Letter][(short)fieldLines.Digit];
+                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
+                ", boardType =" << boardTypeAsQstr(boardType);
+
+    return sPieceNr;
 }
 
 short Chessboard::getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines)
 {
-    short asBoard[8][8]; //= getBoardByItsType(boardType);
+    //todo: problem powtarzania kodu w/z getBoardByItsType
+    if (fieldLines.Letter < L_A || fieldLines.Letter > L_H ||
+            fieldLines.Digit < D_1 || fieldLines.Digit > D_8)
+    {
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines1: fieldLines pot of scope <0,7>."
+                    "fieldLines.Letter =" << fieldLines.Letter << ", fieldLines.Digit =" <<
+                    fieldLines.Digit;
+        return 0;
+    }
+
+    short sPieceNr = 0;
+
     switch(boardType)
     {
-    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
-    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
-    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
-    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
-    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+    case B_MAIN:
+        sPieceNr = m_asBoardMain[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_START:
+        sPieceNr = m_anBoardStart[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_TEMP:
+        sPieceNr = m_asBoardTemp[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_REMOVED:
+        sPieceNr = m_asBoardRemoved[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    default:
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsNr: unknown BOARD val =" << boardType;
+        sPieceNr = 0;
         break;
     }
-    return asBoard[fieldLines.Letter][fieldLines.Digit];
+    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
+                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
+                ", boardType =" << boardTypeAsQstr(boardType);
+
+    return sPieceNr;
 }
 
 FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr)
 {
+    //todo: problem powtarzania kodu w/z getBoardByItsType
     qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
-    short asBoard[8][8]; //= getBoardByItsType(boardType);
+
+    FieldLinesPos fieldLines;
+    if (sFieldNr == 0)
+    {
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines2: sFieldNr == 0";
+        fieldLines.Letter = L_X;
+        fieldLines.Digit = D_X;
+        return fieldLines;
+    }
+    else
+    {
+        qDebug() << "fieldNrToFieldLinesPos13";
+        fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    }
+
+    short sPieceNr = 0;
+
     switch(boardType)
     {
-    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
-    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
-    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
-    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
-    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+    case B_MAIN:
+        sPieceNr = m_asBoardMain[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_START:
+        sPieceNr = m_anBoardStart[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_TEMP:
+        sPieceNr = m_asBoardTemp[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_REMOVED:
+        sPieceNr = m_asBoardRemoved[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    default:
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines: unknown BOARD val =" << boardType;
+        sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldNrToFieldLinesPos13";
-    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
-    short sPieceNr = asBoard[fieldLines.Letter][fieldLines.Digit];
+    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
+                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
+                ", boardType =" << boardTypeAsQstr(boardType);
+
     qDebug() << "fieldNrToFieldLinesPos14";
     FieldLinesPos pieceLines = fieldNrToFieldLinesPos(sPieceNr);
     return pieceLines;
@@ -660,18 +724,47 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr
 
 FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos fieldLines)
 {
-    short asBoard[8][8]; //= getBoardByItsType(boardType);
+    //todo: problem powtarzania kodu w/z getBoardByItsType
+
+    FieldLinesPos pieceLines;
+
+    if (fieldLines.Letter < L_A || fieldLines.Letter > L_H ||
+            fieldLines.Digit < D_1 || fieldLines.Digit > D_8)
+    {
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines1: fieldLines pot of scope <0,7>."
+                    "fieldLines.Letter =" << fieldLines.Letter << ", fieldLines.Digit =" <<
+                    fieldLines.Digit;
+        pieceLines.Letter = L_X;
+        pieceLines.Digit = D_X;
+        return pieceLines;
+    }
+
+    short sPieceNr = 0;
+
     switch(boardType)
     {
-    case B_MAIN: memcpy(asBoard, m_asBoardMain, sizeof(m_asBoardMain)); break;
-    case B_START: memcpy(asBoard, m_anBoardStart, sizeof(m_anBoardStart)); break;
-    case B_TEMP: memcpy(asBoard, m_asBoardTemp, sizeof(m_anBoardStart)); break;
-    case B_REMOVED: memcpy(asBoard, m_asBoardRemoved, sizeof(m_anBoardStart)); break;
-    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+    case B_MAIN:
+        sPieceNr = m_asBoardMain[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_START:
+        sPieceNr = m_anBoardStart[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_TEMP:
+        sPieceNr = m_asBoardTemp[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    case B_REMOVED:
+        sPieceNr = m_asBoardRemoved[(short)fieldLines.Letter][(short)fieldLines.Digit];
+        break;
+    default:
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines: unknown BOARD val =" << boardType;
+        sPieceNr = 0;
         break;
     }
-    short sPieceNr = asBoard[fieldLines.Letter][fieldLines.Digit];
+    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
+                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
+                ", boardType =" << boardTypeAsQstr(boardType);
+
     qDebug() << "fieldNrToFieldLinesPos15";
-    FieldLinesPos pieceLines = fieldNrToFieldLinesPos(sPieceNr);
+    pieceLines = fieldNrToFieldLinesPos(sPieceNr);
     return pieceLines;
 }

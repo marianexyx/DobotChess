@@ -43,17 +43,18 @@ inline LETTER pieceLetterPos(QString QStrLetter)
     else if (QStrLetter == "g" || QStrLetter == "G") {letter = L_G;}
     else if (QStrLetter == "h" || QStrLetter == "H") {letter = L_H;}
     else qDebug() << "ERROR: pieceLetterPos(QString QStrLetter): "
-                     "Unknown QStrLetter value.";
+                     "Unknown QStrLetter value =" << QStrLetter;
 
     return letter;
 }
 
-inline QString pieceLetterPos(LETTER letter)
+inline QString pieceLetterPosAsQStr(LETTER letter)
 {
     QString QStrLetter;
 
     switch(letter)
     {
+    case L_X: QStrLetter = "-1"; break;
     case L_A: QStrLetter = "a"; break;
     case L_B: QStrLetter = "b"; break;
     case L_C: QStrLetter = "c"; break;
@@ -63,7 +64,8 @@ inline QString pieceLetterPos(LETTER letter)
     case L_G: QStrLetter = "g"; break;
     case L_H: QStrLetter = "h"; break;
     default:
-        qDebug() << "ERROR: pieceLetterPos(LETTER letter): Unknown letter value.";
+        qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): Unknown letter value =" <<
+                    letter;
         break;
     }
 

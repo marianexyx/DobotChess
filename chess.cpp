@@ -14,6 +14,10 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs)
 void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
                               LETTER pieceToLetter, DIGIT pieceToDigit)
 {
+    qDebug() << "Chess::listMovesForDobot: Type =" << sequenceTypeAsQstr(Type) <<
+                ", from" << pieceLetterPosAsQStr(pieceFromLetter) << pieceFromDigit + 1 <<
+                "to" << pieceLetterPosAsQStr(pieceToLetter) << pieceToDigit + 1;
+
     //jeżeli nie podano skąd i/lub dokąd ramię ma się przemieścić, to jest to ruch ramienia z aktualnego pola szachownicy nad którym ono wisi
     if (pieceFromLetter == L_X) pieceFromLetter = static_cast<LETTER>(_pChessboard->PieceFrom.Letter);
     if (pieceFromDigit == D_X) pieceFromDigit = static_cast<DIGIT>(_pChessboard->PieceFrom.Digit);
@@ -21,11 +25,11 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
     if (pieceToDigit == D_X) pieceToDigit = static_cast<DIGIT>(_pChessboard->PieceTo.Digit);
 
 
-    if (Type == ST_REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
-    {
+    /*if (Type == ST_REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
+    { //todo: co ten syf tu robi? nigdzie tego chyba nie używam
         pieceFromLetter = pieceToLetter; //przy usuwaniu bierka "from" to ta...
         pieceFromDigit = pieceToDigit; //...która w każdym innym ruchu jest jako "to"
-    }
+    }*/
 
     if (Type == ST_RESTORE && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
     {
@@ -232,24 +236,16 @@ void Chess::resetPiecePositions()
             //aktualnie sprawdzane pole szachownicy
             for (int nCheckingField = 1; nCheckingField <= 64; nCheckingField++)
             {
+                qDebug() << "getPieceOnBoardAsNr1";
                 int nPieceNrOnCheckingField = _pChessboard->getPieceOnBoardAsNr(B_MAIN, nCheckingField);
                 int nPieceStartPosOfCheckingField = _pChessboard->getPieceOnBoardAsNr(B_START, nCheckingField);
-
-                //nr oryginalnego/pierwotnego pola, na którym powinna znajdować...
-                //...się bierka będąca na aktualnie sprawdzanym polu (1-16, 49-64)
-                int nPieceStartPos = this->findInitialFieldOfGivenPiece(nPieceNrOnCheckingField);
-                short sPieceNrOnStartPosOfPieceOnCheckingField = _pChessboard->getPieceOnBoardAsNr(B_MAIN, nPieceStartPos);
+                short sCheckingFieldsStartingPieceNr = this->findInitialFieldOfGivenPiece(nPieceNrOnCheckingField);
+                qDebug() << "getPieceOnBoardAsNr2";
                 qDebug() << "nCheckingField =" << nCheckingField << ", nPieceNrOnCheckingField =" <<
                             nPieceNrOnCheckingField << ", nPieceStartPosOfCheckingField =" <<
-                            nPieceStartPosOfCheckingField << ", nPieceStartPos =" << nPieceStartPos <<
-                            ", sPieceNrOnStartPosOfPieceOnCheckingField =" << sPieceNrOnStartPosOfPieceOnCheckingField;
+                            nPieceStartPosOfCheckingField << ", sCheckingFieldsStartingPieceNr =" << sCheckingFieldsStartingPieceNr;
 
-                //nr bierki na zbitym polu odpowiadającym polu startowemu bierki na...
-                //...polu aktualnie sprawdzanym (1-32)
-                int nRemovedFieldPieceNr;
-                if (nPieceStartPosOfCheckingField > 0) //nie można podawać zera do mianownika (w funkcji)
-                    nRemovedFieldPieceNr = _pChessboard->getPieceOnBoardAsNr(B_REMOVED, nPieceStartPosOfCheckingField);
-                else nPieceStartPosOfCheckingField = 0; //todo: sprawdzić cały ten warunek
+                bool bIsStartPieceOnRemovedFieldOfCheckingField = _pChessboard->getPieceOnBoardAsNr(B_REMOVED, nPieceStartPosOfCheckingField);
 
                 qDebug() << "fieldNrToFieldLinesPos2&3";
                 if (nPieceNrOnCheckingField == 0 //jeżeli na sprawdzanym polu nie ma żadnej bierki...
@@ -258,14 +254,15 @@ void Chess::resetPiecePositions()
 
                 {
                     //sprawdź najpierw po numerze bierki czy leży ona na swoim zbitym miejscu na polu zbitych bierek
-                    if(nRemovedFieldPieceNr > 0) //jeżeli na polu zbitych jest bierka, która startowo stoi na aktualnie sprawdzanym polu
+                    if(bIsStartPieceOnRemovedFieldOfCheckingField) //jeżeli na polu zbitych jest bierka, która startowo stoi na aktualnie sprawdzanym polu
                     {
-                        qDebug() << "check1. nRemovedFieldPieceNr =" << nRemovedFieldPieceNr <<
+                        short sStartPieceOnRemovedFieldOfCheckingField = _pChessboard->getPieceOnBoardAsNr(B_REMOVED, nPieceStartPosOfCheckingField);
+                        qDebug() << "check1. sStartPieceOnRemovedFieldOfCheckingField =" << sStartPieceOnRemovedFieldOfCheckingField <<
                                     ", nCheckingField =" << nCheckingField;
                         qDebug() << "fieldNrToFieldLinesPos4";
                         this->listMovesForDobot(ST_RESTORE, //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
-                                                _pChessboard->fieldNrToFieldLinesPos(nRemovedFieldPieceNr).Letter,
-                                                _pChessboard->fieldNrToFieldLinesPos(nRemovedFieldPieceNr).Digit,
+                                                _pChessboard->fieldNrToFieldLinesPos(sStartPieceOnRemovedFieldOfCheckingField).Letter,
+                                                _pChessboard->fieldNrToFieldLinesPos(sStartPieceOnRemovedFieldOfCheckingField).Digit,
                                                 _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Letter,
                                                 _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Digit);
                     }
@@ -273,6 +270,7 @@ void Chess::resetPiecePositions()
                     {
                         for (int nField = 1; nField <= 64; nField++) //...przewertuj szachownicę w jej poszukiwaniu
                         {
+                            qDebug() << "getPieceOnBoardAsNr4";
                             if (nPieceStartPosOfCheckingField == _pChessboard->getPieceOnBoardAsNr(B_MAIN, nField)
                                     && nCheckingField != nField)
                                 //jeżeli na tym wertowanym poluszachownicy jest bierka której szukamy ale nie może to być
@@ -295,30 +293,30 @@ void Chess::resetPiecePositions()
                 else if (nPieceNrOnCheckingField != 0 && //jeżeli jakaś bierka na pewno tam jest
                          nPieceStartPosOfCheckingField != nPieceNrOnCheckingField) // i nie to bierka która jest tam orygnalnie
                 {
-                        //TODO: TU TKWI PROBLEM: NAKIEROWANIE JEST TYLKO NA POLE, A NIE NA BIERKĘ KTÓRA TAM MOŻE STAĆ. CHYBA
+                    short sPieceNrOnStartPosOfPieceOnCheckingField = _pChessboard->getPieceOnBoardAsNr(B_MAIN, sCheckingFieldsStartingPieceNr);
 
                     if (sPieceNrOnStartPosOfPieceOnCheckingField == 0) //czy startowe pole bierki jest puste, by tam można było ją odstawić
                     {
                         qDebug() << "Chess::resetPiecePositions(): startowe pole bierki rozpatrywanej do odłożenia"
                                     " jest puste- sPieceNrOnStartPosOfPieceOnCheckingField == 0";
                         //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
-                        qDebug() << "check3. nCheckingField =" << nCheckingField <<
-                                    ", sPieceNrOnStartPosOfPieceOnCheckingField =" << sPieceNrOnStartPosOfPieceOnCheckingField;
+
                         qDebug() << "fieldNrToFieldLinesPos6";
                         this->listMovesForDobot(ST_REGULAR,
                                                 _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Letter,
                                                 _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Digit,
-                                                _pChessboard->fieldNrToFieldLinesPos(nPieceStartPos).Letter,
-                                                _pChessboard->fieldNrToFieldLinesPos(nPieceStartPos).Digit);
+                                                _pChessboard->fieldNrToFieldLinesPos(sCheckingFieldsStartingPieceNr).Letter,
+                                                _pChessboard->fieldNrToFieldLinesPos(sCheckingFieldsStartingPieceNr).Digit);
                     }
                     else //jeżeli startowe pole bierki na polu sprawdzanym jest zajęte przez inną bierkę
                     {
                         qDebug() << "Chess::resetPiecePositions(): startowe pole bierki rozpatrywanej do odlozenia NIE jest puste- "
-                                    "sPieceNrOnStartPosOfPieceOnCheckingField != 0. it's' =" << sPieceNrOnStartPosOfPieceOnCheckingField;
+                                    "sPieceNrOnStartPosOfPieceOnCheckingField != 0. It's =" << sPieceNrOnStartPosOfPieceOnCheckingField;
 
                         //pole startowe bierki która jest na polu startowym bierki aktualnie sprawdzanej
+                        qDebug() << "getPieceOnBoardAsNr5";
                         int nStartNrOf2ndPieceOn1stPieceStartPos = _pChessboard->getPieceOnBoardAsNr(B_START, sPieceNrOnStartPosOfPieceOnCheckingField);
-                        qDebug() << "Chess::resetPiecePositions(): nStartNrOf2ndPieceOn1stPieceStartPos =" << nStartNrOf2ndPieceOn1stPieceStartPos;
+                        qDebug() << "nStartNrOf2ndPieceOn1stPieceStartPos =" << nStartNrOf2ndPieceOn1stPieceStartPos;
 
                         if (nStartNrOf2ndPieceOn1stPieceStartPos == nCheckingField) //jeżeli pole docelowe bierki, która znajduje...
                             //...się na polu aktualnie sprawdzanym jest zajętę przez bierkę, której pole startowe znajduje sie na polu aktualnie...
@@ -326,32 +324,35 @@ void Chess::resetPiecePositions()
                         {
                             qDebug() << "Chess::resetPiecePositions(): 2 pieces on each other start field. Remove 2nd, move 1st, restore 2nd.";
 
-                            qDebug() << "check4. nPieceStartPos =" << nPieceStartPos <<
+                            qDebug() << "check4. sCheckingFieldsStartingPieceNr =" << sCheckingFieldsStartingPieceNr <<
                                         ", sPieceNrOnStartPosOfPieceOnCheckingField =" << sPieceNrOnStartPosOfPieceOnCheckingField <<
-                                        ", nCheckingField =" << nCheckingField;
+                                        ", nCheckingField =" << nCheckingField << ", nPieceNrOnCheckingField =" << nPieceNrOnCheckingField;
                             //to przenieś ją na chwilę na jej miejsce na obszarze bierek zbitych.
                             qDebug() << "fieldNrToFieldLinesPos7";
+                            //todo: zrobić funkcję z 1 argumentem która wyczai łapaną bierkę i odstawi ją na swoje pole
                             this->listMovesForDobot(ST_REMOVING,
-                                                    _pChessboard->fieldNrToFieldLinesPos(nPieceStartPos).Letter,
-                                                    _pChessboard->fieldNrToFieldLinesPos(nPieceStartPos).Digit,
-                                                    _pChessboard->fieldNrToFieldLinesPos(sPieceNrOnStartPosOfPieceOnCheckingField).Letter,
-                                                    _pChessboard->fieldNrToFieldLinesPos(sPieceNrOnStartPosOfPieceOnCheckingField).Digit);
+                                                    _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Letter,
+                                                    _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Digit,
+                                                    _pChessboard->fieldNrToFieldLinesPos(nPieceNrOnCheckingField).Letter,
+                                                    _pChessboard->fieldNrToFieldLinesPos(nPieceNrOnCheckingField).Digit);
 
-                            //teraz przenieś bierkę z pola aktualnie sprawdzanego, na pole bierki dopiero co odłożonej na obszar bierek zbitych
+                            /*edit: wystarczy bodajże usunąć 1 z tych bierek, by w kolejnych przjeściach sytuacja sama się ogarnęła
+                             * //teraz przenieś bierkę z pola aktualnie sprawdzanego, na pole bierki dopiero co odłożonej na obszar bierek zbitych
                             qDebug() << "fieldNrToFieldLinesPos8";
                             this->listMovesForDobot(ST_REGULAR,
                                                     _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Letter,
                                                     _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Digit,
-                                                    _pChessboard->fieldNrToFieldLinesPos(nPieceStartPos).Letter,
-                                                    _pChessboard->fieldNrToFieldLinesPos(nPieceStartPos).Digit);
+                                                    _pChessboard->fieldNrToFieldLinesPos(sCheckingFieldsStartingPieceNr).Letter,
+                                                    _pChessboard->fieldNrToFieldLinesPos(sCheckingFieldsStartingPieceNr).Digit);
 
                             //na końcu bierkę odłożoną poza planszę przywróć na pole bierki wcześniej przestawionej
                             qDebug() << "fieldNrToFieldLinesPos9";
+                            //todo: zrobić funkcję z 1 argumentem która wyczai łapaną bierkę i odstawi ją na swoje pole
                             this->listMovesForDobot(ST_RESTORE,
-                                                    _pChessboard->fieldNrToFieldLinesPos(sPieceNrOnStartPosOfPieceOnCheckingField).Letter,
-                                                    _pChessboard->fieldNrToFieldLinesPos(sPieceNrOnStartPosOfPieceOnCheckingField).Digit,
+                                                    _pChessboard->fieldNrToFieldLinesPos(sCheckingFieldsStartingPieceNr).Letter,
+                                                    _pChessboard->fieldNrToFieldLinesPos(sCheckingFieldsStartingPieceNr).Digit,
                                                     _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Letter,
-                                                    _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Digit);
+                                                    _pChessboard->fieldNrToFieldLinesPos(nCheckingField).Digit);*/
                         }
                         else qDebug() << "Chess::resetPiecePositions(): nStartNrOf2ndPieceOn1stPieceStartPos:" <<
                                          nStartNrOf2ndPieceOn1stPieceStartPos << "!= nCheckingField:" << nCheckingField;
