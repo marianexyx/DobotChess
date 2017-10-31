@@ -4,6 +4,7 @@
 #pragma once
 #include <QString>
 
+//todo: zastanowić się nad przypisywaniem liczb od 1 do 8
 enum LETTER
 {
     L_X = -1,
@@ -64,7 +65,8 @@ inline QString pieceLetterPosAsQStr(LETTER letter)
     case L_G: QStrLetter = "g"; break;
     case L_H: QStrLetter = "h"; break;
     default:
-        qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): Unknown letter value =" <<
+        qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): "
+                    "Unknown letter value =" <<
                     letter;
         break;
     }

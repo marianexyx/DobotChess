@@ -9,6 +9,7 @@ INPUT(
 ./release\arduinousb.o
 ./release\igorbot.o
 ./release\webchess.o
+./release\sql.o
 ./release\moc_websockets.o
 ./release\moc_tcpmsgs.o
 ./release\moc_chessboard.o

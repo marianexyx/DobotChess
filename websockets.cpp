@@ -110,8 +110,7 @@ void Websockets::receivedMsg(QString QStrWbstMsgToProcess)
         this->sendToChess(QStrWbstMsgToProcess + " " + QStrWhoSent);
     }
     else if (QStrWbstMsgToProcess.left(4) == "move") { this->sendToChess(QStrWbstMsgToProcess); }
-    //todo: kto decyduje o tym komunikacie (reset)? oby nei gracze
-    else if (QStrWbstMsgToProcess == "reset") { this->sendToChess(QStrWbstMsgToProcess); }
+    //else if (QStrWbstMsgToProcess == "reset") { this->sendToChess(QStrWbstMsgToProcess); } //todo: kto decyduje o tym komunikacie (reset)? oby nei gracze
     else if (QStrWbstMsgToProcess == "getTableDataAsJSON") pClient->sendTextMessage(this->getTableDataAsJSON());
     else if (QStrWbstMsgToProcess == "giveUp")
     {

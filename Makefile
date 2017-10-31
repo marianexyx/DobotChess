@@ -197,6 +197,7 @@ Makefile: DobotChessCore.pro ../Qt/5.6/mingw49_32/mkspecs/win32-g++/qmake.conf .
 		../Qt/5.6/mingw49_32/lib/Qt5WebSockets.prl \
 		../Qt/5.6/mingw49_32/lib/Qt5Network.prl \
 		../Qt/5.6/mingw49_32/lib/Qt5Xml.prl \
+		../Qt/5.6/mingw49_32/lib/Qt5Sql.prl \
 		../Qt/5.6/mingw49_32/lib/Qt5SerialPort.prl \
 		../Qt/5.6/mingw49_32/lib/Qt5Core.prl
 	$(QMAKE) -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug" -o Makefile DobotChessCore.pro
@@ -338,6 +339,7 @@ DobotChessCore.pro:
 ../Qt/5.6/mingw49_32/lib/Qt5WebSockets.prl:
 ../Qt/5.6/mingw49_32/lib/Qt5Network.prl:
 ../Qt/5.6/mingw49_32/lib/Qt5Xml.prl:
+../Qt/5.6/mingw49_32/lib/Qt5Sql.prl:
 ../Qt/5.6/mingw49_32/lib/Qt5SerialPort.prl:
 ../Qt/5.6/mingw49_32/lib/Qt5Core.prl:
 qmake: FORCE

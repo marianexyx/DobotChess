@@ -7,6 +7,7 @@
 QT       += core gui 
 QT       += network 
 QT       += xml 
+QT       += sql
 QT       += serialport 
 QT       += printsupport
 QT       += core websockets
@@ -25,7 +26,8 @@ SOURCES += main.cpp\
     websockets.cpp \
     arduinousb.cpp \
     igorbot.cpp \
-    webchess.cpp
+    webchess.cpp \
+    sql.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -49,7 +51,8 @@ HEADERS  +=  \
     vars/sequence_types.h \
     vars/end_of_game_types.h \
     vars/board_types.h \
-    vars/turn_types.h
+    vars/turn_types.h \
+    sql.h
 
 FORMS    += mainwindow.ui
 

@@ -96,7 +96,7 @@ public:
                       float z = ACTUAL_POS, float r = ACTUAL_POS);
     void armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type); //todo: do chessboardu?
     void removePiece(int nPieceRowPos, int nPieceColumnPos); //todo: do chessboardu?
-    void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = ST_NONE);
+    void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = ST_NONE, QString QStrMoveFromOrTo = NULL);
     void QueuedIdList();
 
     //metody dostępowe do pól
@@ -139,7 +139,6 @@ signals:
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex>);
     void showArduinoGripperStateList(QList<ServoArduino>);
-
 };
 
 #endif // DOBOT_H

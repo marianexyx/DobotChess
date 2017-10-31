@@ -9,6 +9,7 @@ INPUT(
 ./debug\arduinousb.o
 ./debug\igorbot.o
 ./debug\webchess.o
+./debug\sql.o
 ./debug\moc_websockets.o
 ./debug\moc_tcpmsgs.o
 ./debug\moc_chessboard.o

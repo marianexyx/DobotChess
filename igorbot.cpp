@@ -188,7 +188,7 @@ void IgorBot::UndoOk()
     m_bUndo = true; //zapamiętaj że cofnięcie ruchu miało miejsce
     //niech się wykona cały ruch Igora, łącznie ze sprawdzeniem wszystkich...
     //...dziwnych ruchów tak aby też wykonał się dobrze mechanicznie
-    this->checkMsgForChenard("move " + _pChessboard->QsAIPiecieFromTo);
+    this->checkMsgForChenard("move " + _pChessboard->QStrAIPiecieFromTo);
 }
 
 void IgorBot::ThinkOk(QString msg)
@@ -196,7 +196,7 @@ void IgorBot::ThinkOk(QString msg)
     emit this->addTextToConsole("AI is ready to start move\n", LOG_CORE);
     qDebug() << "AI is ready to start move";
 
-    _pChessboard->QsAIPiecieFromTo = msg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
+    _pChessboard->QStrAIPiecieFromTo = msg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
     _pTCPMsgs->TcpQueueMsg(ARDUINO, "undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
     //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }

@@ -45,8 +45,7 @@ private:
     int m_nRemainingBlackTime;
 
     const int m_nMaxPieceHeight;
-    const int m_nMaxRemovedPieceH; //todo: powinna to być jedna wartość z powyższą?
-    int m_nMaxBoardZ;
+    double m_dMinBoardX, m_dMinBoardY, m_dMinBoardZ, m_dMaxBoardX, m_dMaxBoardY, m_dMaxBoardZ;
 
     void changeWindowTitle();
 
@@ -79,6 +78,7 @@ public:
     void switchPlayersTimers();
     void startQueueTimer();
     void stopQueueTimer();
+    bool bIsMoveInAxisRange(float x, float y, float z);
 
     //todo: mam problemy z zwracaiem tablic do funckyj. nie marnować na...
     //...to teraz czasu i dac jako public
@@ -97,10 +97,10 @@ public:
 
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
+    //TODO: używanie tych zmiennych globalnych powoduje że gubię się w kodzie
     FieldLinesPos PieceFrom, PieceTo, PieceActualPos;
 
-    QString QsPiecieFromTo;             // f.e. "e2e4"
-    QString QsAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
+    QString QStrAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
 
     //todo: zamienić można na litery odpowiadające im na szachownicy
     int nGripperPiece;                  // nr bierki znajdującej się aktualnie w chwytaku
@@ -129,7 +129,6 @@ public:
     QString getSiteMoveRequest()                    { return m_QStrSiteMoveRequest; }
     QString getPiecieFromTo();
     int getMaxPieceHeight() const                   { return m_nMaxPieceHeight; }
-    int getMaxRemovedPieceHeight() const            { return m_nMaxRemovedPieceH; }
     QString getGameStatus()                         { return m_QStrGameStatus; }
     WHOSE_TURN getWhoseTurn()                       { return m_WhoseTurn; }
     QString getStrWhoseTurn();
@@ -139,7 +138,7 @@ public:
     QStringList getLegalMoves()                     { return m_legalMoves; }
     QStringList getHisotyMoves()                    { return m_historyMoves; }
     QString getHisotyMovesAsQStr()                  { return m_historyMoves.join(" "); }
-    double getMaxBoardZ()                           { return m_nMaxBoardZ; }
+    double getMinBoardZ()                           { return m_dMinBoardZ; }
     int getWhiteTimeLeft();
     int getBlackTimeLeft();
     int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }

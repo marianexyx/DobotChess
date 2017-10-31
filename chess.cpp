@@ -14,33 +14,40 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs)
 void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
                               LETTER pieceToLetter, DIGIT pieceToDigit)
 {
-    qDebug() << "Chess::listMovesForDobot: Type =" << sequenceTypeAsQstr(Type) <<
-                ", from" << pieceLetterPosAsQStr(pieceFromLetter) << pieceFromDigit + 1 <<
-                "to" << pieceLetterPosAsQStr(pieceToLetter) << pieceToDigit + 1;
-
     //jeżeli nie podano skąd i/lub dokąd ramię ma się przemieścić, to jest to ruch ramienia z aktualnego pola szachownicy nad którym ono wisi
     if (pieceFromLetter == L_X) pieceFromLetter = static_cast<LETTER>(_pChessboard->PieceFrom.Letter);
     if (pieceFromDigit == D_X) pieceFromDigit = static_cast<DIGIT>(_pChessboard->PieceFrom.Digit);
     if (pieceToLetter == L_X) pieceToLetter = static_cast<LETTER>(_pChessboard->PieceTo.Letter);
     if (pieceToDigit == D_X) pieceToDigit = static_cast<DIGIT>(_pChessboard->PieceTo.Digit);
 
+    qDebug() << "Chess::listMovesForDobot: Type =" << sequenceTypeAsQstr(Type) <<
+                ", from" << pieceLetterPosAsQStr(pieceFromLetter) << pieceFromDigit + 1 <<
+                "to" << pieceLetterPosAsQStr(pieceToLetter) << pieceToDigit + 1;
 
-    /*if (Type == ST_REMOVING) //TODO: jak już ten typ ruchu zawiera inny niż normalny typ ruchu, to znormalizować to jakoś
-    { //todo: co ten syf tu robi? nigdzie tego chyba nie używam
-        pieceFromLetter = pieceToLetter; //przy usuwaniu bierka "from" to ta...
-        pieceFromDigit = pieceToDigit; //...która w każdym innym ruchu jest jako "to"
-    }*/
+    if (Type == ST_REMOVING) //TODO: zapakować to jakoś w wymowną funkcję, albo dodać do innej części kodu
+    {
+        //przy usuwaniu bierka "from" to ta która w każdym innym ruchu jest jako "to",...
+        //...bez tego będzie chciał usuwać bierkę "from"
+        pieceFromLetter = pieceToLetter;
+        pieceFromDigit = pieceToDigit;
+    }
 
-    if (Type == ST_RESTORE && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+    FieldLinesPos PieceFrom, PieceTo; //todo: znowu mieszanie i dublowanie zmiennych
+    PieceFrom.Letter = pieceFromLetter;
+    PieceFrom.Digit = pieceFromDigit;
+    PieceTo.Letter = pieceToLetter;
+    PieceTo.Digit = pieceToDigit;
+    //short sPieceNrOnFieldFrom = _pChessboard->getPieceOnBoardAsNr( Type == ST_RESTORE ? B_REMOVED : B_MAIN, PieceFrom);
+    short sPieceNrOnFieldTo = _pChessboard->getPieceOnBoardAsNr(B_MAIN, PieceTo);
+    //todo: sPieceNrOnFieldTo powinno wystarczyć dla remove i restore
+
+    if (Type == ST_RESTORE && pieceToLetter <= L_C)
     {
         qDebug() << "check1 goToSafeRemovedField";
-        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type); //TODO: pieceToDigit nie jest poprawną daną (przy...
-    //...zbijaniu czarnego z b7 (głębsza linia zbitych) ramię najpierw poszło nad białe pole zbite, a potem nad...
-    //...czarne, by chyba znowu próbować wyjśc przez białe)
+        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
     }
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
-
     _pDobot->gripperState(DM_OPEN, Type);
     _pDobot->pieceFromTo(DM_FROM, pieceFromLetter, pieceFromDigit, Type);
     _pDobot->armUpDown(DM_DOWN, DM_FROM, Type);
@@ -49,10 +56,18 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
     _pDobot->armUpDown(DM_UP, DM_FROM, Type);
     _pChessboard->pieceStateChanged(DM_FROM, pieceFromLetter, pieceFromDigit, Type);
 
-    if ((Type == ST_REMOVING || Type == ST_RESTORE) && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+    if (Type == ST_RESTORE && pieceToLetter <= L_C)
     {
         qDebug() << "check2 goToSafeRemovedField";
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
+    }
+    if (Type == ST_REMOVING && pieceToLetter <= L_C)
+    {
+        qDebug() << "check3 goToSafeRemovedField";
+        qDebug() << "Chess::listMovesForDobot: sPieceNrOnFieldTo =" << sPieceNrOnFieldTo;
+        qDebug() << "Chess::listMovesForDobot: sPieceNrOnFieldTo Digit =" <<
+                    _pChessboard->fieldNrToFieldLinesPos(sPieceNrOnFieldTo).Digit+1;
+        this->goToSafeRemovedField(_pChessboard->fieldNrToFieldLinesPos(sPieceNrOnFieldTo).Digit, Type);
     }
 
     _pDobot->pieceFromTo(DM_TO, pieceToLetter, pieceToDigit, Type);
@@ -62,49 +77,41 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
     _pDobot->armUpDown(DM_UP, DM_TO, Type);
     _pChessboard->pieceStateChanged(DM_TO, pieceToLetter, pieceToDigit, Type);
 
-    if (Type == ST_REMOVING && (pieceToLetter == L_A || pieceToLetter == L_B || pieceToLetter == L_C))
+    if (Type == ST_REMOVING && pieceToLetter <= L_C)
     {
-        qDebug() << "check3 goToSafeRemovedField";
-        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
-    }
+        qDebug() << "check4 goToSafeRemovedField";
+        qDebug() << "Chess::listMovesForDobot: sPieceNrOnFieldTo =" << sPieceNrOnFieldTo;
+        qDebug() << "Chess::listMovesForDobot: sPieceNrOnFieldTo Digit =" <<
+                    _pChessboard->fieldNrToFieldLinesPos(sPieceNrOnFieldTo).Digit+1;
+        this->goToSafeRemovedField(_pChessboard->fieldNrToFieldLinesPos(sPieceNrOnFieldTo).Digit, Type);
+    } //po zbiciu ramię może zostać nad zbitymi polami
     else if (Type != ST_REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
 }
 
 void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
 {
-    qDebug() << "goToSafeRemovedField. digitTo<0,7>=" << digitTo;
-    _pDobot->writeMoveTypeInConsole(DM_INDIRECT, sequence);
-
-    int nRemPieceNr;
-    DIGIT remPieceDestDigit;
-    //powrót do bezpiecznej pozycji na zbitych może odbyć się po odłożeniu zbitej bierki, a wtedy...
-    //...nie ma już jej w gripperze by sprawdzić jej pole
-    if (sequence == ST_REMOVING && _pChessboard->nGripperPiece != 0)
-    {
-        nRemPieceNr = _pChessboard->nGripperPiece;
-        qDebug() << "fieldNrToFieldLinesPos1";
-        remPieceDestDigit = _pChessboard->fieldNrToFieldLinesPos(nRemPieceNr).Digit;
-    }
-    else if (sequence == ST_RESTORE || (sequence == ST_REMOVING && _pChessboard->nGripperPiece == 0))
-        //dla restore() pozycja pola na obszarze usuniętych musi być podana wprost do pieceFromTo()
-    {
-        //dla ST_RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
-        remPieceDestDigit = digitTo;
-    }
-
+    qDebug() << "Chess::goToSafeRemovedField: digitTo =" << digitTo+1;
     DIGIT indirectFieldDigit;
-    if (remPieceDestDigit == D_1 || remPieceDestDigit == D_2) indirectFieldDigit = D_2;
-    else if (remPieceDestDigit == D_3 || remPieceDestDigit == D_4) indirectFieldDigit = D_3;
-    else qDebug() << "ERROR: unknown remPieceDestDigit value =" << remPieceDestDigit;
-
-    qDebug() << "goToSafeRemovedField. indirectFieldDigit=" << indirectFieldDigit;
+    if (digitTo == D_1 || digitTo == D_2)
+        indirectFieldDigit = D_2;
+    else if (digitTo == D_3 || digitTo == D_4)
+        indirectFieldDigit = D_3;
+    else
+    {
+        qDebug() << "ERROR: Chess::goToSafeRemovedField: unknown digitTo value =" << digitTo;
+        return;
+    }
 
     float fIndirect_x = _pChessboard->m_adRemovedPiecesPositions_x[L_D][indirectFieldDigit];
     float fIndirect_y = _pChessboard->m_adRemovedPiecesPositions_y[L_D][indirectFieldDigit];
     float fIndirect_z = _pChessboard->m_adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
+    qDebug() << "Chess::goToSafeRemovedField: indirectField[d][" << indirectFieldDigit+1 <<
+                "] XYZ =" << fIndirect_x << "," << fIndirect_y << "," << fIndirect_z;
 
     _pDobot->addCmdToList(DM_TO_POINT, ST_REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
-                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS); //TODO: getMaxRemovedPieceHeight?
+                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
+
+    _pDobot->writeMoveTypeInConsole(DM_INDIRECT, sequence);
 }
 
 void Chess::legalOk(QString msg) //todo: nazwy tych funkcji 'ok' nie mówią co robią
@@ -148,9 +155,9 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
 
 void Chess::castlingMovingSequence()
 {
-    this->listMovesForDobot(ST_CASTLING_KING); //wykonaj przemieszczenie królem
-    _pChessboard->castlingFindRookToMove(); //podmień pozycje ruszonego króla na pozycję wieży
-    this->listMovesForDobot(ST_CASTLING_ROOK); //wykonaj przemieszczenie wieżą
+    this->listMovesForDobot(ST_CASTLING_KING);
+    _pChessboard->castlingFindRookToMove();
+    this->listMovesForDobot(ST_CASTLING_ROOK);
 }
 
 void Chess::enpassantMovingSequence()
@@ -416,7 +423,7 @@ void Chess::handleMove(QString move)
     _pChessboard->findBoardPos(move);
 
     _pChessboard->setMoveType(this->findMoveType(move));
-    qDebug() << "move type =" << _pChessboard->getMoveType();
+    qDebug() << "move type =" << sequenceTypeAsQstr(_pChessboard->getMoveType());
 
     switch(_pChessboard->getMoveType())
     {
@@ -432,6 +439,7 @@ void Chess::handleMove(QString move)
         this->MoveTcpPiece("move " + move);
         break;
     case ST_REMOVING:
+        //todo: wygodniej byłoby podzielić ruchy na połówki zamiast zawsze próbować wykonywać 2 sekwencje
         this->listMovesForDobot(ST_REMOVING);
         this->listMovesForDobot(ST_REGULAR);
         this->MoveTcpPiece("move " + move);

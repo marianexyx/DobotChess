@@ -20,28 +20,21 @@ Chessboard::Chessboard():
 {0, 0, 0, 0} ,
 {0, 0, 0, 0} ,
 {0, 0, 0, 0}},
-    m_nMaxPieceHeight(52), // dla pola h8 max wysokość bierki to 46
-    m_nMaxRemovedPieceH(44.5),
-    m_QStrSiteMoveRequest(""),
-    m_WhoseTurn(NO_TURN),
+    m_nMaxPieceHeight(50), //poprzednio 44.5. todo: sprawdzić skrajne pozycje na up/down
     m_lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
     m_lTimersStartQueue(1000*60*2)
 {
     memcpy(m_asBoardMain, m_anBoardStart, sizeof(m_anBoardStart)); //todo: pseudooperator m_asBoardMain == m_anBoardStart
     memcpy(m_asBoardTemp, m_anBoardStart, sizeof(m_anBoardStart)); //todo: pseudooperator m_asBoardTemp == m_anBoardStart
 
-    QsPiecieFromTo = "";
     nGripperPiece = 0;
+    m_QStrSiteMoveRequest = "";
+    m_WhoseTurn = NO_TURN;
 
-
-    double a1_x = 168.8; double a1_y = 77.4; double a1_z = -21.9;
-    double a8_x = 317.0; double a8_y = 71.8; double a8_z = -16.6;
-    double h1_x = 164.7; double h1_y = -91.2; double h1_z = -21.5;
-    double h8_x = 314.0; double h8_y = -85.5; double h8_z = -16.3;
-    //                                      "z" to pozycje na styku chwytaka z szachownicą
-
-    std::vector<double> v{ a1_z, a8_z, h1_z, h8_z };
-    m_nMaxBoardZ = *std::max_element( v.begin(), v.end() );
+    double a1_x = 157.4; double a1_y = 76.3; double a1_z = -22.9;
+    double a8_x = 306.6; double a8_y = 75.0; double a8_z = -19.1;
+    double h1_x = 157.4; double h1_y = -81.9; double h1_z = -23.1;
+    double h8_x = 305.6; double h8_y = -79.2; double h8_z = -19.3;
 
     for (int digit = 0; digit <= 7; digit++)
     {
@@ -59,24 +52,48 @@ Chessboard::Chessboard():
         }
     }
 
+    float fSquareWidht = 21.f;
+    double removedWhiteCloser_x = 108.9; double removedWhiteCloser_y = 176.0; double removedWhiteCloser_z = -21.8;
+    double removedWhiteFurther_x = 259.0; /*double removedWhiteFurther_y = 169.3;*/ double removedWhiteFurther_z = -19.5;
     for (int column = 0; column <= 1; column++)
     {
         for (int row = 0; row <= 7; row++)
         {
-            m_adRemovedPiecesPositions_x[row][column] = 115.f + row*((266.7-115.f)/7.f);
-            m_adRemovedPiecesPositions_y[row][column] = 177.f - column*21.2 + (-7.8/7.f)*row; //169.2-177= -7.8
-            m_adRemovedPiecesPositions_z[row][column] = -21.f - row*((-21.f + 20.f)/7.f);
+            m_adRemovedPiecesPositions_x[row][column] = removedWhiteCloser_x +
+                    row*((removedWhiteFurther_x - removedWhiteCloser_x)/7.f);
+            m_adRemovedPiecesPositions_y[row][column] = removedWhiteCloser_y -
+                    column * fSquareWidht /* + (removedOuterFurther_y - removedOuterCloser_y/7.f) * row*/;
+            m_adRemovedPiecesPositions_z[row][column] = removedWhiteCloser_z +
+                    row*((removedWhiteFurther_z - removedWhiteCloser_z)/7.f);
         }
     }
+    double removedBlackCloser_x = 115.5; double removedBlackCloser_y = -148.4; double removedBlackCloser_z = -23.2;
+    double removedBlackFurther_x = 267.2; /*double removedBlackFurther_y = */ ; double removedBlackFurther_z = -19.4;
     for (int column = 2; column <= 3; column++)
     {
         for (int row = 0; row <= 7; row++)
         {
-            m_adRemovedPiecesPositions_x[row][column] = 118.7 + row*((271.5-118.7)/7.f);
-            m_adRemovedPiecesPositions_y[row][column] = -160.7 + ((column-2)*(-20.3)) + (10.f/7.f)*row; //-181-(-160.7) = -20.3
-            m_adRemovedPiecesPositions_z[row][column] = -20.4 - row*((-4.6)/7.f); //(-20.4 - (-15.8) = -4.6
+            m_adRemovedPiecesPositions_x[row][column] = removedBlackCloser_x +
+                    row*((removedBlackFurther_x - removedBlackCloser_x)/7.f);
+            m_adRemovedPiecesPositions_y[row][column] = removedBlackCloser_y +
+                    ((column-2)*(-fSquareWidht))/* + (removedBlackCloser_y - removedBlackFurther_y/7.f)*row*/;
+            m_adRemovedPiecesPositions_z[row][column] = removedBlackCloser_z +
+                    row*((removedBlackFurther_z - removedBlackCloser_z)/7.f);
         }
     }
+
+    std::vector<double> limesOfX{ a1_x, a8_x, h1_x, h8_x, removedWhiteCloser_x, removedWhiteFurther_x,
+                removedBlackCloser_x, removedBlackFurther_x };
+    std::vector<double> limesOfY{ a1_y, a8_y, h1_y, h8_y, removedWhiteCloser_y, removedBlackCloser_y };
+    std::vector<double> limesOfZ{ a1_z, a8_z, h1_z, h8_z, removedWhiteCloser_z, removedWhiteFurther_z,
+                removedBlackCloser_z, removedBlackFurther_z};
+    double tolerance = 0.5;
+    m_dMinBoardX = *std::min_element( limesOfX.begin(), limesOfX.end() ) - tolerance;
+    m_dMinBoardY = *std::min_element( limesOfY.begin(), limesOfY.end() ) - tolerance;
+    m_dMinBoardZ = *std::min_element( limesOfZ.begin(), limesOfZ.end() ) - tolerance;
+    m_dMaxBoardX = *std::max_element( limesOfX.begin(), limesOfX.end() ) + tolerance;
+    m_dMaxBoardY = *std::max_element( limesOfY.begin(), limesOfY.end() ) + tolerance;
+    m_dMaxBoardZ = *std::max_element( limesOfZ.begin(), limesOfZ.end() ) + m_nMaxPieceHeight;
 
     m_whiteTimer = new QTimer();
     m_blackTimer = new QTimer();
@@ -107,10 +124,10 @@ void Chessboard::findBoardPos(QString QStrPiecePositions)
 
     PieceTo.Letter = pieceLetterPos(QStrPiecePositions.mid(2,1));
     PieceTo.Digit = static_cast<DIGIT>(QStrPiecePositions.mid(3,1).toInt() - 1);
-    qDebug() << "Chessboard::findBoardPos: PieceFrom.Letter =" << PieceFrom.Letter <<
-                ", PieceFrom.Digit =" << PieceFrom.Digit <<
-                ", PieceTo.Letter =" << PieceTo.Letter <<
-                ", PieceTo.Digit =" << PieceTo.Digit;
+    qDebug() << "Chessboard::findBoardPos: PieceFrom.Letter =" <<  pieceLetterPosAsQStr(PieceFrom.Letter) <<
+                ", PieceFrom.Digit =" << PieceFrom.Digit+1 <<
+                ", PieceTo.Letter =" << pieceLetterPosAsQStr(PieceTo.Letter) <<
+                ", PieceTo.Digit =" << PieceTo.Digit+1;
 }
 
 QString Chessboard::getPiecieFromTo()
@@ -172,8 +189,8 @@ bool Chessboard::isMoveRemoving()
 {
     if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != ".")
     {
-        qDebug() << "m_QStrBoard[PieceTo.Letter:" << PieceTo.Letter << "][PieceTo.Digit:" <<
-                    PieceTo.Digit << "] =" << m_QStrBoard[PieceTo.Letter][PieceTo.Digit];
+        qDebug() << "m_QStrBoard[PieceTo.Letter:" << pieceLetterPosAsQStr(PieceTo.Letter) << "][PieceTo.Digit:" <<
+                    PieceTo.Digit+1 << "] =" << m_QStrBoard[PieceTo.Letter][PieceTo.Digit];
         return true;
     }
     else return false;
@@ -626,9 +643,8 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
-                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
-                ", boardType =" << boardTypeAsQstr(boardType);
+    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
+                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
     return sPieceNr;
 }
@@ -639,7 +655,7 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines)
     if (fieldLines.Letter < L_A || fieldLines.Letter > L_H ||
             fieldLines.Digit < D_1 || fieldLines.Digit > D_8)
     {
-        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines1: fieldLines pot of scope <0,7>."
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines1: fieldLines out of scope <0,7>."
                     "fieldLines.Letter =" << fieldLines.Letter << ", fieldLines.Digit =" <<
                     fieldLines.Digit;
         return 0;
@@ -666,9 +682,8 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines)
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
-                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
-                ", boardType =" << boardTypeAsQstr(boardType);
+    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
+                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
     return sPieceNr;
 }
@@ -713,9 +728,8 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
-                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
-                ", boardType =" << boardTypeAsQstr(boardType);
+    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
+                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
     qDebug() << "fieldNrToFieldLinesPos14";
     FieldLinesPos pieceLines = fieldNrToFieldLinesPos(sPieceNr);
@@ -731,7 +745,7 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos 
     if (fieldLines.Letter < L_A || fieldLines.Letter > L_H ||
             fieldLines.Digit < D_1 || fieldLines.Digit > D_8)
     {
-        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines1: fieldLines pot of scope <0,7>."
+        qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines1: fieldLines out of scope <0,7>."
                     "fieldLines.Letter =" << fieldLines.Letter << ", fieldLines.Digit =" <<
                     fieldLines.Digit;
         pieceLines.Letter = L_X;
@@ -760,11 +774,34 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos 
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines.Letter =" << (short)fieldLines.Letter << ", fieldLines.Digit =" <<
-                (short)fieldLines.Digit << ", sPieceNr =" << sPieceNr <<
-                ", boardType =" << boardTypeAsQstr(boardType);
+    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
+                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
     qDebug() << "fieldNrToFieldLinesPos15";
     pieceLines = fieldNrToFieldLinesPos(sPieceNr);
     return pieceLines;
+}
+
+bool Chessboard::bIsMoveInAxisRange(float x, float y, float z)
+{
+    bool check = true;
+    if ( x < m_dMinBoardX || x > m_dMaxBoardX)
+    {
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: X axis out of range <" << m_dMinBoardX << ","
+                 << m_dMaxBoardX << ">. x =" << x;
+        check = false;
+    }
+    if ( y < m_dMinBoardY || y > m_dMaxBoardY)
+    {
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Y axis out of range <" << m_dMinBoardY << ","
+                 << m_dMaxBoardY << ">. y =" << y;
+        check = false;
+    }
+    if ( z < m_dMinBoardZ || z > m_dMaxBoardZ)
+    {
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Z axis out of range <" << m_dMinBoardZ << ","
+                 << m_dMaxBoardZ << ">. z =" << z;
+        check = false;
+    }
+    return check;
 }
