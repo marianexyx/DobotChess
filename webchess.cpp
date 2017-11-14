@@ -173,24 +173,24 @@ void WebChess::playerClickedStart(QString QStrWhoClicked)
 {
     if (QStrWhoClicked == "WHITE")
     {
-        _pWebsockets->setClientStateByType(PT_WHITE, true);
+        _pWebsockets->setClientState(PT_WHITE, true);
         qDebug() << "white player clicked start";
     }
     else if (QStrWhoClicked == "BLACK")
     {
-        _pWebsockets->setClientStateByType(PT_BLACK, true);
+        _pWebsockets->setClientState(PT_BLACK, true);
         qDebug() << "black player clicked start";
     }
     else qDebug() << "ERROR:unknown playerClickedStart val:" << QStrWhoClicked;
 
-    if (_pWebsockets->isStartClickedByPlayerType(PT_WHITE) &&
-            _pWebsockets->isStartClickedByPlayerType(PT_BLACK))
+    if (_pWebsockets->isStartClickedByPlayer(PT_WHITE) &&
+            _pWebsockets->isStartClickedByPlayer(PT_BLACK))
     {
         qDebug() << "both players have clicked start. try to start game";
         _pChessboard->stopQueueTimer();
         this->NewGame();
-        _pWebsockets->setClientStateByType(PT_WHITE, false);
-        _pWebsockets->setClientStateByType(PT_BLACK, false);
+        _pWebsockets->setClientState(PT_WHITE, false);
+        _pWebsockets->setClientState(PT_BLACK, false);
     }
 }
 

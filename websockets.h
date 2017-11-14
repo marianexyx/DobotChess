@@ -38,6 +38,25 @@ struct Clients
     }
 };
 
+/*
+ //todo: podzielić tą klasę na wielę podklas. zaprojektować klasy tak by tworzyło to małe...
+//... klasy na potrzeby tej klasy, żyjące jak organy
+
+// składnik
+class CIngredient { / * ... * / };
+// obiekt nadrzędny
+class CAggregate
+{
+    private:
+    // pole ze składowym składnikiem
+        CIngredient* m_pSkladnik;
+    public:
+    // konstruktor i destruktor
+        CAggregate() { m_pSkladnik = new CIngredient; }
+        ~CAggregate() { delete m_pSkladnik; }
+};
+*/
+
 class Websockets: public QObject
 {
     Q_OBJECT
@@ -48,7 +67,7 @@ private:
     QWebSocketServer *m_pWebSocketServer;
     QList<Clients> m_clients;
 
-private Q_SLOTS: //TODO: czym to się różni od zwykłego private/zwykłego slots?
+private Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
     void socketDisconnected();
 
 public:
@@ -59,34 +78,32 @@ public:
 
     void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
 
-    //todo: wszystko poniżej jako prywatne?
-    //todo: nie trzeba dopisywać "byType"- funkcje mogą mieć takie same nazwy i przyjmować...
-    //...różne parametry
+    //todo: wszystko poniżej powinno by w strukturze Clients
     void newClientSocket(QWebSocket *playerSocket);
     void setClientName(QWebSocket *playerSocket, QString name);
     void setPlayerType(QWebSocket *playerSocket, PLAYERS_TYPES type);
     void clearPlayerType(PLAYERS_TYPES type);
-    void setClientStateBySocket(QWebSocket *playerSocket, bool state);
-    void setClientStateByType(PLAYERS_TYPES type, bool state);
+    void setClientState(QWebSocket *playerSocket, bool state);
+    void setClientState(PLAYERS_TYPES type, bool state);
     void addClientToQueue(QWebSocket *playerSocket);
     void removeClient(QWebSocket *playerSocket);
-    void removeClientFromQueueBySocket(QWebSocket *playerSocket);
+    void removeClientFromQueue(QWebSocket *playerSocket);
     void resetPlayersStartConfirmInfo();
-    void moveNextClientFromQueueToTableIfExists(PLAYERS_TYPES chair);
+    void replaceClientOnChairWithQueuedPlayerIfExist(PLAYERS_TYPES chair, LOG formMsg = LOG_NOTHING);
     void clearBothPlayersStates();
 
-    Clients getClientBySocket(QWebSocket *playerSocket);
-    QWebSocket *getClientSocketByName(QString playerName);
-    QString getClientNameBySocket(QWebSocket *playerSocket);
-    QWebSocket *getNextQueuedClientsSocket();
-    QString getQueuedClientsListAsQStr();
-    PLAYERS_TYPES getClientTypeBySocket(QWebSocket *playerSocket);
+    Clients getClient(QWebSocket *playerSocket);
+    QWebSocket *getClientSocket(QString playerName);
+    QString getClientName(QWebSocket *playerSocket);
+    QWebSocket *getNextQueuedClientSocket();
+    QString getQueuedClientsList();
+    PLAYERS_TYPES getClientType(QWebSocket *playerSocket);
     bool isPlayerChairEmpty(PLAYERS_TYPES type);
-    int64_t getQueuedClientByName(QString name);
-    int64_t getQueuedClientBySocket(QWebSocket *playerSocket);
+    int64_t getQueuedClient(QString name);
+    int64_t getQueuedClient(QWebSocket *playerSocket);
     QWebSocket *getPlayerSocket(PLAYERS_TYPES type);
-    bool isStartClickedByPlayerType(PLAYERS_TYPES type);
-    QString getPlayerNameByType(PLAYERS_TYPES type);
+    bool isStartClickedByPlayer(PLAYERS_TYPES type);
+    QString getPlayerName(PLAYERS_TYPES type);
     bool isClientInQueue(QWebSocket *playerSocket);
     bool isClientNameExists(QString name);
     int getAmountOfQueuedClients();
@@ -95,7 +112,7 @@ public:
 
     ~Websockets();
 
-public Q_SLOTS: //todo: jaka jest różnica między zwykłym slots?
+public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
     void receivedMsg(QString QStrWbstMsgToProcess);
     void onNewConnection();
 

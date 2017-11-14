@@ -33,7 +33,7 @@ enum DIGIT
 
 inline LETTER pieceLetterPos(QString QStrLetter)
 {
-    LETTER letter;
+    LETTER letter = L_X;
 
     if (QStrLetter == "a" || QStrLetter == "A") {letter = L_A; }
     else if (QStrLetter == "b" || QStrLetter == "B") {letter = L_B;}

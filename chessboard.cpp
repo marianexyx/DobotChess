@@ -138,22 +138,22 @@ QString Chessboard::getPiecieFromTo()
     return piecieFromTo;
 }
 
-short Chessboard::fieldLinesPosToFieldNr(FieldLinesPos fieldLines)
+short Chessboard::PositionOnBoardToFieldNr(PositionOnBoard fieldLines)
 {
     short sFieldNr = static_cast<short>(fieldLines.Letter) +
             static_cast<short>(fieldLines.Digit)*8;
     if (sFieldNr < 1 || sFieldNr > 64)
     {
-        qDebug() << "ERROR: Chessboard::fieldLinesPosToFieldNr: sFieldNr out of range <1,64>:"
+        qDebug() << "ERROR: Chessboard::PositionOnBoardToFieldNr: sFieldNr out of range <1,64>:"
                  << sFieldNr;
         return 0;
     }
     else return sFieldNr;
 }
 
-FieldLinesPos Chessboard::fieldNrToFieldLinesPos(short sFieldNr) //będzie działać też dla bierek...
+PositionOnBoard Chessboard::fieldNrToPositionOnBoard(short sFieldNr) //będzie działać też dla bierek...
 { //...zbitych jako PieceToRemoveToRemovedPiecePos (0-32)
-    FieldLinesPos fieldLines;
+    PositionOnBoard fieldLines;
 
     if (sFieldNr != 0) //zabezpieczenie przed przypadkowym podaniem zera do mianownika
     {
@@ -175,10 +175,10 @@ FieldLinesPos Chessboard::fieldNrToFieldLinesPos(short sFieldNr) //będzie dzia�
     }
     else
     {
-        emit this->addTextToConsole("ERROR. Chess::fieldNrToFieldLinesPos: próba"
+        emit this->addTextToConsole("ERROR. Chess::fieldNrToPositionOnBoard: próba"
                                     " dzielenia przez zero.  nfieldNr = " +
                                     QString::number(sFieldNr) + "\n");
-        qDebug() << "ERROR: Chessboard::fieldNrToFieldLinesPos: proba dzielenia przez zero. nfieldNr =" <<
+        qDebug() << "ERROR: Chessboard::fieldNrToPositionOnBoard: proba dzielenia przez zero. nfieldNr =" <<
                     sFieldNr;
     }
 
@@ -525,9 +525,8 @@ void Chessboard::switchPlayersTimers()
                      "white or black.  it's' ==" << getWhoseTurn();
 }
 
-void Chessboard::startQueueTimer() //todo: zmienić nazewnictwo na "start" z wszystkich metod "queue"
+void Chessboard::startQueueTimer()
 {
-    qDebug() << "Chessboard::startQueueTimer()";
     m_startQueueTimer->stop();
     m_startQueueTimer->setInterval(m_lTimersStartQueue);
     emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
@@ -537,7 +536,6 @@ void Chessboard::startQueueTimer() //todo: zmienić nazewnictwo na "start" z wsz
 
 void Chessboard::stopQueueTimer()
 {
-    qDebug() << "Chessboard::stopQueueTimer()";
     m_startQueueTimer->stop();
     m_updateLabelTimer->stop();
     this->updateTimeLabels();
@@ -581,7 +579,7 @@ int Chessboard::getBlackTimeLeft()
 }*/
 
 //todo: templaty/szablony?
-void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, FieldLinesPos fieldLines)
+void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, PositionOnBoard fieldLines)
 {
     switch(boardType)
     {
@@ -596,22 +594,22 @@ void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, FieldLinesPos 
 
 void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, short sFieldNr)
 {
-    qDebug() << "fieldNrToFieldLinesPos10";
-    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    qDebug() << "fieldNrToPositionOnBoard10";
+    PositionOnBoard fieldLines = fieldNrToPositionOnBoard(sFieldNr);
     this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
 }
 
-void Chessboard::setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, short sFieldNr)
+void Chessboard::setPieceOnBoard(BOARD boardType, PositionOnBoard pieceLines, short sFieldNr)
 {
-    qDebug() << "fieldNrToFieldLinesPos11";
-    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
-    short sPieceNr = fieldLinesPosToFieldNr(pieceLines);
+    qDebug() << "fieldNrToPositionOnBoard11";
+    PositionOnBoard fieldLines = fieldNrToPositionOnBoard(sFieldNr);
+    short sPieceNr = PositionOnBoardToFieldNr(pieceLines);
     this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
 }
 
-void Chessboard::setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, FieldLinesPos fieldLines)
+void Chessboard::setPieceOnBoard(BOARD boardType, PositionOnBoard pieceLines, PositionOnBoard fieldLines)
 {
-    short sPieceNr = fieldLinesPosToFieldNr(pieceLines);
+    short sPieceNr = PositionOnBoardToFieldNr(pieceLines);
     this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
 }
 
@@ -621,7 +619,7 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
     qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
 
     if (sFieldNr == 0) return 0;
-    FieldLinesPos fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+    PositionOnBoard fieldLines = fieldNrToPositionOnBoard(sFieldNr);
     short sPieceNr = 0;
 
     switch(boardType)
@@ -649,7 +647,7 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
     return sPieceNr;
 }
 
-short Chessboard::getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines)
+short Chessboard::getPieceOnBoardAsNr(BOARD boardType, PositionOnBoard fieldLines)
 {
     //todo: problem powtarzania kodu w/z getBoardByItsType
     if (fieldLines.Letter < L_A || fieldLines.Letter > L_H ||
@@ -688,12 +686,12 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines)
     return sPieceNr;
 }
 
-FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr)
+PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr)
 {
     //todo: problem powtarzania kodu w/z getBoardByItsType
     qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
 
-    FieldLinesPos fieldLines;
+    PositionOnBoard fieldLines;
     if (sFieldNr == 0)
     {
         qDebug() << "ERROR: Chessboard::getPieceOnBoardAsLines2: sFieldNr == 0";
@@ -703,8 +701,8 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr
     }
     else
     {
-        qDebug() << "fieldNrToFieldLinesPos13";
-        fieldLines = fieldNrToFieldLinesPos(sFieldNr);
+        qDebug() << "fieldNrToPositionOnBoard13";
+        fieldLines = fieldNrToPositionOnBoard(sFieldNr);
     }
 
     short sPieceNr = 0;
@@ -731,16 +729,16 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr
     qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
                 ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
-    qDebug() << "fieldNrToFieldLinesPos14";
-    FieldLinesPos pieceLines = fieldNrToFieldLinesPos(sPieceNr);
+    qDebug() << "fieldNrToPositionOnBoard14";
+    PositionOnBoard pieceLines = fieldNrToPositionOnBoard(sPieceNr);
     return pieceLines;
 }
 
-FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos fieldLines)
+PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, PositionOnBoard fieldLines)
 {
     //todo: problem powtarzania kodu w/z getBoardByItsType
 
-    FieldLinesPos pieceLines;
+    PositionOnBoard pieceLines;
 
     if (fieldLines.Letter < L_A || fieldLines.Letter > L_H ||
             fieldLines.Digit < D_1 || fieldLines.Digit > D_8)
@@ -777,8 +775,8 @@ FieldLinesPos Chessboard::getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos 
     qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
                 ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
-    qDebug() << "fieldNrToFieldLinesPos15";
-    pieceLines = fieldNrToFieldLinesPos(sPieceNr);
+    qDebug() << "fieldNrToPositionOnBoard15";
+    pieceLines = fieldNrToPositionOnBoard(sPieceNr);
     return pieceLines;
 }
 

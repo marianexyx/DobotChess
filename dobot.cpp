@@ -349,15 +349,15 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
         if ((Type == ST_REMOVING && partOfSequence == DM_TO) || (Type == ST_RESTORE && partOfSequence == DM_FROM))
         {
             int nRemPieceNr;
-            FieldLinesPos remPieceDest;
+            PositionOnBoard remPieceDest;
 
             if (Type == ST_REMOVING)
             {
                 if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
                 {
                     nRemPieceNr = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
-                    remPieceDest.Letter = _pChessboard->fieldNrToFieldLinesPos(nRemPieceNr).Letter;
-                    remPieceDest.Digit = _pChessboard->fieldNrToFieldLinesPos(nRemPieceNr).Digit;
+                    remPieceDest.Letter = _pChessboard->fieldNrToPositionOnBoard(nRemPieceNr).Letter;
+                    remPieceDest.Digit = _pChessboard->fieldNrToPositionOnBoard(nRemPieceNr).Digit;
                 }
                 else
                 {
@@ -456,20 +456,20 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
             qDebug() << "Dobot::armUpDown: nGripperPiece =" << _pChessboard->nGripperPiece
                      << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
 
-            qDebug() << "fieldNrToFieldLinesPos18";
+            qDebug() << "fieldNrToPositionOnBoard18";
             f_xUpDown = _pChessboard->m_adRemovedPiecesPositions_x
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Digit];
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
             f_yUpDown = _pChessboard->m_adRemovedPiecesPositions_y
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Digit];
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
             if (armDestination == DM_UP) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Digit] +
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit] +
                     _pChessboard->getMaxPieceHeight();
             else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToFieldLinesPos(_pChessboard->nGripperPiece).Digit];
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
             f_rUpDown = ACTUAL_POS;
         }
         else

@@ -83,6 +83,22 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
     connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
             this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
 
+    /*TODO: starać się stosować związki dwustronny obiektów zamiast uzywac emitów
+
+    class CBar;
+    class CFoo
+    {
+        private:
+            // wskaźnik do połączonego obiektu CBar
+            CBar* m_pBar;
+    };
+    class CBar
+    {
+        private:
+            // wskaźnik do połączonego obiektu CFoo
+            CFoo* m_pFoo;
+};
+    */
     connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)), //przesyłanie odpowiedzi z chenard...
             _pWebChess, SLOT(checkMsgFromChenard(QString, QString)));  //...na WWW przez silnk gry.
     connect(_pTCPmsg, SIGNAL(msgFromTcpToArd(QString, QString)), //przesyłanie odpowiedzi z chenard...

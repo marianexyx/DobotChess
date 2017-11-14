@@ -15,10 +15,68 @@
 #include "vars/board_types.h"
 #include "vars/turn_types.h"
 
-struct FieldLinesPos
+struct PositionOnBoard
 {
-    LETTER Letter = L_X;
-    DIGIT Digit = D_X;
+    LETTER Letter;
+    DIGIT Digit;
+
+    PositionOnBoard(): Letter(L_X), Digit(D_X) {}
+    PositionOnBoard(LETTER L, DIGIT D): Letter(L), Digit(D) {}
+    PositionOnBoard(int nL, int nD)
+    {
+        if ((nL >= L_A && nL <= L_H && nD >= D_1 && nD <= D_8) || (nL == L_X && nD == D_X))
+        {
+            Letter = static_cast<LETTER>(nL);
+            Digit = static_cast<DIGIT>(nD);
+        }
+        else
+        {
+            Letter = L_X;
+            Digit = D_X;
+            qDebug() << "ERROR: PositionOnBoard: parameters out of range: nL =" << nL
+                     << ", nD =" << nD;
+        }
+    }
+    PositionOnBoard(QString QStrL, DIGIT D)
+    {
+        Letter = pieceLetterPos(QStrL);
+        Digit = D;
+        if (Letter == L_X || Digit == D_X)
+            qDebug() << "WARNING: PositionOnBoard(QString QStrL, DIGIT D): parameter is X: "
+                        "Letter =" << Letter << ", Digit =" << Digit;
+    }
+    PositionOnBoard(QString QStrL, int nD)
+    {
+        Letter = pieceLetterPos(QStrL);
+        Digit = static_cast<DIGIT>(nD);
+        if (Letter == L_X || Digit == D_X)
+            qDebug() << "WARNING: PositionOnBoard(QString QStrL, int nD): parameter is X: "
+                        "Letter =" << Letter << ", Digit =" << Digit;
+    }
+    PositionOnBoard(QString QStrBoardPos)
+    {
+        if (QStrBoardPos.length() != 2)
+        {
+            qDebug() << "ERROR: PositionOnBoard(QString QStrBoardPos): QStrBoardPos.length() != 2)";
+            Letter = L_X;
+            Digit = D_X;
+        }
+        else
+        {
+            Letter = pieceLetterPos(QStrBoardPos.left(1));
+            Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt() - 1);
+        }
+        if (Letter == L_X || Digit == D_X)
+            qDebug() << "WARNING: PositionOnBoard(QString QStrBoardPos): parameter is X: "
+                        "Letter =" << Letter << ", Digit =" << Digit;
+    }
+
+    void setFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
+    QString getAsQStr() { return pieceLetterPosAsQStr(Letter);}
+    QString getAsQStrBoardPos()
+    {
+            return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1);
+    }
 };
 
 //TODO: chessboard powinien być obiektem klasy chess
@@ -45,9 +103,10 @@ private:
     int m_nRemainingBlackTime;
 
     const int m_nMaxPieceHeight;
+    //todo: struktura
     double m_dMinBoardX, m_dMinBoardY, m_dMinBoardZ, m_dMaxBoardX, m_dMaxBoardY, m_dMaxBoardZ;
 
-    void changeWindowTitle();
+    void changeWindowTitle(); //todo: to wyrzucenia
 
     void FENToBoard(QString FENBoard);
     WHOSE_TURN whoseTurn(QString whoseTurn);
@@ -58,8 +117,8 @@ public:
     Chessboard();
 
     void findBoardPos(QString QStrPiecePositions);
-    short fieldLinesPosToFieldNr(FieldLinesPos fieldLines);
-    FieldLinesPos fieldNrToFieldLinesPos(short sFieldNr);
+    short PositionOnBoardToFieldNr(PositionOnBoard fieldLines);
+    PositionOnBoard fieldNrToPositionOnBoard(short sFieldNr);
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);
     bool isMoveEnpassant(QString moveToTest);
@@ -98,7 +157,7 @@ public:
     //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
     //...nich dobrać metodami dostępowymi?
     //TODO: używanie tych zmiennych globalnych powoduje że gubię się w kodzie
-    FieldLinesPos PieceFrom, PieceTo, PieceActualPos;
+    PositionOnBoard PieceFrom, PieceTo, PieceActualPos;
 
     QString QStrAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
 
@@ -117,9 +176,9 @@ public:
                                                       emit showHistoryMoves(historyMoves); }
     //short getBoardByItsType(BOARD boardType);
     void setPieceOnBoard(BOARD boardType, short sPieceNr, short sFieldNr);
-    void setPieceOnBoard(BOARD boardType, short sPieceNr, FieldLinesPos fieldLines);
-    void setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, short sFieldNr);
-    void setPieceOnBoard(BOARD boardType, FieldLinesPos pieceLines, FieldLinesPos fieldLines);
+    void setPieceOnBoard(BOARD boardType, short sPieceNr, PositionOnBoard fieldLines);
+    void setPieceOnBoard(BOARD boardType, PositionOnBoard pieceLines, short sFieldNr);
+    void setPieceOnBoard(BOARD boardType, PositionOnBoard pieceLines, PositionOnBoard fieldLines);
 
     void clearLegalMoves()                          { m_legalMoves.clear();
                                                       emit showLegalMoves(m_legalMoves);}
@@ -144,9 +203,9 @@ public:
     int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
     bool isStartTimerRunning()                  { return m_startQueueTimer->isActive(); }
     short getPieceOnBoardAsNr(BOARD boardType, short sFieldNr);
-    short getPieceOnBoardAsNr(BOARD boardType, FieldLinesPos fieldLines);
-    FieldLinesPos getPieceOnBoardAsLines(BOARD boardType, short sFieldNr);
-    FieldLinesPos getPieceOnBoardAsLines(BOARD boardType, FieldLinesPos fieldLines);
+    short getPieceOnBoardAsNr(BOARD boardType, PositionOnBoard fieldLines);
+    PositionOnBoard getPieceOnBoardAsLines(BOARD boardType, short sFieldNr);
+    PositionOnBoard getPieceOnBoardAsLines(BOARD boardType, PositionOnBoard fieldLines);
 
 private slots:
     void timeOutWhite();
