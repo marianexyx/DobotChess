@@ -9,7 +9,6 @@ enum END_TYPE
     ET_WHIE_WON,
     ET_BLACK_WON,
     ET_DRAW,
-    ET_STAND_UP,
     ET_GIVE_UP,
     ET_SOCKET_LOST,
     ET_TIMEOUT_START,
@@ -25,7 +24,6 @@ inline QString endTypeAsQstr(END_TYPE ET)
     case ET_WHIE_WON: QStrEndType = "whiteWon"; break;
     case ET_BLACK_WON: QStrEndType = "blackWon"; break;
     case ET_DRAW: QStrEndType = "draw"; break;
-    case ET_STAND_UP: QStrEndType = "standUp"; break;
     case ET_GIVE_UP: QStrEndType = "giveUp"; break;
     case ET_SOCKET_LOST: QStrEndType = "socketLost" ; break;
     case ET_TIMEOUT_START: QStrEndType = "timeoutStart"; break;

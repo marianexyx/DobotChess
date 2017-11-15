@@ -77,36 +77,40 @@ public:
     void sendMsg(QString QStrWsMsg);
 
     void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
+    void playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType);
+    void resetBoardData();
 
     //todo: wszystko poniżej powinno by w strukturze Clients
-    void newClientSocket(QWebSocket *playerSocket);
-    void setClientName(QWebSocket *playerSocket, QString name);
-    void setPlayerType(QWebSocket *playerSocket, PLAYERS_TYPES type);
+    void newClientSocket(QWebSocket *clientSocket);
+    void setClientName(QWebSocket *clientSocket, QString name);
+    void setPlayerType(QWebSocket *clientSocket, PLAYERS_TYPES type);
     void clearPlayerType(PLAYERS_TYPES type);
-    void setClientState(QWebSocket *playerSocket, bool state);
+    void setClientState(QWebSocket *clientSocket, bool state);
     void setClientState(PLAYERS_TYPES type, bool state);
-    void addClientToQueue(QWebSocket *playerSocket);
-    void removeClient(QWebSocket *playerSocket);
-    void removeClientFromQueue(QWebSocket *playerSocket);
+    void addClientToQueue(QWebSocket *clientSocket);
+    void removeClient(QWebSocket *clientSocket);
+    void removeClientFromQueue(QWebSocket *clientSocket);
     void resetPlayersStartConfirmInfo();
-    void replaceClientOnChairWithQueuedPlayerIfExist(PLAYERS_TYPES chair, LOG formMsg = LOG_NOTHING);
-    void clearBothPlayersStates();
+    void cleanChairAndPutThereNextQueuedClientIfExist(PLAYERS_TYPES chair, LOG formMsg = LOG_NOTHING);
 
-    Clients getClient(QWebSocket *playerSocket);
+    bool isClientInList(QWebSocket *clientSocket);
+    Clients getClient(QWebSocket *clientSocket);
     QWebSocket *getClientSocket(QString playerName);
-    QString getClientName(QWebSocket *playerSocket);
+    QString getClientName(QWebSocket *clientSocket);
     QWebSocket *getNextQueuedClientSocket();
     QString getQueuedClientsList();
-    PLAYERS_TYPES getClientType(QWebSocket *playerSocket);
+    PLAYERS_TYPES getClientType(QWebSocket *clientSocket);
     bool isPlayerChairEmpty(PLAYERS_TYPES type);
+    bool isGameTableOccupied();
     int64_t getQueuedClient(QString name);
-    int64_t getQueuedClient(QWebSocket *playerSocket);
+    int64_t getQueuedClient(QWebSocket *clientSocket);
     QWebSocket *getPlayerSocket(PLAYERS_TYPES type);
     bool isStartClickedByPlayer(PLAYERS_TYPES type);
     QString getPlayerName(PLAYERS_TYPES type);
-    bool isClientInQueue(QWebSocket *playerSocket);
+    bool isClientInQueue(QWebSocket *clientSocket);
     bool isClientNameExists(QString name);
     int getAmountOfQueuedClients();
+    bool isClientAPlayer(QWebSocket *clientSocket);
 
     //void testQueuedClients(); //test jednostkowy
 

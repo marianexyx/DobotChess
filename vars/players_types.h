@@ -19,13 +19,22 @@ inline QString playerTypeAsQStr(PLAYERS_TYPES PT)
     switch(PT)
     {
     case PT_NONE: QStrType = ""; break;
-    case PT_WHITE: QStrType = "WHITE"; break;
-    case PT_BLACK: QStrType = "BLACK"; break;
+    case PT_WHITE: QStrType = "White"; break;
+    case PT_BLACK: QStrType = "Black"; break;
     default:
-        qDebug() << "ERROR: playerTypeAsQStr: unknwown parameter:" << PT;
+        qDebug() << "ERROR: playerTypeAsQStr: unknwown parameter:" << QString::number(PT);
         break;
     }
     return QStrType;
+}
+
+inline PLAYERS_TYPES playerTypeFromQStr(QString QStrPlayer)
+{
+    PLAYERS_TYPES playerType = PT_NONE;
+    if (QStrPlayer == "White") playerType = PT_WHITE;
+    else if (QStrPlayer == "Black") playerType = PT_BLACK;
+    else qDebug() << "ERROR: playerTypeFromQStr: unknwown parameter:" << QStrPlayer;
+    return playerType;
 }
 
 #endif // PLAYERS_TYPES_H

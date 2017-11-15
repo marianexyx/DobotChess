@@ -527,6 +527,7 @@ void Chessboard::switchPlayersTimers()
 
 void Chessboard::startQueueTimer()
 {
+    qDebug() << "Chessboard::startQueueTimer()";
     m_startQueueTimer->stop();
     m_startQueueTimer->setInterval(m_lTimersStartQueue);
     emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
@@ -534,7 +535,7 @@ void Chessboard::startQueueTimer()
     m_updateLabelTimer->start();
 }
 
-void Chessboard::stopQueueTimer()
+void Chessboard::stopQueueTimer() //stop == reset
 {
     m_startQueueTimer->stop();
     m_updateLabelTimer->stop();
