@@ -78,7 +78,6 @@ public:
 
     void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
     void playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType);
-    void resetBoardData();
 
     //todo: wszystko poniżej powinno by w strukturze Clients
     void newClientSocket(QWebSocket *clientSocket);
@@ -91,7 +90,7 @@ public:
     void removeClient(QWebSocket *clientSocket);
     void removeClientFromQueue(QWebSocket *clientSocket);
     void resetPlayersStartConfirmInfo();
-    void cleanChairAndPutThereNextQueuedClientIfExist(PLAYERS_TYPES chair, LOG formMsg = LOG_NOTHING);
+    void cleanChairAndPutThereNextQueuedClientIfExist(PLAYERS_TYPES chair);
 
     bool isClientInList(QWebSocket *clientSocket);
     Clients getClient(QWebSocket *clientSocket);

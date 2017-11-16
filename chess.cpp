@@ -10,7 +10,7 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs)
     _pChessboard = pChessboard;
 }
 
-//todo: tu musi być szablon by móc używać różnych parametrów wejściowych, bo funkcja jest za duża by ją powtarzać
+//todo: po reorganizacji klas niech ta funkcja przyjmuje struktury. najlepiej bylobyh ja podzielic na 2
 void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
                               LETTER pieceToLetter, DIGIT pieceToDigit)
 {
@@ -332,7 +332,7 @@ void Chess::resetPiecePositions()
                 if (!isChessboardInvariable)
                 {
                     memcpy(_pChessboard->m_asBoardTemp, _pChessboard->m_asBoardMain,
-                           sizeof(_pChessboard->m_asBoardMain)); //todo: pseudooperator m_asBoardTemp = m_asBoardMain
+                           sizeof(_pChessboard->m_asBoardMain));
                 }
                 else
                 {

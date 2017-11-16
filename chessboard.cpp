@@ -24,8 +24,8 @@ Chessboard::Chessboard():
     m_lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
     m_lTimersStartQueue(1000*60*2)
 {
-    memcpy(m_asBoardMain, m_anBoardStart, sizeof(m_anBoardStart)); //todo: pseudooperator m_asBoardMain == m_anBoardStart
-    memcpy(m_asBoardTemp, m_anBoardStart, sizeof(m_anBoardStart)); //todo: pseudooperator m_asBoardTemp == m_anBoardStart
+    memcpy(m_asBoardMain, m_anBoardStart, sizeof(m_anBoardStart));
+    memcpy(m_asBoardTemp, m_anBoardStart, sizeof(m_anBoardStart));
 
     nGripperPiece = 0;
     m_QStrSiteMoveRequest = "";
@@ -595,14 +595,12 @@ void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, PositionOnBoar
 
 void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, short sFieldNr)
 {
-    qDebug() << "fieldNrToPositionOnBoard10";
     PositionOnBoard fieldLines = fieldNrToPositionOnBoard(sFieldNr);
     this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
 }
 
 void Chessboard::setPieceOnBoard(BOARD boardType, PositionOnBoard pieceLines, short sFieldNr)
 {
-    qDebug() << "fieldNrToPositionOnBoard11";
     PositionOnBoard fieldLines = fieldNrToPositionOnBoard(sFieldNr);
     short sPieceNr = PositionOnBoardToFieldNr(pieceLines);
     this->setPieceOnBoard(boardType, sPieceNr, fieldLines);
@@ -617,8 +615,6 @@ void Chessboard::setPieceOnBoard(BOARD boardType, PositionOnBoard pieceLines, Po
 short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
 {
     //todo: problem powtarzania kodu w/z getBoardByItsType
-    qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
-
     if (sFieldNr == 0) return 0;
     PositionOnBoard fieldLines = fieldNrToPositionOnBoard(sFieldNr);
     short sPieceNr = 0;
@@ -642,8 +638,6 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, short sFieldNr)
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
-                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
     return sPieceNr;
 }
@@ -681,8 +675,6 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, PositionOnBoard fieldLine
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
-                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
     return sPieceNr;
 }
@@ -690,7 +682,6 @@ short Chessboard::getPieceOnBoardAsNr(BOARD boardType, PositionOnBoard fieldLine
 PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sFieldNr)
 {
     //todo: problem powtarzania kodu w/z getBoardByItsType
-    qDebug() << "Chessboard::getPieceOnBoardAsNr: sFieldNr =" << sFieldNr;
 
     PositionOnBoard fieldLines;
     if (sFieldNr == 0)
@@ -700,11 +691,7 @@ PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sField
         fieldLines.Digit = D_X;
         return fieldLines;
     }
-    else
-    {
-        qDebug() << "fieldNrToPositionOnBoard13";
-        fieldLines = fieldNrToPositionOnBoard(sFieldNr);
-    }
+    else fieldLines = fieldNrToPositionOnBoard(sFieldNr);
 
     short sPieceNr = 0;
 
@@ -727,10 +714,7 @@ PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, short sField
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
-                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
-    qDebug() << "fieldNrToPositionOnBoard14";
     PositionOnBoard pieceLines = fieldNrToPositionOnBoard(sPieceNr);
     return pieceLines;
 }
@@ -773,10 +757,7 @@ PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, PositionOnBo
         sPieceNr = 0;
         break;
     }
-    qDebug() << "fieldLines =" << pieceLetterPosAsQStr(fieldLines.Letter) << (short)fieldLines.Digit + 1 <<
-                ", sPieceNr =" << sPieceNr << ", boardType =" << boardTypeAsQstr(boardType);
 
-    qDebug() << "fieldNrToPositionOnBoard15";
     pieceLines = fieldNrToPositionOnBoard(sPieceNr);
     return pieceLines;
 }
@@ -803,4 +784,15 @@ bool Chessboard::bIsMoveInAxisRange(float x, float y, float z)
         check = false;
     }
     return check;
+}
+
+void Chessboard::resetBoardData() //todo: troche bodajze nieadekwatna nazwa
+{
+    //todo: zastanowić się na spokojnie jakie czyszczenia jeszcze tu upchać
+    //todo: sprawdzić czy zresetowałem inne dane: zegary, tury, planszę fizyczną/ w pamięci itd
+    this->stopBoardTimers();
+    this->setWhoseTurn(NO_TURN);
+    this->clearLegalMoves();
+    this->clearHistoryMoves();
+    this->clearBoard();
 }

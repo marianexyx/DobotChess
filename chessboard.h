@@ -7,6 +7,7 @@
 #include "QObject"
 #include "qdebug.h"
 #include <vector>
+#include <typeinfo>
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "vars/dobot_moves.h"
@@ -72,11 +73,8 @@ struct PositionOnBoard
     }
 
     void setFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
-    QString getAsQStr() { return pieceLetterPosAsQStr(Letter);}
-    QString getAsQStrBoardPos()
-    {
-            return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1);
-    }
+    QString getAsQStr() { return pieceLetterPosAsQStr(Letter); }
+    QString getAsQStrBoardPos() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1); }
 };
 
 //TODO: chessboard powinien być obiektem klasy chess
@@ -138,6 +136,7 @@ public:
     void startQueueTimer();
     void stopQueueTimer();
     bool bIsMoveInAxisRange(float x, float y, float z);
+    void resetBoardData();
 
     //todo: mam problemy z zwracaiem tablic do funckyj. nie marnować na...
     //...to teraz czasu i dac jako public
