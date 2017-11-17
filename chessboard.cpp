@@ -87,13 +87,14 @@ Chessboard::Chessboard():
     std::vector<double> limesOfY{ a1_y, a8_y, h1_y, h8_y, removedWhiteCloser_y, removedBlackCloser_y };
     std::vector<double> limesOfZ{ a1_z, a8_z, h1_z, h8_z, removedWhiteCloser_z, removedWhiteFurther_z,
                 removedBlackCloser_z, removedBlackFurther_z};
-    double tolerance = 0.5;
-    m_dMinBoardX = *std::min_element( limesOfX.begin(), limesOfX.end() ) - tolerance;
-    m_dMinBoardY = *std::min_element( limesOfY.begin(), limesOfY.end() ) - tolerance;
-    m_dMinBoardZ = *std::min_element( limesOfZ.begin(), limesOfZ.end() ) - tolerance;
-    m_dMaxBoardX = *std::max_element( limesOfX.begin(), limesOfX.end() ) + tolerance;
-    m_dMaxBoardY = *std::max_element( limesOfY.begin(), limesOfY.end() ) + tolerance;
-    m_dMaxBoardZ = *std::max_element( limesOfZ.begin(), limesOfZ.end() ) + m_nMaxPieceHeight;
+    double tolerance = 0.5;   
+    m_dMinBoard.x = *std::min_element( limesOfX.begin(), limesOfX.end() ) - tolerance;
+    m_dMinBoard.y = *std::min_element( limesOfY.begin(), limesOfY.end() ) - tolerance;
+    m_dMinBoard.z = *std::min_element( limesOfZ.begin(), limesOfZ.end() ) - tolerance;
+    m_dMaxBoard.x = *std::max_element( limesOfX.begin(), limesOfX.end() ) + tolerance;
+    m_dMaxBoard.y = *std::max_element( limesOfY.begin(), limesOfY.end() ) + tolerance;
+    m_dMaxBoard.z = *std::max_element( limesOfZ.begin(), limesOfZ.end() ) + m_nMaxPieceHeight;
+
 
     m_whiteTimer = new QTimer();
     m_blackTimer = new QTimer();
@@ -174,13 +175,8 @@ PositionOnBoard Chessboard::fieldNrToPositionOnBoard(short sFieldNr) //będzie d
         fieldLines.Digit = static_cast<DIGIT>(sFieldNrColumn);
     }
     else
-    {
-        emit this->addTextToConsole("ERROR. Chess::fieldNrToPositionOnBoard: próba"
-                                    " dzielenia przez zero.  nfieldNr = " +
-                                    QString::number(sFieldNr) + "\n");
-        qDebug() << "ERROR: Chessboard::fieldNrToPositionOnBoard: proba dzielenia przez zero. nfieldNr =" <<
-                    sFieldNr;
-    }
+        qDebug() << "ERROR: Chessboard::fieldNrToPositionOnBoard: proba dzielenia "
+                    "przez zero. nfieldNr =" << sFieldNr;
 
     return fieldLines;
 }
@@ -588,7 +584,7 @@ void Chessboard::setPieceOnBoard(BOARD boardType, short sPieceNr, PositionOnBoar
     case B_START: m_anBoardStart[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
     case B_TEMP: m_asBoardTemp[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
     case B_REMOVED: m_asBoardRemoved[fieldLines.Letter][fieldLines.Digit] = sPieceNr; break;
-    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: unknown BOARD val =" << boardType;
+    default: qDebug() << "ERROR: Chessboard::setPieceOnBoard: wrong BOARD val =" << boardType;
         break;
     }
 }
@@ -765,22 +761,22 @@ PositionOnBoard Chessboard::getPieceOnBoardAsLines(BOARD boardType, PositionOnBo
 bool Chessboard::bIsMoveInAxisRange(float x, float y, float z)
 {
     bool check = true;
-    if ( x < m_dMinBoardX || x > m_dMaxBoardX)
+    if ( x < m_dMinBoard.x || x > m_dMaxBoard.x)
     {
-        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: X axis out of range <" << m_dMinBoardX << ","
-                 << m_dMaxBoardX << ">. x =" << x;
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: X axis out of range <"
+                 << m_dMinBoard.x << "," << m_dMaxBoard.x << ">. x =" << x;
         check = false;
     }
-    if ( y < m_dMinBoardY || y > m_dMaxBoardY)
+    if ( y < m_dMinBoard.y || y > m_dMaxBoard.y)
     {
-        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Y axis out of range <" << m_dMinBoardY << ","
-                 << m_dMaxBoardY << ">. y =" << y;
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Y axis out of range <"
+                 << m_dMinBoard.y << "," << m_dMaxBoard.y << ">. y =" << y;
         check = false;
     }
-    if ( z < m_dMinBoardZ || z > m_dMaxBoardZ)
+    if ( z < m_dMinBoard.z || z > m_dMaxBoard.z)
     {
-        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Z axis out of range <" << m_dMinBoardZ << ","
-                 << m_dMaxBoardZ << ">. z =" << z;
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Z axis out of range <"
+                 << m_dMinBoard.z << "," << m_dMaxBoard.z << ">. z =" << z;
         check = false;
     }
     return check;

@@ -33,7 +33,7 @@ Dobot::Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb):
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
     
     m_ullCoreQueuedCmdIndex = 1;
-    m_uiQueuedCmdLeftSpace = 10000; //jakaś duża liczba, bo mam dalej warunek krytycznego błędu dla zera
+    m_uiQueuedCmdLeftSpace = std::numeric_limits<unsigned int>::max();
     
     firstPosId.index = 0;
     lastPosId.index = 0;
@@ -193,7 +193,7 @@ void Dobot::QueuedIdList()
         PtpCmdActualVal retreatId;
         retreatId = (pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
         addCmdToList(DM_TO_POINT, ST_NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
-        m_ullRetreatIndex = 10000000; //jakas duza liczba
+        m_ullRetreatIndex = std::numeric_limits<unsigned long long>::max();
     }
 }
 
@@ -227,9 +227,7 @@ void Dobot::onConnectDobot()
         {
             emit this->QueueLabels(m_uiQueuedCmdLeftSpace, m_ullDobotQueuedCmdIndex,
                                    m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
-                                   firstPosId.index); //TODO: w zasadzie potrzebuje tylko zaaktualizować...
-            //...m_ullDobotQueuedCmdIndex, i to możę nie warto tutaj nawet. bardziej...
-            //...są to testy czy to się dzieje
+                                   firstPosId.index);
         }
         else
         {
@@ -284,7 +282,6 @@ void Dobot::initDobot()
     //ona oznacza w praktyce?
     SetEndEffectorParams(&endEffectorParams, false, NULL);
     
-    //TODO: nie ma sensu ustawiać JOG parametrów, jak nie będę nigdy sterował tutaj kątami
     JOGJointParams jogJointParams;
     for (int i = 0; i < 4; i++)
     {
@@ -444,8 +441,6 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
     //pozycje obszaru bierek usuniętych
     if (Type == ST_REMOVING && partOfSequence == DM_TO) //jeżeli odstawiamy bierkę na obszar zbitych...
     {
-        //TODO: ten zapis fieldNrToFieldPos działa, ale zmienić jakoś nazewnictwo funkcji, bo jest...
-        //...nieadekwatna w tym przypadku.
         //TODO2: zastrukturyzować, spakować w funkcję
         //todo3: uporządkować kod zabezpieczeń
         //todo4: w całej klasie dobot ie powinna się pojawić ani 1 linia kodu z której by wynikało że...
@@ -456,7 +451,6 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
             qDebug() << "Dobot::armUpDown: nGripperPiece =" << _pChessboard->nGripperPiece
                      << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
 
-            qDebug() << "fieldNrToPositionOnBoard18";
             f_xUpDown = _pChessboard->m_adRemovedPiecesPositions_x
                     [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
                     [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];

@@ -124,7 +124,7 @@ void Websockets::receivedMsg(QString QStrWsMsgToProcess)
             return;
         }
 
-        PLAYERS_TYPES playerChair = playerTypeFromQStr(QStrWsMsgToProcess.mid(5));
+        PLAYER_TYPE playerChair = playerTypeFromQStr(QStrWsMsgToProcess.mid(5));
 
         _pChessboard->setWhoseTurn(NO_TURN);
         if (!this->isPlayerChairEmpty(playerChair))
@@ -316,7 +316,7 @@ void Websockets::msgFromChessboardToWebsockets(QString QStrWsMsg)
     this->sendMsg(QStrWsMsg);
 }
 
-void Websockets::cleanChairAndPutThereNextQueuedClientIfExist(PLAYERS_TYPES chair)
+void Websockets::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair)
 {
     this->clearPlayerType(chair);
 
@@ -447,7 +447,7 @@ void Websockets::setClientName(QWebSocket *clientSocket, QString name)
                 "typeid(clientSocket) =" << typeid(clientSocket).name();
 }
 
-void Websockets::setPlayerType(QWebSocket *clientSocket, PLAYERS_TYPES type)
+void Websockets::setPlayerType(QWebSocket *clientSocket, PLAYER_TYPE type)
 {
     Q_FOREACH (Clients client, m_clients)
     {
@@ -489,7 +489,7 @@ void Websockets::setPlayerType(QWebSocket *clientSocket, PLAYERS_TYPES type)
 
 }
 
-void Websockets::clearPlayerType(PLAYERS_TYPES type)
+void Websockets::clearPlayerType(PLAYER_TYPE type)
 {
     if (type != PT_NONE)
     {
@@ -546,14 +546,14 @@ void Websockets::setClientState(QWebSocket *clientSocket, bool state)
     qDebug() << "ERROR: Websockets::setClientState- client not found";
 }
 
-void Websockets::setClientState(PLAYERS_TYPES type, bool state)
+void Websockets::setClientState(PLAYER_TYPE type, bool state)
 {
     Q_FOREACH (Clients client, m_clients)
     {
         if (client.type == type)
         {
             if(state && client.isStartClickedByPlayer == state)
-                qDebug() << "WARNING: Websockets::setClientState(PLAYERS_TYPES type, "
+                qDebug() << "WARNING: Websockets::setClientState(PLAYER_TYPE type, "
                             "bool state)- client has already clicked start";
 
             Clients changedClient = client;
@@ -795,7 +795,7 @@ QString Websockets::getQueuedClientsList()
     qDebug() << "Websockets::testQueuedClients(): QStrQueuedClients =" << QStrQueuedClients;
 }*/
 
-PLAYERS_TYPES Websockets::getClientType(QWebSocket *clientSocket)
+PLAYER_TYPE Websockets::getClientType(QWebSocket *clientSocket)
 {
     Q_FOREACH (Clients client, m_clients)
     {
@@ -806,7 +806,7 @@ PLAYERS_TYPES Websockets::getClientType(QWebSocket *clientSocket)
     return PT_NONE;
 }
 
-bool Websockets::isPlayerChairEmpty(PLAYERS_TYPES type)
+bool Websockets::isPlayerChairEmpty(PLAYER_TYPE type)
 {
     Q_FOREACH (Clients client, m_clients)
     {
@@ -845,7 +845,7 @@ int64_t Websockets::getQueuedClient(QWebSocket *clientSocket)
     return -1;
 }
 
-QWebSocket *Websockets::getPlayerSocket(PLAYERS_TYPES type)
+QWebSocket *Websockets::getPlayerSocket(PLAYER_TYPE type)
 {
     if (type != PT_NONE)
     {
@@ -864,7 +864,7 @@ QWebSocket *Websockets::getPlayerSocket(PLAYERS_TYPES type)
     }
 }
 
-bool Websockets::isStartClickedByPlayer(PLAYERS_TYPES type)
+bool Websockets::isStartClickedByPlayer(PLAYER_TYPE type)
 {
     if (type != PT_NONE)
     {
@@ -883,7 +883,7 @@ bool Websockets::isStartClickedByPlayer(PLAYERS_TYPES type)
     }
 }
 
-QString Websockets::getPlayerName(PLAYERS_TYPES type)
+QString Websockets::getPlayerName(PLAYER_TYPE type)
 {
     if (type == PT_WHITE && isPlayerChairEmpty(PT_WHITE))
         return "White";

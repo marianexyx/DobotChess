@@ -1,10 +1,10 @@
-#ifndef PLAYERS_TYPES_H
-#define PLAYERS_TYPES_H
+#ifndef PLAYER_TYPE_H
+#define PLAYER_TYPE_H
 
 #pragma once
 #include <QString>
 
-enum PLAYERS_TYPES
+enum PLAYER_TYPE
 {
     PT_NONE,
     PT_WHITE,
@@ -13,7 +13,7 @@ enum PLAYERS_TYPES
 
 //TODO: includować to wszędzie gdzie używam zmiennych biały/czarny czy white/black
 
-inline QString playerTypeAsQStr(PLAYERS_TYPES PT)
+inline QString playerTypeAsQStr(PLAYER_TYPE PT)
 {
     QString QStrType;
     switch(PT)
@@ -28,13 +28,13 @@ inline QString playerTypeAsQStr(PLAYERS_TYPES PT)
     return QStrType;
 }
 
-inline PLAYERS_TYPES playerTypeFromQStr(QString QStrPlayer)
+inline PLAYER_TYPE playerTypeFromQStr(QString QStrPlayer)
 {
-    PLAYERS_TYPES playerType = PT_NONE;
+    PLAYER_TYPE playerType = PT_NONE;
     if (QStrPlayer == "White") playerType = PT_WHITE;
     else if (QStrPlayer == "Black") playerType = PT_BLACK;
     else qDebug() << "ERROR: playerTypeFromQStr: unknwown parameter:" << QStrPlayer;
     return playerType;
 }
 
-#endif // PLAYERS_TYPES_H
+#endif // PLAYER_TYPE_H

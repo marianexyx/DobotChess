@@ -5,6 +5,7 @@
 #include <QString>
 
 enum BOARD { B_MAIN,
+             B_CHENARD,
              B_START,
              B_TEMP,
              B_REMOVED };
@@ -15,6 +16,7 @@ inline QString boardTypeAsQstr(BOARD board)
     switch(board)
     {
     case B_MAIN: QStrType = "mainBoard"; break;
+    case B_CHENARD: QStrType = "chenardBoard"; break;
     case B_START: QStrType = "startBoard"; break;
     case B_TEMP: QStrType = "tempBoard"; break;
     case B_REMOVED: QStrType = "removedBoard"; break;

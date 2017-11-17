@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QValidator>
 #include <QList>
+#include <limits>
 #include "DobotDll.h"
 #include "DobotType.h"
 #include "chessboard.h"

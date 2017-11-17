@@ -23,7 +23,7 @@ struct Clients
 {
     QWebSocket *socket;
     QString name;
-    PLAYERS_TYPES type;
+    PLAYER_TYPE type;
     bool isStartClickedByPlayer;
     int64_t queue;
 
@@ -82,15 +82,15 @@ public:
     //todo: wszystko poniżej powinno by w strukturze Clients
     void newClientSocket(QWebSocket *clientSocket);
     void setClientName(QWebSocket *clientSocket, QString name);
-    void setPlayerType(QWebSocket *clientSocket, PLAYERS_TYPES type);
-    void clearPlayerType(PLAYERS_TYPES type);
+    void setPlayerType(QWebSocket *clientSocket, PLAYER_TYPE type);
+    void clearPlayerType(PLAYER_TYPE type);
     void setClientState(QWebSocket *clientSocket, bool state);
-    void setClientState(PLAYERS_TYPES type, bool state);
+    void setClientState(PLAYER_TYPE type, bool state);
     void addClientToQueue(QWebSocket *clientSocket);
     void removeClient(QWebSocket *clientSocket);
     void removeClientFromQueue(QWebSocket *clientSocket);
     void resetPlayersStartConfirmInfo();
-    void cleanChairAndPutThereNextQueuedClientIfExist(PLAYERS_TYPES chair);
+    void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair);
 
     bool isClientInList(QWebSocket *clientSocket);
     Clients getClient(QWebSocket *clientSocket);
@@ -98,14 +98,14 @@ public:
     QString getClientName(QWebSocket *clientSocket);
     QWebSocket *getNextQueuedClientSocket();
     QString getQueuedClientsList();
-    PLAYERS_TYPES getClientType(QWebSocket *clientSocket);
-    bool isPlayerChairEmpty(PLAYERS_TYPES type);
+    PLAYER_TYPE getClientType(QWebSocket *clientSocket);
+    bool isPlayerChairEmpty(PLAYER_TYPE type);
     bool isGameTableOccupied();
     int64_t getQueuedClient(QString name);
     int64_t getQueuedClient(QWebSocket *clientSocket);
-    QWebSocket *getPlayerSocket(PLAYERS_TYPES type);
-    bool isStartClickedByPlayer(PLAYERS_TYPES type);
-    QString getPlayerName(PLAYERS_TYPES type);
+    QWebSocket *getPlayerSocket(PLAYER_TYPE type);
+    bool isStartClickedByPlayer(PLAYER_TYPE type);
+    QString getPlayerName(PLAYER_TYPE type);
     bool isClientInQueue(QWebSocket *clientSocket);
     bool isClientNameExists(QString name);
     int getAmountOfQueuedClients();

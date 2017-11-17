@@ -15,6 +15,10 @@
 #include "vars/sequence_types.h"
 #include "vars/board_types.h"
 #include "vars/turn_types.h"
+#include "vars/players_types.h"
+#include "vars/board_types.h"
+
+enum PIECE_TYPE { P_PAWN, P_ROOK, P_KNIGHT, P_BISHOP, P_KING, P_QUEEN };
 
 struct PositionOnBoard
 {
@@ -77,7 +81,261 @@ struct PositionOnBoard
     QString getAsQStrBoardPos() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1); }
 };
 
-//TODO: chessboard powinien być obiektem klasy chess
+class Piece
+{
+private:
+    int m_pieceID;
+    PIECE_TYPE m_PieceType;
+    PLAYER_TYPE m_PieceColor;
+    PositionOnBoard m_StartField;
+    BOARD m_BoardTypePos;
+
+public:
+    Piece(int pieceID)
+    {
+        if (pieceID < 1 || pieceID > 32)
+        {
+            qDebug() << "ERROR: Piece::Piece(): pieceID out of range:" << pieceID;
+            return;
+        }
+        m_pieceID = pieceID;
+
+        if (pieceID >=16) m_PieceColor = PT_WHITE;
+        else m_PieceColor = PT_BLACK;
+
+        m_StartField = this->pieceNrToPositionOnBoard(pieceID);
+
+        switch(pieceID)
+        {
+        case 1: case 8: case 25: case 32:
+            m_PieceType = P_ROOK; break;
+        case 2: case 7: case 26: case 31:
+            m_PieceType = P_KNIGHT; break;
+        case 3: case 6: case 27: case 30:
+            m_PieceType = P_BISHOP; break;
+        case 4: case 28:
+            m_PieceType = P_QUEEN; break;
+        case 5: case 29:
+            m_PieceType = P_KING; break;
+        default:
+            m_PieceType = P_PAWN; break;
+        }
+
+        m_BoardTypePos = B_MAIN;
+    }
+    //todo:dodac funckje zwracajaca string/char bierki typu FEN na podstwie typu bierki i jej koloru
+
+    //todo: 2 ponizsze funkcje sa zdublowany z chessboardu
+    short PositionOnBoardToPieceNr(PositionOnBoard pieceLines)
+    {
+        short sPieceNr = static_cast<short>(pieceLines.Letter) +
+                static_cast<short>(pieceLines.Digit)*8;
+        if (sPieceNr < 1 || sPieceNr > 32) //todo: to tez sie powtarza
+        {
+            qDebug() << "ERROR: Piece::PositionOnBoardToFieldNr: sPieceNr out of range <1,32>:"
+                     << sPieceNr;
+            return 0;
+        }
+        else return sPieceNr;
+    }
+
+    PositionOnBoard pieceNrToPositionOnBoard(short sPiecedNr)
+    {
+        PositionOnBoard pieceLines;
+
+        if (sPiecedNr != 0)
+        {
+            short sPieceNrColumn, sPieceNrRow; //tablica[nNrRow][nNrColumn];
+
+            if (sPiecedNr % 8 != 0) //8, 16, 24, 32, 40, 48, 56 i 64.
+            {
+                sPieceNrColumn = sPiecedNr / 8;
+                sPieceNrRow  = (sPiecedNr - 1) - (sPieceNrColumn * 8);
+            }
+            else //8, 16, 24, 32, 40, 48, 56 i 64.
+            {
+                sPieceNrColumn = (sPiecedNr / 8) - 1;
+                sPieceNrRow = 7;
+            }
+
+            pieceLines.Letter = static_cast<LETTER>(sPieceNrRow);
+            pieceLines.Digit = static_cast<DIGIT>(sPieceNrColumn);
+        }
+        else
+            qDebug() << "ERROR: Chessboard::fieldNrToPositionOnBoard: proba"
+                        " dzielenia przez zero. nNr =" << sPiecedNr;
+
+        return pieceLines;
+    }
+
+    int getPieceNr() const { return m_pieceID; }
+    PIECE_TYPE getPieceType() const { return m_PieceType; }
+    PLAYER_TYPE getPieceColor() const { return m_PieceColor; }
+    PositionOnBoard getPieceStartField() const { return m_StartField; }
+    BOARD getPieceBoardTypePos() const { return m_BoardTypePos;}
+};
+
+struct Point3D
+{
+    double x;
+    double y;
+    double z;
+};
+
+//todo: tworzyc to jako tablice obiektow w szasownicach?
+struct Field
+{
+    int nNr;
+    int nPieceOnField;
+
+    static PositionOnBoard fieldNrToPositionOnBoard(short sFieldNr) //todo: powtrzenie kodu
+    //a moze da rade przeniesc te funkcje do chessboardu?
+    {
+        PositionOnBoard boardPos;
+
+        if (sFieldNr < 1 || sFieldNr > 64)
+        {
+            if (sFieldNr % 8 != 0) //8, 16, 24, 32, 40, 48, 56 i 64.
+            {
+                boardPos.Digit = sFieldNr / 8;
+                boardPos.Letter  = (sFieldNr - 1) - (sFieldNrColumn * 8);
+            }
+            else //8, 16, 24, 32, 40, 48, 56 i 64.
+            {
+                boardPos.Digit = (sFieldNr / 8) - 1;
+                boardPos.Letter = 7;
+            }
+        }
+        else qDebug() << "ERROR: Field::fieldNrToPositionOnBoard: "
+                         "field out of range. nNr =" << sFieldNr;
+
+        return boardPos;
+    }
+
+    static short PositionOnBoardToFieldNr(PositionOnBoard fieldLines)
+    {
+        short sFieldNr = static_cast<short>(fieldLines.Letter) +
+                static_cast<short>(fieldLines.Digit)*8;
+        if (sFieldNr < 1 || sFieldNr > 64)
+        {
+            qDebug() << "ERROR: Field::PositionOnBoardToFieldNr: sPieceNr "
+                        "out of range <1,32>:" << sFieldNr;
+            return 0;
+        }
+        else return sFieldNr;
+    }
+
+    bool isFieldOccupied() const { return nPieceOnField > 0 ? true : false; }
+};
+
+class Chessboard2 //todo: bez makra QOBCJECT. ta szachownica ma by w 100% zalezna
+{
+   /*
+    ok  -każde pole w dwóch formach: (znikna pośrednie konwersje poukrywane po kodzie)
+    ok      -jako ID- numer
+    ok      -jako struktura pola litera-cyfra
+    ok  -bierkę aktualnie na sobie posiadaną (id)
+    ok  -nr startowej bierki (id) - ze stratowej szachownicy pobierac
+    ok  -sprawdzanie czy pole jest zajęte
+    -showBoardInDebug
+    -arrayBoardToQStr
+    -get/set/clear field - private friend gripper
+    -pozycja xyz kazdego pola?
+    */
+private:
+    Field m_Field[64];
+
+public:
+    Chessboard2(BOARD boardType)
+    {
+
+        switch(boardType)
+        {
+        case B_MAIN:
+        case B_START:
+        case B_CHENARD:
+            for (int i=1; i >=64; ++i)
+            {
+                m_Field[i].nNr = i;
+                if (i >= 49) m_Field[i].nPieceOnField = i - 32;
+                else if (i >= 16) m_Field[i].nPieceOnField = i;
+                else m_Field[i].nPieceOnField = 0;
+            }
+            break;
+        case B_REMOVED:
+        case B_TEMP:
+            for (int i=1; i >=64; ++i)
+            {
+                m_Field[i].nNr = i;
+                m_Field[i].nNr = 0;
+            }
+            break;
+        default:
+            qDebug() << "ERROR: Chessboard2::setPieceOnBoard: wrong BOARD val ="
+                     << boardType;
+            break;
+        }
+    }
+
+    void showBoardInDebug();
+    QString arrayBoardToQStr(QString QStrBoard[8][8]);
+
+    PositionOnBoard getPosOnBoard(int nNr) const
+    { return fieldNrToPositionOnBoard(nNr); }
+
+    void setPieceOnField(int nPassedPiece, PositionOnBoard PosOnBoard)
+    //todo: friend dla chwytaka?
+    {
+        int nDestinationNr = Field::PositionOnBoardToFieldNr(PosOnBoard);
+
+        if (nPassedPiece < 1 || nPassedPiece > 32)
+        {
+            qDebug() << "ERROR: Chessboard2::setPiecePosition: nPiece "
+                        "out of range. nPiece =" << nPiece;
+            return;
+        }
+        if (m_Field[nDestinationNr].isFieldOccupied())
+        {
+            qDebug() << "ERROR: Chessboard2::setPiecePosition: field is already occupied by"
+                        " another piece. nPiece =" << nPiece << ", field =" << m_Field[nPiece];
+            return;
+        }
+        for (int i = 1; i >=64; ++i)
+        {
+            if (nPiece == m_Field[i].nPieceOnField)
+            {
+                qDebug() << "ERROR: Chessboard2::setPiecePosition: this nPiece "
+                            "already exist on board. nPiece =" << nPiece;
+                return;
+            }
+        }
+
+        m_Field[nDestinationNr].nPieceOnField = nPassedPiece;
+        qDebug() << "Chessboard2::setPieceOnField- new pieceNr:" << nPassedPiece
+                 << "on fieldNr:" << nDestinationNr;
+    }
+
+    void clearField(PositionOnBoard PosOnBoard)
+    {
+        int nNrToClear = Field::PositionOnBoardToFieldNr(PosOnBoard);
+
+        if (m_Field[nNrToClear].isFieldOccupied() == false)
+        {
+            qDebug() << "ERROR: Chessboard2::clearField: field is already clear. fieldNr ="
+                     << m_Field[nNrToClear].nNr << ", piece on it ="
+                     << m_Field[nNrToClear].nPieceOnField;
+            return;
+        }
+
+        //todo: ladniejsze komunikaty mozna dac zamiast numerow
+        qDebug() << "Chessboard2::clearField: clearing field:" << nNrToClear << ". old piece ="
+                  << m_Field[nNrToClear].nPieceOnField << ", now its == 0";
+        m_Field[nNrToClear].nPieceOnField = 0;
+    }
+};
+
+
+//TODO: chessboard powinien być rodzicem klasy chess
 class Chessboard: public QObject
 {
     Q_OBJECT
@@ -101,8 +359,7 @@ private:
     int m_nRemainingBlackTime;
 
     const int m_nMaxPieceHeight;
-    //todo: struktura
-    double m_dMinBoardX, m_dMinBoardY, m_dMinBoardZ, m_dMaxBoardX, m_dMaxBoardY, m_dMaxBoardZ;
+    Point3D m_dMinBoard, m_dMaxBoard;
 
     void changeWindowTitle(); //todo: to wyrzucenia
 
@@ -135,7 +392,7 @@ public:
     void switchPlayersTimers();
     void startQueueTimer();
     void stopQueueTimer();
-    bool bIsMoveInAxisRange(float x, float y, float z);
+    bool bIsMoveInAxisRange(float x, float y, float z); //todo:dobot
     void resetBoardData();
 
     //todo: mam problemy z zwracaiem tablic do funckyj. nie marnować na...
@@ -196,7 +453,7 @@ public:
     QStringList getLegalMoves()                     { return m_legalMoves; }
     QStringList getHisotyMoves()                    { return m_historyMoves; }
     QString getHisotyMovesAsQStr()                  { return m_historyMoves.join(" "); }
-    double getMinBoardZ()                           { return m_dMinBoardZ; }
+    double getMinBoardZ()                           { return m_dMinBoard.z; }
     int getWhiteTimeLeft();
     int getBlackTimeLeft();
     int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
