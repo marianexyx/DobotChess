@@ -42,3 +42,5 @@ inline QString logAsQstr(LOG log)
 
 #endif /* LOG_H */
 
+
+

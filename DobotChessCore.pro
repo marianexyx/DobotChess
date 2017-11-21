@@ -52,7 +52,8 @@ HEADERS  +=  \
     vars/end_of_game_types.h \
     vars/board_types.h \
     vars/turn_types.h \
-    sql.h
+    sql.h \
+    vars/piece_type.h
 
 FORMS    += mainwindow.ui
 

@@ -74,4 +74,6 @@ inline QString pieceLetterPosAsQStr(LETTER letter)
     return QStrLetter;
 }
 
+inline QString posOnBoardAsQstr(PositionOnBoard )
+
 #endif // BOARD_AXIS_H

@@ -17,8 +17,8 @@
 #include "vars/turn_types.h"
 #include "vars/players_types.h"
 #include "vars/board_types.h"
+#include "vars/piece_type.h" //todo: includowac caly folder
 
-enum PIECE_TYPE { P_PAWN, P_ROOK, P_KNIGHT, P_BISHOP, P_KING, P_QUEEN };
 
 struct PositionOnBoard
 {
@@ -124,6 +124,39 @@ public:
         m_BoardTypePos = B_MAIN;
     }
     //todo:dodac funckje zwracajaca string/char bierki typu FEN na podstwie typu bierki i jej koloru
+    static PIECE_TYPE typeFromFENSign(char FENSign)
+    {
+        PIECE_TYPE type;
+
+        bool isPieceBlack;
+        switch(FENSign)
+        {
+        case 'p': case 'r': case 'n': case 'b': case 'k': case 'q':
+            isPieceBlack = true; break;
+        case 'P': case 'R': case 'N': case 'B': case 'K': case 'Q':
+            isPieceBlack = false; break;
+        default:
+            qDebug() << "ERROR: NrFromFENChar: unknown FENSign val =" << FENSign;
+        }
+
+        switch(FENSign)
+        {
+        case 'p': case 'P': type = P_PAWN; break;
+        case 'r': case 'R': type = P_ROOK; break;
+        case 'n': case 'N': type = P_KNIGHT; break;
+        case 'b': case 'B': type = P_BISHOP; break;
+        case 'k': case 'K': type = P_KING; break;
+        case 'q': case 'Q': type = P_QUEEN; break;
+        default: break;
+        }
+
+        return type;
+    }
+
+    static typeFromNr(int pieceNr) //todo: bez przyrostków "from"?
+    {
+        //todo:
+    }
 
     //todo: 2 ponizsze funkcje sa zdublowany z chessboardu
     short PositionOnBoardToPieceNr(PositionOnBoard pieceLines)
@@ -326,6 +359,7 @@ public:
                      << m_Field[nNrToClear].nPieceOnField;
             return;
         }
+         Field::fieldNrToPositionOnBoard(m_Field[nNrToClear].nPieceOnField).Letter
 
         //todo: ladniejsze komunikaty mozna dac zamiast numerow
         qDebug() << "Chessboard2::clearField: clearing field:" << nNrToClear << ". old piece ="
