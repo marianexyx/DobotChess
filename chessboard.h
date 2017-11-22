@@ -93,11 +93,10 @@ private:
 public:
     Piece(int pieceID)
     {
-        if (pieceID < 1 || pieceID > 32)
-        {
-            qDebug() << "ERROR: Piece::Piece(): pieceID out of range:" << pieceID;
-            return;
-        }
+        if (Piece::typeFromNr(pieceID) != -1)
+            m_PieceType = Piece::typeFromNr(pieceID);
+        else return;
+
         m_pieceID = pieceID;
 
         if (pieceID >=16) m_PieceColor = PT_WHITE;
@@ -105,39 +104,49 @@ public:
 
         m_StartField = this->pieceNrToPositionOnBoard(pieceID);
 
-        switch(pieceID)
-        {
-        case 1: case 8: case 25: case 32:
-            m_PieceType = P_ROOK; break;
-        case 2: case 7: case 26: case 31:
-            m_PieceType = P_KNIGHT; break;
-        case 3: case 6: case 27: case 30:
-            m_PieceType = P_BISHOP; break;
-        case 4: case 28:
-            m_PieceType = P_QUEEN; break;
-        case 5: case 29:
-            m_PieceType = P_KING; break;
-        default:
-            m_PieceType = P_PAWN; break;
-        }
-
         m_BoardTypePos = B_MAIN;
     }
-    //todo:dodac funckje zwracajaca string/char bierki typu FEN na podstwie typu bierki i jej koloru
-    static PIECE_TYPE typeFromFENSign(char FENSign)
-    {
-        PIECE_TYPE type;
 
-        bool isPieceBlack;
+    static bool isInRange(int nPieceNr)
+    {
+        if (nPieceNr < 1 || nPieceNr > 32)
+        {
+            qDebug() << "ERROR: Piece: pieceNr out of range 1-32:" << nPieceNr;
+            return false;
+        }
+        else return true;
+    }
+
+    //todo:dodac funckje zwracajaca string/char bierki typu FEN na podstwie typu bierki i jej koloru
+    static PLAYER_TYPE player(char FENSign)
+    {
+        PLAYER_TYPE playerType;
+
         switch(FENSign)
         {
         case 'p': case 'r': case 'n': case 'b': case 'k': case 'q':
-            isPieceBlack = true; break;
+            playerType = PT_BLACK; break;
         case 'P': case 'R': case 'N': case 'B': case 'K': case 'Q':
-            isPieceBlack = false; break;
+            playerType = PT_WHITE; break;
         default:
-            qDebug() << "ERROR: NrFromFENChar: unknown FENSign val =" << FENSign;
+            qDebug() << "ERROR: Piece::player unknown FENSign val =" << FENSign;
+            playerType = PT_NONE;
+            break;
         }
+
+        return playerType;
+    }
+
+    static PLAYER_TYPE player(int nPieceNr)
+    {
+        //todo /////////////////////////////////////////////
+    }
+
+    static PIECE_TYPE type(char FENSign)
+    {
+        if (Piece::player(FENSign) == PT_NONE) return -1;
+
+        PIECE_TYPE type;
 
         switch(FENSign)
         {
@@ -153,50 +162,61 @@ public:
         return type;
     }
 
-    static typeFromNr(int pieceNr) //todo: bez przyrostków "from"?
+    static PIECE_TYPE type(int pieceNr)
     {
-        //todo:
+        if (!Piece::isInRange(pieceNr)) return -1;
+
+        PIECE_TYPE PieceType;
+
+        switch(pieceNr)
+        {
+        case 1: case 8: case 25: case 32:
+            PieceType = P_ROOK; break;
+        case 2: case 7: case 26: case 31:
+            PieceType = P_KNIGHT; break;
+        case 3: case 6: case 27: case 30:
+            PieceType = P_BISHOP; break;
+        case 4: case 28:
+            PieceType = P_QUEEN; break;
+        case 5: case 29:
+            PieceType = P_KING; break;
+        default:
+            PieceType = P_PAWN; break;
+        }
+
+        return PieceType;
     }
 
     //todo: 2 ponizsze funkcje sa zdublowany z chessboardu
-    short PositionOnBoardToPieceNr(PositionOnBoard pieceLines)
+    static short nr(PositionOnBoard pieceLines)
     {
-        short sPieceNr = static_cast<short>(pieceLines.Letter) +
+        short sPieceNr = static_cast<short>(pieceLines.Letter+1) +
                 static_cast<short>(pieceLines.Digit)*8;
-        if (sPieceNr < 1 || sPieceNr > 32) //todo: to tez sie powtarza
-        {
-            qDebug() << "ERROR: Piece::PositionOnBoardToFieldNr: sPieceNr out of range <1,32>:"
-                     << sPieceNr;
-            return 0;
-        }
+
+        if (!Piece::isInRange(pieceNr)) return -1;
         else return sPieceNr;
     }
 
-    PositionOnBoard pieceNrToPositionOnBoard(short sPiecedNr)
+    static PositionOnBoard Pos(short sPiecedNr)
     {
         PositionOnBoard pieceLines;
+        if (!Piece::isInRange(pieceNr)) return pieceLines;
 
-        if (sPiecedNr != 0)
+        short sPieceNrColumn, sPieceNrRow;
+
+        if (sPiecedNr % 8 != 0)
         {
-            short sPieceNrColumn, sPieceNrRow; //tablica[nNrRow][nNrColumn];
-
-            if (sPiecedNr % 8 != 0) //8, 16, 24, 32, 40, 48, 56 i 64.
-            {
-                sPieceNrColumn = sPiecedNr / 8;
-                sPieceNrRow  = (sPiecedNr - 1) - (sPieceNrColumn * 8);
-            }
-            else //8, 16, 24, 32, 40, 48, 56 i 64.
-            {
-                sPieceNrColumn = (sPiecedNr / 8) - 1;
-                sPieceNrRow = 7;
-            }
-
-            pieceLines.Letter = static_cast<LETTER>(sPieceNrRow);
-            pieceLines.Digit = static_cast<DIGIT>(sPieceNrColumn);
+            sPieceNrColumn = sPiecedNr / 8;
+            sPieceNrRow  = (sPiecedNr - 1) - (sPieceNrColumn * 8);
         }
         else
-            qDebug() << "ERROR: Chessboard::fieldNrToPositionOnBoard: proba"
-                        " dzielenia przez zero. nNr =" << sPiecedNr;
+        {
+            sPieceNrColumn = (sPiecedNr / 8) - 1;
+            sPieceNrRow = 7;
+        }
+
+        pieceLines.Letter = static_cast<LETTER>(sPieceNrRow);
+        pieceLines.Digit = static_cast<DIGIT>(sPieceNrColumn);
 
         return pieceLines;
     }
