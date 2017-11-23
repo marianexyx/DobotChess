@@ -27,7 +27,9 @@ SOURCES += main.cpp\
     arduinousb.cpp \
     igorbot.cpp \
     webchess.cpp \
-    sql.cpp
+    sql.cpp \
+    piece.cpp \
+    field.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -53,7 +55,10 @@ HEADERS  +=  \
     vars/board_types.h \
     vars/turn_types.h \
     sql.h \
-    vars/piece_type.h
+    vars/piece_type.h \
+    piece.h \
+    vars/posotion_on_board.h \
+    field.h
 
 FORMS    += mainwindow.ui
 

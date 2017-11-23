@@ -241,7 +241,6 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
         this->setPieceOnBoard(B_REMOVED, nGripperPiece, nGripperPiece);
         qDebug() << "Piece just placed on removed area";
         nGripperPiece = 0;
-        qDebug() << "Chessboard::pieceStateChanged: 2) nGripperPiece = 0";
     }
     //todo: bierki poruszane ramieniem zapisywane są do tablicy m_asBoardMain. jeżeli bierki zostały poruszone tylko w...
     //...pamięci bez udziału dobota (np. poprzez podane listy ruchów bezpośrednio do tcp) to system myśli że...
@@ -251,7 +250,6 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
     {
         nGripperPiece = m_asBoardMain[letter][digit]; //...to w chwytaku jest bierka...
         //...pochwycona z szachownicy...
-        qDebug() << "Chessboard::pieceStateChanged: 3) nGripperPiece =" << nGripperPiece;
         m_asBoardMain[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
     }
     else if (partOfSequence == DM_TO)//lecz jeżeli bierka została przemieszczona na szachownicę
@@ -260,7 +258,6 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
         m_asBoardMain[letter][digit] = nGripperPiece; //...to docelowe pole na...
         //...szachownicy jest już zajęte...
         nGripperPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
-        qDebug() << "Chessboard::pieceStateChanged: 4) nGripperPiece = 0";
     }
     else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";
 }
