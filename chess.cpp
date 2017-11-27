@@ -8,6 +8,9 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs)
     _pTCPMsgs = pTCPMsgs;
     _pDobot = pDobot;
     _pChessboard = pChessboard;
+
+    _pTimers = new ChessTimers;
+    _pMovements = new ChessMovements;
 }
 
 //todo: po reorganizacji klas niech ta funkcja przyjmuje struktury. najlepiej bylobyh ja podzielic na 2
@@ -176,47 +179,9 @@ void Chess::enpassantMovingSequence()
     _pChessboard->PieceTo.Digit = tempDigitPos; //wróć prewencyjnie w pamięci do normalnej pozycji
 }
 
-//todo: reset i jego funkcje zrobić jako klasę-organ
-short Chess::findInitialPieceNrOnGivenField(short sField)
-{
-    if (sField < 1 || sField > 64)
-    {
-        qDebug() << "ERROR: Chess::findInitialPieceNrOnGivenField: field out of scope <1,64>:" << sField;
-        return 0;
-    }
-
-    short sInitPieceNr;
-
-    if (sField <= 16)
-        sInitPieceNr = sField; //dla pól białych bierek pole oryginalne = nr bierki
-    else if (sField > 48)
-        sInitPieceNr = sField - 32; //dla pól czarnych bierek (49-64) są to bierki 17-32
-    else sInitPieceNr = 0; //na środkowych rzędach pól nie ma startowo bierek
-
-    return sInitPieceNr;
-}
-
-
-short Chess::findInitialFieldOfGivenPiece(short sPiece)
-{
-    if (sPiece < 0 || sPiece > 32)
-    {
-        qDebug() << "ERROR: Chess::findInitialFieldOfGivenPiece: piece out of scope <0,32>:" << sPiece;
-        return 0;
-    }
-
-    short sInitFieldNr;
-
-    if (sPiece <= 16)
-        sInitFieldNr = sPiece; //dla białych bierek pole oryginalne = nr bierki
-    else  sInitFieldNr = sPiece + 32; //dla czarnych bierek (17-32) są to pola 49-64
-
-    return sInitFieldNr;
-}
-
 void Chess::resetPiecePositions()
 {
-    if (!_pChessboard->compareArrays(_pChessboard->m_asBoardMain, _pChessboard->m_anBoardStart))
+    if (!this->compareArrays(_pChessboard->m_asBoardMain, _pChessboard->m_anBoardStart))
         //jeżeli bierki stoją na szachownicy nieruszone, to nie ma potrzeby ich odstawiać
     {
         bool  bArraysEqual; //warunek wyjścia z poniższej pętli do..for
@@ -313,7 +278,7 @@ void Chess::resetPiecePositions()
             //sprawdzanie czy ustawienie bierek na szachownicy jest ostateczne, tj. takie same jak na...
             //...starcie. Jeżeli którakolwiek bierka nie znajduje się na swoim startowym polu, to stan...
             //...rozmieszczenia bierek na szachownicy nie jest ostateczny.
-            bArraysEqual = _pChessboard->compareArrays(_pChessboard->m_asBoardMain,
+            bArraysEqual = this->compareArrays(_pChessboard->m_asBoardMain,
                                                        _pChessboard->m_anBoardStart);
 
             if (!bArraysEqual) //jeżeli plansza jest w stanie startowym, to można nie robić reszty...
@@ -323,7 +288,7 @@ void Chess::resetPiecePositions()
                 //...przestawiającą bierki. Jeżeli jest różnica od ostatniego razu, to zapamiętaj że...
                 //...tak jest. Pozwoli to sprawdzać czy pętla do..for nie zacięła się, a co za tym...
                 //...idzie- spradzane jest czy odstawianie bierek na planszę się nie zacieło.
-                isChessboardInvariable = _pChessboard->compareArrays(_pChessboard->m_asBoardMain,
+                isChessboardInvariable = this->compareArrays(_pChessboard->m_asBoardMain,
                                                                      _pChessboard->m_asBoardTemp);
 
                 //jeżeli aktualne przewertowane planszy w poszukiwaniu bierek do odstawienia...
@@ -394,15 +359,16 @@ void Chess::handleMove(QString move)
     }
 }
 
-SEQUENCE_TYPE Chess::findMoveType(QString move)
+
+bool Chess::compareArrays(short nArray1[][8], short nArray2[][8])
 {
-    if (_pChessboard->getLegalMoves().contains(move + "q")) return ST_PROMOTE_TO_WHAT;
-    else if (_pChessboard->getLegalMoves().contains(move))
+    for (short i=0; i<8; i++)
     {
-        if (_pChessboard->isMoveEnpassant(move)) return ST_ENPASSANT;
-        else if (_pChessboard->isMoveCastling(move)) return ST_CASTLING;
-        else if (_pChessboard->isMoveRemoving()) return ST_REMOVING;
-        else return ST_REGULAR;
+        for (short j=0; j<8; j++)
+        {
+            if (nArray1[i][j] != nArray2[i][j])
+                return false;
+        }
     }
-    else return ST_BADMOVE;
+    return true;
 }

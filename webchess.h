@@ -12,7 +12,7 @@ class WebChess : public Chess
     Q_OBJECT
 
  private:
-    Websockets *_pWebsockets; //reszta wskaznikow dziedziczona 
+    Websockets *_pWebsockets; //reszta wskaznikow jest dziedziczona
 
 public:
     WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, Websockets *pWebsockets);

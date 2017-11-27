@@ -4,7 +4,7 @@
 #pragma once
 #include <QString>
 
-enum SEQUENCE_TYPE { ST_NONE,
+enum SEQUENCE_TYPE { ST_NONE, //todo: trzeba to będzie podzielić na ruchy szachowe i ramienia
                      ST_BADMOVE,
                      ST_REGULAR,
                      ST_PROMOTE_TO_WHAT,

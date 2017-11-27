@@ -29,7 +29,9 @@ SOURCES += main.cpp\
     webchess.cpp \
     sql.cpp \
     piece.cpp \
-    field.cpp
+    field.cpp \
+    chess/chess_timers.cpp \
+    chess/chess_movements.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -58,7 +60,9 @@ HEADERS  +=  \
     vars/piece_type.h \
     piece.h \
     vars/posotion_on_board.h \
-    field.h
+    field.h \
+    chess/chess_timers.h \
+    chess/chess_movements.h
 
 FORMS    += mainwindow.ui
 

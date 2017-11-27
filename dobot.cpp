@@ -197,6 +197,33 @@ void Dobot::QueuedIdList()
     }
 }
 
+bool Dobot::bIsMoveInAxisRange(float x, float y, float z)
+{
+    bool check = true;
+    if ( x < _pChessboard->getMinBoardAxis().x || x > _pChessboard->getMaxBoardAxis().x)
+    {
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: X axis out of range <"
+                 << _pChessboard->getMinBoardAxis().x  << "," <<
+                    _pChessboard->getMaxBoardAxis().x << ">. x =" << x;
+        check = false;
+    }
+    if ( y < _pChessboard->getMinBoardAxis().y || y > _pChessboard->getMaxBoardAxis().y)
+    {
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Y axis out of range <"
+                 << _pChessboard->getMinBoardAxis().y << ","
+                 << _pChessboard->getMaxBoardAxis().y << ">. y =" << y;
+        check = false;
+    }
+    if ( z < _pChessboard->getMinBoardAxis().z || z > _pChessboard->getMaxBoardAxis().z)
+    {
+        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Z axis out of range <"
+                 << _pChessboard->getMinBoardAxis().z << ","
+                 << _pChessboard->getMaxBoardAxis().z << ">. z =" << z;
+        check = false;
+    }
+    return check;
+}
+
 void Dobot::onConnectDobot()
 {
     if (!connectStatus)
@@ -437,6 +464,8 @@ void Dobot::wait(int nMs, SEQUENCE_TYPE sequence)
 
 void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type)
 { //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
+    //todo2: ruch up/down powinien byc zaszyty w innych ruchach. jego dedukcja powinna sie...
+    //...opierac na podstawie sprawdzania czy ramie trzyma jakas bierke, cyz po nia idzie
     float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
     //pozycje obszaru bierek usuniętych
     if (Type == ST_REMOVING && partOfSequence == DM_TO) //jeżeli odstawiamy bierkę na obszar zbitych...

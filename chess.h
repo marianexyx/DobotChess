@@ -9,17 +9,30 @@
 #include "chessboard.h"
 #include "tcpmsgs.h"
 #include "vars/board_axis.h"
+#include "chess/chess_timers.h"
+#include "chess/chess_movements.h"
 
-//TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami wejsciowymi (arduino/website)
+//TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami ...
+//...wejsciowymi (arduino/website)- sprawdzić czy to da radę
+/*todo2: na pierwszy rzut oka i po kolei powinno być widać to tu się dzieje:
+ruch e2e4 wpada do obiektu szachow:
+-sprawdzane jest ze statusu czy ruch był mozliwy
+-określenie typu ruchu
+-zakolejkowanie ruchu na dobocie
+-wykonanie zapytania o ruch na tcp
+-reagowanie na odpowiedzi z tcp*/
 
 class Chess: public QObject
 {
     Q_OBJECT
 
 protected:
-    TCPMsgs *_pTCPMsgs;
-    Dobot *_pDobot;
-    Chessboard *_pChessboard;
+    TCPMsgs* _pTCPMsgs;
+    Dobot* _pDobot;
+    Chessboard* _pChessboard;
+
+    ChessTimers* _pTimers;
+    ChessMovements* _pMovements;
 
     //----------------KOMUNIKACJA Z GRACZEM-------------//
     virtual void GameStarted() = 0;
@@ -53,6 +66,7 @@ protected:
 
     //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);
+    bool compareArrays(short nArray1[][8], short nArray2[][8]);
 
 public slots:
     //--------------KOMUNIKACJA Z CHENARD--------------//
@@ -60,16 +74,15 @@ public slots:
     virtual void checkMsgForChenard(QString msg) = 0; //protected slot?
 
     //---------------STEROWANIE RAMIENIEM--------------//
-    short findInitialPieceNrOnGivenField(short sField);
-    short findInitialFieldOfGivenPiece(short sPiece);
     void resetPiecePositions();
 
 public:
     Chess(); //czysto wirtualne klasy muszą mieć pusty konstruktor
     Chess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs);
 
+
     //---------------STEROWANIE RAMIENIEM--------------//
-    void listMovesForDobot(SEQUENCE_TYPE Type,
+    void listMovesForDobot(SEQUENCE_TYPE Type, //todo: rozdzielic na 2 ruchy
                              LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
                              LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
 

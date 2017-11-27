@@ -7,6 +7,10 @@ Field::Field()
     else return;
 
     m_sPieceOnField = 0;
+
+    m_Location3D.x = -1;
+    m_Location3D.y = -1;
+    m_Location3D.z = -1;
 }
 
 

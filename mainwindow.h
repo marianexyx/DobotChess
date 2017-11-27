@@ -64,10 +64,9 @@ private slots:
 
     /*---sloty do używania GUI MainWindow---*/
     void writeInConsole(QString QStrMsg, LOG msgType);
-    void changeWindowtitle(QString title);
     void setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType);
     void showBoard(QString QStrBoard);
-    void clearBoard();
+    void clearFormBoard();
     void showLegalMoves(QStringList legalMoves);
     void showHistoryMoves(QStringList historyMoves);
 

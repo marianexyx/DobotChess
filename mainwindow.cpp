@@ -11,7 +11,7 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
 {
     ui->setupUi(this); //bodajże wskazuje że UI dziedziczy to tej (this) klasie, przez co zostanie...
     //... zniszczona razem z mainwindow.
-    this->setWindowTitle("Awaiting for new game");
+    this->setWindowTitle("Chess);
 
     _pDobotArm = pDobotArm;
     _pWebSockets = pWebSockets;
@@ -52,8 +52,8 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
     connect(_pChessboard, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
-    connect(_pChessboard, SIGNAL(clearBoard()),
-            this, SLOT(clearBoard()));
+    connect(_pChessboard, SIGNAL(clearFormBoard()),
+            this, SLOT(clearFormBoard()));
     connect(_pChessboard, SIGNAL(showBoard(QString)),
             this, SLOT(showBoard(QString)));
     connect(_pChessboard, SIGNAL(showLegalMoves(QStringList)),
@@ -76,8 +76,6 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(setQueueLabels(int,int,int,int,int)));
     connect(_pArduinoUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
-    connect(_pChessboard, SIGNAL(changeWindowTitle(QString)),
-            this, SLOT(changeWindowtitle(QString)));
     connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
             this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
     connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
@@ -649,11 +647,6 @@ void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
     else ui->sendTcpBtn->setEnabled(false);
 }
 
-void MainWindow::changeWindowtitle(QString title)
-{
-    this->setWindowTitle(title);
-}
-
 void MainWindow::showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex> list)
 {
     QString QStrQueuedList;
@@ -761,7 +754,7 @@ void MainWindow::setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelTy
     }
 }
 
-void MainWindow::clearBoard()
+void MainWindow::clearFormBoard()
 {
     ui->boardPTE->clear();
 }

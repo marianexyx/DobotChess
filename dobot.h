@@ -90,7 +90,7 @@ public:
     void gripperAngle(float fDutyCycle);
 
     void pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type); //todo: do chessboardu?
-    void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type); //todo: do chessboardu?
+    void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type);
     void wait(int nMs, SEQUENCE_TYPE sequence);
     void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = ST_NONE,
                       float x = ACTUAL_POS, float y = ACTUAL_POS,
@@ -99,6 +99,7 @@ public:
     void removePiece(int nPieceRowPos, int nPieceColumnPos); //todo: do chessboardu?
     void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = ST_NONE, QString QStrMoveFromOrTo = NULL);
     void QueuedIdList();
+    bool bIsMoveInAxisRange(float x, float y, float z);
 
     //metody dostępowe do pól
     void setCoreQueuedCmdIndex(unsigned long long ullCoreQueuedCmdIndex)

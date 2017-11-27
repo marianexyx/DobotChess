@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <QTimer>
 #include <QtMath>
 #include "QString"
 #include "QObject"
 #include "qdebug.h"
 #include <vector>
 #include <typeinfo>
+#include <limits>
 #include "field.h"
 #include "piece.h"
 #include "vars/basic_vars.h"
@@ -31,70 +31,24 @@ class Chessboard2 //todo: bez makra QOBCJECT. ta szachownica ma by w 100% zalezn
 
 private:
     Field* m_pField[64];
+    Point3D m_dMinBoard, m_dMaxBoard;
 
 public:
-    Chessboard2()
-    {
-        for (int i=1; i>=64; ++i)
-            *m_pField[i] = new Field(i);
-    }
+    Chessboard2(BOARD boardType);
+    ~Chessboard2();
 
-    ~Chessboard2()
-    {
-        for (int i=1; i >=64; ++i)
-        {
-            delete m_pField[i];
-            m_pField[i] = nullptr;
-        }
-    }
-
-    //<--todo
-    Point3D m_dMinBoard, m_dMaxBoard;
-    void FENToBoard(QString FENBoard);
-    void showBoardInDebug();
-    QString arrayBoardAsQStr(QString QStrBoard[8][8]);
+    QString** FENToBoard(QString FENBoard); //dodatkowo zawsze zwalniac potem pamiec- freeboard
+    //void showBoardInDebug(); //nie przerabiac poki niepotrzebne
+    QString arrayBoardAsQStr(QString QStrBoard[8][8]); //todo: double pointers + freeboard
 
 signals:
     void addTextToConsole(QString);
-    void clearBoard(); //clearFormBoard
-    void showBoard(QString); //showForm
-    //todo --/>
+    void clearFormBoard();
+    void showBoardInForm(QString);
 
-    void setPieceOnField(short sPassedPiece, short sDestFieldNr) //todo: friend dla chwytaka?
-    {
-        if (!Piece::isInRange(sPassedPiece)) return;
-        if (m_pField[sDestFieldNr]->isFieldOccupied())
-        {
-            qDebug() << "ERROR: Chessboard2::setPiecePosition: field is already occupied"
-                        " by another piece. nPiece =" << sPassedPiece << ", field =" <<
-                        m_pField[sDestFieldNr];
-            return;
-        }
-        for (int i = 1; i >=64; ++i)
-        {
-            if (m_pField[i]->getPieceOnField() == sPassedPiece)
-            {
-                qDebug() << "ERROR: Chessboard2::setPiecePosition: this piece "
-                            "already exist on board. piece =" << sPassedPiece <<
-                            "on field =" << m_pField[i]->getNrAsQStr();
-                return;
-            }
-        }
-
-        m_pField[nDestinationNr].setPieceOnField(sPassedPiece);
-        qDebug() << "Chessboard2::setPieceOnField- new pieceNr:" << sPassedPiece
-                 << "on fieldNr:" << nDestinationNr;
-    }
-
+    void setPieceOnField(short sPassedPiece, short sDestFieldNr); //todo: friend dla chwytaka?
     short getPieceOnField(short sField) const { return m_pField[sField]->getPieceOnField(); }
-
-    void clearField(short sNrToClear)
-    {
-        qDebug() << "Chessboard2::clearField: clearing field:" << Field::nrAsQStr(nNrToClear) <<
-                    ". old piece =" << m_pField[sNrToClear]->getPieceOnField() <<
-                    ", now it will be == 0";
-        m_pField[sNrToClear]->clear();
-    }
+    void clearField(short sNrToClear);
 };
 
 class Chessboard: public QObject
@@ -106,53 +60,28 @@ private:
     QString m_QStrGameStatus;
     QString m_QStrBoard[8][8];
     WHOSE_TURN m_WhoseTurn;
-    QString m_QStrCastlings;
-    QString m_QStrEnpassant;
+
     QStringList m_legalMoves;
     QStringList m_historyMoves;
-    SEQUENCE_TYPE m_moveType;
-
-    QTimer *m_whiteTimer;
-    QTimer *m_blackTimer;
-    QTimer *m_updateLabelTimer;
-    QTimer *m_startQueueTimer;
-    int m_nRemainingWhiteTime;
-    int m_nRemainingBlackTime;
 
     const int m_nMaxPieceHeight;
     Point3D m_dMinBoard, m_dMaxBoard;
 
-    void changeWindowTitle(); //todo: to wyrzucenia
-
     void FENToBoard(QString FENBoard);
     WHOSE_TURN whoseTurn(QString whoseTurn);
-    const long m_lTimersStartTime;
-    const long m_lTimersStartQueue;
 
 public:
     Chessboard();
 
     void findBoardPos(QString QStrPiecePositions); //todo: dziwna nazwa. operowanie na globalnych.
-    short PositionOnBoardToFieldNr(PositionOnBoard fieldLines);
-    PositionOnBoard fieldNrToPositionOnBoard(short sFieldNr);
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);
     bool isMoveEnpassant(QString moveToTest);
     void castlingFindRookToMove();
     void pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter, //todo: to robi jakoby za...
                            DIGIT digit, SEQUENCE_TYPE Type); //...przenoszenie chwytakiem
-    bool compareArrays(short nArray1[][8], short nArray2[][8]);
     void saveStatusData(QString status);
-    void showBoardInDebug();
-    QString arrayBoardToQStr(QString QStrBoard[8][8]);
 
-    void startGameTimer();
-    void resetGameTimers();
-    QString milisecToClockTime(long lMilis);
-    void stopBoardTimers();
-    void switchPlayersTimers();
-    void startQueueTimer();
-    void stopQueueTimer();
     bool bIsMoveInAxisRange(float x, float y, float z); //todo:dobot
     void resetBoardData();
 
@@ -184,8 +113,7 @@ public:
     QString QStrFuturePromote;
 
     //metody dostępowe
-    void setWhoseTurn(WHOSE_TURN Turn)              { m_WhoseTurn = Turn;
-                                                      this->changeWindowTitle(); } //todo: zabrać to?
+    void setWhoseTurn(WHOSE_TURN Turn)              { m_WhoseTurn = Turn; }
     void setMoveType(SEQUENCE_TYPE Type)            { m_moveType = Type; }
     void setLegalMoves(QStringList legalMoves)      { m_legalMoves = legalMoves;
                                                       emit showLegalMoves(legalMoves); }
@@ -215,25 +143,17 @@ public:
     QStringList getHisotyMoves()                    { return m_historyMoves; }
     QString getHisotyMovesAsQStr()                  { return m_historyMoves.join(" "); }
     double getMinBoardZ()                           { return m_dMinBoard.z; }
-    int getWhiteTimeLeft();
-    int getBlackTimeLeft();
-    int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
-    bool isStartTimerRunning()                  { return m_startQueueTimer->isActive(); }
+    Point3D getMinBoardAxis() const { return m_dMinBoard; }
+    Point3D getMaxBoardAxis() const { return m_dMaxBoard; }
+
     short getPieceOnBoardAsNr(BOARD boardType, short sFieldNr);
     short getPieceOnBoardAsNr(BOARD boardType, PositionOnBoard fieldLines);
     PositionOnBoard getPieceOnBoardAsLines(BOARD boardType, short sFieldNr);
     PositionOnBoard getPieceOnBoardAsLines(BOARD boardType, PositionOnBoard fieldLines);
 
-private slots:
-    void timeOutWhite();
-    void timeOutBlack();
-    void updateTimeLabels();
-    void timeOutStartQueue();
-
 signals:
     void addTextToConsole(QString);
-    void changeWindowTitle(QString);
-    void clearBoard();
+    void clearFormBoard();
     void showBoard(QString);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showLegalMoves(QStringList);
