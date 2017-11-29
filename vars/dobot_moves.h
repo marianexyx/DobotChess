@@ -15,6 +15,8 @@ enum DOBOT_MOVE { DM_TO_POINT,
                   DM_TO,
                   DM_INDIRECT };
 
+enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
+
 inline QString dobotMoveAsQstr(DOBOT_MOVE DM)
 {
     QString QStrMove;

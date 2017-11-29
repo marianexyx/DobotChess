@@ -19,7 +19,7 @@ struct PositionOnBoard
     PositionOnBoard(QString QStrBoardPos);
 
     static QString posAsQStr(PositionOnBoard Pos)
-    { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit + 1); }
+    { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit+1); }
 
     void setLetterFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
     QString getAsQStr() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1); }

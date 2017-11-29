@@ -32,7 +32,7 @@ struct ArmPosForCurrentCmdQueuedIndex
     float r;
 };
 
-struct PtpCmdActualVal
+struct PtpCmdActualVal //todo: mozna stosować point3d, a r dawać zawsze domyslnie jako 0
 {
     float x;
     float y;
@@ -90,6 +90,7 @@ public:
     void gripperAngle(float fDutyCycle);
 
     void pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type); //todo: do chessboardu?
+    void doMoveSequence(Point3D dest3D, VERTICAL_MOVE vertMove = VM_NONE);
     void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type);
     void wait(int nMs, SEQUENCE_TYPE sequence);
     void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = ST_NONE,

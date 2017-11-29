@@ -15,14 +15,16 @@
 class ChessMovements
 {
 private:
-    Chessboard2* _pChessboard2;
+    Chessboard2* _pChessboard2Main;
+    Chessboard2* _pChessboard2Removed;
 
     QString m_QStrCastlings;
     QString m_QStrEnpassant;
     SEQUENCE_TYPE m_moveType;
 
 public:
-    ChessMovements(Chessboard2* pChessboard2);
+    ChessMovements(Chessboard2* pChessboard2Main, Chessboard2* pChessboard2Removed);
+    ~ChessMovements();
 
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);

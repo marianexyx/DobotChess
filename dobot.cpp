@@ -418,7 +418,7 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
         return;
     }
     
-    if (_pChessboard->bIsMoveInAxisRange(f_xFromTo, f_yFromTo, f_zFromTo))
+    if (this->bIsMoveInAxisRange(f_xFromTo, f_yFromTo, f_zFromTo))
         //zabezpieczenia odległościowe. todo: da się je ustawić jako alarmy w odobcie?
     {
         ArmPosForCurrentCmdQueuedIndex actualPosIdx;
@@ -445,6 +445,21 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
     
     _pChessboard->PieceActualPos.Letter = letter; //todo: wrzucić to do warunków na letter/digit
     _pChessboard->PieceActualPos.Digit = digit;
+}
+
+void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE vertMove = VM_NONE)
+{
+    SEQUENCE_TYPE Type = ST_NONE; //todo: typ do wyrzucenia z addCmdToList
+    if (vertMove == VM_GRAB)
+        this->gripperState(DM_OPEN, Type);
+    this->addCmdToList(DM_TO_POINT, Type, dest3D.x, dest3D.y, dest3D.z +
+                       Piece::dMaxPieceHeight, 0);
+    this->armUpDown(DM_DOWN, DM_FROM, Type); //todo: usunąć "DOBOT_MOVE"
+    if (vertMove == VM_PUT)
+        this->gripperState(DM_OPEN, Type);
+    else if (vertMove == VM_GRAB)
+        this->gripperState(DM_CLOSE, Type);
+    this->armUpDown(DM_UP, DM_TO, Type);
 }
 
 void Dobot::gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type)

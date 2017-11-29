@@ -30,6 +30,7 @@ class Chessboard2 //todo: bez makra QOBCJECT. ta szachownica ma by w 100% zalezn
 //info: szachownica nie powinna być tworzona a z bierkami- to gra o tym decyduje gdzie i jakie są
 
 private:
+    BOARD m_boardType;
     Field* m_pField[64];
     Point3D m_dMinBoard, m_dMaxBoard;
 
@@ -41,14 +42,18 @@ public:
     //void showBoardInDebug(); //nie przerabiac poki niepotrzebne
     QString arrayBoardAsQStr(QString QStrBoard[8][8]); //todo: double pointers + freeboard
 
+    BOARD getBoardType() const { return m_boardType; }
+    void setPieceOnField(short sPassedPiece, short sDestFieldNr); //todo: friend dla chwytaka?
+    short getPieceOnField(short sField) const { return m_pField[sField]->getPieceOnField(); }
+    void clearField(short sNrToClear);
+    Point3D getFieldLocation3D(short sFieldNr) const { return m_pField[sFieldNr]->getLocation3D(); }
+    bool isPointInLocationLimits(Point3D point);
+
 signals:
     void addTextToConsole(QString);
     void clearFormBoard();
     void showBoardInForm(QString);
 
-    void setPieceOnField(short sPassedPiece, short sDestFieldNr); //todo: friend dla chwytaka?
-    short getPieceOnField(short sField) const { return m_pField[sField]->getPieceOnField(); }
-    void clearField(short sNrToClear);
 };
 
 class Chessboard: public QObject

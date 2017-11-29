@@ -64,7 +64,10 @@ void ChessMovements::regularMoveSequence(Chess* pChess)
     //TODO: to wygląda jakby to robił dobot wszystko, ten ruch tj.
     this->MoveTcpPiece("move " + move);
 
-    pChess->movePieceWithManipulator(_pChessboard2Main, );
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPieceFrom(), VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPieceTo(), VM_PUT);
+    
+    pChess->MoveTcpPiece("move " + move); //todo: wbijam sie w private
 }
 
 
