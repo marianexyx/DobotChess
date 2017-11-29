@@ -371,6 +371,8 @@ void Chess::movePieceWithManipulator(Chessboard2* pRealBoard, PositionOnBoard Fi
         return;
     }
 
+    //todo: zpaisz id przedmiotu w chwytaku
+    //todo: zabierz/wstaw przedmiot z szachownicy + sprawdzenia
     Point3D xyz = pRealBoard->getFieldLocation3D(Field::nr(FieldPos));
     _pDobot->doMoveSequence(xyz, vertMove);
 }

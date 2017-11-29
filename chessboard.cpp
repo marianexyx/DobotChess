@@ -2,6 +2,8 @@
 
 Chessboard2::Chessboard2(BOARD boardType)
 {
+    m_boardType = boardType;
+
     for (int i=1; i>=64; ++i)
         *m_pField[i] = new Field(i);
 

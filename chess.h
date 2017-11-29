@@ -36,6 +36,8 @@ protected:
     ChessTimers* _pTimers;
     ChessMovements* _pMovements;
 
+    PositionOnBoard _PieceFrom, _PieceTo;
+
     //----------------KOMUNIKACJA Z GRACZEM-------------//
     virtual void GameStarted() = 0;
     virtual void BadMove(QString msg) = 0;
@@ -45,6 +47,7 @@ protected:
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
     virtual void NewGame() = 0;
+    //TODO: friend dla podklas, czy dziedziczyc? (tylko ze to virtual...)
     virtual void MoveTcpPiece( QString msg) = 0;
     virtual void Status() = 0;
     virtual void Promote(QString msg) = 0;
@@ -91,6 +94,10 @@ public:
     void listMovesForDobot(SEQUENCE_TYPE Type, //todo: rozdzielic na 2 ruchy
                              LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
                              LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
+
+    PositionOnBoard getPieceFrom() const { return _PieceFrom; }
+    PositionOnBoard getPieceTo() const { return _PieceTo; }
+
 
 signals:
     void addTextToConsole(QString, char);
