@@ -15,14 +15,12 @@ class WebChess : public Chess
     Websockets *_pWebsockets; //reszta wskaznikow jest dziedziczona
 
 public:
+    //todo: poprawic konstruktor, bo w chess sie zmienil a nie sa dzidziczone
     WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, Websockets *pWebsockets);
 
     //----------KOMUNIKACJA Z WWW----------//
-    void GameStarted();
-    void BadMove(QString msg);
     void GameInProgress();
-    void EndOfGame(QString msg);
-    void PromoteToWhat(QString moveForFuturePromote);
+    void SendDataToPlayer(QString msg);
 
     //--------KOMUNIKACJA Z CHENARD--------//
     void NewGame();

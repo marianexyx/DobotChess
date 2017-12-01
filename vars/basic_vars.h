@@ -5,13 +5,11 @@
 
 #include <QString>
 
-//todo pozamieniac to
+enum COMMUNICATION_TYPES { WEBSITE = 1,
+                           ARDUINO = 2,
+                           TEST = 3 };
 
-const int WEBSITE = 1;
-const int ARDUINO = 2;
-const int TEST = 3;
-
-const int ACTUAL_POS = 1000;
+const int ACTUAL_POS = 1000; //todo: zamienic na limity, jezeli jeszce bedzie potrzebne
 
 struct Point3D
 {

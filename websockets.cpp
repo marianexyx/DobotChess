@@ -57,7 +57,7 @@ void Websockets::resetPlayersStartConfirmInfo()
         this->setClientState(PT_BLACK, false);
 }
 
-QString Websockets::getTableDataAsJSON()
+QString Websockets::getTableDataAsJSON() //todo: funkcja do pzeniesienia
 {
     //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt","wtime":345581,"btime":300000,"queue":"empty"}
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + this->getPlayerName(PT_WHITE) +

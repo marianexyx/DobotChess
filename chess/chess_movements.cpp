@@ -58,20 +58,115 @@ PositionOnBoard ChessMovements::findRookToMoveInCastling(PositionOnBoard FieldDe
     return RookFieldDest;
 }
 
+
+
 void ChessMovements::regularMoveSequence(Chess* pChess)
 {
-    this->listMovesForDobot(ST_REGULAR);
-    //TODO: to wygląda jakby to robił dobot wszystko, ten ruch tj.
-    this->MoveTcpPiece("move " + move);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosFrom(), VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_PUT);
 
-    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPieceFrom(), VM_GRAB);
-    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPieceTo(), VM_PUT);
-
+    //todo: skoro MoveTcpPiece ma move w nazwie, to string moglby sie sam pisac
     pChess->MoveTcpPiece("move " + move); //todo: wbijam sie w private
+    //todo2: MoveTcpPiece robic w warstwie wyzej by nie powtarzac tego tutaj za kazdym razem
+    //todo3: nie znam "move"
 }
 
+void ChessMovements::removeMoveSequence(Chess* pChess)
+{
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_GRAB);
+    this->goToSafeRemovedFieldIfNeeded(pChess);
+    pChess->movePieceWithManipulator(_pChessboard2Removed,
+                                     pChess->getPiece(pChess->getPosTo())->getStartField(),
+                                     VM_PUT);
+    this->goToSafeRemovedFieldIfNeeded(pChess);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosFrom(), VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_PUT);
 
+    pChess->MoveTcpPiece("move " + move);
+}
 
+void ChessMovements::restoreMoveSequence(Chess* pChess, short sPieceToRestore)
+{
+    this->goToSafeRemovedFieldIfNeeded(pChess);
+    pChess->movePieceWithManipulator(_pChessboard2Removed, Field::Pos(sPieceToRestore), VM_GRAB);
+    this->goToSafeRemovedFieldIfNeeded(pChess);
+    pChess->movePieceWithManipulator(_pChessboard2Main,
+                                     pChess->getPiece(sPieceToRestore)->getStartField(),
+                                     VM_PUT);
+}
 
+void ChessMovements::castlingMoveSequence(Chess* pChess)
+{
+    pChess->movePieceWithManipulator(_pChessboard2Main,
+                                     this->findKingToMoveInCastling(pChess->getPosFrom()),
+                                     VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main,
+                                     this->findKingToMoveInCastling(pChess->getPosTo()),
+                                     VM_PUT);
+    pChess->movePieceWithManipulator(_pChessboard2Main,
+                                     this->findRookToMoveInCastling(pChess->getPosFrom()),
+                                     VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main,
+                                     this->findRookToMoveInCastling(pChess->getPosTo()),
+                                     VM_PUT);
 
+    this->MoveTcpPiece("move " + move);
+}
 
+void ChessMovements::enpassantMoveSequence(Chess* pChess)
+{
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosFrom(), VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_PUT);
+    if (pChess->getPosFrom().Digit < pChess->getPosTo().Digit) //white move
+    {
+        PositionOnBoard pieceToRemoveInEnpassant(pChess->getPosTo().Letter,
+                                                 pChess->getPosTo().Digit - 1);
+        pChess->movePieceWithManipulator(_pChessboard2Main,
+                                         pieceToRemoveInEnpassant,
+                                         VM_GRAB);
+    }
+    else if (pChess->getPosFrom().Digit > pChess->getPosTo().Digit) //black move
+    {
+        PositionOnBoard pieceToRemoveInEnpassant(pChess->getPosTo().Letter,
+                                                 pChess->getPosTo().Digit + 1);
+        pChess->movePieceWithManipulator(_pChessboard2Main,
+                                         pieceToRemoveInEnpassant,
+                                         VM_GRAB);
+    }
+    else
+    {
+        qDebug() << "ERROR: ChessMovements::enpassantMoveSequence: no move "
+                     "detected is digits axis (digits abs(from-to)==0)";
+        return;
+    }
+    this->goToSafeRemovedFieldIfNeeded(pChess);
+    pChess->movePieceWithManipulator(_pChessboard2Removed,
+                                     pChess->getPiece(pChess->getPosTo())->getStartField(),
+                                     VM_PUT);
+    this->goToSafeRemovedFieldIfNeeded(pChess);
+
+    this->MoveTcpPiece("move " + move);
+}
+//todo: po wszystkich ruchach czyscic zmienne globalne from/to jezeli jeszcze beda istniec
+
+//todo: niby sie rozni tylko przypisaniem innej bierki
+void ChessMovements::promoteMoveSequence(Chess* pChess)
+{
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosFrom(), VM_GRAB);
+    pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_PUT);
+}
+
+void ChessMovements::goToSafeRemovedFieldIfNeeded(Chess *pChess)
+{
+    DIGIT digitTo = pChess->getPosTo().Digit;
+    if (digitTo == D_1) digitTo = D_2;
+    else if (digitTo == D_4) digitTo = D_3;
+    else
+    {
+        qDebug() << "ERROR: Chess::goToSafeRemovedField: unknown digitTo value =" << digitTo;
+        return;
+    }
+
+    PositionOnBoard safeRemovedField(L_D, digitTo);
+    pChess->movePieceWithManipulator(_pChessboard2Removed, safeRemovedField;
+}

@@ -452,13 +452,19 @@ void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE vertMove = VM_NONE)
     SEQUENCE_TYPE Type = ST_NONE; //todo: typ do wyrzucenia z addCmdToList
     if (vertMove == VM_GRAB)
         this->gripperState(DM_OPEN, Type);
+
     this->addCmdToList(DM_TO_POINT, Type, dest3D.x, dest3D.y, dest3D.z +
                        Piece::dMaxPieceHeight, 0);
+
+    if (vertMove == VM_NONE) return;
+
     this->armUpDown(DM_DOWN, DM_FROM, Type); //todo: usunąć "DOBOT_MOVE"
+
     if (vertMove == VM_PUT)
         this->gripperState(DM_OPEN, Type);
     else if (vertMove == VM_GRAB)
         this->gripperState(DM_CLOSE, Type);
+
     this->armUpDown(DM_UP, DM_TO, Type);
 }
 

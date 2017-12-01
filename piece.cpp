@@ -8,7 +8,7 @@ Piece::Piece(short sPieceID)
 
     m_sPieceID = sPieceID;
     m_PieceColor = Piece::Color(sPieceID);
-    m_StartField = Piece::Pos(sPieceID);
+    m_sStartFieldID = Piece::Pos(sPieceID);
 }
 
 static bool Piece::isInRange(short sPieceNr)

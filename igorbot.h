@@ -24,11 +24,8 @@ public:
     IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs, ArduinoUsb *pArduinoUsb);
 
     //----------KOMUNIKACJA Z ARDUINO----------//
-    void GameStarted();
-    void BadMove(QString msg);
     void GameInProgress();
-    void EndOfGame(QString msg);
-    void PromoteToWhat(QString moveForFuturePromote);
+    void SendDataToPlayer(QString msg);
 
     //----------KOMUNIKACJA Z CHENARD----------//
     void NewGame();

@@ -14,77 +14,19 @@ WebChess::WebChess(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 //---------------------------------------------------------------------------//
 //----------------------------KOMUNIKACJA Z WWW------------------------------//
 //---------------------------------------------------------------------------//
-
-void WebChess::GameStarted()
-{
-    _pWebsockets->addTextToConsole("newGame\n", LOG_WEBSOCKET);
-    qDebug() << "Sending 'newOk' to site";
-
-    _pChessboard->resetGameTimers();
-    _pChessboard->startGameTimer();
-    _pWebsockets->sendMsg("newOk");
-}
-
-void WebChess::BadMove(QString msg)
-{
-    qDebug() << "Bad move:" << msg << ". Sending to WS: badMove";
-    emit this->addTextToConsole("Bad move: " + msg + "\n", LOG_CORE);
-
-    _pWebsockets->sendMsg("badMove " + msg + " " + _pChessboard->getStrWhoseTurn());
-}
-
 void WebChess::GameInProgress()
 {
-    qDebug() << "Chess::GameInProgress(): Sending to WS: moveOk" <<
-                _pChessboard->getPiecieFromTo() <<
-                _pChessboard->getStrWhoseTurn() << "continue";
-
     _pChessboard->switchPlayersTimers();
-    _pWebsockets->sendMsg("moveOk " + _pChessboard->getSiteMoveRequest() + " " +
-                          _pChessboard->getStrWhoseTurn() + " continue");
+    this->SendDataToPlayer("moveOk " + _pChessboard->getSiteMoveRequest() + " " +
+                           _pChessboard->getStrWhoseTurn() + " continue");
 }
 
-void WebChess::EndOfGame(QString msg)
+void WebChess::SendDataToPlayer(QString msg)
 {
-    END_TYPE ETWhoWon;
-    if (msg.left(3) == "1-0") ETWhoWon = ET_WHIE_WON;
-    else if (msg.left(3) == "0-1") ETWhoWon = ET_BLACK_WON;
-    else if (msg.left(7) == "1/2-1/2") ETWhoWon = ET_DRAW;
-    else
-    {
-        qDebug() << "ERROR: WebChess::EndOfGame: unknown arg val =" << msg;
-        return;
-    }
-    QString QStrWhoWon = endTypeAsQstr(ETWhoWon);
+    qDebug() << "Sending to WS:" << msg;
+    this->addTextToConsole("Sending to WS: " + msg, LOG_CORE);
 
-    _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
-
-    qDebug() << "Sending to WS: moveOk " << _pChessboard->getPiecieFromTo() << " nt " <<
-                QStrWhoWon << " " << _pWebsockets->getTableDataAsJSON();
-
-    //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
-    _pWebsockets->sendMsg("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + QStrWhoWon +
-                          " " + _pWebsockets->getTableDataAsJSON());
-    //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość informacji...
-    //...leci od websocketów? sprawdzić, jeżeli tak to zobaczyć czy da się wysyłanie każdego rodzaju inforacji...
-    //...upchać w websocketach dla porządku i czy jest taka potrzeba
-    //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
-    //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
-    //todo: stworzyć funkcję czyszczącą masę rzeczy przy różnych warunkach jak koniec gry
-    _pChessboard->resetGameTimers();
-    this->reset();
-}
-
-void WebChess::PromoteToWhat(QString moveForFuturePromote)
-{
-    _pChessboard->QStrFuturePromote = moveForFuturePromote;
-
-    qDebug() << "Sending to WS: moveOk" << moveForFuturePromote <<
-                _pChessboard->getStrWhoseTurn() << "promote";
-
-    _pChessboard->switchPlayersTimers();
-    _pWebsockets->sendMsg("moveOk " + moveForFuturePromote + " " +
-                                      _pChessboard->getStrWhoseTurn() + " promote");
+    _pWebsockets->sendMsg(msg);
 }
 
 //-------------------------------------------------------------------------------//
@@ -200,23 +142,23 @@ void WebChess::NewGame() //przesyłanie prośby o nową grę na TCP
     if (!_pWebsockets->isPlayerChairEmpty(PT_WHITE) && !_pWebsockets->isPlayerChairEmpty(PT_BLACK))
         //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     {
-        _pWebsockets->addTextToConsole("Sending 'new' game command to tcp \n", LOG_WEBSOCKET);
+        this->addTextToConsole("Sending 'new' game command to tcp \n", LOG_WEBSOCKET);
         _pTCPMsgs->TcpQueueMsg(WEBSITE, "new");
     }
-    else _pWebsockets->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", LOG_WEBSOCKET);
+    else this->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", LOG_WEBSOCKET);
 }
 
 void WebChess::MoveTcpPiece(QString msg) // żądanie ruchu- przemieszczenie bierki.
 {
     //do tych ruchów zaliczają się: zwykły ruch, bicie, roszada.
-    _pWebsockets->addTextToConsole("Sending normal move to tcp: " + msg + "\n", LOG_WEBSOCKET);
+    this->addTextToConsole("Sending normal move to tcp: " + msg + "\n", LOG_WEBSOCKET);
     qDebug() << "WebChess::MoveTcpPiece: Sending normal move to tcp: " << msg;
     _pTCPMsgs->TcpQueueMsg(WEBSITE, msg); //zapytaj się tcp o poprawność prośby o ruch
 }
 
 void WebChess::Status()
 {
-    _pWebsockets->addTextToConsole("Sending to tcp: status\n", LOG_CORE);
+    this->addTextToConsole("Sending to tcp: status\n", LOG_CORE);
     qDebug() << "Sending to tcp: status";
     _pTCPMsgs->TcpQueueMsg(WEBSITE, "status");
 }
@@ -242,7 +184,7 @@ void WebChess::reset() //todo: przemyśleć co tu musi być
 {
     _pChessboard->setWhoseTurn(NO_TURN);
     _pWebsockets->resetPlayersStartConfirmInfo();
-    _pWebsockets->sendMsg("reseting");
+    this->SendDataToPlayer("reseting");
     _pChessboard->resetGameTimers();
     this->resetPiecePositions();
 }

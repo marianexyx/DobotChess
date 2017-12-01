@@ -8,7 +8,9 @@
 #include "dobot.h"
 #include "chessboard.h"
 #include "tcpmsgs.h"
+#include "piece.h"
 #include "vars/board_axis.h"
+#include "vars/end_of_game_types.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_movements.h"
 
@@ -36,14 +38,14 @@ protected:
     ChessTimers* _pTimers;
     ChessMovements* _pMovements;
 
-    PositionOnBoard _PieceFrom, _PieceTo;
+    Piece* _pPiece[32];
+
+    PositionOnBoard _PosFrom, _PosTo; //todo: przypisac wartosci
+    QString QStrFuturePromote; //todo: zamienic na Pos x2? + nazwa malo adekwatna
 
     //----------------KOMUNIKACJA Z GRACZEM-------------//
-    virtual void GameStarted() = 0;
-    virtual void BadMove(QString msg) = 0;
     virtual void GameInProgress() = 0;
-    virtual void EndOfGame(QString msg) = 0;
-    virtual void PromoteToWhat(QString moveForFuturePromote) = 0;
+    virtual void SendDataToPlayer(QString msg) = 0;
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
     virtual void NewGame() = 0;
@@ -57,14 +59,8 @@ protected:
     void historyOk(QString msg);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-
     virtual void TcpMoveOk() = 0;
     virtual void resetBoardCompleted() = 0;
-
-    //---------------STEROWANIE RAMIENIEM---------------//
-    void castlingMovingSequence();
-    void enpassantMovingSequence();
-    void goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence);
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     SEQUENCE_TYPE findMoveType(QString move);
@@ -72,32 +68,40 @@ protected:
     void movePieceWithManipulator(Chessboard2 *pRealBoard, PositionOnBoard FieldPos,
                                   VERTICAL_MOVE vertMove = VM_NONE);
 
-    //------KLASOWE POMOCNICZE METODY OBLICZENIOWE------//
+    //------METODY NARZEDZIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);
     bool compareArrays(short nArray1[][8], short nArray2[][8]);
 
-public slots:
+public slots: //todo: protected slots?
     //--------------KOMUNIKACJA Z CHENARD--------------//
-    virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0; //protected slot?
-    virtual void checkMsgForChenard(QString msg) = 0; //protected slot?
+    virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0;
+    virtual void checkMsgForChenard(QString msg) = 0;
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void resetPiecePositions();
 
 public:
-    Chess(); //czysto wirtualne klasy muszą mieć pusty konstruktor
+    Chess(); //must have przy virualach
     Chess(Dobot* pDobot, Chessboard* pChessboard, Chessboard2* pChessboardMain,
     Chessboard2* pChessboardRemoved, TCPMsgs* pTCPMsgs);
 
+    void promoteToWhat(QString moveForFuturePromote);
+    void GameStarted();
+    void BadMove(QString msg);
+    void EndOfGame(QString msg);
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void listMovesForDobot(SEQUENCE_TYPE Type, //todo: rozdzielic na 2 ruchy
                              LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
                              LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
 
-    PositionOnBoard getPieceFrom() const { return _PieceFrom; }
-    PositionOnBoard getPieceTo() const { return _PieceTo; }
+    Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
+    PositionOnBoard getPosFrom() const { return _PosFrom; }
+    PositionOnBoard getPosTo() const { return _PosTo; }
 
+    void setFuturePromote(QString QStrMove) { QStrFuturePromote = QStrMove; } //todo: friend
+    void clearFuturePromote() { QStrFuturePromote.clear(); }
+    QString getFuturePromote() const { return QStrFuturePromote; }
 
 signals:
     void addTextToConsole(QString, char);

@@ -13,6 +13,62 @@ Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, Chessboard2 *pChessboardMai
 
     _pTimers = new ChessTimers;
     _pMovements = new ChessMovements;
+
+    for (int i=1; i>=32; ++i)
+        *_pPiece[i] = new Piece(i);
+}
+
+void Chess::promoteToWhat(QString moveForFuturePromote)
+{
+    //todo: ogarnac gdzies czyszczenie tej zmiennej po wszystkim i sprawdzanie czy nie probuje...
+    //...uzywac gdzies tej zmiennej pustej
+    _pChessboard->QStrFuturePromote = moveForFuturePromote;
+
+    _pChessboard->switchPlayersTimers();
+    this->SendDataToPlayer("moveOk " + moveForFuturePromote + " " +
+                           _pChessboard->getStrWhoseTurn() + " promote");
+}
+
+void Chess::GameStarted()
+{
+    qDebug() << "Sending 'newOk' to player";
+    this->addTextToConsole("newGame\n", LOG_CORE);
+
+    _pChessboard->resetGameTimers();
+    _pChessboard->startGameTimer();
+
+    this->SendDataToPlayer("newOk");
+}
+
+void Chess::BadMove(QString msg)
+{
+    this->SendDataToPlayer("badMove " + msg + " " + _pChessboard->getStrWhoseTurn());
+}
+
+void Chess::EndOfGame(QString msg)
+{
+    END_TYPE ETWhoWon;
+    if (msg.left(3) == "1-0") ETWhoWon = ET_WHIE_WON;
+    else if (msg.left(3) == "0-1") ETWhoWon = ET_BLACK_WON;
+    else if (msg.left(7) == "1/2-1/2") ETWhoWon = ET_DRAW;
+    else
+    {
+        qDebug() << "ERROR: Chess::EndOfGame: unknown arg val =" << msg;
+        return;
+    }
+
+    //todo: ta funkcja bedzie gdzie indziej, dostepna rowniez dla arduino
+    _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
+
+    //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
+    this->SendDataToPlayer("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + endTypeAsQstr(ETWhoWon)
+                           + " " + _pWebsockets->getTableDataAsJSON()); //todo: json przeniesc
+    //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość informacji...
+    //...leci od websocketów? sprawdzić, jeżeli tak to zobaczyć czy da się wysyłanie każdego rodzaju inforacji...
+    //...upchać w websocketach dla porządku i czy jest taka potrzeba
+    //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
+    //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
+    this->reset();
 }
 
 //todo: po reorganizacji klas niech ta funkcja przyjmuje struktury. najlepiej bylobyh ja podzielic na 2
@@ -80,32 +136,6 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
     else if (Type != ST_REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
 }
 
-void Chess::goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence)
-{
-    qDebug() << "Chess::goToSafeRemovedField: digitTo =" << digitTo+1;
-    DIGIT indirectFieldDigit;
-    if (digitTo == D_1 || digitTo == D_2)
-        indirectFieldDigit = D_2;
-    else if (digitTo == D_3 || digitTo == D_4)
-        indirectFieldDigit = D_3;
-    else
-    {
-        qDebug() << "ERROR: Chess::goToSafeRemovedField: unknown digitTo value =" << digitTo;
-        return;
-    }
-
-    float fIndirect_x = _pChessboard->m_adRemovedPiecesPositions_x[L_D][indirectFieldDigit];
-    float fIndirect_y = _pChessboard->m_adRemovedPiecesPositions_y[L_D][indirectFieldDigit];
-    float fIndirect_z = _pChessboard->m_adRemovedPiecesPositions_z[L_D][indirectFieldDigit];
-    qDebug() << "Chess::goToSafeRemovedField: indirectField[d][" << indirectFieldDigit+1 <<
-                "] XYZ =" << fIndirect_x << "," << fIndirect_y << "," << fIndirect_z;
-
-    _pDobot->addCmdToList(DM_TO_POINT, ST_REMOVING, fIndirect_x, fIndirect_y, fIndirect_z +
-                          _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
-
-    _pDobot->writeMoveTypeInConsole(DM_INDIRECT, sequence);
-}
-
 void Chess::legalOk(QString msg) //todo: nazwy tych funkcji 'ok' nie mówią co robią
 {
     QStringList legalMoves = msg.split(QRegExp("\\s"));
@@ -143,42 +173,6 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
 {
     qDebug() << "ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " <<
                 respond << "for tcpMsgType = " << msgType;
-}
-
-void Chess::castlingMovingSequence()
-{
-    this->listMovesForDobot(ST_CASTLING_KING);
-    _pChessboard->castlingFindRookToMove();
-    this->listMovesForDobot(ST_CASTLING_ROOK);
-}
-
-void Chess::enpassantMovingSequence()
-{
-    //wykonaj normalny ruch. enpassant to jedyny przypadek bicia, gdzie mogę zbić po normalnym ruchu.
-    this->listMovesForDobot(ST_ENPASSANT);
-
-    DIGIT tempDigitPos = _pChessboard->PieceTo.Digit; //w razie czego zapaiętaj oryginalną wartość pola (cyfry) bijącego
-    if (_pChessboard->getWhoseTurn() == WHITE_TURN)
-    {
-        //pozycja zbijanego czarnego pionka przez pionka białego w jego turze (białego)
-        _pChessboard->PieceTo.Digit = static_cast<DIGIT>((int)_pChessboard->PieceTo.Digit - 1); //todo: sprawdzić czy dziala
-    }
-    else if (_pChessboard->getWhoseTurn() == BLACK_TURN)
-    {
-        //pozycja zbijanego białego pionka przez pionka czarnego w jego turze (czarnego)
-        _pChessboard->PieceTo.Digit = static_cast<DIGIT>((int)_pChessboard->PieceTo.Digit + 1);
-    }
-    else
-    {
-        emit _pDobot->addTextToConsole("Error03!: Wrong turn in enpassant statement: "
-                                       + (QString)_pChessboard->getWhoseTurn() + "/n", LOG_DOBOT);
-        qDebug() << "Error03!: Chess::enpassantMovingSequence(): Unknown turn type: "
-                 << _pChessboard->getWhoseTurn() << "/n";
-        return;
-    }
-    //wyjątkowo zbijany będzie gdzie indziej niż lądujący (w enpassant zawsze występuje bicie)
-    this->listMovesForDobot(ST_REMOVING); //usuń pionka bitego ze  zmienioną pozycją.
-    _pChessboard->PieceTo.Digit = tempDigitPos; //wróć prewencyjnie w pamięci do normalnej pozycji
 }
 
 void Chess::resetPiecePositions()
@@ -361,6 +355,7 @@ void Chess::handleMove(QString move)
     }
 }
 
+//todo: jezeli movements beda dziedziczone, to to powinno byc wewnatrz tamtej klasy
 void Chess::movePieceWithManipulator(Chessboard2* pRealBoard, PositionOnBoard FieldPos,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {

@@ -16,62 +16,33 @@ IgorBot::IgorBot(Dobot *pDobot, Chessboard *pChessboard, TCPMsgs *pTCPMsgs,
 //-------------------------------------------------------------------------------//
 //----------------------------KOMUNIKACJA Z ARDUINO------------------------------//
 //-------------------------------------------------------------------------------//
-
-void IgorBot::GameStarted()
-{
-    emit this->addTextToConsole("new_game\n", LOG_USB_SENT);
-    qDebug() << "Sending to USB: new_game";
-    _pArduinoUsb->sendDataToUsb("started"); //na arduino daj możliwość już wciśnięcua start
-}
-
-void IgorBot::BadMove(QString msg)
-{
-    qDebug() << "Bad move:" << msg << ". Sending to USB: BAD_MOVE";
-    emit this->addTextToConsole("Bad move: " + msg + ". Sending to USB: BAD_MOVE\n", LOG_CORE);
-
-    //todo: simplified() nie usuwa tylko podmienia białe znaki. sprawdzić to wszędzie
-    //_pArduinoUsb->sendDataToUsb(msg.simplified());
-    _pArduinoUsb->sendDataToUsb("BAD_MOVE");
-}
-
 void IgorBot::GameInProgress()
 {
-    //podaj na stronę info o tym że ruch został wykonany
-    qDebug() << "IgorBot::GameInProgress(): Sending to Arduino: game_in_progress";
-    emit this->addTextToConsole("game_in_progress", LOG_CORE);
-
     if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
     {
-        if (m_bIsIgorsAiSimulatedAsPlayer2) _pArduinoUsb->sendDataToUsb("EnterSimulatedIgorsMove");
+        if (m_bIsIgorsAiSimulatedAsPlayer2)
+            this->SendDataToPlayer("EnterSimulatedIgorsMove");
         else this->Think5000(); //wymyśl kolejny ruch bota białego Igora
     }
     else  //a jeżeli po wykonaniu ruchu Igora gra jest dalej w toku
     {
         m_bUndo = false;
-        _pArduinoUsb->sendDataToUsb("IgorHasEndedMove"); //niech gracz wykonuje swój kolejny ruch
+        this->SendDataToPlayer("IgorHasEndedMove"); //niech gracz wykonuje swój kolejny ruch
     }
 }
 
-void IgorBot::EndOfGame(QString msg)
+void IgorBot::SendDataToPlayer(QString msg)
 {
-    QString QsWhoWon;
-    if (msg.left(3) == "1-0") QsWhoWon = "white_won";
-    else if (msg.left(3) == "0-1") QsWhoWon = "black_won";
-    else if (msg.left(7) == "1/2-1/2") QsWhoWon = "draw";
+    //todo: nieujednolicone typy komunikatów web z arduino są, przez co...
+    //...takie dziwne zmiany w locie (wynika to z virtualow i dziedziwczenia)
+    if (msg.contains("promote")) msg = "promote";
+    else if (msg.contains("newOk")) msg = "started";
+    else if (msg.contains("badMove")) msg = "BAD_MOVE";
 
-    qDebug() << "Sending to usb: " << QsWhoWon;
-    _pArduinoUsb->sendDataToUsb("GameOver: " + QsWhoWon);
+    qDebug() << "Sending to arduino:" << msg;
+    this->addTextToConsole("Sending to arduino: " + msg, LOG_CORE);
 
-    this->resetPiecePositions(); //przywróć wszystkie bierki do stanu początkowego
-    //TODO: zablokować możliwość robienia czegokolwiek na stronie/arduino aż to się nie zakończy
-}
-
-void IgorBot::PromoteToWhat(QString moveForFuturePromote)
-{
-    _pChessboard->QStrFuturePromote = moveForFuturePromote;
-    qDebug() << "Sending to arduino: promote";
-    this->addTextToConsole("Sending to arduino: promote", LOG_CORE);
-    _pArduinoUsb->sendDataToUsb("promote"); //zapytaj się arduino na co ma być ta promocja
+    _pArduinoUsb->sendDataToUsb(msg);
 }
 
 //-------------------------------------------------------------------------------//

@@ -32,16 +32,17 @@ public:
     PositionOnBoard findKingToMoveInCastling(PositionOnBoard FieldDest);
     PositionOnBoard findRookToMoveInCastling(PositionOnBoard FieldDest);
 
-    void handleMove(QString move); //?
-    void regularMoveSequence(); //todo: napisac
-    void removeMoveSequence(); //todo: napisac
-    void restoreMoveSequence(); //todo: napisac
-    void castlingMoveSequence();
-    void enpassantMoveSequence();
+    //todo: wszystkie ruchy powinny byc jako private/friend
+    void regularMoveSequence(Chess* pChess);
+    void removeMoveSequence(Chess* pChess);
+    void restoreMoveSequence(Chess* pChess, short sPieceToRestore);
+    void castlingMoveSequence(Chess *pChess);
+    void enpassantMoveSequence(Chess* pChess);
+    void promoteMoveSequence(Chess* pChess);
 
-    void goToSafeRemovedField(DIGIT digitTo, SEQUENCE_TYPE sequence); //?
+    void goToSafeRemovedFieldIfNeeded(Chess *pChess);
     //void BadMove(QString msg);
-    void PromoteToWhat(QString moveForFuturePromote);
+    void promoteToWhat(QString moveForFuturePromote);
 
 
 };

@@ -48,6 +48,7 @@ public:
     void clearField(short sNrToClear);
     Point3D getFieldLocation3D(short sFieldNr) const { return m_pField[sFieldNr]->getLocation3D(); }
     bool isPointInLocationLimits(Point3D point);
+    short getPieceStartField(short sPiece) const { return
 
 signals:
     void addTextToConsole(QString);
@@ -115,7 +116,6 @@ public:
     //todo: zamienić można na litery odpowiadające im na szachownicy
     int nGripperPiece;                  // nr bierki znajdującej się aktualnie w chwytaku
 
-    QString QStrFuturePromote;
 
     //metody dostępowe
     void setWhoseTurn(WHOSE_TURN Turn)              { m_WhoseTurn = Turn; }

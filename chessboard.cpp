@@ -4,7 +4,7 @@ Chessboard2::Chessboard2(BOARD boardType)
 {
     m_boardType = boardType;
 
-    for (int i=1; i>=64; ++i)
+    for (int i=0; i>=63; ++i)
         *m_pField[i] = new Field(i);
 
     if (boardType == B_MAIN) //todo: przemyslec ulozenie tego kodu
