@@ -9,6 +9,23 @@ enum COMMUNICATION_TYPES { WEBSITE = 1,
                            ARDUINO = 2,
                            TEST = 3 };
 
+inline QString communicationTypeAsQStr(COMMUNICATION_TYPES type)
+{
+    QString typeAsQStr;
+
+    switch(type)
+    {
+    case WEBSITE: typeAsQStr = "website"; break;
+    case ARDUINO: typeAsQStr = "arduino"; break;
+    case TEST: typeAsQStr = "test"; break;
+    default: qDebug() << "ERROR: communicationTypeAsQStr: unknown parametr =" <<
+                         communicationTypeAsQStr;
+    }
+
+    return typeAsQStr;
+}
+
+
 const int ACTUAL_POS = 1000; //todo: zamienic na limity, jezeli jeszce bedzie potrzebne
 
 struct Point3D

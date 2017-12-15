@@ -41,17 +41,17 @@ Dobot::Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb):
 
     middleAboveBoard.x = 260; //mniej wiecej srodek planszy w osi x
     middleAboveBoard.y = HomeChess.y;
-    middleAboveBoard.z = _pChessboard->getMinBoardZ() + _pChessboard->getMaxPieceHeight();
+    middleAboveBoard.z = _pChessboard->getMinBoardZ() + Piece::dMaxPieceHeight;
     middleAboveBoard.r = 0;
 
     retreatYPlus.x = 180;
     retreatYPlus.y = HomeChess.y + 100;
-    retreatYPlus.z = _pChessboard->getMinBoardZ() + _pChessboard->getMaxPieceHeight();;
+    retreatYPlus.z = _pChessboard->getMinBoardZ() + Piece::dMaxPieceHeight;
     retreatYPlus.r = 0;
 
     retreatYMinus.x = 180;
     retreatYMinus.y = HomeChess.y - 100;
-    retreatYMinus.z = _pChessboard->getMinBoardZ() + _pChessboard->getMaxPieceHeight();;
+    retreatYMinus.z = _pChessboard->getMinBoardZ() + Piece::dMaxPieceHeight;
     retreatYMinus.r = 0;
 }
 
@@ -427,7 +427,7 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
         if (f_zFromTo != actualPosIdx.z && (f_xFromTo != actualPosIdx.x || f_yFromTo != actualPosIdx.y))
         {
             this->addCmdToList(DM_TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo +
-                               _pChessboard->getMaxPieceHeight(), f_rFromTo);
+                               Piece::dMaxPieceHeight, f_rFromTo);
 
             QString QStrMoveFromOrTo = pieceLetterPosAsQStr(letter) + QString::number(digit+1);
             this->writeMoveTypeInConsole(partOfSequence, Type, QStrMoveFromOrTo);
@@ -510,7 +510,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
             if (armDestination == DM_UP) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
                     [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
                     [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit] +
-                    _pChessboard->getMaxPieceHeight();
+                    Piece::dMaxPieceHeight;
             else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
                     [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
                     [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
@@ -535,7 +535,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_yUpDown = _pChessboard->m_adRemovedPiecesPositions_y
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            if (armDestination == DM_UP) f_zUpDown = _pChessboard->getMaxPieceHeight() +
+            if (armDestination == DM_UP) f_zUpDown = Piece::dMaxPieceHeight +
                     _pChessboard->m_adRemovedPiecesPositions_z
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
@@ -558,7 +558,7 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             f_yUpDown = _pChessboard->m_adChessboardPositions_y
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            if (armDestination == DM_UP) f_zUpDown = _pChessboard->getMaxPieceHeight() +
+            if (armDestination == DM_UP) f_zUpDown = Piece::dMaxPieceHeight +
                     _pChessboard->m_adChessboardPositions_z
                     [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
             else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adChessboardPositions_z
@@ -604,10 +604,10 @@ void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
     float f_zRemove = _pChessboard->m_adRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];
     float f_rRemove = ACTUAL_POS;
     qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
-                _pChessboard->getMaxPieceHeight() << ", r =" << f_rRemove;
+                Piece::dMaxPieceHeight << ", r =" << f_rRemove;
 
-    this->addCmdToList(DM_TO_POINT, ST_REMOVING, f_xRemove, f_yRemove, f_zRemove + _pChessboard->getMaxPieceHeight(),
-                       f_rRemove);
+    this->addCmdToList(DM_TO_POINT, ST_REMOVING, f_xRemove, f_yRemove,
+                       f_zRemove + Piece::dMaxPieceHeight, f_rRemove);
 }
 /// END OF: TYPY RUCHÓW PO PLANSZY
 

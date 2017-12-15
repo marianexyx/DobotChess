@@ -65,9 +65,8 @@ void ChessMovements::regularMoveSequence(Chess* pChess)
     pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosFrom(), VM_GRAB);
     pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_PUT);
 
-    //todo: skoro MoveTcpPiece ma move w nazwie, to string moglby sie sam pisac
-    pChess->MoveTcpPiece("move " + move); //todo: wbijam sie w private
-    //todo2: MoveTcpPiece robic w warstwie wyzej by nie powtarzac tego tutaj za kazdym razem
+    pChess->SendMsgToTcp("move " + move); //todo: wbijam sie w private
+    //todo2: SendMsgToTcp robic w warstwie wyzej by nie powtarzac tego tutaj za kazdym razem
     //todo3: nie znam "move"
 }
 
@@ -82,7 +81,7 @@ void ChessMovements::removeMoveSequence(Chess* pChess)
     pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosFrom(), VM_GRAB);
     pChess->movePieceWithManipulator(_pChessboard2Main, pChess->getPosTo(), VM_PUT);
 
-    pChess->MoveTcpPiece("move " + move);
+    pChess->SendMsgToTcp("move " + move);
 }
 
 void ChessMovements::restoreMoveSequence(Chess* pChess, short sPieceToRestore)
@@ -110,7 +109,7 @@ void ChessMovements::castlingMoveSequence(Chess* pChess)
                                      this->findRookToMoveInCastling(pChess->getPosTo()),
                                      VM_PUT);
 
-    this->MoveTcpPiece("move " + move);
+    this->SendMsgToTcp("move " + move);
 }
 
 void ChessMovements::enpassantMoveSequence(Chess* pChess)
@@ -145,7 +144,7 @@ void ChessMovements::enpassantMoveSequence(Chess* pChess)
                                      VM_PUT);
     this->goToSafeRemovedFieldIfNeeded(pChess);
 
-    this->MoveTcpPiece("move " + move);
+    this->SendMsgToTcp("move " + move);
 }
 //todo: po wszystkich ruchach czyscic zmienne globalne from/to jezeli jeszcze beda istniec
 

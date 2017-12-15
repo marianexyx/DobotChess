@@ -8,7 +8,7 @@ Piece::Piece(short sPieceID)
 
     m_sPieceID = sPieceID;
     m_PieceColor = Piece::Color(sPieceID);
-    m_sStartFieldID = Piece::Pos(sPieceID);
+    m_sStartFieldID = Piece::StartFieldNr(sPieceID);
 }
 
 static bool Piece::isInRange(short sPieceNr)
@@ -102,10 +102,19 @@ static short Piece::nr(PositionOnBoard PieceLines)
     else return -1;
 }
 
-static PositionOnBoard Piece::Pos(short sPiecedNr)
+static short Piece::StartFieldNr(short sPieceNr)
+{
+    if (!Piece::isInRange(sPieceNr)) return -1;
+
+    if (sPieceNr <= 16) return sPieceNr;
+    else return sPieceNr + 32;
+}
+
+static PositionOnBoard Piece::StartFieldPos(short sPieceNr)
 {
     PositionOnBoard PieceLines;
-    if (!Piece::isInRange(pieceNr)) return PieceLines;
+
+    if (!Piece::isInRange(sPieceNr)) return PieceLines;
 
     if (sPiecedNr % 8 != 0)
     {

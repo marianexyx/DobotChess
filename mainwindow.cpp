@@ -5,21 +5,19 @@ QT_USE_NAMESPACE
 
 MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
-                       IgorBot *pIgorBot, WebChess *pWebChess, QWidget *parent) :
+                       Chess *pChess, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this); //bodajże wskazuje że UI dziedziczy to tej (this) klasie, przez co zostanie...
     //... zniszczona razem z mainwindow.
-    this->setWindowTitle("Chess);
+    this->setWindowTitle("Chess");
 
     _pDobotArm = pDobotArm;
     _pWebSockets = pWebSockets;
     _pChessboard = pChessboard;
     _pTCPmsg = pTCPmsg;
-    _pArduinoUsb = pArduinoUsb;
-    _pIgorBot = pIgorBot;
-    _pWebChess = pWebChess;
+    _pChess = pChess;
 
     //TODO: to pewnie dałoby się wrzucić do odpwoiednich klas
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
@@ -41,9 +39,7 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(writeInConsole(QString,LOG)));
     connect(_pWebSockets, SIGNAL(addTextToConsole(QString,LOG)),
             this, SLOT(writeInConsole(QString,LOG)));
-    connect(_pWebChess, SIGNAL(addTextToConsole(QString,LOG)),
-            this, SLOT(writeInConsole(QString,LOG)));
-    connect(_pArduinoUsb, SIGNAL(addTextToConsole(QString,LOG)),
+    connect(_pChess, SIGNAL(addTextToConsole(QString,LOG)),
             this, SLOT(writeInConsole(QString,LOG)));
 
     connect(_pWebSockets, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
@@ -54,7 +50,7 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
     connect(_pChessboard, SIGNAL(clearFormBoard()),
             this, SLOT(clearFormBoard()));
-    connect(_pChessboard, SIGNAL(showBoard(QString)),
+    connect(_pChessboard, SIGNAL(showBoardInForm(QString)),
             this, SLOT(showBoard(QString)));
     connect(_pChessboard, SIGNAL(showLegalMoves(QStringList)),
             this, SLOT(showLegalMoves(QStringList)));
@@ -97,14 +93,12 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             CFoo* m_pFoo;
 };
     */
-    connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)), //przesyłanie odpowiedzi z chenard...
-            _pWebChess, SLOT(checkMsgFromChenard(QString, QString)));  //...na WWW przez silnk gry.
-    connect(_pTCPmsg, SIGNAL(msgFromTcpToArd(QString, QString)), //przesyłanie odpowiedzi z chenard...
-            _pIgorBot, SLOT(checkMsgFromChenard(QString, QString)));  //...na Arduino przez klasę SI.
-    connect(_pTCPmsg, SIGNAL(msgFromTcpToCore(QString, QString)), //przesyłanie odpowiedzi z chenard...
-            this, SLOT(checkMsgFromChenard(QString, QString)));  //...na Arduino przez klasę SI.
-    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)), //przesyłanie wiadomości z ...
-            _pWebChess, SLOT(checkMsgForChenard(QString))); //...websocketów na silnk gry.
+    connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)),
+            _pChess, SLOT(checkMsgFromChenard(QString, QString)));
+    connect(_pTCPmsg, SIGNAL(msgFromTcpToCore(QString, QString)),
+            this, SLOT(checkMsgFromChenard(QString, QString)));
+    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)),
+            _pChess, SLOT(checkMsgForChenard(QString)));
     connect(_pChessboard, SIGNAL(msgFromChessboardToWebsockets(QString)),
             _pWebSockets, SLOT(msgFromChessboardToWebsockets(QString)));
 
@@ -392,8 +386,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 float fService_y = _pChessboard->m_adChessboardPositions_y[serviceLetterPos][serviceDigitPos];
                 float fService_z = _pChessboard->m_adChessboardPositions_z[serviceLetterPos][serviceDigitPos];
 
-                _pDobotArm->addCmdToList(DM_TO_POINT, ST_REMOVING, fService_x, fService_y, fService_z +
-                                         _pChessboard->getMaxPieceHeight(), ACTUAL_POS);
+                _pDobotArm->addCmdToList(DM_TO_POINT, ST_REMOVING, fService_x, fService_y,
+                                         fService_z + Piece::dMaxPieceHeight, ACTUAL_POS);
                 _pChessboard->PieceActualPos.Letter = serviceLetterPos;
                 _pChessboard->PieceActualPos.Digit = serviceDigitPos;
             }
@@ -458,6 +452,7 @@ void MainWindow::on_executeDobotComandsBtn_clicked()
 {
     int result = SetQueuedCmdStartExec(); //rozpocznij wykonywanie zakolejkowanych komend.
 
+    //todo: addTextToConsole wywoływać bezpośrednio w tym pliku
     if (result == DobotCommunicate_NoError)
         _pDobotArm->addTextToConsole("Start executing dobot queued cmds.\n", LOG_DOBOT);
     else if (result == DobotCommunicate_BufferFull)
@@ -632,7 +627,7 @@ void MainWindow::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     {
         QString lastMove = tcpMsgType.right(4);
         _pChessboard->findBoardPos(lastMove);
-        _pWebChess->TcpMoveOk();
+        _pChess->TcpMoveOk();
     }
     else
     {

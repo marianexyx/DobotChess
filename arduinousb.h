@@ -14,15 +14,14 @@ class ArduinoUsb: public QObject
 
 public:
     ArduinoUsb();
-
     ~ArduinoUsb();
 
-    QList <QSerialPortInfo> availablePort;     // lista portów pod którymi są urządzenia
-    const QSerialPortInfo *usbInfo;                // obecnie wybrany serial port
-    QSerialPort *usbPort;                        // obecnie otwarty port
+    QList <QSerialPortInfo> availablePort; //lista portów pod którymi są urządzenia
+    const QSerialPortInfo *usbInfo; //obecnie wybrany serial port
+    QSerialPort *usbPort; //obecnie otwarty port
     QString QsFullSerialMsg;
 
-    void sendDataToUsb(QString QsMsg); //wysyłanie wiadomośći na usb
+    void sendDataToUsb(QString QsMsg);
     void searchDevices();
     void ManageMsgFromUsb(QString QsUsbMsg);
 
@@ -40,12 +39,14 @@ private slots:
 
     //TODO: te sygnały to rympał w ogarnianiu kodu. działają na klasy pod którymi nie są, co...
     //...powoduje chaos w ogarnianiu co skąd i kiedy leci
+    //todo: sygnały wiedzą że klasa ma związek z szachami. usb powinno tylko przepychać dane...
+    //...w 2 strony
 signals:
     void addTextToConsole(QString, LOG);
     void updatePortsComboBox(int);
     void reset();
     void AIEnemySend(QString);
-    void TcpQueueMsg(int, QString); //zakolejkuj żądanie do wykonania na tcp
+    void TcpQueueMsg(int, QString); //todo: usb nie powinno mieć dostępu bokiem do tcp
 };
 
 #endif // ARDUINOUSB_H

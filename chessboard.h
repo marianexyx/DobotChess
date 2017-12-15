@@ -24,10 +24,12 @@
 #include "vars/posotion_on_board.h"
 #include "vars/piece_type.h" //todo: includowac caly folder
 
+//todo: chessboard powinno być tworzone tylko wewnątrz partii szachów?
 //todo: przemyśleć dziedziczenie z field
 class Chessboard2 //todo: bez makra QOBCJECT. ta szachownica ma by w 100% zalezna
 {
-//info: szachownica nie powinna być tworzona a z bierkami- to gra o tym decyduje gdzie i jakie są
+//info: szachownica nie powinna być tworzona a z bierkami- to...
+//...gra o tym decyduje gdzie i jakie są
 
 private:
     BOARD m_boardType;
@@ -48,13 +50,11 @@ public:
     void clearField(short sNrToClear);
     Point3D getFieldLocation3D(short sFieldNr) const { return m_pField[sFieldNr]->getLocation3D(); }
     bool isPointInLocationLimits(Point3D point);
-    short getPieceStartField(short sPiece) const { return
 
 signals:
     void addTextToConsole(QString);
     void clearFormBoard();
     void showBoardInForm(QString);
-
 };
 
 class Chessboard: public QObject
@@ -80,38 +80,12 @@ public:
     Chessboard();
 
     void findBoardPos(QString QStrPiecePositions); //todo: dziwna nazwa. operowanie na globalnych.
-    bool isMoveRemoving();
-    bool isMoveCastling(QString moveToTest);
-    bool isMoveEnpassant(QString moveToTest);
-    void castlingFindRookToMove();
     void pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter, //todo: to robi jakoby za...
                            DIGIT digit, SEQUENCE_TYPE Type); //...przenoszenie chwytakiem
     void saveStatusData(QString status);
 
     bool bIsMoveInAxisRange(float x, float y, float z); //todo:dobot
     void resetBoardData();
-
-    //todo: mam problemy z zwracaiem tablic do funckyj. nie marnować na...
-    //...to teraz czasu i dac jako public
-    short m_asBoardMain[8][8];
-    /*todo: const*/ short m_anBoardStart[8][8];
-    short m_asBoardTemp[8][8];
-    short m_asBoardRemoved[8][4];
-
-    //todo: na razie niech to będzie w public
-    double m_adChessboardPositions_x[8][8];
-    double m_adChessboardPositions_y[8][8];
-    double m_adChessboardPositions_z[8][8];
-    double m_adRemovedPiecesPositions_x[8][4];
-    double m_adRemovedPiecesPositions_y[8][4];
-    double m_adRemovedPiecesPositions_z[8][4];
-
-    //TODO: jeżeli zrobię poniższe dane (tj. struktury) jako private, to jak się potem do...
-    //...nich dobrać metodami dostępowymi?
-    //TODO: używanie tych zmiennych globalnych powoduje że gubię się w kodzie
-    PositionOnBoard PieceFrom, PieceTo, PieceActualPos;
-
-    QString QStrAIPiecieFromTo;           //zapamiętany kolejny ruch bota czekający na wywołanie
 
     //todo: zamienić można na litery odpowiadające im na szachownicy
     int nGripperPiece;                  // nr bierki znajdującej się aktualnie w chwytaku
@@ -137,7 +111,6 @@ public:
 
     QString getSiteMoveRequest()                    { return m_QStrSiteMoveRequest; }
     QString getPiecieFromTo();
-    int getMaxPieceHeight() const                   { return m_nMaxPieceHeight; }
     QString getGameStatus()                         { return m_QStrGameStatus; }
     WHOSE_TURN getWhoseTurn()                       { return m_WhoseTurn; }
     QString getStrWhoseTurn();
@@ -157,9 +130,6 @@ public:
     PositionOnBoard getPieceOnBoardAsLines(BOARD boardType, PositionOnBoard fieldLines);
 
 signals:
-    void addTextToConsole(QString);
-    void clearFormBoard();
-    void showBoard(QString);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showLegalMoves(QStringList);
     void showHistoryMoves(QStringList);

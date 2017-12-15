@@ -13,6 +13,8 @@
 #include "vars/end_of_game_types.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_movements.h"
+#include "chess/chess_status.h"
+#include "chess/chess_bot.h"
 
 //TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami ...
 //...wejsciowymi (arduino/website)- sprawdzić czy to da radę
@@ -28,7 +30,7 @@ class Chess: public QObject
 {
     Q_OBJECT
 
-protected:
+protected: //todo: private?
     TCPMsgs* _pTCPMsgs;
     Dobot* _pDobot;
     Chessboard* _pChessboard;
@@ -37,30 +39,32 @@ protected:
 
     ChessTimers* _pTimers;
     ChessMovements* _pMovements;
+    ChessBot* _pBot;
+    ChessStatus* _pStatus;
 
     Piece* _pPiece[32];
+
+    COMMUNICATION_TYPES _PlayerSource;
 
     PositionOnBoard _PosFrom, _PosTo; //todo: przypisac wartosci
     QString QStrFuturePromote; //todo: zamienic na Pos x2? + nazwa malo adekwatna
 
     //----------------KOMUNIKACJA Z GRACZEM-------------//
-    virtual void GameInProgress() = 0;
-    virtual void SendDataToPlayer(QString msg) = 0;
+    void GameInProgress();
+    void SendDataToPlayer(QString msg);
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
-    virtual void NewGame() = 0;
+    void NewGame();
     //TODO: friend dla podklas, czy dziedziczyc? (tylko ze to virtual...)
-    virtual void MoveTcpPiece( QString msg) = 0;
-    virtual void Status() = 0;
-    virtual void Promote(QString msg) = 0;
-    virtual void AskForLegalMoves() = 0;
-    virtual void AskForHistoryMoves() = 0;
-    void legalOk(QString msg);
-    void historyOk(QString msg);
+    void Promote(QString msg);
+    void SendMsgToTcp(QString msg);
+    void legalOk(QString msg); //todo: czyli co sie dzieje dalej?
+    void historyOk(QString msg); //todo: czyli co sie dzieje dalej?
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-    virtual void TcpMoveOk() = 0;
-    virtual void resetBoardCompleted() = 0;
+    void TcpMoveOk(); //todo: czyli co sie dzieje dalej?
+    void reset(); //todo: reset czego?
+    void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     SEQUENCE_TYPE findMoveType(QString move);
@@ -70,12 +74,13 @@ protected:
 
     //------METODY NARZEDZIOWE------//
     void wrongTcpAnswer(QString msgType, QString respond);
+    void playerClickedStart(QString QStrWhoClicked); //todo: typ, a nie string
     bool compareArrays(short nArray1[][8], short nArray2[][8]);
 
 public slots: //todo: protected slots?
     //--------------KOMUNIKACJA Z CHENARD--------------//
-    virtual void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond) = 0;
-    virtual void checkMsgForChenard(QString msg) = 0;
+    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
+    void checkMsgForChenard(QString msg);
 
     //---------------STEROWANIE RAMIENIEM--------------//
     void resetPiecePositions();
@@ -104,7 +109,7 @@ public:
     QString getFuturePromote() const { return QStrFuturePromote; }
 
 signals:
-    void addTextToConsole(QString, char);
+    void addTextToConsole(QString, LOG);
 };
 
 #endif // CHESS_H

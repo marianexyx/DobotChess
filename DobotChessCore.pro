@@ -25,13 +25,13 @@ SOURCES += main.cpp\
     chessboard.cpp \
     websockets.cpp \
     arduinousb.cpp \
-    igorbot.cpp \
-    webchess.cpp \
     sql.cpp \
     piece.cpp \
     field.cpp \
     chess/chess_timers.cpp \
-    chess/chess_movements.cpp
+    chess/chess_movements.cpp \
+    chess/chess_bot.cpp \
+    chess/chess_status.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -44,8 +44,6 @@ HEADERS  +=  \
     DobotDll/DobotDll.h \
     DobotDll/DobotType.h \
     mainwindow.h \
-    igorbot.h \
-    webchess.h \
     vars/log.h \
     vars/basic_vars.h \
     vars/board_axis.h \
@@ -62,7 +60,9 @@ HEADERS  +=  \
     vars/posotion_on_board.h \
     field.h \
     chess/chess_timers.h \
-    chess/chess_movements.h
+    chess/chess_movements.h \
+    chess/chess_bot.h \
+    chess/chess_status.h
 
 FORMS    += mainwindow.ui
 

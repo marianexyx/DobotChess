@@ -12,6 +12,7 @@
 #include "vars/board_types.h"
 #include "vars/dobot_moves.h"
 
+//todo: sprawdzic klasę z założeniami w "przebudowa podobiektow w klasie chess.txt"
 class ChessMovements
 {
 private:
@@ -33,6 +34,7 @@ public:
     PositionOnBoard findRookToMoveInCastling(PositionOnBoard FieldDest);
 
     //todo: wszystkie ruchy powinny byc jako private/friend
+    //todo: z nazw powycinać "MoveSequence"?
     void regularMoveSequence(Chess* pChess);
     void removeMoveSequence(Chess* pChess);
     void restoreMoveSequence(Chess* pChess, short sPieceToRestore);
