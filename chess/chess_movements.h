@@ -19,22 +19,17 @@ private:
     Chessboard2* _pChessboard2Main;
     Chessboard2* _pChessboard2Removed;
 
-    QString m_QStrCastlings;
-    QString m_QStrEnpassant;
-    SEQUENCE_TYPE m_moveType;
+    SEQUENCE_TYPE _moveType;
+    PosFromTo _PosMove;
 
 public:
     ChessMovements(Chessboard2* pChessboard2Main, Chessboard2* pChessboard2Removed);
     ~ChessMovements();
 
-    bool isMoveRemoving();
-    bool isMoveCastling(QString moveToTest);
-    bool isMoveEnpassant(QString moveToTest);
-    PositionOnBoard findKingToMoveInCastling(PositionOnBoard FieldDest);
-    PositionOnBoard findRookToMoveInCastling(PositionOnBoard FieldDest);
+    PosOnBoard findKingPosInCastling(PosOnBoard FieldDest);
+    PosOnBoard findRookPosInCastling(PosOnBoard FieldDest);
 
     //todo: wszystkie ruchy powinny byc jako private/friend
-    //todo: z nazw powycinać "MoveSequence"?
     void regularMoveSequence(Chess* pChess);
     void removeMoveSequence(Chess* pChess);
     void restoreMoveSequence(Chess* pChess, short sPieceToRestore);
@@ -44,9 +39,11 @@ public:
 
     void goToSafeRemovedFieldIfNeeded(Chess *pChess);
     //void BadMove(QString msg);
-    void promoteToWhat(QString moveForFuturePromote);
+    void promoteToWhat(QString QStrMoveForFuturePromote);
 
-
+    void setMove(QString QStrMove) { _PosMove = PosFromTo::fromQStr(QStrMove); }
+    PosFromTo getMove() const { return _PosMove; }
+    void clearMove(); //todo: na koniec sprawdzić gdzie to implementować
 };
 
 #endif // CHESS_MOVEMENTS_H

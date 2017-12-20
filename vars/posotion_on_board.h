@@ -6,27 +6,47 @@
 #include "QString"
 #include "vars/board_axis.h"
 
-struct PositionOnBoard
+struct PosOnBoard
 {
     LETTER Letter;
     DIGIT Digit;
 
-    PositionOnBoard(): Letter(L_X), Digit(D_X) {}
-    PositionOnBoard(LETTER L, DIGIT D): Letter(L), Digit(D) {}
-    PositionOnBoard(int nL, int nD);
-    PositionOnBoard(QString QStrL, DIGIT D);
-    PositionOnBoard(QString QStrL, int nD);
-    PositionOnBoard(QString QStrBoardPos);
+    PosOnBoard(): Letter(L_X), Digit(D_X) {}
+    PosOnBoard(LETTER L, DIGIT D): Letter(L), Digit(D) {}
+    PosOnBoard(int nL, int nD);
+    PosOnBoard(QString QStrL, DIGIT D);
+    PosOnBoard(QString QStrL, int nD);
+    PosOnBoard(QString QStrBoardPos);
 
-    static QString posAsQStr(PositionOnBoard Pos)
+    static QString posAsQStr(PosOnBoard Pos)
     { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit+1); }
 
     void setLetterFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
     QString getAsQStr() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1); }
 };
 
+struct PosFromTo
+{
+    PosOnBoard from;
+    PosOnBoard to;
 
-PositionOnBoard::PositionOnBoard(int nL, int nD)
+    PosFromTo(PosOnBoard PosFrom, PosOnBoard PosTo) { from = PosFrom, to = PosTo;}
+    PosFromTo(LETTER fromL, DIGIT fromD, LETTER toL, DIGIT toD);
+    PosFromTo(QString QStrMoveFromTo);
+
+    static bool isMoveInProperFormat(QString QStrMoveFromTo);
+    static PosFromTo fromQStr(QString QStrMoveFromTo);
+
+    QString asQStr();
+    void clear();
+};
+
+
+
+
+
+//PosOnBoard:
+PosOnBoard::PosOnBoard(int nL, int nD)
 {
     if ((nL >= L_A && nL <= L_H && nD >= D_1 && nD <= D_8) || (nL == L_X && nD == D_X))
     {
@@ -37,33 +57,33 @@ PositionOnBoard::PositionOnBoard(int nL, int nD)
     {
         Letter = L_X;
         Digit = D_X;
-        qDebug() << "ERROR: PositionOnBoard: parameters out of range: nL =" << nL
+        qDebug() << "ERROR: PosOnBoard: parameters out of range: nL =" << nL
                  << ", nD =" << nD;
     }
 }
 
-PositionOnBoard::PositionOnBoard(QString QStrL, DIGIT D)
+PosOnBoard::PosOnBoard(QString QStrL, DIGIT D)
 {
     Letter = pieceLetterPos(QStrL);
     Digit = D;
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PositionOnBoard(QString QStrL, DIGIT D): parameter is X: "
+        qDebug() << "WARNING: PosOnBoard(QString QStrL, DIGIT D): parameter is X: "
                     "Letter =" << Letter << ", Digit =" << Digit;
 }
 
-PositionOnBoard::PositionOnBoard(QString QStrL, int nD)
+PosOnBoard::PosOnBoard(QString QStrL, int nD)
 {
     Letter = pieceLetterPos(QStrL);
     Digit = static_cast<DIGIT>(nD);
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PositionOnBoard(QString QStrL, int nD): parameter is X: "
+        qDebug() << "WARNING: PosOnBoard(QString QStrL, int nD): parameter is X: "
                     "Letter =" << Letter << ", Digit =" << Digit;
 }
-PositionOnBoard::PositionOnBoard(QString QStrBoardPos)
+PosOnBoard::PosOnBoard(QString QStrBoardPos)
 {
     if (QStrBoardPos.length() != 2)
     {
-        qDebug() << "ERROR: PositionOnBoard(QString QStrBoardPos): QStrBoardPos.length() != 2)";
+        qDebug() << "ERROR: PosOnBoard(QString QStrBoardPos): QStrBoardPos.length() != 2)";
         Letter = L_X;
         Digit = D_X;
     }
@@ -73,8 +93,88 @@ PositionOnBoard::PositionOnBoard(QString QStrBoardPos)
         Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt() - 1);
     }
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PositionOnBoard(QString QStrBoardPos): parameter is X: "
+        qDebug() << "WARNING: PosOnBoard(QString QStrBoardPos): parameter is X: "
                     "Letter =" << Letter << ", Digit =" << Digit;
+}
+
+
+
+
+//PosFromTo:
+PosFromTo::PosFromTo(LETTER fromL, DIGIT fromD, LETTER toL, DIGIT toD)
+{
+    from.Letter = fromL;
+    from.Digit = fromD;
+    to.Letter = toL;
+    to.Digit = toD;
+}
+
+PosFromTo::PosFromTo(QString QStrMoveFromTo)
+{
+    if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return;
+
+    from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
+    from.Digit = QString::number(QStrMoveFromTo.mid(2,1));
+    to.Letter = pieceLetterPos(QStrMoveFromTo.mid(3,1));
+    to.Digit = QString::number(QStrMoveFromTo.right(1));
+}
+
+static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
+{
+    if (QStrMoveFromTo.length() != 4)
+    {
+        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat: parameter length != 4."
+                    ". it ==" << QStrMoveFromTo.length();
+        return false;
+    }
+
+    if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)
+        return false;
+    if (QString::number(QStrMoveFromTo.mid(2,1)) < 1 ||
+            QString::number(QStrMoveFromTo.mid(2,1)) > 8)
+    {
+        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat: pieceFromDigit is out"
+                    " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.mid(2,1));
+        return false;
+    }
+    if (pieceLetterPos(QStrMoveFromTo.mid(3,1)) == L_X)
+        return false;
+    if (QString::number(QStrMoveFromTo.mid(4,1)) < 1 ||
+            QString::number(QStrMoveFromTo.right(1)) > 8)
+    {
+        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat: pieceToDigit is out"
+                    " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
+        return false;
+    }
+
+    return true;
+}
+
+static PosFromTo PosFromTo::fromQStr(QString QStrMoveFromTo)
+{
+    if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return;
+
+    PosFromTo move;
+    move.from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
+    move.from.Digit = QString::number(QStrMoveFromTo.mid(2,1));
+    move.to.Letter = pieceLetterPos(QStrMoveFromTo.mid(3,1));
+    move.to.Digit = QString::number(QStrMoveFromTo.right(1));
+
+    return move;
+}
+
+QString PosFromTo::getAsQStr()
+{
+    return pieceLetterPosAsQStr(from.Letter) + QString::number(from.Digit)
+            + pieceLetterPosAsQStr(to.Letter) + QString::number(to.Digit);
+}
+
+void PosFromTo::clear()
+{
+    from.Letter = L_X;
+    from.Digit = D_X;
+    to.Letter = L_X;
+    to.Digit = D_X;
 }
 
 #endif // POSOTION_ON_BOARD_H

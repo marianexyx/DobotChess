@@ -28,15 +28,15 @@ public:
     static PLAYER_TYPE Color(short sPieceNr);
     static PIECE_TYPE Type(char cFENSign);
     static PIECE_TYPE Type(short sPieceNr);
-    static short nr(PositionOnBoard PieceLines);
+    static short nr(PosOnBoard PieceLines);
     static short StartFieldNr(short sPieceNr);
-    static PositionOnBoard StartFieldPos(short sPieceNr);
+    static PosOnBoard StartFieldPos(short sPieceNr);
 
     short getNr() const { return m_sPieceID; }
     PIECE_TYPE getType() const { return m_PieceType; }
     PLAYER_TYPE getColor() const { return m_PieceColor; }
     short getStartFieldNr() const { return m_sStartFieldID; }
-    PositionOnBoard getStartFieldPos() const { return Piece::StartFieldPos(m_sPieceID); }
+    PosOnBoard getStartFieldPos() const { return Piece::StartFieldPos(m_sPieceID); }
 };
 
 #endif // PIECE_H

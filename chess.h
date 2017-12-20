@@ -30,7 +30,7 @@ class Chess: public QObject
 {
     Q_OBJECT
 
-protected: //todo: private?
+protected: //todo: private/protected?
     TCPMsgs* _pTCPMsgs;
     Dobot* _pDobot;
     Chessboard* _pChessboard;
@@ -46,20 +46,15 @@ protected: //todo: private?
 
     COMMUNICATION_TYPES _PlayerSource;
 
-    PositionOnBoard _PosFrom, _PosTo; //todo: przypisac wartosci
-    QString QStrFuturePromote; //todo: zamienic na Pos x2? + nazwa malo adekwatna
-
     //----------------KOMUNIKACJA Z GRACZEM-------------//
     void GameInProgress();
     void SendDataToPlayer(QString msg);
 
     //--------------KOMUNIKACJA Z CHENARD--------------//
     void NewGame();
-    //TODO: friend dla podklas, czy dziedziczyc? (tylko ze to virtual...)
+    //TODO: friend dla podklas?
     void Promote(QString msg);
     void SendMsgToTcp(QString msg);
-    void legalOk(QString msg); //todo: czyli co sie dzieje dalej?
-    void historyOk(QString msg); //todo: czyli co sie dzieje dalej?
 
     //-----------------FUNKCJE SZACHOWE-----------------//
     void TcpMoveOk(); //todo: czyli co sie dzieje dalej?
@@ -67,9 +62,9 @@ protected: //todo: private?
     void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
 
     //-----------------FUNKCJE SZACHOWE-----------------//
-    SEQUENCE_TYPE findMoveType(QString move);
-    void handleMove(QString move);
-    void movePieceWithManipulator(Chessboard2 *pRealBoard, PositionOnBoard FieldPos,
+
+    void handleMove(QString QStrMove); //todo: czyli co?
+    void movePieceWithManipulator(Chessboard2 *pRealBoard, PosOnBoard FieldPos,
                                   VERTICAL_MOVE vertMove = VM_NONE);
 
     //------METODY NARZEDZIOWE------//
@@ -90,23 +85,17 @@ public:
     Chess(Dobot* pDobot, Chessboard* pChessboard, Chessboard2* pChessboardMain,
     Chessboard2* pChessboardRemoved, TCPMsgs* pTCPMsgs);
 
-    void promoteToWhat(QString moveForFuturePromote);
     void GameStarted();
     void BadMove(QString msg);
     void EndOfGame(QString msg);
+    void resetBoardData();
+    bool isPiecesSetOk();
 
-    //---------------STEROWANIE RAMIENIEM--------------//
     void listMovesForDobot(SEQUENCE_TYPE Type, //todo: rozdzielic na 2 ruchy
                              LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
                              LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
 
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
-    PositionOnBoard getPosFrom() const { return _PosFrom; }
-    PositionOnBoard getPosTo() const { return _PosTo; }
-
-    void setFuturePromote(QString QStrMove) { QStrFuturePromote = QStrMove; } //todo: friend
-    void clearFuturePromote() { QStrFuturePromote.clear(); }
-    QString getFuturePromote() const { return QStrFuturePromote; }
 
 signals:
     void addTextToConsole(QString, LOG);

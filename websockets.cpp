@@ -67,7 +67,7 @@ QString Websockets::getTableDataAsJSON() //todo: funkcja do pzeniesienia
             ",\"btime\":" + QString::number(_pChessboard->getBlackTimeLeft()) +
             ",\"queue\":\"" + this->getQueuedClientsList();
 
-    if (_pChessboard->isStartTimerRunning())
+    if (_pTimers->isStartTimerRunning())
     {
         QString QStrWhiteClickedStart = this->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
         QString QStrBlackClickedStart = this->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
@@ -75,8 +75,8 @@ QString Websockets::getTableDataAsJSON() //todo: funkcja do pzeniesienia
                 QString::number(_pChessboard->getStartTimeLeft());
     }
 
-    if (!_pChessboard->getHisotyMoves().isEmpty())
-        QStrTableData += "\",\"history\":\"" + _pChessboard->getHisotyMovesAsQStr();
+    if (!_pChessStatus->getHistoryMoves().isEmpty())
+        QStrTableData += "\",\"history\":\"" + _pChessStatus->getHistoryMovesAsQStr();
 
     QStrTableData += "\"}";
 

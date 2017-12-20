@@ -14,10 +14,10 @@ class ChessBot
 private:
     ArduinoUsb *_pArduinoUsb; //reszta wskaznikow dziedziczona
 
-    bool m_bAI;
-    bool m_bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
+    bool _bAI;
+    bool _bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
     //...na 'status' z tcp dotyczy wykonanego ruchu gracza lub igora
-    bool m_bIsIgorsAiSimulatedAsPlayer2;
+    bool _bIsIgorsAiSimulatedAsPlayer2;
     QString _QStrAIPiecieFromTo; //zapamiętany kolejny ruch bota czekający na wywołanie
 
     void wrongTcpAnswer(QString msgType, QString respond);
@@ -32,11 +32,11 @@ public:
     void ThinkOk(QString msg); //todo: i co dalej to robi?
 
     //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    void setAI(bool bAI)                { m_bAI = bAI; } //todo: wszystkie nazwy "AI" zamienić na "Igor"
-    void setAIAsPlayer2(bool bIsAIAsP2) { m_bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
+    void setAI(bool bAI)                { _bAI = bAI; } //todo: wszystkie nazwy "AI" zamienić na "Igor"
+    void setAIAsPlayer2(bool bIsAIAsP2) { _bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
 
-    bool getAIAsPlayer2() { return m_bIsIgorsAiSimulatedAsPlayer2; } //todo: is...
-    bool getAI() { return m_bAI; } //todo: is...
+    bool getAIAsPlayer2() { return _bIsIgorsAiSimulatedAsPlayer2; } //todo: is...
+    bool getAI() { return _bAI; } //todo: is...
 
 public slots:
     void EnemyStart(); //ogólna funkcja sterująca (edit: todo: czym/jak/poco?)

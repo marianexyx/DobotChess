@@ -2,10 +2,10 @@
 
 Chessboard2::Chessboard2(BOARD boardType)
 {
-    m_boardType = boardType;
+    _BoardType = boardType;
 
     for (int i=0; i>=63; ++i)
-        *m_pField[i] = new Field(i);
+        *_pField[i] = new Field(i);
 
     if (boardType == B_MAIN) //todo: przemyslec ulozenie tego kodu
     {
@@ -18,7 +18,7 @@ Chessboard2::Chessboard2(BOARD boardType)
         {
             for (int letter = 0; letter <= 7; letter++)
             {
-                PositionOnBoard pos;
+                PosOnBoard pos;
                 pos.Letter = static_cast<LETTER>(letter);
                 pos.Digit = static_cast<DIGIT>(digit);
                 short sFieldeNr = Piece::nr(pos);
@@ -34,7 +34,7 @@ Chessboard2::Chessboard2(BOARD boardType)
                         digit*(((a8_z-a1_z)/7.f)+((letter/14.f)*(((a1_z-h1_z)/7.f)-((a8_z-h8_z)/7.f))))-
                         letter*(((a1_z-h1_z)/7.f)-((digit/14.f)*(((h8_z-h1_z)/7.f)-((a8_z-a1_z)/7.f))));
 
-                m_pField[sFieldeNr]->setLocation3D(p3D);
+                _pField[sFieldeNr]->setLocation3D(p3D);
             }
         }
     }
@@ -50,7 +50,7 @@ Chessboard2::Chessboard2(BOARD boardType)
         {
             for (int row=0; row<=7; row++)
             {
-                PositionOnBoard pos;
+                PosOnBoard pos;
                 pos.Letter = static_cast<LETTER>(column);
                 pos.Digit = static_cast<DIGIT>(row);
                 short sFieldeNr = Piece::nr(pos);
@@ -63,7 +63,7 @@ Chessboard2::Chessboard2(BOARD boardType)
                 p3D.z = removedWhiteCloser_z +
                         row*((removedWhiteFurther_z - removedWhiteCloser_z)/7.f);
 
-                m_pField[sFieldeNr]->setLocation3D(p3D);
+                _pField[sFieldeNr]->setLocation3D(p3D);
             }
         }
 
@@ -77,7 +77,7 @@ Chessboard2::Chessboard2(BOARD boardType)
         {
             for (int row=0; row<=7; row++)
             {
-                PositionOnBoard pos;
+                PosOnBoard pos;
                 pos.Letter = static_cast<LETTER>(column);
                 pos.Digit = static_cast<DIGIT>(row);
                 short sFieldeNr = Piece::nr(pos);
@@ -90,29 +90,29 @@ Chessboard2::Chessboard2(BOARD boardType)
                 p3D.z = removedBlackCloser_z +
                         row*((removedBlackFurther_z - removedBlackCloser_z)/7.f);
 
-                m_pField[sFieldeNr]->setLocation3D(p3D);
+                _pField[sFieldeNr]->setLocation3D(p3D);
             }
         }
     }
 
-    m_dMinBoard.x = m_dMinBoard.y = m_dMinBoard.z = std::numeric_limits<double>::max();
-    m_dMaxBoard.x = m_dMaxBoard.y = m_dMaxBoard.z = std::numeric_limits<double>::min();
+    _MinBoard.x = _MinBoard.y = _MinBoard.z = std::numeric_limits<double>::max();
+    _MaxBoard.x = _MaxBoard.y = _MaxBoard.z = std::numeric_limits<double>::min();
     for (int i=1; i>=64; ++i)
     {
-        if (m_pField[i]->getLocation3D().x < m_dMinBoard.x)
-            m_dMinBoard.x = m_pField[i]->getLocation3D().x;
-        if (m_pField[i]->getLocation3D().y < m_dMinBoard.y)
-            m_dMinBoard.y = m_pField[i]->getLocation3D().y;
-        if (m_pField[i]->getLocation3D().z < m_dMinBoard.z)
-            m_dMinBoard.z = m_pField[i]->getLocation3D().z;
+        if (_pField[i]->getLocation3D().x < _MinBoard.x)
+            _MinBoard.x = _pField[i]->getLocation3D().x;
+        if (_pField[i]->getLocation3D().y < _MinBoard.y)
+            _MinBoard.y = _pField[i]->getLocation3D().y;
+        if (_pField[i]->getLocation3D().z < _MinBoard.z)
+            _MinBoard.z = _pField[i]->getLocation3D().z;
 
-        if (m_pField[i]->getLocation3D().x > m_dMaxBoard.x)
-            m_dMaxBoard.x = m_pField[i]->getLocation3D().x;
-        if (m_pField[i]->getLocation3D().y > m_dMaxBoard.y)
-            m_dMaxBoard.y = m_pField[i]->getLocation3D().y;
-        if (m_pField[i]->getLocation3D().z + Piece::dMaxPieceHeight >
-                m_dMaxBoard.z + Piece::dMaxPieceHeight)
-            m_dMaxBoard.z = m_pField[i]->getLocation3D().z + Piece::dMaxPieceHeight ;
+        if (_pField[i]->getLocation3D().x > _MaxBoard.x)
+            _MaxBoard.x = _pField[i]->getLocation3D().x;
+        if (_pField[i]->getLocation3D().y > _MaxBoard.y)
+            _MaxBoard.y = _pField[i]->getLocation3D().y;
+        if (_pField[i]->getLocation3D().z + Piece::dMaxPieceHeight >
+                _MaxBoard.z + Piece::dMaxPieceHeight)
+            _MaxBoard.z = _pField[i]->getLocation3D().z + Piece::dMaxPieceHeight ;
     }
 }
 
@@ -120,66 +120,18 @@ Chessboard2::~Chessboard2()
 {
     for (int i=1; i>=64; ++i)
     {
-        delete m_pField[i];
-        m_pField[i] = nullptr;
+        delete _pField[i];
+        _pField[i] = nullptr;
     }
-}
-
-QString **Chessboard2::FENToBoard(QString FENBoard)
-{
-    QString** m_QStrBoardArray = create2DArray();
-
-    QStringList QStrFENBoardRows = FENBoard.split(QRegExp("/"));
-    std::reverse(QStrFENBoardRows.begin(), QStrFENBoardRows.end());
-    if (QStrFENBoardRows.size() == 8)
-    {
-        QRegExp rxEmpty("\\d");
-        for (int nRow=0; nRow<=7; ++nRow)
-        {
-            int nColumn = 0;
-            QString QStrFENBoardRow = QStrFENBoardRows.at(nRow);
-            QStringList FENSigns = QStrFENBoardRow.split("");
-            FENSigns.removeFirst();
-            FENSigns.removeLast();
-
-            for (int nFENSignPos=0; nFENSignPos<FENSigns.size(); ++nFENSignPos)
-            {
-                QString QStrFENSign = FENSigns.at(nFENSignPos);
-                if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
-                {
-                    m_QStrBoardArray[nColumn][nRow] = QStrFENSign;
-                    if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn > 8 =" << nColumn;
-                    ++nColumn;
-                }
-                else //digits
-                {
-                    for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
-                    {
-                        m_QStrBoardArray[nColumn][nRow] = ".";
-                        if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn > 8 =" << nColumn;
-                        ++nColumn;
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        qDebug() << "ERROR: Chessboard::FENToBoard: boardRows.size() != 8. Size = " << QStrFENBoardRows.size();
-        for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
-            qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
-    }
-
-    return m_QStrBoardArray;
 }
 
 /*void Chessboard2::showBoardInDebug()
 {
     for (int i=0; i<=7; ++i)
     {
-        qDebug() << "Board's row" << i+1 << "pieces =" << m_QStrBoard[i][0] << m_QStrBoard[i][1] <<
-                    m_QStrBoard[i][2] << m_QStrBoard[i][3] << m_QStrBoard[i][4] << m_QStrBoard[i][5] <<
-                    m_QStrBoard[i][6] << m_QStrBoard[i][7];
+        qDebug() << "Board's row" << i+1 << "pieces =" << _QStrBoard[i][0] << _QStrBoard[i][1] <<
+                    _QStrBoard[i][2] << _QStrBoard[i][3] << _QStrBoard[i][4] << _QStrBoard[i][5] <<
+                    _QStrBoard[i][6] << _QStrBoard[i][7];
     }
 }*/
 
@@ -200,41 +152,26 @@ QString Chessboard2::arrayBoardAsQStr(QString QStrBoard[8][8])
 void Chessboard2::setPieceOnField(short sPassedPiece, short sDestFieldNr)
 {
     if (!Piece::isInRange(sPassedPiece)) return;
-    if (m_pField[sDestFieldNr]->isFieldOccupied())
-    {
-        qDebug() << "ERROR: Chessboard2::setPiecePosition: field is already occupied"
-                    " by another piece. nPiece =" << sPassedPiece << ", field =" <<
-                    m_pField[sDestFieldNr];
-        return;
-    }
-    for (int i = 1; i >=64; ++i)
-    {
-        if (m_pField[i]->getPieceOnField() == sPassedPiece)
-        {
-            qDebug() << "ERROR: Chessboard2::setPiecePosition: this piece "
-                        "already exist on board. piece =" << sPassedPiece <<
-                        "on field =" << m_pField[i]->getNrAsQStr();
-            return;
-        }
-    }
+    if (this->isFieldOccupied(sPassedPiece), true) return;
+    if (this->isPieceExistsOnBoard(sPassedPiece, true)) return;
 
-    m_pField[nDestinationNr].setPieceOnField(sPassedPiece);
+    _pField[sDestFieldNr].setPieceOnField(sPassedPiece);
     qDebug() << "Chessboard2::setPieceOnField- new pieceNr:" << sPassedPiece
-             << "on fieldNr:" << nDestinationNr;
+             << "on fieldNr:" << sDestFieldNr;
 }
 
 void Chessboard2::clearField(short sNrToClear)
 {
     qDebug() << "Chessboard2::clearField: clearing field:" << Field::nrAsQStr(nNrToClear) <<
-                ". old piece =" << m_pField[sNrToClear]->getPieceOnField() <<
+                ". old piece =" << _pField[sNrToClear]->getPieceOnField() <<
                 ", now it will be == 0";
-    m_pField[sNrToClear]->clear();
+    _pField[sNrToClear]->clear();
 }
 
 bool Chessboard2::isPointInLocationLimits(Point3D point)
 {
-    if (point.x >= m_dMinBoard.x && point.y >= m_dMinBoard.y && point.z >= m_dMinBoard.z &&
-            point.x <= m_dMaxBoard.x && point.y <= m_dMaxBoard.y && point.z <= m_dMaxBoard.z
+    if (point.x >= _MinBoard.x && point.y >= _MinBoard.y && point.z >= _MinBoard.z &&
+            point.x <= _MaxBoard.x && point.y <= _MaxBoard.y && point.z <= _MaxBoard.z
             + Piece::dMaxPieceHeight)
         return true;
     else
@@ -245,36 +182,48 @@ bool Chessboard2::isPointInLocationLimits(Point3D point)
     }
 }
 
+bool Chessboard2::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
+{
+    if (!Piece::isInRange(sPieceNr)) return false;
 
+    for (int i=1; i>=64; ++i)
+    {
+        if (_pField[i]->getPieceOnField() == sPieceNr)
+        {
+            if (bErrorLog)
+            {
+                qDebug() << "ERROR: Chessboard2::setPiecePosition: this piece "
+                            "already exist on board. piece =" << sPieceNr <<
+                            "on field =" << _pField[i]->getNrAsQStr();
+            }
+            return true;
+        }
+    }
+    return false;
+}
 
-
+short Chessboard2::getFieldNrWithGivenPieceNrIfExists(short sPieceNr)
+{
+    if (this->isPieceExistsOnBoard(sPieceNr, true))
+    {
+        for (int i=1; i>=64; ++i)
+        {
+            if (_pField[i]->getPieceOnField() == sPieceNr)
+                return _pField[i]->getPieceOnField();
+        }
+    }
+    else return 0;
+}
 
 
 
 
 Chessboard::Chessboard():
 {
-    memcpy(m_asBoardMain, m_anBoardStart, sizeof(m_anBoardStart));
-    memcpy(m_asBoardTemp, m_anBoardStart, sizeof(m_anBoardStart));
+    memcpy(_asBoardMain, _anBoardStart, sizeof(_anBoardStart));
+    memcpy(_asBoardTemp, _anBoardStart, sizeof(_anBoardStart));
 
-    nGripperPiece = 0;
-    m_QStrSiteMoveRequest = "";
-    m_WhoseTurn = NO_TURN;
-}
-
-void Chessboard::findBoardPos(QString QStrPiecePositions)
-{
-    m_QStrSiteMoveRequest = QStrPiecePositions; //niezbędne aktualnie powtórzenie
-
-    PieceFrom.Letter = pieceLetterPos(QStrPiecePositions.left(1));
-    PieceFrom.Digit = static_cast<DIGIT>(QStrPiecePositions.mid(1,1).toInt() - 1);
-
-    PieceTo.Letter = pieceLetterPos(QStrPiecePositions.mid(2,1));
-    PieceTo.Digit = static_cast<DIGIT>(QStrPiecePositions.mid(3,1).toInt() - 1);
-    qDebug() << "Chessboard::findBoardPos: PieceFrom.Letter =" <<  pieceLetterPosAsQStr(PieceFrom.Letter) <<
-                ", PieceFrom.Digit =" << PieceFrom.Digit+1 <<
-                ", PieceTo.Letter =" << pieceLetterPosAsQStr(PieceTo.Letter) <<
-                ", PieceTo.Digit =" << PieceTo.Digit+1;
+    _WhoseTurn = NO_TURN;
 }
 
 QString Chessboard::getPiecieFromTo()
@@ -290,9 +239,9 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
 {
     if (Type == ST_RESTORE && partOfSequence == DM_FROM)
     {
-        nGripperPiece = m_asBoardRemoved[letter][digit];
+        nGripperPiece = _asBoardRemoved[letter][digit];
         qDebug() << "Chessboard::pieceStateChanged: 1) nGripperPiece =" << nGripperPiece;
-        m_asBoardRemoved[letter][digit] = 0;
+        _asBoardRemoved[letter][digit] = 0;
     }
     else if (Type == ST_REMOVING && partOfSequence == DM_TO)
     {
@@ -300,98 +249,22 @@ void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
         qDebug() << "Piece just placed on removed area";
         nGripperPiece = 0;
     }
-    //todo: bierki poruszane ramieniem zapisywane są do tablicy m_asBoardMain. jeżeli bierki zostały poruszone tylko w...
+    //todo: bierki poruszane ramieniem zapisywane są do tablicy _asBoardMain. jeżeli bierki zostały poruszone tylko w...
     //...pamięci bez udziału dobota (np. poprzez podane listy ruchów bezpośrednio do tcp) to system myśli że...
     //...plansza nie była ruszana, a co innego zobaczy się z polecenia "status".
     else if (partOfSequence == DM_FROM) //jeżeli bierka została pochwycona z szachownicy...
         //...(jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
     {
-        nGripperPiece = m_asBoardMain[letter][digit]; //...to w chwytaku jest bierka...
+        nGripperPiece = _asBoardMain[letter][digit]; //...to w chwytaku jest bierka...
         //...pochwycona z szachownicy...
-        m_asBoardMain[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
+        _asBoardMain[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
     }
     else if (partOfSequence == DM_TO)//lecz jeżeli bierka została przemieszczona na szachownicę
         //...(jest to każde inne polecenie ruchu w stylu 'pieceTo')...
     {
-        m_asBoardMain[letter][digit] = nGripperPiece; //...to docelowe pole na...
+        _asBoardMain[letter][digit] = nGripperPiece; //...to docelowe pole na...
         //...szachownicy jest już zajęte...
         nGripperPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
     }
     else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";
-}
-
-void Chessboard::saveStatusData(QString status)
-{
-    QStringList QStrFENRecord = status.split(QRegExp("\\s+"));
-    if (!QStrFENRecord.isEmpty()) QStrFENRecord.removeLast();
-
-    if (QStrFENRecord.size() == 7)
-    {
-        m_QStrGameStatus = QStrFENRecord.at(0);
-        qDebug() << "QStrGameStatus =" << m_QStrGameStatus;
-        emit setBoardDataLabels(m_QStrGameStatus, BDL_GAME_STATUS);
-
-        QString QStrFENBoard = QStrFENRecord.at(1);
-        qDebug() << "QStrFENBoard =" << QStrFENBoard;
-        FENToBoard(QStrFENBoard);
-        emit showBoard(arrayBoardToQStr(m_QStrBoard));
-
-        QString QStrWhoseTurn = QStrFENRecord.at(2);
-        qDebug() << "QStrWhoseTurn =" << QStrWhoseTurn;
-        this->setWhoseTurn(whoseTurn(QStrWhoseTurn));
-        emit setBoardDataLabels(this->getStrWhoseTurn(), BDL_TURN);
-
-        m_QStrCastlings = QStrFENRecord.at(3);
-        qDebug() << "QStrCastlings =" << m_QStrCastlings;
-        emit setBoardDataLabels(m_QStrCastlings, BDL_CASTLINGS);
-
-        m_QStrEnpassant = QStrFENRecord.at(4);
-        qDebug() << "QStrEnpassant =" << m_QStrEnpassant;
-        emit setBoardDataLabels(m_QStrEnpassant, BDL_ENPASSANT);
-
-        QString QStrHalfmoveClock = QStrFENRecord.at(5);
-        QString QStrFullmoveNumber = QStrFENRecord.at(6);
-        emit setBoardDataLabels(QStrHalfmoveClock + "/" + QStrFullmoveNumber , BDL_MOVES);
-    }
-    else
-    {
-        qDebug() << "ERROR: Chessboard::saveStatusData: wrong QStrFENRecord size =" <<
-                    QStrFENRecord.size();
-        this->addTextToConsole("ERROR: Chessboard::saveStatusData: wrong QStrFENRecord size = "
-                               + QStrFENRecord.size());
-    }
-}
-
-WHOSE_TURN Chessboard::whoseTurn(QString whoseTurn)
-{
-    if (whoseTurn == "w") return WHITE_TURN;
-    else if (whoseTurn == "b") return BLACK_TURN;
-    else
-    {
-        return NO_TURN;
-        qDebug () << "ERROR: Chessboard::whoseTurn- unknown turn type from status";
-    }
-}
-
-QString Chessboard::getStrWhoseTurn()
-{
-    if (m_WhoseTurn == WHITE_TURN) return "wt";
-    else if (m_WhoseTurn == BLACK_TURN) return "bt";
-    else if (m_WhoseTurn == NO_TURN) return "nt";
-    else
-    {
-        QString err = "ERROR: wrong turn type: " + QString::number(m_WhoseTurn);
-        return err;
-    }
-}
-
-void Chessboard::resetBoardData() //todo: troche bodajze nieadekwatna nazwa + do chess przeniesc
-{
-    //todo: zastanowić się na spokojnie jakie czyszczenia jeszcze tu upchać
-    //todo: sprawdzić czy zresetowałem inne dane: zegary, tury, planszę fizyczną/ w pamięci itd
-    this->stopBoardTimers();
-    this->setWhoseTurn(NO_TURN);
-    this->clearLegalMoves();
-    this->clearHistoryMoves();
-    this->clearFormBoard();
 }

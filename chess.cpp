@@ -96,8 +96,8 @@ void Chess::Promote(QString msg)
         this->listMovesForDobot(ST_PROMOTION);
 
     _pChessboard->setMoveType(ST_PROMOTION);
-    this->SendMsgToTcp("move " + _pChessboard->QStrFuturePromote + msg);
-    _pChessboard->QStrFuturePromote.clear();
+    this->SendMsgToTcp("move " + _pStatus->getFuturePromoteAsQStr() + msg);
+    _pStatus->clearFuturePromote();
 }
 
 void Chess::SendMsgToTcp(QString msg)
@@ -107,24 +107,13 @@ void Chess::SendMsgToTcp(QString msg)
     _pTCPMsgs->TcpQueueMsg(_PlayerSource, msg);
 }
 
-void Chess::promoteToWhat(QString moveForFuturePromote)
-{
-    //todo: ogarnac gdzies czyszczenie tej zmiennej po wszystkim i sprawdzanie czy nie probuje...
-    //...uzywac gdzies tej zmiennej pustej
-    _pChessboard->QStrFuturePromote = moveForFuturePromote;
-
-    _pChessboard->switchPlayersTimers();
-    this->SendDataToPlayer("moveOk " + moveForFuturePromote + " " +
-                           _pChessboard->getStrWhoseTurn() + " promote");
-}
-
 void Chess::GameStarted()
 {
     qDebug() << "Sending 'newOk' to player";
     this->addTextToConsole("newGame\n", LOG_CORE);
 
-    _pChessboard->resetGameTimers();
-    _pChessboard->startGameTimer();
+    _pTimers->resetGameTimers();
+    _pTimers->startGameTimer();
 
     this->SendDataToPlayer("newOk");
 }
@@ -158,6 +147,42 @@ void Chess::EndOfGame(QString msg)
     //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
     //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
     this->reset();
+}
+
+void Chess::resetBoardData() //todo: troche bodajze nieadekwatna nazwa
+{
+    //todo: zastanowić się na spokojnie jakie czyszczenia jeszcze tu upchać
+    //todo: sprawdzić czy zresetowałem inne dane: zegary, tury, planszę fizyczną/ w pamięci itd
+    //todo: przeniesione metody
+    _pTimers->stopBoardTimers();
+    _pStatus->setWhoseTurn(NO_TURN);
+    _pStatus->clearLegalMoves();
+    _pStatus->clearHistoryMoves();
+    _pStatus->clearFormBoard();
+}
+
+bool Chess::isPiecesSetOk()
+{
+    for (short piece=1; piece>=32; ++piece)
+    {
+        bool isPieceExists = false;
+        for (short field=1; field>=64; ++field)
+        {
+            if (_pChessboardMain->getField(field)->getPieceNrOnField() == piece ||
+                    _pChessboardRemoved->getField(field)->getPieceNrOnField() == piece ||
+                    _pDobot->getItemInGripper() == piece)
+            {
+                isPieceExists = true;
+                break;
+            }
+        }
+        if (!isPieceExists)
+        {
+            qDebug() << "ERROR: Chess::isPiecesSetOk- it isn't, missing piece nr:" << piece;
+            return false;
+        }
+    }
+    return true;
 }
 
 //todo: po reorganizacji klas niech ta funkcja przyjmuje struktury. najlepiej bylobyh ja podzielic na 2
@@ -202,13 +227,13 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
     {
         this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
     }
-    PositionOnBoard PieceTo; //todo: znowu mieszanie i dublowanie zmiennych
+    PosOnBoard PieceTo; //todo: znowu mieszanie i dublowanie zmiennych
     PieceTo.Letter = pieceToLetter;
     PieceTo.Digit = pieceToDigit;
     short sPieceNrOnFieldTo = _pChessboard->getPieceOnBoardAsNr(B_MAIN, PieceTo);
     if (Type == ST_REMOVING && pieceToLetter <= L_C)
     {
-        this->goToSafeRemovedField(_pChessboard->fieldNrToPositionOnBoard(sPieceNrOnFieldTo).Digit, Type);
+        this->goToSafeRemovedField(_pChessboard->fieldNrToPosOnBoard(sPieceNrOnFieldTo).Digit, Type);
     }
 
     _pDobot->pieceFromTo(DM_TO, pieceToLetter, pieceToDigit, Type);
@@ -220,42 +245,9 @@ void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT 
 
     if (Type == ST_REMOVING && pieceToLetter <= L_C)
     {
-        this->goToSafeRemovedField(_pChessboard->fieldNrToPositionOnBoard(sPieceNrOnFieldTo).Digit, Type);
+        this->goToSafeRemovedField(_pChessboard->fieldNrToPosOnBoard(sPieceNrOnFieldTo).Digit, Type);
     } //po zbiciu ramię może zostać nad zbitymi polami
     else if (Type != ST_REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
-}
-
-void Chess::legalOk(QString msg) //todo: nazwy tych funkcji 'ok' nie mówią co robią
-{
-    QStringList legalMoves = msg.split(QRegExp("\\s"));
-    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
-    if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
-
-    if (!legalMoves.isEmpty())
-    {
-        QString QStrLastLegalMove = legalMoves.last();
-        QStrLastLegalMove = QStrLastLegalMove.simplified();
-        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" ); //remove np. "\n"
-        legalMoves.last() = QStrLastLegalMove;
-    }
-    _pChessboard->setLegalMoves(legalMoves);
-}
-
-void Chess::historyOk(QString msg)
-{
-    QStringList historyMoves = msg.split(QRegExp("\\s"));
-    if (!historyMoves.isEmpty()) historyMoves.removeFirst(); //remove "ok"
-    if (!historyMoves.isEmpty()) historyMoves.removeFirst(); //remove np. "20"
-
-    if (!historyMoves.isEmpty()) //whipe CR, LF, spacebars etc
-    {
-        QString QStrLastHistoryMove = historyMoves.last();
-        QStrLastHistoryMove = QStrLastHistoryMove.simplified();
-        QStrLastHistoryMove = QStrLastHistoryMove.replace( " ", "" ); //remove np. "\n"
-        historyMoves.last() = QStrLastHistoryMove;
-    }
-
-    _pChessboard->setHistoryMoves(historyMoves);
 }
 
 void Chess::TcpMoveOk()
@@ -326,7 +318,7 @@ void Chess::playerClickedStart(QString QStrWhoClicked)
             _pWebsockets->isStartClickedByPlayer(PT_BLACK))
     {
         qDebug() << "both players have clicked start. try to start game";
-        _pChessboard->stopQueueTimer();
+        _pTimers->stopQueueTimer();
         this->NewGame();
         _pWebsockets->setClientState(PT_WHITE, false);
         _pWebsockets->setClientState(PT_BLACK, false);
@@ -347,8 +339,8 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             if (tcpRespond == "OK\n" || tcpRespond == "OK")
             {
                 //pierwszy legal i status wyglądają zawsze tak samo:
-                _pChessboard->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
-                this->legalOk("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
+                _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
+                _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
                               "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
                 this->GameStarted();
             }
@@ -376,8 +368,8 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
                      _pChessboard->getGameStatus().left(3) == "0-1" ||
                      _pChessboard->getGameStatus().left(7) == "1/2-1/2")
             {
-                _pChessboard->clearLegalMoves();
-                _pChessboard->clearHistoryMoves();
+                _pStatus->clearLegalMoves();
+                _pStatus->clearHistoryMoves();
                 this->EndOfGame(tcpRespond);
             }
             else
@@ -386,14 +378,14 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         else if (tcpMsgType.left(7) == "history" && tcpRespond.left(3) == "OK ")
         {
             qDebug() << "manage history tcp answer";
-            this->historyOk(tcpRespond);
+            _pStatus->historyOk(tcpRespond);
             _pWebsockets->sendMsg("history " + _pChessboard->getHisotyMovesAsQStr());
             this->SendMsgToTcp("legal");
             //todo: jeszcze odpowiedź na site
         }
         else if (tcpMsgType == "legal" && tcpRespond.left(3) == "OK ")
         {
-            this->legalOk(tcpRespond);
+            _pStatus->setLegalMoves(tcpRespond);
         }
         else qDebug() << "ERROR: WebChess:checkMsgFromChenard() received unknown tcpMsgType: "
                       << tcpMsgType;
@@ -423,8 +415,8 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             }
             else
             {
-                _pChessboard->clearLegalMoves();
-                _pChessboard->clearHistoryMoves();
+                _pStatus->clearLegalMoves();
+                _pStatus->clearHistoryMoves();
                 this->EndOfGame(tcpRespond);
             }
         }
@@ -438,7 +430,7 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         }
         else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
         {
-            this->legalOk(tcpRespond);
+            _pStatus->setLegalMoves(tcpRespond);
         }
         else wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
@@ -497,8 +489,8 @@ void Chess::resetPiecePositions()
                 bool bIsStartPieceOnRemovedFieldOfCheckingField = _pChessboard->getPieceOnBoardAsNr(B_REMOVED, nPieceStartPosOfCheckingField);
 
                 if (nPieceNrOnCheckingField == 0 //jeżeli na sprawdzanym polu nie ma żadnej bierki...
-                        && (_pChessboard->fieldNrToPositionOnBoard(nCheckingField).Digit <= D_2  //...a coś tam powinno być
-                            || _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Digit >= D_7))
+                        && (_pChessboard->fieldNrToPosOnBoard(nCheckingField).Digit <= D_2  //...a coś tam powinno być
+                            || _pChessboard->fieldNrToPosOnBoard(nCheckingField).Digit >= D_7))
 
                 {
                     //sprawdź najpierw po numerze bierki czy leży ona na swoim zbitym miejscu na polu zbitych bierek
@@ -506,10 +498,10 @@ void Chess::resetPiecePositions()
                     {
                         short sStartPieceOnRemovedFieldOfCheckingField = _pChessboard->getPieceOnBoardAsNr(B_REMOVED, nPieceStartPosOfCheckingField);
                         this->listMovesForDobot(ST_RESTORE, //przenieś bierkę z pól zbitych bierek na oryginalne pole bierki na szachownicy
-                                                _pChessboard->fieldNrToPositionOnBoard(sStartPieceOnRemovedFieldOfCheckingField).Letter,
-                                                _pChessboard->fieldNrToPositionOnBoard(sStartPieceOnRemovedFieldOfCheckingField).Digit,
-                                                _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Letter,
-                                                _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Digit);
+                                                _pChessboard->fieldNrToPosOnBoard(sStartPieceOnRemovedFieldOfCheckingField).Letter,
+                                                _pChessboard->fieldNrToPosOnBoard(sStartPieceOnRemovedFieldOfCheckingField).Digit,
+                                                _pChessboard->fieldNrToPosOnBoard(nCheckingField).Letter,
+                                                _pChessboard->fieldNrToPosOnBoard(nCheckingField).Digit);
                     }
                     else //jeżeli nie ma bierki na polu zbitych bierek, to leży ona gdzieś na szachownicy to ...
                     {
@@ -521,10 +513,10 @@ void Chess::resetPiecePositions()
                                 // oryginalna pozycja bierki (musi być na obcym polu startowym)
                             { //to przenieś ją na swoje pierwotne/startowe pole na szachownicy
                                 this->listMovesForDobot(ST_REGULAR,
-                                                        _pChessboard->fieldNrToPositionOnBoard(nField).Letter,
-                                                        _pChessboard->fieldNrToPositionOnBoard(nField).Digit,
-                                                        _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Letter,
-                                                        _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Digit);
+                                                        _pChessboard->fieldNrToPosOnBoard(nField).Letter,
+                                                        _pChessboard->fieldNrToPosOnBoard(nField).Digit,
+                                                        _pChessboard->fieldNrToPosOnBoard(nCheckingField).Letter,
+                                                        _pChessboard->fieldNrToPosOnBoard(nCheckingField).Digit);
                             }
                         }
                     }
@@ -539,10 +531,10 @@ void Chess::resetPiecePositions()
                     if (sPieceNrOnStartPosOfPieceOnCheckingField == 0) //czy startowe pole bierki jest puste, by tam można było ją odstawić
                     {
                         this->listMovesForDobot(ST_REGULAR,
-                                                _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Letter,
-                                                _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Digit,
-                                                _pChessboard->fieldNrToPositionOnBoard(sCheckingFieldsStartingPieceNr).Letter,
-                                                _pChessboard->fieldNrToPositionOnBoard(sCheckingFieldsStartingPieceNr).Digit);
+                                                _pChessboard->fieldNrToPosOnBoard(nCheckingField).Letter,
+                                                _pChessboard->fieldNrToPosOnBoard(nCheckingField).Digit,
+                                                _pChessboard->fieldNrToPosOnBoard(sCheckingFieldsStartingPieceNr).Letter,
+                                                _pChessboard->fieldNrToPosOnBoard(sCheckingFieldsStartingPieceNr).Digit);
                     }
                     else //jeżeli startowe pole bierki na polu sprawdzanym jest zajęte przez inną bierkę
                     {
@@ -556,10 +548,10 @@ void Chess::resetPiecePositions()
                             //to przenieś ją na chwilę na jej miejsce na obszarze bierek zbitych.
                             //todo: zrobić funkcję z 1 argumentem która wyczai łapaną bierkę i odstawi ją na swoje pole
                             this->listMovesForDobot(ST_REMOVING,
-                                                    _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Letter,
-                                                    _pChessboard->fieldNrToPositionOnBoard(nCheckingField).Digit,
-                                                    _pChessboard->fieldNrToPositionOnBoard(nPieceNrOnCheckingField).Letter,
-                                                    _pChessboard->fieldNrToPositionOnBoard(nPieceNrOnCheckingField).Digit);
+                                                    _pChessboard->fieldNrToPosOnBoard(nCheckingField).Letter,
+                                                    _pChessboard->fieldNrToPosOnBoard(nCheckingField).Digit,
+                                                    _pChessboard->fieldNrToPosOnBoard(nPieceNrOnCheckingField).Letter,
+                                                    _pChessboard->fieldNrToPosOnBoard(nPieceNrOnCheckingField).Digit);
                         }
                         else qDebug() << "Chess::resetPiecePositions(): nStartNrOf2ndPieceOn1stPieceStartPos:" <<
                                          nStartNrOf2ndPieceOn1stPieceStartPos << "!= nCheckingField:" << nCheckingField;
@@ -615,33 +607,24 @@ void Chess::resetPiecePositions()
     this->resetBoardCompleted();
 }
 
-void Chess::handleMove(QString move)
+void Chess::handleMove(QString QStrMove)
 {
-    qDebug() << "Chess::handleMove =" << move;
-    _pChessboard->findBoardPos(move);
-
-    _pChessboard->setMoveType(this->findMoveType(move));
-    qDebug() << "move type =" << sequenceTypeAsQstr(_pChessboard->getMoveType());
+    _pMovements->setMove(QStrMove);
+    _pMovements->setMoveType(_pStatus->findMoveType(QStrMove));
 
     switch(_pChessboard->getMoveType())
     {
     /*case ST_PROMOTE_TO_WHAT: //todo: ST_PROMOTE_TO_WHAT to nie ruch- to brak ruchu. wywalic stad
         this->PromoteToWhat(move);
         break;*/
-    case ST_ENPASSANT:
-        this->enpassantMovingSequence();
-        break;
+    case ST_REGULAR: _pMovements->regularMoveSequence(*this); break;
+    case ST_REMOVING: _pMovements->removeMoveSequence(*this);  break;
+    case ST_RESTORE: _pMovements->restoreMoveSequence(*this);  break;
+    case ST_ENPASSANT: _pMovements->enpassantMoveSequence(*this); break;
     case ST_CASTLING:
         this->castlingMovingSequence();
         break;
-    case ST_REMOVING:
-        //todo: wygodniej byłoby podzielić ruchy na połówki zamiast zawsze próbować wykonywać 2 sekwencje
-        this->listMovesForDobot(ST_REMOVING);
-        this->listMovesForDobot(ST_REGULAR);
-        break;
-    case ST_REGULAR:
-        this->listMovesForDobot(ST_REGULAR); //TODO: to wygląda jakby to robił dobot wszystko, ten ruch tj.
-        break;
+
     /*case ST_BADMOVE: //todo: bad_move to nie ruch- to brak ruchu. wywalic stad
         this->BadMove(move);
         break;*/
@@ -651,11 +634,11 @@ void Chess::handleMove(QString move)
         break;
     }
 
-    this->SendMsgToTcp("move " + move);
+    this->SendMsgToTcp("move " + QStrMove);
 }
 
 //todo: jezeli movements beda dziedziczone, to to powinno byc wewnatrz tamtej klasy
-void Chess::movePieceWithManipulator(Chessboard2* pRealBoard, PositionOnBoard FieldPos,
+void Chess::movePieceWithManipulator(Chessboard2* pRealBoard, PosOnBoard FieldPos,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {
     if (pRealBoard->getBoardType() != B_MAIN && pRealBoard->getBoardType() != B_REMOVED)
@@ -665,23 +648,26 @@ void Chess::movePieceWithManipulator(Chessboard2* pRealBoard, PositionOnBoard Fi
         return;
     }
 
-    //todo: zpaisz id przedmiotu w chwytaku
-    //todo: zabierz/wstaw przedmiot z szachownicy + sprawdzenia
-    Point3D xyz = pRealBoard->getFieldLocation3D(Field::nr(FieldPos));
-    _pDobot->doMoveSequence(xyz, vertMove);
-}
-
-SEQUENCE_TYPE Chess::findMoveType(QString QStrMove)
-{
-    if (this->getLegalMoves().contains(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //todo: this?
-    else if (this->getLegalMoves().contains(QStrMove)) //todo: this?
+    if (vertMove == VM_GRAB)
     {
-        if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
-        else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
-        else if (this->isMoveRemoving()) return ST_REMOVING;
-        else return ST_REGULAR;
+        if (!this->isPiecesSetOk()) return;
+        short sPieceNrOnField = pRealBoard->getField(FieldPos)->getPieceNrOnField();
+        if (!Piece::isInRange(sPieceNrOnField)) return;
+
+        _pDobot->setItemInGripper(sPieceNrOnField);
+        pRealBoard->clearField(Field::nr(FieldPos));
+        if (!this->isPiecesSetOk()) return;
     }
-    else return ST_BADMOVE;
+    else if (vertMove == VM_PUT)
+    {
+        if (!this->isPiecesSetOk()) return;
+        pRealBoard->setPieceOnField(_pDobot->getItemInGripper(), Field::nr(FieldPos));
+        _pDobot->clearGripper();
+        if (!this->isPiecesSetOk()) return;
+    }
+
+    Point3D xyz = pRealBoard->getField(Field::nr(FieldPos))->getLocation3D();
+    _pDobot->doMoveSequence(xyz, vertMove);
 }
 
 bool Chess::compareArrays(short nArray1[][8], short nArray2[][8])

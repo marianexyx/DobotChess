@@ -1,27 +1,27 @@
 #include "chess_timers.h"
 
 ChessTimers::ChessTimers():
-    m_lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
-    m_lTimersStartQueue(1000*60*2)
+    _lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
+    _lTimersStartQueue(1000*60*2)
 {
-    m_whiteTimer = new QTimer();
-    m_blackTimer = new QTimer();
-    m_updateLabelTimer = new QTimer();
-    m_startQueueTimer = new QTimer();
-    m_whiteTimer->setInterval(m_lTimersStartTime);
-    m_blackTimer->setInterval(m_lTimersStartTime);
-    m_updateLabelTimer->setInterval(1000);
-    m_startQueueTimer->setInterval(m_lTimersStartQueue);
-    m_whiteTimer->setSingleShot(true);
-    m_blackTimer->setSingleShot(true);
-    m_updateLabelTimer->setSingleShot(false);
-    m_startQueueTimer->setSingleShot(true);
-    connect(m_whiteTimer, SIGNAL(timeout()), this, SLOT(timeOutWhite()));
-    connect(m_blackTimer, SIGNAL(timeout()), this, SLOT(timeOutBlack()));
-    connect(m_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
-    connect(m_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
-    m_nRemainingWhiteTime = m_lTimersStartTime;
-    m_nRemainingBlackTime = m_lTimersStartTime;
+    _whiteTimer = new QTimer();
+    _blackTimer = new QTimer();
+    _updateLabelTimer = new QTimer();
+    _startQueueTimer = new QTimer();
+    _whiteTimer->setInterval(_lTimersStartTime);
+    _blackTimer->setInterval(_lTimersStartTime);
+    _updateLabelTimer->setInterval(1000);
+    _startQueueTimer->setInterval(_lTimersStartQueue);
+    _whiteTimer->setSingleShot(true);
+    _blackTimer->setSingleShot(true);
+    _updateLabelTimer->setSingleShot(false);
+    _startQueueTimer->setSingleShot(true);
+    connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(timeOutWhite()));
+    connect(_blackTimer, SIGNAL(timeout()), this, SLOT(timeOutBlack()));
+    connect(_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
+    connect(_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
+    _nRemainingWhiteTime = _lTimersStartTime;
+    _nRemainingBlackTime = _lTimersStartTime;
 }
 //private slots:
 
@@ -39,14 +39,14 @@ void ChessTimers::timeOutBlack()
 
 void ChessTimers::updateTimeLabels()
 {
-    if (m_whiteTimer->isActive())
-        emit setBoardDataLabels(milisecToClockTime(m_whiteTimer->remainingTime()), BDL_WHITE_TIME);
-    else if (m_blackTimer->isActive())
-        emit setBoardDataLabels(milisecToClockTime(m_blackTimer->remainingTime()), BDL_BLACK_TIME);
+    if (_whiteTimer->isActive())
+        emit setBoardDataLabels(milisecToClockTime(_whiteTimer->remainingTime()), BDL_WHITE_TIME);
+    else if (_blackTimer->isActive())
+        emit setBoardDataLabels(milisecToClockTime(_blackTimer->remainingTime()), BDL_BLACK_TIME);
 
-    if (m_startQueueTimer->isActive())
-        emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
-    else setBoardDataLabels(milisecToClockTime(m_lTimersStartQueue), BDL_QUEUE_TIME);
+    if (_startQueueTimer->isActive())
+        emit setBoardDataLabels(milisecToClockTime(_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
+    else setBoardDataLabels(milisecToClockTime(_lTimersStartQueue), BDL_QUEUE_TIME);
 }
 
 void ChessTimers::timeOutStartQueue()
@@ -59,26 +59,26 @@ void ChessTimers::timeOutStartQueue()
 
 void ChessTimers::startGameTimer()
 {
-    m_whiteTimer->start();
-    m_updateLabelTimer->start();
+    _whiteTimer->start();
+    _updateLabelTimer->start();
 }
 
 void ChessTimers::stopBoardTimers()
 {
-    m_whiteTimer->stop();
-    m_blackTimer->stop();
-    m_updateLabelTimer->stop();
+    _whiteTimer->stop();
+    _blackTimer->stop();
+    _updateLabelTimer->stop();
 }
 
 void ChessTimers::resetGameTimers()
 {
     this->stopBoardTimers();
-    m_whiteTimer->setInterval(m_lTimersStartTime);
-    m_blackTimer->setInterval(m_lTimersStartTime);
-    m_nRemainingWhiteTime = m_whiteTimer->interval();
-    m_nRemainingBlackTime = m_blackTimer->interval();
-    emit setBoardDataLabels(milisecToClockTime(m_lTimersStartTime), BDL_WHITE_TIME);
-    emit setBoardDataLabels(milisecToClockTime(m_lTimersStartTime), BDL_BLACK_TIME);
+    _whiteTimer->setInterval(_lTimersStartTime);
+    _blackTimer->setInterval(_lTimersStartTime);
+    _nRemainingWhiteTime = _whiteTimer->interval();
+    _nRemainingBlackTime = _blackTimer->interval();
+    emit setBoardDataLabels(milisecToClockTime(_lTimersStartTime), BDL_WHITE_TIME);
+    emit setBoardDataLabels(milisecToClockTime(_lTimersStartTime), BDL_BLACK_TIME);
 }
 
 QString ChessTimers::milisecToClockTime(long lMilis)
@@ -100,19 +100,19 @@ void ChessTimers::switchPlayersTimers()
 {
     if (getWhoseTurn() == WHITE_TURN)
     {
-        m_nRemainingBlackTime = m_blackTimer->remainingTime();
-        m_blackTimer->stop();
+        _nRemainingBlackTime = _blackTimer->remainingTime();
+        _blackTimer->stop();
 
-        m_whiteTimer->setInterval(m_nRemainingWhiteTime);
-        m_whiteTimer->start();
+        _whiteTimer->setInterval(_nRemainingWhiteTime);
+        _whiteTimer->start();
     }
     else if (getWhoseTurn() == BLACK_TURN)
     {
-        m_nRemainingWhiteTime = m_whiteTimer->remainingTime();
-        m_whiteTimer->stop();
+        _nRemainingWhiteTime = _whiteTimer->remainingTime();
+        _whiteTimer->stop();
 
-        m_blackTimer->setInterval(m_nRemainingBlackTime);
-        m_blackTimer->start();
+        _blackTimer->setInterval(_nRemainingBlackTime);
+        _blackTimer->start();
     }
     else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
                      "white or black.  it's' ==" << getWhoseTurn();
@@ -121,17 +121,17 @@ void ChessTimers::switchPlayersTimers()
 void ChessTimers::startQueueTimer()
 {
     qDebug() << "Chessboard::startQueueTimer()";
-    m_startQueueTimer->stop();
-    m_startQueueTimer->setInterval(m_lTimersStartQueue);
-    emit setBoardDataLabels(milisecToClockTime(m_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
-    m_startQueueTimer->start();
-    m_updateLabelTimer->start();
+    _startQueueTimer->stop();
+    _startQueueTimer->setInterval(_lTimersStartQueue);
+    emit setBoardDataLabels(milisecToClockTime(_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
+    _startQueueTimer->start();
+    _updateLabelTimer->start();
 }
 
 void ChessTimers::stopQueueTimer() //stop == reset
 {
-    m_startQueueTimer->stop();
-    m_updateLabelTimer->stop();
+    _startQueueTimer->stop();
+    _updateLabelTimer->stop();
     this->updateTimeLabels();
 }
 
@@ -139,14 +139,14 @@ void ChessTimers::stopQueueTimer() //stop == reset
 
 int ChessTimers::getWhiteTimeLeft()
 {
-    if (m_whiteTimer->remainingTime() != -1)
-        return m_whiteTimer->remainingTime();
-    else return m_nRemainingWhiteTime;
+    if (_whiteTimer->remainingTime() != -1)
+        return _whiteTimer->remainingTime();
+    else return _nRemainingWhiteTime;
 }
 
 int ChessTimers::getBlackTimeLeft()
 {
-    if (m_blackTimer->remainingTime() != -1)
-        return m_blackTimer->remainingTime();
-    else return m_nRemainingBlackTime;
+    if (_blackTimer->remainingTime() != -1)
+        return _blackTimer->remainingTime();
+    else return _nRemainingBlackTime;
 }

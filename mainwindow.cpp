@@ -5,7 +5,7 @@ QT_USE_NAMESPACE
 
 MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
-                       Chess *pChess, QWidget *parent) :
+                       ChessStatus *pChessStatus, Chess *pChess, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -17,6 +17,8 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
     _pWebSockets = pWebSockets;
     _pChessboard = pChessboard;
     _pTCPmsg = pTCPmsg;
+    _pArduinoUsb = pArduinoUsb;
+    _pChessStatus = pChessStatus;
     _pChess = pChess;
 
     //TODO: to pewnie dałoby się wrzucić do odpwoiednich klas
@@ -50,11 +52,12 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
     connect(_pChessboard, SIGNAL(clearFormBoard()),
             this, SLOT(clearFormBoard()));
+    //todo: przekazujemy tablicę wskaźników
     connect(_pChessboard, SIGNAL(showBoardInForm(QString)),
             this, SLOT(showBoard(QString)));
-    connect(_pChessboard, SIGNAL(showLegalMoves(QStringList)),
+    connect(_pChessStatus, SIGNAL(showLegalMoves(QStringList)),
             this, SLOT(showLegalMoves(QStringList)));
-    connect(_pChessboard, SIGNAL(showHistoryMoves(QStringList)),
+    connect(_pChessStatus, SIGNAL(showHistoryMoves(QStringList)),
             this, SLOT(showHistoryMoves(QStringList)));
     connect(_pWebSockets, SIGNAL(showClientsList(QList<Clients>)),
             this, SLOT(showClientsList(QList<Clients>)));

@@ -5,14 +5,14 @@ ChessBot::ChessBot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb)
     _pChessboard = pChessboard;
     _pArduinoUsb = pArduinoUsb;
 
-    m_bAI = false;
-    m_bUndo = false;
-    m_bIsIgorsAiSimulatedAsPlayer2 = false;
+    _bAI = false;
+    _bUndo = false;
+    _bIsIgorsAiSimulatedAsPlayer2 = false;
 }
 
 void ChessBot::UndoOk()
 {
-    m_bUndo = true; //zapamiętaj że cofnięcie ruchu miało miejsce
+    _bUndo = true; //zapamiętaj że cofnięcie ruchu miało miejsce
     //niech się wykona cały ruch Igora, łącznie ze sprawdzeniem wszystkich...
     //...dziwnych ruchów tak aby też wykonał się dobrze mechanicznie
     this->checkMsgForChenard("move " + _QStrAIPiecieFromTo);
@@ -41,7 +41,7 @@ void ChessBot::wrongTcpAnswer(QString msgType, QString respond)
 
 void ChessBot::checkAI()
 {
-    if (!m_bAI) //wywal błąd jeżeli próbuje wywołać metodę w tej klasie bez włączonej SI
+    if (!_bAI) //wywal błąd jeżeli próbuje wywołać metodę w tej klasie bez włączonej SI
     {
         emit this->addTextToConsole("ERROR: initiated IgorBot method with AI turned off\n", LOG_NOTHING);
         qDebug() << "ERROR: initiated IgorBot method with AI turned off";

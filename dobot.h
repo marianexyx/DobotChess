@@ -54,6 +54,8 @@ private:
     Chessboard *_pChessboard;
     ArduinoUsb *_pArduinoUsb;
 
+    short _sGrippersItemID;
+
     bool connectStatus;
     //typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM m_gripperServo;
@@ -103,27 +105,25 @@ public:
     bool bIsMoveInAxisRange(float x, float y, float z);
 
     //metody dostępowe do pól
+    void setItemInGripper(short sGrippersItemID);
+    void clearGripper();
     void setCoreQueuedCmdIndex(unsigned long long ullCoreQueuedCmdIndex)
-    {m_ullCoreQueuedCmdIndex = ullCoreQueuedCmdIndex;}
+    { m_ullCoreQueuedCmdIndex = ullCoreQueuedCmdIndex; }
     void setDobotQueuedCmdIndex(unsigned long long ullDobotQueuedCmdIndex)
-    {m_ullDobotQueuedCmdIndex = ullDobotQueuedCmdIndex;}
+    { m_ullDobotQueuedCmdIndex = ullDobotQueuedCmdIndex; }
     void setRetreatIndex(unsigned long long ullRetreatIndex)
-    {m_ullRetreatIndex = ullRetreatIndex;}
+    { m_ullRetreatIndex = ullRetreatIndex; }
     void setQueuedCmdLeftSpace(unsigned int uiQueuedCmdLeftSpace)
-    {m_uiQueuedCmdLeftSpace = uiQueuedCmdLeftSpace;}
+    { m_uiQueuedCmdLeftSpace = uiQueuedCmdLeftSpace; }
 
-    unsigned long long getCoreQueuedCmdIndex() const    { return m_ullCoreQueuedCmdIndex; }
-    unsigned long long  getDobotQueuedCmdIndex() const  { return m_ullDobotQueuedCmdIndex; }
-    unsigned long long  getRetreatIndex() const         { return m_ullRetreatIndex; }
-    unsigned int getQueuedCmdLeftSpace() const          { return m_uiQueuedCmdLeftSpace; }
-    float getHomePos(char ch)                           { if (ch == 'x') return HomeChess.x;
-                                                          else if (ch == 'y') return HomeChess.y;
-                                                          else if (ch == 'z') return HomeChess.z;
-                                                          else return HomeChess.r; }
-    float getmiddleAboveBoardPos(char ch)               { if (ch == 'x') return middleAboveBoard.x;
-                                                          else if (ch == 'y') return middleAboveBoard.y;
-                                                          else if (ch == 'z') return middleAboveBoard.z;
-                                                          else return middleAboveBoard.r; }
+    bool isGripperEmpty() const { return _sGrippersItemID == 0 ? true : false; }
+    short getItemInGripper() const { return _sGrippersItemID; }
+    unsigned long long getCoreQueuedCmdIndex() const { return m_ullCoreQueuedCmdIndex; }
+    unsigned long long getDobotQueuedCmdIndex() const { return m_ullDobotQueuedCmdIndex; }
+    unsigned long long getRetreatIndex() const { return m_ullRetreatIndex; }
+    unsigned int getQueuedCmdLeftSpace() const { return m_uiQueuedCmdLeftSpace; }
+    float getHomePos(char ch);
+    float getmiddleAboveBoardPos(char ch);
 
 public slots:
     void onConnectDobot();

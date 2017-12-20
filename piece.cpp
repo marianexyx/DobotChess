@@ -93,7 +93,7 @@ static PIECE_TYPE Piece::Type(short sPieceNr)
     return PieceType;
 }
 
-static short Piece::nr(PositionOnBoard PieceLines)
+static short Piece::nr(PosOnBoard PieceLines)
 {
     short sPieceNr = static_cast<short>(PieceLines.Letter + 1) +
             static_cast<short>(PieceLines.Digit)*8;
@@ -110,9 +110,9 @@ static short Piece::StartFieldNr(short sPieceNr)
     else return sPieceNr + 32;
 }
 
-static PositionOnBoard Piece::StartFieldPos(short sPieceNr)
+static PosOnBoard Piece::StartFieldPos(short sPieceNr)
 {
-    PositionOnBoard PieceLines;
+    PosOnBoard PieceLines;
 
     if (!Piece::isInRange(sPieceNr)) return PieceLines;
 

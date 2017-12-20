@@ -12,6 +12,8 @@ Dobot::Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb):
 {
     _pChessboard = pChessboard;
     _pArduinoUsb = pArduinoUsb;
+
+    _sGrippersItemID = 0;
     
     connectStatus = false;
 
@@ -223,6 +225,45 @@ bool Dobot::bIsMoveInAxisRange(float x, float y, float z)
     }
     return check;
 }
+void Dobot::setItemInGripper(short sGrippersItemID)
+{
+    if (!this->isGripperEmpty())
+    {
+        qDebug() << "ERROR: Dobot::isGripperEmpty()- it isn't. item nr in gripper: "
+                 << _sGrippersItemID << ". passed item nr as par:" << sGrippersItemID;
+        return;
+    }
+
+    _sGrippersItemID = sGrippersItemID;
+}
+
+void Dobot::clearGripper()
+{
+    if (!this->isGripperEmpty())
+    {
+        qDebug() << "ERROR: Dobot::isGripperEmpty()- it isn't. item nr in gripper: "
+                 << _sGrippersItemID << ". passed item nr as par:" << sGrippersItemID;
+        return;
+    }
+
+    _sGrippersItemID = 0;
+}
+
+float Dobot::getHomePos(char ch)
+{
+    if (ch == 'x') return HomeChess.x;
+    else if (ch == 'y') return HomeChess.y;
+    else if (ch == 'z') return HomeChess.z;
+    else return HomeChess.r;
+}
+
+float Dobot::getmiddleAboveBoardPos(char ch)
+{
+    if (ch == 'x') return middleAboveBoard.x;
+    else if (ch == 'y') return middleAboveBoard.y;
+    else if (ch == 'z') return middleAboveBoard.z;
+    else return middleAboveBoard.r;
+}
 
 void Dobot::onConnectDobot()
 {
@@ -373,15 +414,15 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
         if ((Type == ST_REMOVING && partOfSequence == DM_TO) || (Type == ST_RESTORE && partOfSequence == DM_FROM))
         {
             int nRemPieceNr;
-            PositionOnBoard remPieceDest;
+            PosOnBoard remPieceDest;
 
             if (Type == ST_REMOVING)
             {
                 if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
                 {
                     nRemPieceNr = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
-                    remPieceDest.Letter = _pChessboard->fieldNrToPositionOnBoard(nRemPieceNr).Letter;
-                    remPieceDest.Digit = _pChessboard->fieldNrToPositionOnBoard(nRemPieceNr).Digit;
+                    remPieceDest.Letter = _pChessboard->fieldNrToPosOnBoard(nRemPieceNr).Letter;
+                    remPieceDest.Digit = _pChessboard->fieldNrToPosOnBoard(nRemPieceNr).Digit;
                 }
                 else
                 {
@@ -502,18 +543,18 @@ void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQU
                      << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
 
             f_xUpDown = _pChessboard->m_adRemovedPiecesPositions_x
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit];
             f_yUpDown = _pChessboard->m_adRemovedPiecesPositions_y
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit];
             if (armDestination == DM_UP) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit] +
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit] +
                     Piece::dMaxPieceHeight;
             else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPositionOnBoard(_pChessboard->nGripperPiece).Digit];
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
+                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit];
             f_rUpDown = ACTUAL_POS;
         }
         else

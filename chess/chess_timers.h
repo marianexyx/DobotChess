@@ -9,14 +9,14 @@
 class ChessTimers
 {
 private:
-    QTimer *m_whiteTimer;
-    QTimer *m_blackTimer;
-    QTimer *m_updateLabelTimer;
-    QTimer *m_startQueueTimer;
-    int m_nRemainingWhiteTime;
-    int m_nRemainingBlackTime;
-    const long m_lTimersStartTime;
-    const long m_lTimersStartQueue;
+    QTimer *_whiteTimer;
+    QTimer *_blackTimer;
+    QTimer *_updateLabelTimer;
+    QTimer *_startQueueTimer;
+    int _nRemainingWhiteTime;
+    int _nRemainingBlackTime;
+    const long _lTimersStartTime;
+    const long _lTimersStartQueue;
 
 private slots:
     void timeOutWhite();
@@ -37,8 +37,8 @@ public:
 
     int getWhiteTimeLeft();
     int getBlackTimeLeft();
-    int getStartTimeLeft()                      { return m_startQueueTimer->remainingTime(); }
-    bool isStartTimerRunning()                  { return m_startQueueTimer->isActive(); }
+    int getStartTimeLeft() { return _startQueueTimer->remainingTime(); }
+    bool isStartTimerRunning() { return _startQueueTimer->isActive(); }
 };
 
 #endif // CHESS_TIMERS_H

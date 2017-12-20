@@ -8,33 +8,39 @@
 #include "vars/basic_vars.h"
 #include "vars/posotion_on_board.h"
 
+//todo: udałoby się dziedziczyć chessboard po field'zie. settery mogłyby by być wtedy...
+//... protected, a gettery public (sprawdzić)
 class Field
 {
 private:
-    short m_sNr;
-    short m_sPieceOnField;
-    Point3D m_Location3D;
+    short _sNr;
+    short _sPieceOnField;
+    short _sStartPieceNrOnField;
+    Point3D _Location3D;
 
 public:
-    Field(short sFieldID); //todo: friend dla chessboard
-    ~Field(); //todo: friend dla chessboard
+    Field(short sFieldID);
+    ~Field();
 
     static double dSquareWidht = 21.f;
 
     static bool isInRange(short sFieldNr);
-    static PositionOnBoard Pos(short sFieldNr);
-    static short nr(PositionOnBoard FieldLines);
+    static PosOnBoard Pos(short sFieldNr);
+    static short nr(PosOnBoard FieldLines);
     static QString nrAsQStr(short sFieldNr);
+    static short startPieceNrOnField(short sFieldNr);
+    static short startPieceNrOnField(PosOnBoard FieldLines);
 
-    void setLocation3D(Point3D Point) { m_Location3D = Point; } //todo: friend dla chessboard
-    void setPieceOnField(short sPieceNr); //todo: friend dla chessboard
-    void clear();
+    void setField3DLocation(Point3D Point) { _Location3D = Point; }
+    void setPieceOnField(short sPieceNr);
+    void clearField();
 
-    Point3D getLocation3D() const { return m_Location3D; }
-    bool isFieldOccupied() const { return m_sPieceOnField > 0 ? true : false; }
-    short getNr() const { return m_sNr; }
-    QString getNrAsQStr() const { return Field::nrAsQStr(m_sNr); }
-    short getPieceOnField() const { return m_sPieceOnField; }
+    Point3D getLocation3D() const { return _Location3D; }
+    bool isFieldOccupied(bool bErrorLog = false);
+    short getNr() const { return _sNr; }
+    QString getNrAsQStr() const { return Field::nrAsQStr(_sNr); }
+    short getPieceNrOnField() const { return _sPieceOnField; }
+    short getStartPieceNrOnField() const { return _sStartPieceNrOnField; }
 };
 
 #endif // FIELD_H
