@@ -9,6 +9,7 @@
 #include "chessboard.h"
 #include "tcpmsgs.h"
 #include "piece.h"
+#include "websockets.h"
 #include "vars/board_axis.h"
 #include "vars/end_of_game_types.h"
 #include "chess/chess_timers.h"
@@ -31,11 +32,13 @@ class Chess: public QObject
     Q_OBJECT
 
 protected: //todo: private/protected?
-    TCPMsgs* _pTCPMsgs;
     Dobot* _pDobot;
-    Chessboard* _pChessboard;
-    Chessboard2* _pChessboardMain;
-    Chessboard2* _pChessboardRemoved;
+    Chessboard* _pBoardMain;
+    Chessboard* _pBoardRemoved;
+    Websockets* _pWebsockets;
+    TCPMsgs* _pTCPMsgs;
+
+    COMMUNICATION_TYPES _PlayerSource;
 
     ChessTimers* _pTimers;
     ChessMovements* _pMovements;
@@ -43,8 +46,6 @@ protected: //todo: private/protected?
     ChessStatus* _pStatus;
 
     Piece* _pPiece[32];
-
-    COMMUNICATION_TYPES _PlayerSource;
 
     //----------------KOMUNIKACJA Z GRACZEM-------------//
     void GameInProgress();
@@ -64,7 +65,7 @@ protected: //todo: private/protected?
     //-----------------FUNKCJE SZACHOWE-----------------//
 
     void handleMove(QString QStrMove); //todo: czyli co?
-    void movePieceWithManipulator(Chessboard2 *pRealBoard, PosOnBoard FieldPos,
+    void movePieceWithManipulator(Chessboard *pRealBoard, PosOnBoard FieldPos,
                                   VERTICAL_MOVE vertMove = VM_NONE);
 
     //------METODY NARZEDZIOWE------//
@@ -82,18 +83,14 @@ public slots: //todo: protected slots?
 
 public:
     Chess(); //must have przy virualach
-    Chess(Dobot* pDobot, Chessboard* pChessboard, Chessboard2* pChessboardMain,
-    Chessboard2* pChessboardRemoved, TCPMsgs* pTCPMsgs);
+    Chess(Dobot* pDobot, Chessboard* pBoardMain, Chessboard* pBoardRemoved,
+          TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
 
     void GameStarted();
     void BadMove(QString msg);
     void EndOfGame(QString msg);
     void resetBoardData();
     bool isPiecesSetOk();
-
-    void listMovesForDobot(SEQUENCE_TYPE Type, //todo: rozdzielic na 2 ruchy
-                             LETTER pieceFromLetter = L_X, DIGIT pieceFromDigit = D_X,
-                             LETTER pieceToLetter = L_X, DIGIT pieceToDigit = D_X);
 
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
 

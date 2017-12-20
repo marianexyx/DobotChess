@@ -6,6 +6,7 @@
 
 enum END_TYPE
 {
+    ET_NONE,
     ET_WHIE_WON,
     ET_BLACK_WON,
     ET_DRAW,
@@ -33,5 +34,7 @@ inline QString endTypeAsQstr(END_TYPE ET)
 
     return QStrEndType;
 }
+
+
 
 #endif // END_OF_GAME_TYPES_H

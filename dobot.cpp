@@ -135,6 +135,8 @@ void Dobot::QueuedIdList()
                 switch(takenPosId.move)
                 {
                 case DM_TO_POINT:
+                    //todo: zabronic ruchow w 3 plaszczyznach na raz
+                    //todo: zabronic na ruch 'x' i 'y', jezeli 'z' jest zbyt nisko
                     ptpCmd.x = takenPosId.x;
                     ptpCmd.y = takenPosId.y;
                     ptpCmd.z = takenPosId.z;
@@ -490,6 +492,7 @@ void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, S
 
 void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE vertMove = VM_NONE)
 {
+    //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
     SEQUENCE_TYPE Type = ST_NONE; //todo: typ do wyrzucenia z addCmdToList
     if (vertMove == VM_GRAB)
         this->gripperState(DM_OPEN, Type);

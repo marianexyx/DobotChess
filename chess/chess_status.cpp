@@ -2,7 +2,7 @@
 
 ChessStatus::ChessStatus()
 {
-
+    _WhoseTurn = NO_TURN;
 }
 
 QString **ChessStatus::FENToBoard(QString FENBoard)
@@ -90,14 +90,14 @@ void ChessStatus::saveStatusData(QString status)
 
     if (QStrFENRecord.size() == 7)
     {
-        _QStrGameStatus = QStrFENRecord.at(0);
-        qDebug() << "QStrGameStatus =" << _QStrGameStatus;
-        emit setBoardDataLabels(_QStrGameStatus, BDL_GAME_STATUS);
+         _FENGameState = FENGameState(QStrFENRecord.at(0));
+        qDebug() << "FEN game state =" << QStrFENRecord.at(0);
+        emit setBoardDataLabels(QStrFENRecord.at(0), BDL_GAME_STATUS);
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "QStrFENBoard =" << QStrFENBoard;
         this->FENToBoard(QStrFENBoard);
-        emit showBoardInForm(Chessboard2::arrayBoardToQStr(_QStrBoard));
+        emit showBoardInForm(Chessboard::arrayBoardToQStr(_QStrBoard));
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "QStrWhoseTurn =" << QStrWhoseTurn;

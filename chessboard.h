@@ -28,7 +28,7 @@
 //info: bez makra QOBCJECT. ta szachownica ma by w 100% zalezna
 //info: szachownica nie powinna być tworzona z bierkami- to...
 //...gra o tym decyduje gdzie i jakie są
-class Chessboard2
+class Chessboard
 {
 private:
     BOARD _BoardType;
@@ -36,8 +36,8 @@ private:
     Point3D _MinBoard, _MaxBoard;
 
 public:
-    Chessboard2(BOARD boardType);
-    ~Chessboard2();
+    Chessboard(BOARD boardType);
+    ~Chessboard();
 
     BOARD getBoardType() const { return _BoardType; }
     void setPieceOnField(short sPassedPiece, short sDestFieldNr); //todo: friend dla chwytaka?
@@ -58,32 +58,7 @@ signals:
     void addTextToConsole(QString);
     void showBoardInForm(QString);
     void clearFormBoard();
-};
-
-class Chessboard: public QObject
-{
-    Q_OBJECT
-
-private:
-    Point3D _MinBoard, _MaxBoard;
-
-public:
-    Chessboard();
-
-
-    void pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter, //todo: to robi jakoby za...
-                           DIGIT digit, SEQUENCE_TYPE Type); //...przenoszenie chwytakiem
-
-    //metody dostępowe
-    void setMoveType(SEQUENCE_TYPE Type)            { _moveType = Type; }
-
-    QString getPiecieFromTo();
-    SEQUENCE_TYPE getMoveType()                     { return _moveType; }
-
-signals:
-    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
-    //todo: znowu odwoływanie się w górę do rodzica
-    void msgFromChessboardToWebsockets(QString);
+    void setBoardDataLabels(QString, BOARD_DATA_LABELS); //todo
 };
 
 #endif // CHESSBOARD_H

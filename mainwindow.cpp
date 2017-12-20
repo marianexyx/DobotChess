@@ -102,8 +102,6 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(checkMsgFromChenard(QString, QString)));
     connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)),
             _pChess, SLOT(checkMsgForChenard(QString)));
-    connect(_pChessboard, SIGNAL(msgFromChessboardToWebsockets(QString)),
-            _pWebSockets, SLOT(msgFromChessboardToWebsockets(QString)));
 
     this->initControl(); //init dobot JOG control
 

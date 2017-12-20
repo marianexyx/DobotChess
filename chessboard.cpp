@@ -1,6 +1,6 @@
 #include "chessboard.h"
 
-Chessboard2::Chessboard2(BOARD boardType)
+Chessboard::Chessboard(BOARD boardType)
 {
     _BoardType = boardType;
 
@@ -116,7 +116,7 @@ Chessboard2::Chessboard2(BOARD boardType)
     }
 }
 
-Chessboard2::~Chessboard2()
+Chessboard::~Chessboard()
 {
     for (int i=1; i>=64; ++i)
     {
@@ -125,7 +125,7 @@ Chessboard2::~Chessboard2()
     }
 }
 
-/*void Chessboard2::showBoardInDebug()
+/*void Chessboard::showBoardInDebug()
 {
     for (int i=0; i<=7; ++i)
     {
@@ -135,7 +135,7 @@ Chessboard2::~Chessboard2()
     }
 }*/
 
-QString Chessboard2::arrayBoardAsQStr(QString QStrBoard[8][8])
+QString Chessboard::arrayBoardAsQStr(QString QStrBoard[8][8])
 {
     QString board = "";
     for (int i=0; i<=7; ++i)
@@ -149,26 +149,26 @@ QString Chessboard2::arrayBoardAsQStr(QString QStrBoard[8][8])
     return board;
 }
 
-void Chessboard2::setPieceOnField(short sPassedPiece, short sDestFieldNr)
+void Chessboard::setPieceOnField(short sPassedPiece, short sDestFieldNr)
 {
     if (!Piece::isInRange(sPassedPiece)) return;
     if (this->isFieldOccupied(sPassedPiece), true) return;
     if (this->isPieceExistsOnBoard(sPassedPiece, true)) return;
 
     _pField[sDestFieldNr].setPieceOnField(sPassedPiece);
-    qDebug() << "Chessboard2::setPieceOnField- new pieceNr:" << sPassedPiece
+    qDebug() << "Chessboard::setPieceOnField- new pieceNr:" << sPassedPiece
              << "on fieldNr:" << sDestFieldNr;
 }
 
-void Chessboard2::clearField(short sNrToClear)
+void Chessboard::clearField(short sNrToClear)
 {
-    qDebug() << "Chessboard2::clearField: clearing field:" << Field::nrAsQStr(nNrToClear) <<
+    qDebug() << "Chessboard::clearField: clearing field:" << Field::nrAsQStr(nNrToClear) <<
                 ". old piece =" << _pField[sNrToClear]->getPieceOnField() <<
                 ", now it will be == 0";
     _pField[sNrToClear]->clear();
 }
 
-bool Chessboard2::isPointInLocationLimits(Point3D point)
+bool Chessboard::isPointInLocationLimits(Point3D point)
 {
     if (point.x >= _MinBoard.x && point.y >= _MinBoard.y && point.z >= _MinBoard.z &&
             point.x <= _MaxBoard.x && point.y <= _MaxBoard.y && point.z <= _MaxBoard.z
@@ -176,13 +176,13 @@ bool Chessboard2::isPointInLocationLimits(Point3D point)
         return true;
     else
     {
-        qDebug() << "ERROR: Chessboard2::isPointInLocationLimits: point out of sight. x,y,z="
+        qDebug() << "ERROR: Chessboard::isPointInLocationLimits: point out of sight. x,y,z="
                  << point.x << point.y << point.z;
         return false;
     }
 }
 
-bool Chessboard2::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
+bool Chessboard::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
 {
     if (!Piece::isInRange(sPieceNr)) return false;
 
@@ -192,7 +192,7 @@ bool Chessboard2::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
         {
             if (bErrorLog)
             {
-                qDebug() << "ERROR: Chessboard2::setPiecePosition: this piece "
+                qDebug() << "ERROR: Chessboard::setPiecePosition: this piece "
                             "already exist on board. piece =" << sPieceNr <<
                             "on field =" << _pField[i]->getNrAsQStr();
             }
@@ -202,7 +202,7 @@ bool Chessboard2::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
     return false;
 }
 
-short Chessboard2::getFieldNrWithGivenPieceNrIfExists(short sPieceNr)
+short Chessboard::getFieldNrWithGivenPieceNrIfExists(short sPieceNr)
 {
     if (this->isPieceExistsOnBoard(sPieceNr, true))
     {
@@ -213,58 +213,4 @@ short Chessboard2::getFieldNrWithGivenPieceNrIfExists(short sPieceNr)
         }
     }
     else return 0;
-}
-
-
-
-
-Chessboard::Chessboard():
-{
-    memcpy(_asBoardMain, _anBoardStart, sizeof(_anBoardStart));
-    memcpy(_asBoardTemp, _anBoardStart, sizeof(_anBoardStart));
-
-    _WhoseTurn = NO_TURN;
-}
-
-QString Chessboard::getPiecieFromTo()
-{
-    QString piecieFromTo = pieceLetterPosAsQStr(PieceFrom.Letter) + QString::number(PieceFrom.Digit+1) +
-            pieceLetterPosAsQStr(PieceTo.Letter) + QString::number(PieceTo.Digit+1);
-
-    return piecieFromTo;
-}
-
-void Chessboard::pieceStateChanged(DOBOT_MOVE partOfSequence, LETTER letter,
-                                   DIGIT digit, SEQUENCE_TYPE Type)
-{
-    if (Type == ST_RESTORE && partOfSequence == DM_FROM)
-    {
-        nGripperPiece = _asBoardRemoved[letter][digit];
-        qDebug() << "Chessboard::pieceStateChanged: 1) nGripperPiece =" << nGripperPiece;
-        _asBoardRemoved[letter][digit] = 0;
-    }
-    else if (Type == ST_REMOVING && partOfSequence == DM_TO)
-    {
-        this->setPieceOnBoard(B_REMOVED, nGripperPiece, nGripperPiece);
-        qDebug() << "Piece just placed on removed area";
-        nGripperPiece = 0;
-    }
-    //todo: bierki poruszane ramieniem zapisywane są do tablicy _asBoardMain. jeżeli bierki zostały poruszone tylko w...
-    //...pamięci bez udziału dobota (np. poprzez podane listy ruchów bezpośrednio do tcp) to system myśli że...
-    //...plansza nie była ruszana, a co innego zobaczy się z polecenia "status".
-    else if (partOfSequence == DM_FROM) //jeżeli bierka została pochwycona z szachownicy...
-        //...(jest to każde inne polecenie ruchu w stylu 'pieceFrom')...
-    {
-        nGripperPiece = _asBoardMain[letter][digit]; //...to w chwytaku jest bierka...
-        //...pochwycona z szachownicy...
-        _asBoardMain[letter][digit] = 0; //...a miejsce ruszanego pionka jest już puste.
-    }
-    else if (partOfSequence == DM_TO)//lecz jeżeli bierka została przemieszczona na szachownicę
-        //...(jest to każde inne polecenie ruchu w stylu 'pieceTo')...
-    {
-        _asBoardMain[letter][digit] = nGripperPiece; //...to docelowe pole na...
-        //...szachownicy jest już zajęte...
-        nGripperPiece = 0; //... a w chwytaku nie ma już żadnej bierki.
-    }
-    else qDebug() << "ERROR: Chessboard::pieceStateChanged: none statement has been met.";
 }

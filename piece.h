@@ -18,8 +18,8 @@ private:
     short m_sStartFieldID;
 
 public:
-    Piece(short sPieceID); //todo: friend dla chessboard
-    ~Piece(); //todo: friend dla chessboard
+    Piece(short sPieceID);
+    ~Piece();
 
     static double dMaxPieceHeight = 50.f;
 

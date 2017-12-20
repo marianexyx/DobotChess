@@ -62,7 +62,9 @@ HEADERS  +=  \
     chess/chess_timers.h \
     chess/chess_movements.h \
     chess/chess_bot.h \
-    chess/chess_status.h
+    chess/chess_status.h \
+    vars/game_status.h \
+    vars/fen_game_state.h
 
 FORMS    += mainwindow.ui
 

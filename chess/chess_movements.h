@@ -16,14 +16,14 @@
 class ChessMovements
 {
 private:
-    Chessboard2* _pChessboard2Main;
-    Chessboard2* _pChessboard2Removed;
+    Chessboard* _pBoardMain;
+    Chessboard* _pBoardRemoved;
 
     SEQUENCE_TYPE _moveType;
     PosFromTo _PosMove;
 
 public:
-    ChessMovements(Chessboard2* pChessboard2Main, Chessboard2* pChessboard2Removed);
+    ChessMovements(Chessboard* pBoardMain, Chessboard* pBoardRemoved);
     ~ChessMovements();
 
     PosOnBoard findKingPosInCastling(PosOnBoard FieldDest);
@@ -42,7 +42,9 @@ public:
     void promoteToWhat(QString QStrMoveForFuturePromote);
 
     void setMove(QString QStrMove) { _PosMove = PosFromTo::fromQStr(QStrMove); }
+    void setMoveType(SEQUENCE_TYPE Type) { _moveType = Type; }
     PosFromTo getMove() const { return _PosMove; }
+    SEQUENCE_TYPE getMoveType() const { return _moveType; }
     void clearMove(); //todo: na koniec sprawdzić gdzie to implementować
 };
 

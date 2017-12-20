@@ -163,7 +163,7 @@ static PosFromTo PosFromTo::fromQStr(QString QStrMoveFromTo)
     return move;
 }
 
-QString PosFromTo::getAsQStr()
+QString PosFromTo::asQStr()
 {
     return pieceLetterPosAsQStr(from.Letter) + QString::number(from.Digit)
             + pieceLetterPosAsQStr(to.Letter) + QString::number(to.Digit);

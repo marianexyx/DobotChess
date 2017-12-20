@@ -5,12 +5,13 @@
 
 #include <QString>
 #include "chessboard.h"
+#include "vars/fen_game_state.h"
 
 class ChessStatus
 {
 
 private:
-    QString _QStrGameStatus;
+    FEN_GAME_STATE _FENGameState;
     QString _QStrBoard[8][8]; //todo:?? nazwać to jakiś tempem, albo używać obiektów
     WHOSE_TURN _WhoseTurn;
     QString _QStrCastlings;
@@ -34,6 +35,7 @@ public:
     SEQUENCE_TYPE findMoveType(QString move);
 
     //todo: settery jako friend dla chess?
+    void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
     void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
     void setLegalMoves(QString msg);
     void setLegalMoves(QStringList legalMoves) { _legalMoves = legalMoves;
@@ -43,13 +45,13 @@ public:
                                                      emit showHistoryMoves(_historyMoves); }
     //void setFuturePromote(QString QStrMove) { _QStrFuturePromote = QStrMove; }
 
-    QString getGameStatus() { return _QStrGameStatus; }
-    WHOSE_TURN getWhoseTurn() { return _WhoseTurn; }
-    QStringList getLegalMoves() { return _legalMoves; }
-    QStringList getHisotyMoves() { return _historyMoves; }
-    QString getHisotyMovesAsQStr() { return _historyMoves.join(" "); }
-    QString getCastlings() { return _QStrCastlings; }
-    QString getEnpassant() { return _QStrEnpassant; }
+    FEN_GAME_STATE getFENGameState() const { return _FENGameState; }
+    WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
+    QStringList getLegalMoves() const { return _legalMoves; }
+    QStringList getHisotyMoves() const { return _historyMoves; }
+    QString getHisotyMovesAsQStr() const { return _historyMoves.join(" "); }
+    QString getCastlings() const { return _QStrCastlings; }
+    QString getEnpassant() const { return _QStrEnpassant; }
     QString getFuturePromoteAsQStr() const { return _FuturePromoteMove.asQStr(); }
 
     void clearLegalMoves() { _legalMoves.clear(); emit showLegalMoves(_legalMoves);}

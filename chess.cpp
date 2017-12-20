@@ -3,14 +3,14 @@
 
 Chess::Chess() {} //czysto wirtualne klasy muszą mieć pusty konstruktor
 
-Chess::Chess(Dobot *pDobot, Chessboard *pChessboard, Chessboard2 *pChessboardMain,
-             Chessboard2 *pChessboardRemoved, TCPMsgs *pTCPMsgs, COMMUNICATION_TYPES PlayerSource)
+Chess::Chess(Dobot *pDobot, Chessboard *pBoardMain, Chessboard *pBoardRemoved,
+             Websockets* pWebsockets, TCPMsgs *pTCPMsgs, COMMUNICATION_TYPES PlayerSource)
 {
-    _pTCPMsgs = pTCPMsgs;
     _pDobot = pDobot;
-    _pChessboard = pChessboard;
-    _pChessboardMain = pChessboardMain;
-    _pChessboardRemoved = pChessboardRemoved;
+    _pBoardMain = pBoardMain;
+    _pBoardRemoved = pBoardRemoved;
+    _pWebsockets = pWebsockets;
+    _pTCPMsgs = pTCPMsgs;
 
     _PlayerSource = PlayerSource;
 
@@ -25,9 +25,9 @@ void Chess::GameInProgress()
 {
     if (_PlayerSource == WEBSITE)
     {
-        _pChessboard->switchPlayersTimers();
-        this->SendDataToPlayer("moveOk " + _pChessboard->getSiteMoveRequest() + " " +
-                               _pChessboard->getStrWhoseTurn() + " continue");
+        _pTimers->switchPlayersTimers();
+        this->SendDataToPlayer("moveOk " + _pMovements->getMove().asQStr() + " " +
+                               turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -93,9 +93,9 @@ void Chess::NewGame() //przesyłanie prośby o nową grę na TCP
 void Chess::Promote(QString msg)
 {
     if (_PlayerSource == WEBSITE)
-        this->listMovesForDobot(ST_PROMOTION);
+        _pMovements->promoteMoveSequence(*this);
 
-    _pChessboard->setMoveType(ST_PROMOTION);
+    _pMovements->setMoveType(ST_PROMOTION);
     this->SendMsgToTcp("move " + _pStatus->getFuturePromoteAsQStr() + msg);
     _pStatus->clearFuturePromote();
 }
@@ -120,7 +120,7 @@ void Chess::GameStarted()
 
 void Chess::BadMove(QString msg)
 {
-    this->SendDataToPlayer("badMove " + msg + " " + _pChessboard->getStrWhoseTurn());
+    this->SendDataToPlayer("badMove " + msg + " " + turnTypeAsQstr(_pStatus->getWhoseTurn()));
 }
 
 void Chess::EndOfGame(QString msg)
@@ -139,13 +139,15 @@ void Chess::EndOfGame(QString msg)
     _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
 
     //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
-    this->SendDataToPlayer("moveOk " + _pChessboard->getPiecieFromTo() + " nt " + endTypeAsQstr(ETWhoWon)
-                           + " " + _pWebsockets->getTableDataAsJSON()); //todo: json przeniesc
-    //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość informacji...
-    //...leci od websocketów? sprawdzić, jeżeli tak to zobaczyć czy da się wysyłanie każdego rodzaju inforacji...
-    //...upchać w websocketach dla porządku i czy jest taka potrzeba
-    //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na stronę,
-    //przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą że nastąpił koniec gry
+    this->SendDataToPlayer("moveOk " + _pMovements->getMove().asQStr() + " nt " +
+                           endTypeAsQstr(ETWhoWon) + " " +
+                           _pWebsockets->getTableDataAsJSON()); //todo: json przeniesc
+    //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość...
+    //...informacji leci od websocketów? sprawdzić, jeżeli tak to zobaczyć czy da się wysyłanie...
+    //...każdego rodzaju inforacji upchać w websocketach dla porządku i czy jest taka potrzeba
+    //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na...
+    //...stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą...
+    //...że nastąpił koniec gry
     this->reset();
 }
 
@@ -168,8 +170,8 @@ bool Chess::isPiecesSetOk()
         bool isPieceExists = false;
         for (short field=1; field>=64; ++field)
         {
-            if (_pChessboardMain->getField(field)->getPieceNrOnField() == piece ||
-                    _pChessboardRemoved->getField(field)->getPieceNrOnField() == piece ||
+            if (_pBoardMain->getField(field)->getPieceNrOnField() == piece ||
+                    _pBoardRemoved->getField(field)->getPieceNrOnField() == piece ||
                     _pDobot->getItemInGripper() == piece)
             {
                 isPieceExists = true;
@@ -183,71 +185,6 @@ bool Chess::isPiecesSetOk()
         }
     }
     return true;
-}
-
-//todo: po reorganizacji klas niech ta funkcja przyjmuje struktury. najlepiej bylobyh ja podzielic na 2
-void Chess::listMovesForDobot(SEQUENCE_TYPE Type, LETTER pieceFromLetter, DIGIT pieceFromDigit,
-                              LETTER pieceToLetter, DIGIT pieceToDigit)
-{
-    //jeżeli nie podano skąd i/lub dokąd ramię ma się przemieścić, to jest to ruch ramienia z aktualnego pola szachownicy nad którym ono wisi
-    if (pieceFromLetter == L_X) pieceFromLetter = _pChessboard->PieceFrom.Letter;
-    if (pieceFromDigit == D_X) pieceFromDigit = _pChessboard->PieceFrom.Digit;
-    if (pieceToLetter == L_X) pieceToLetter = _pChessboard->PieceTo.Letter;
-    if (pieceToDigit == D_X) pieceToDigit = _pChessboard->PieceTo.Digit;
-
-    qDebug() << "Chess::listMovesForDobot: Type =" << sequenceTypeAsQstr(Type) <<
-                ", from" << pieceLetterPosAsQStr(pieceFromLetter) << pieceFromDigit + 1 <<
-                "to" << pieceLetterPosAsQStr(pieceToLetter) << pieceToDigit + 1;
-
-    if (Type == ST_REMOVING) //TODO: zapakować to jakoś w wymowną funkcję, albo dodać do innej części kodu. albo zmienic system usuwania bierek
-    {
-        //przy usuwaniu bierka "from" to ta która w każdym innym ruchu jest jako "to",...
-        //...bez tego będzie chciał usuwać bierkę "from"
-        pieceFromLetter = pieceToLetter;
-        pieceFromDigit = pieceToDigit;
-    }
-
-    //todo: mozliwe ze cale przjscia typu goToSafeRemovedField beda zbedne jezeli kaze dobotowi...
-    //...isc ruchami kolistymi na przegubach
-    if (Type == ST_RESTORE && pieceToLetter <= L_C)
-    {
-        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
-    }
-
-    //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
-    _pDobot->gripperState(DM_OPEN, Type);
-    _pDobot->pieceFromTo(DM_FROM, pieceFromLetter, pieceFromDigit, Type);
-    _pDobot->armUpDown(DM_DOWN, DM_FROM, Type);
-    _pDobot->gripperState(DM_CLOSE, Type);
-    _pDobot->wait(400, Type);
-    _pDobot->armUpDown(DM_UP, DM_FROM, Type);
-    _pChessboard->pieceStateChanged(DM_FROM, pieceFromLetter, pieceFromDigit, Type);
-
-    if (Type == ST_RESTORE && pieceToLetter <= L_C)
-    {
-        this->goToSafeRemovedField((DIGIT)pieceToDigit, Type);
-    }
-    PosOnBoard PieceTo; //todo: znowu mieszanie i dublowanie zmiennych
-    PieceTo.Letter = pieceToLetter;
-    PieceTo.Digit = pieceToDigit;
-    short sPieceNrOnFieldTo = _pChessboard->getPieceOnBoardAsNr(B_MAIN, PieceTo);
-    if (Type == ST_REMOVING && pieceToLetter <= L_C)
-    {
-        this->goToSafeRemovedField(_pChessboard->fieldNrToPosOnBoard(sPieceNrOnFieldTo).Digit, Type);
-    }
-
-    _pDobot->pieceFromTo(DM_TO, pieceToLetter, pieceToDigit, Type);
-    _pDobot->armUpDown(DM_DOWN, DM_TO, Type);
-    _pDobot->gripperState(DM_OPEN, Type);
-    _pDobot->wait(400, Type);
-    _pDobot->armUpDown(DM_UP, DM_TO, Type);
-    _pChessboard->pieceStateChanged(DM_TO, pieceToLetter, pieceToDigit, Type);
-
-    if (Type == ST_REMOVING && pieceToLetter <= L_C)
-    {
-        this->goToSafeRemovedField(_pChessboard->fieldNrToPosOnBoard(sPieceNrOnFieldTo).Digit, Type);
-    } //po zbiciu ramię może zostać nad zbitymi polami
-    else if (Type != ST_REMOVING) _pDobot->setRetreatIndex(_pDobot->getCoreQueuedCmdIndex());
 }
 
 void Chess::TcpMoveOk()
@@ -265,10 +202,10 @@ void Chess::reset() //todo: przemyśleć co tu musi być
     //todo: pewnie bota udało by się scalić z tą funkcją w pewnych momentach
     if (_PlayerSource == WEBSITE)
     {
-        _pChessboard->setWhoseTurn(NO_TURN);
+        _pStatus->setWhoseTurn(NO_TURN);
         _pWebsockets->resetPlayersStartConfirmInfo();
         this->SendDataToPlayer("reseting");
-        _pChessboard->resetGameTimers();
+        _pTimers->resetGameTimers();
         this->resetPiecePositions();
     }
     else
@@ -356,17 +293,18 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         }
         else if (tcpMsgType == "status")
         {
-            _pChessboard->saveStatusData(tcpRespond);
+            _pStatus->saveStatusData(tcpRespond);
 
-            if (_pChessboard->getGameStatus().left(1) == "*")
+            if (_pStatus->getFENGameState() == FGS_IN_PROGRESS)
             {
                 this->SendMsgToTcp("history pgn");
-                this->GameInProgress(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi na legal..
-                //...wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął blokadę przed kojenym ruchem)
+                this->GameInProgress(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi...
+                //...na legal wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął blokadę...
+                //...przed kojenym ruchem)
             }
-            else if (_pChessboard->getGameStatus().left(3) == "1-0" ||
-                     _pChessboard->getGameStatus().left(3) == "0-1" ||
-                     _pChessboard->getGameStatus().left(7) == "1/2-1/2")
+            else if (_pStatus->getFENGameState() == FGS_WHITE_WON ||
+                     _pStatus->getFENGameState() == FGS_BLACK_WON ||
+                     _pStatus->getFENGameState() == FGS_DRAW)
             {
                 _pStatus->clearLegalMoves();
                 _pStatus->clearHistoryMoves();
@@ -638,7 +576,7 @@ void Chess::handleMove(QString QStrMove)
 }
 
 //todo: jezeli movements beda dziedziczone, to to powinno byc wewnatrz tamtej klasy
-void Chess::movePieceWithManipulator(Chessboard2* pRealBoard, PosOnBoard FieldPos,
+void Chess::movePieceWithManipulator(Chessboard* pRealBoard, PosOnBoard FieldPos,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {
     if (pRealBoard->getBoardType() != B_MAIN && pRealBoard->getBoardType() != B_REMOVED)
