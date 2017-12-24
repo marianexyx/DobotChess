@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     chess/chess_timers.cpp \
     chess/chess_movements.cpp \
     chess/chess_bot.cpp \
-    chess/chess_status.cpp
+    chess/chess_status.cpp \
+    client.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -64,7 +65,8 @@ HEADERS  +=  \
     chess/chess_bot.h \
     chess/chess_status.h \
     vars/game_status.h \
-    vars/fen_game_state.h
+    vars/fen_game_state.h \
+    client.h
 
 FORMS    += mainwindow.ui
 

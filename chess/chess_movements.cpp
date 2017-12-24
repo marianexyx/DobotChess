@@ -149,7 +149,7 @@ void ChessMovements::promoteToWhat(QString QStrMoveForFuturePromote)
     _pChessboard->QStrFuturePromote = QStrMoveForFuturePromote;
 
     _pChessboard->switchPlayersTimers();
-    this->SendDataToPlayer("moveOk " + QStrMoveForFuturePromote + " " +
+    this->sendDataToPlayer("moveOk " + QStrMoveForFuturePromote + " " +
                            _pChessboard->getStrWhoseTurn() + " promote");
 }
 

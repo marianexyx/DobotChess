@@ -31,6 +31,7 @@ public:
     bool isMoveRemoving();
     bool isMoveCastling(QString moveToTest);
     bool isMoveEnpassant(QString moveToTest);
+    bool isMovePromotion(QString moveToTest);
     void saveStatusData(QString status);
     SEQUENCE_TYPE findMoveType(QString move);
 

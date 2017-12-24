@@ -1,62 +1,69 @@
 #include "chess.h"
 
-
-Chess::Chess() {} //czysto wirtualne klasy muszą mieć pusty konstruktor
-
-Chess::Chess(Dobot *pDobot, Chessboard *pBoardMain, Chessboard *pBoardRemoved,
+Chess::Chess(Dobot *pDobot, Chessboard *pBoardMain, Chessboard *pBoardRemoved, ArduinoUsb *pUsb,
              Websockets* pWebsockets, TCPMsgs *pTCPMsgs, COMMUNICATION_TYPES PlayerSource)
 {
+    _pTimers = new ChessTimers;
+    _pMovements = new ChessMovements;
+    _pBot = new ChessBot;
+    _pStatus = new ChessStatus;
+
     _pDobot = pDobot;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
     _pWebsockets = pWebsockets;
     _pTCPMsgs = pTCPMsgs;
+    _pUsb = pUsb;
 
     _PlayerSource = PlayerSource;
 
-    _pTimers = new ChessTimers;
-    _pMovements = new ChessMovements;
-
     for (int i=1; i>=32; ++i)
         *_pPiece[i] = new Piece(i);
+
+    connect(_pTimers, SIGNAL(sendMsgToPlayer(QString)), this, SLOT(sendDataToPlayer(QString)));
 }
 
-void Chess::GameInProgress()
+Chess::~Chess()
+{
+    delete _pTimers;
+    delete _pMovements;
+    delete _pBot;
+    delete _pStatus;
+}
+
+
+void Chess::continueGameplay()
 {
     if (_PlayerSource == WEBSITE)
     {
         _pTimers->switchPlayersTimers();
-        this->SendDataToPlayer("moveOk " + _pMovements->getMove().asQStr() + " " +
+        this->sendDataToPlayer("moveOk " + _pMovements->getMove().asQStr() + " " +
                                turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
     }
     else if (_PlayerSource == ARDUINO)
     {
-        if (!m_bUndo) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
+        if (!_pBot->getAI) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
         {
-            if (m_bIsIgorsAiSimulatedAsPlayer2)
-                this->SendDataToPlayer("EnterSimulatedIgorsMove");
-            else this->SendMsgToTcp("think 5000");; //wymyśl kolejny ruch bota białego Igora
+            if (_pBot->getAIAsPlayer2())
+                this->sendDataToPlayer("EnterSimulatedIgorsMove");
+            else this->SendMsgToTcp("think 5000"); //wymyśl kolejny ruch bota białego Igora
         }
         else  //a jeżeli po wykonaniu ruchu Igora gra jest dalej w toku
         {
-            m_bUndo = false;
-            this->SendDataToPlayer("IgorHasEndedMove"); //niech gracz wykonuje swój kolejny ruch
+            _pBot->setAI(false);
+            this->sendDataToPlayer("IgorHasEndedMove"); //niech gracz wykonuje swój kolejny ruch
         }
     }
     else
-        qDebug() << "ERROR: Chess::GameInProgress: unknown _PlayerSource val ="
+        qDebug() << "ERROR: Chess::continueGameplay: unknown _PlayerSource val ="
                  << _PlayerSource;
-
-
 }
 
-void Chess::SendDataToPlayer(QString msg)
+void Chess::sendDataToPlayer(QString msg)
 {
     qDebug() << "Sending to" << communicationTypeAsQStr(_PlayerSource) << ":" << msg;
     this->addTextToConsole("Sending to " + communicationTypeAsQStr(_PlayerSource) + ": "
                            + msg, LOG_CORE);
-
-    _pWebsockets->sendMsg(msg);
 
     if (_PlayerSource == WEBSITE)
     {
@@ -70,15 +77,15 @@ void Chess::SendDataToPlayer(QString msg)
         else if (msg.contains("newOk")) msg = "started";
         else if (msg.contains("badMove")) msg = "BAD_MOVE";
 
-        _pArduinoUsb->sendDataToUsb(msg);
+        _pUsb->sendDataToUsb(msg);
     }
     else
-        qDebug() << "ERROR: Chess::SendDataToPlayer: unknown _PlayerSource val ="
+        qDebug() << "ERROR: Chess::sendDataToPlayer: unknown _PlayerSource val ="
                  << _PlayerSource;
 }
 
 
-void Chess::NewGame() //przesyłanie prośby o nową grę na TCP
+void Chess::startNewGameInChenard() //przesyłanie prośby o nową grę na TCP
 {
     //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
     if ((!_pWebsockets->isPlayerChairEmpty(PT_WHITE) && !_pWebsockets->isPlayerChairEmpty(PT_BLACK))
@@ -87,7 +94,7 @@ void Chess::NewGame() //przesyłanie prośby o nową grę na TCP
         this->SendMsgToTcp("new");
     }
     else
-        this->addTextToConsole("ERROR: Chess::NewGame(): Wrong players names\n", LOG_WEBSOCKET);
+        qDebug() << "ERROR: Chess::startNewGameInChenard(): Wrong players names";
 }
 
 void Chess::Promote(QString msg)
@@ -115,12 +122,12 @@ void Chess::GameStarted()
     _pTimers->resetGameTimers();
     _pTimers->startGameTimer();
 
-    this->SendDataToPlayer("newOk");
+    this->sendDataToPlayer("newOk");
 }
 
 void Chess::BadMove(QString msg)
 {
-    this->SendDataToPlayer("badMove " + msg + " " + turnTypeAsQstr(_pStatus->getWhoseTurn()));
+    this->sendDataToPlayer("badMove " + msg + " " + turnTypeAsQstr(_pStatus->getWhoseTurn()));
 }
 
 void Chess::EndOfGame(QString msg)
@@ -139,7 +146,7 @@ void Chess::EndOfGame(QString msg)
     _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
 
     //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
-    this->SendDataToPlayer("moveOk " + _pMovements->getMove().asQStr() + " nt " +
+    this->sendDataToPlayer("moveOk " + _pMovements->getMove().asQStr() + " nt " +
                            endTypeAsQstr(ETWhoWon) + " " +
                            _pWebsockets->getTableDataAsJSON()); //todo: json przeniesc
     //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość...
@@ -187,12 +194,40 @@ bool Chess::isPiecesSetOk()
     return true;
 }
 
+QString Chess::getTableDataAsJSON()
+{
+    //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt",
+    //"wtime":345581,"btime":300000,"queue":"empty"}
+    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + this->getPlayerName(PT_WHITE) +
+            "\",\"bplr\":\"" + this->getPlayerName(PT_BLACK) +
+            "\",\"turn\":\"" + _pChessboard->getStrWhoseTurn() +
+            "\",\"wtime\":" + QString::number(_pChessboard->getWhiteTimeLeft())  +
+            ",\"btime\":" + QString::number(_pChessboard->getBlackTimeLeft()) +
+            ",\"queue\":\"" + this->getQueuedClientsList();
+
+    if (_pTimers->isStartTimerRunning())
+    {
+        QString QStrWhiteClickedStart = this->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
+        QString QStrBlackClickedStart = this->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
+        QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
+                QString::number(_pChessboard->getStartTimeLeft());
+    }
+
+    if (!_pChessStatus->getHistoryMoves().isEmpty())
+        QStrTableData += "\",\"history\":\"" + _pChessStatus->getHistoryMovesAsQStr();
+
+    QStrTableData += "\"}";
+
+    qDebug() << "Websockets::getTableDataAsJSON(): QStrTableData =" << QStrTableData;
+    return QStrTableData;
+}
+
 void Chess::TcpMoveOk()
 {
     qDebug() << "Chess::TcpMoveOk()";
 
     if (_PlayerSource == WEBSITE)
-        this->GameInProgress();
+        this->continueGameplay();
 
     this->SendMsgToTcp("status");
 }
@@ -204,7 +239,7 @@ void Chess::reset() //todo: przemyśleć co tu musi być
     {
         _pStatus->setWhoseTurn(NO_TURN);
         _pWebsockets->resetPlayersStartConfirmInfo();
-        this->SendDataToPlayer("reseting");
+        this->sendDataToPlayer("reseting");
         _pTimers->resetGameTimers();
         this->resetPiecePositions();
     }
@@ -224,7 +259,7 @@ void Chess::resetBoardCompleted()
     }
     else if (_PlayerSource == ARDUINO)
     {
-        this->NewGame();
+        this->startNewGameInChenard();
     }
     else
         qDebug() << "ERROR: Chess::resetBoardCompleted: unknown _PlayerSource val ="
@@ -256,7 +291,7 @@ void Chess::playerClickedStart(QString QStrWhoClicked)
     {
         qDebug() << "both players have clicked start. try to start game";
         _pTimers->stopQueueTimer();
-        this->NewGame();
+        this->startNewGameInChenard();
         _pWebsockets->setClientState(PT_WHITE, false);
         _pWebsockets->setClientState(PT_BLACK, false);
     }
@@ -298,9 +333,9 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             if (_pStatus->getFENGameState() == FGS_IN_PROGRESS)
             {
                 this->SendMsgToTcp("history pgn");
-                this->GameInProgress(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi...
-                //...na legal wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął blokadę...
-                //...przed kojenym ruchem)
+                this->continueGameplay(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi...
+                //...na legal wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął...
+                //...blokadę przed kojenym ruchem)
             }
             else if (_pStatus->getFENGameState() == FGS_WHITE_WON ||
                      _pStatus->getFENGameState() == FGS_BLACK_WON ||
@@ -393,7 +428,7 @@ void Chess::checkMsgForChenard(QString msgFromWs)
     else if (_PlayerSource == ARDUINO)
     {
         qDebug() << "IgorBot::checkMsgForChenard: received: " << msg;
-        if (msg == "new") this->NewGame();
+        if (msg == "new") this->startNewGameInChenard();
         else if (msg.left(4) == "move") this->handleMove(msg.mid(5));
         else if (msg.left(9) == "promoteTo") this->Promote(msg.mid(10));
         else if (msg.left(5) == "reset") this->resetPiecePositions();
@@ -552,27 +587,25 @@ void Chess::handleMove(QString QStrMove)
 
     switch(_pChessboard->getMoveType())
     {
-    /*case ST_PROMOTE_TO_WHAT: //todo: ST_PROMOTE_TO_WHAT to nie ruch- to brak ruchu. wywalic stad
-        this->PromoteToWhat(move);
-        break;*/
+    //todo: ST_PROMOTE_TO_WHAT to nie ruch- to brak ruchu. wywalic stad
+    /*case ST_PROMOTE_TO_WHAT: this->PromoteToWhat(move); break;*/
     case ST_REGULAR: _pMovements->regularMoveSequence(*this); break;
     case ST_REMOVING: _pMovements->removeMoveSequence(*this);  break;
-    case ST_RESTORE: _pMovements->restoreMoveSequence(*this);  break;
+    //restore available only in reset command
+    //case ST_RESTORE: _pMovements->restoreMoveSequence(*this, );  break;
     case ST_ENPASSANT: _pMovements->enpassantMoveSequence(*this); break;
-    case ST_CASTLING:
-        this->castlingMovingSequence();
-        break;
-
-    /*case ST_BADMOVE: //todo: bad_move to nie ruch- to brak ruchu. wywalic stad
-        this->BadMove(move);
-        break;*/
+    case ST_CASTLING: this->castlingMovingSequence(); break;
+    //todo: bad_move to nie ruch- to brak ruchu. wywalic stad
+    /*case ST_BADMOVE: this->BadMove(move); break;*/
+    case ST_PROMOTION: _pMovements->promoteMoveSequence(*this); break;
     case ST_NONE:
     default:
-        qDebug() << "ERROR: Chess::handleMove: wrong MoveType :" << _pChessboard->getMoveType();
+        qDebug() << "ERROR: Chess::handleMove: wrong MoveType:" << _pMovements->getMoveType();
         break;
     }
 
     this->SendMsgToTcp("move " + QStrMove);
+    //_pStatus->clearFuturePromote(); //todo: sprawdzic jak ogarniac czyszczenia po ruchu
 }
 
 //todo: jezeli movements beda dziedziczone, to to powinno byc wewnatrz tamtej klasy

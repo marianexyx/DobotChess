@@ -16,6 +16,7 @@
 #include "dobot.h"
 #include "chess/chess_status.h"
 #include "chess.h"
+#include "client.h"
 
 namespace Ui
 {

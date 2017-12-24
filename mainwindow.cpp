@@ -43,7 +43,6 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(writeInConsole(QString,LOG)));
     connect(_pChess, SIGNAL(addTextToConsole(QString,LOG)),
             this, SLOT(writeInConsole(QString,LOG)));
-
     connect(_pWebSockets, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),
              this, SLOT(setBoardDataLabels(QString,BOARD_DATA_LABELS)));
     connect(_pDobotArm, SIGNAL(setBoardDataLabels(QString,BOARD_DATA_LABELS)),

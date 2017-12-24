@@ -28,13 +28,13 @@ ChessTimers::ChessTimers():
 void ChessTimers::timeOutWhite()
 {
     this->resetGameTimers();
-    emit msgFromChessboardToWebsockets("timeOutWhite");
+    emit sendMsgToPlayer("timeOutWhite");
 }
 
 void ChessTimers::timeOutBlack()
 {
     this->resetGameTimers();
-    emit msgFromChessboardToWebsockets("timeOutBlack");
+    emit sendMsgToPlayer("timeOutBlack");
 }
 
 void ChessTimers::updateTimeLabels()
@@ -52,7 +52,7 @@ void ChessTimers::updateTimeLabels()
 void ChessTimers::timeOutStartQueue()
 {
     this->stopQueueTimer();
-    emit msgFromChessboardToWebsockets("timeOutStartQueue");
+    emit sendMsgToPlayer("timeOutStartQueue");
 }
 
 //public:

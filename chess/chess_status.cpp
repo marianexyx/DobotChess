@@ -55,12 +55,20 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
 
 bool ChessStatus::isMoveRemoving()
 {
-    if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != ".")
+    if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != ".") //todo
     {
         qDebug() << "m_QStrBoard[PieceTo.Letter:" << pieceLetterPosAsQStr(PieceTo.Letter) << "][PieceTo.Digit:" <<
                     PieceTo.Digit+1 << "] =" << m_QStrBoard[PieceTo.Letter][PieceTo.Digit];
         return true;
     }
+    else return false;
+}
+
+bool ChessStatus::isMovePromotion(QString moveToTest)
+{
+    if ((moveToTest == "q" || moveToTest == "r" || moveToTest == "b" || moveToTest == "k")
+            && moveToTest.length() == 1 )
+        return true;
     else return false;
 }
 
@@ -133,6 +141,7 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
         if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
         else if (this->isMoveRemoving()) return ST_REMOVING;
+        else if (this->isMovePromotion()) return ST_PROMOTION;
         else return ST_REGULAR;
     }
     else return ST_BADMOVE;

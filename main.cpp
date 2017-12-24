@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    Client
     ArduinoUsb ArduinoUsbEnemysUI;
     Chessboard ChessboardDobot001;
     Dobot DobotArm001(&ChessboardDobot001, &ArduinoUsbEnemysUI);
