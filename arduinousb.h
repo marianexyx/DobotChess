@@ -23,7 +23,7 @@ public:
 
     void sendDataToUsb(QString QsMsg);
     void searchDevices();
-    void ManageMsgFromUsb(QString QsUsbMsg);
+    void manageMsgFromUsb(QString QStrMsg);
 
 private:
     QByteArray QByteA_data; // tablica niezorganizowanych danych przypływających z usb

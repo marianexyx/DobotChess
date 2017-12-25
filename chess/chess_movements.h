@@ -26,6 +26,8 @@ public:
     ChessMovements(Chessboard* pBoardMain, Chessboard* pBoardRemoved);
     ~ChessMovements();
 
+    void findAndSaveMoveAndSendItToTcp(QString QStrMove);
+
     PosOnBoard findKingPosInCastling(PosOnBoard FieldDest);
     PosOnBoard findRookPosInCastling(PosOnBoard FieldDest);
 

@@ -32,7 +32,7 @@ public:
                         TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                         ChessStatus* pChessStatus, Chess *pChess, QWidget *parent = 0);
 
-    virtual ~MainWindow(); //tutaj virtual?
+    virtual ~MainWindow(); //todo: tutaj virtual?
 
 /*protected:
     void closeEvent(QCloseEvent *);*/ //TODO: to się może chyba przydać
@@ -55,7 +55,8 @@ private:
     void refreshBtn();
     void initDobot();
     void initControl();
-    QString checkMoveForTcp(QString QsFT); //sprawdź czy w line edicie jest wpisany ruch w poprawnym formacie
+    //sprawdź czy w line edicie jest wpisany ruch w poprawnym formacie
+    QString checkMoveForTcp(QString QsFT);
 
 private slots:
     void onChangedMode();
@@ -63,7 +64,7 @@ private slots:
     void onJOGCtrlBtnReleased();
     void onPTPsendBtnClicked();
 
-    /*---sloty do używania GUI MainWindow---*/
+    //sloty do używania GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG msgType);
     void setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType);
     void showBoard(QString QStrBoard);

@@ -24,7 +24,7 @@ void ChessBot::ThinkOk(QString msg)
     qDebug() << "AI is ready to start move";
 
     _QStrAIPiecieFromTo = msg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
-    this->SendMsgToTcp("undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
+    this->sendMsgToTcp("undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz przeciągnąć go...
     //...przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać w szczególnych przypadkach.
 }
 

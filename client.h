@@ -7,20 +7,38 @@
 #include <QtCore/QByteArray>
 #include <limits>
 #include "vars/players_types.h"
+#include "vars/log.h"
+#include "vars/board_data_labels.h"
 #include "typeinfo"
 
-class Client
+struct Client //todo: class friend to Clients
 {
-private:
+    //TODO: ogarnąć ID- posługiwać się ID do przekazywania pomiędzy klasami info o kliencie...
+    //...o którym mowa (np. w websocketach każde polecenie od klienta wysyłać z IDkiem do...
+    //...klasy chess, gdzie tam dopiero sprawdzać czy dany gracz mógł to polecenie wysłać
+    unsigned long long ullId;
     QWebSocket *socket;
     QString name;
     PLAYER_TYPE type;
     bool isStartClickedByPlayer;
     int64_t queue;
-public:
-    Client();
 
-    bool operator ==(const struct Clients& st);
+    bool operator ==(const struct Client& st)
+    {
+        return socket == st.socket &&
+                name == st.name &&
+                type == st.type &&
+                isStartClickedByPlayer == st.isStartClickedByPlayer &&
+                queue == st.queue;
+    }
+};
+
+class Clients
+{
+private:
+    QList<Client> _clients;
+public:
+    Clients() {}
 
     void newClientSocket(QWebSocket *clientSocket);
     void setClientName(QWebSocket *clientSocket, QString name);
@@ -56,9 +74,7 @@ public:
     //void testQueuedClients(); //test jednostkowy
 
 signals:
-    //todo: void showClientsList(QList<Client>);
+    void showClientsList(QList<Client>);
 };
-
-QList<Client> clients;
 
 #endif // CLIENT_H

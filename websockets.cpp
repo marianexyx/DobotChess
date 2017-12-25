@@ -46,36 +46,29 @@ void Websockets::onNewConnection()
 
 //TODO2: obsuga komend serwisowych przez websockety
 
-void Websockets::resetPlayersStartConfirmInfo()
-{
-    qDebug() << "Websockets::resetPlayersStartConfirmInfo()";
-    if (this->isStartClickedByPlayer(PT_WHITE))
-           this->setClientState(PT_WHITE, false);
-    if (this->isStartClickedByPlayer(PT_BLACK))
-        this->setClientState(PT_BLACK, false);
-}
-
 void Websockets::receivedMsg(QString QStrWsMsgToProcess)
 {    
     if (QStrWsMsgToProcess != "keepConnected")
         qDebug() << "Websockets::receivedMsg (from site):" << QStrWsMsgToProcess;
 
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender()); //przysyłający
 
     if (QStrWsMsgToProcess == "keepConnected")
-    {
         emit setBoardDataLabels(std::to_string(m_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
-    }
     else if (QStrWsMsgToProcess == "newGame" || QStrWsMsgToProcess == "new")
     {
         QString QStrWhoSent = "";
-        if (pClient == this->getPlayerSocket(PT_WHITE))  QStrWhoSent = "WHITE";
-        else if (pClient == this->getPlayerSocket(PT_BLACK)) QStrWhoSent = "BLACK";
+        if (pClient == this->getPlayerSocket(PT_WHITE))
+            QStrWhoSent = "WHITE";
+        else if (pClient == this->getPlayerSocket(PT_BLACK))
+            QStrWhoSent = "BLACK";
 
         this->sendToChess(QStrWsMsgToProcess + " " + QStrWhoSent);
     }
-    else if (QStrWsMsgToProcess.left(4) == "move") { this->sendToChess(QStrWsMsgToProcess); }
-    else if (QStrWsMsgToProcess == "getTableDataAsJSON") pClient->sendTextMessage(this->getTableDataAsJSON());
+    else if (QStrWsMsgToProcess.left(4) == "move")
+        this->sendToChess(QStrWsMsgToProcess);
+    else if (QStrWsMsgToProcess == "getTableDataAsJSON")
+        pClient->sendTextMessage(this->getTableDataAsJSON());
     else if (QStrWsMsgToProcess == "giveUp")
     {
         if (pClient) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam gdzie są...
@@ -223,7 +216,7 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: przepychac wiadomosci, nei r
         if (!this->isStartClickedByPlayer(PT_BLACK))
             this->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-        this->resetPlayersStartConfirmInfo(); //todo: to jest  bardziej zmienna stolu, czy clienta?
+        _pClientsList->resetPlayersStartConfirmInfo();
          _pChessboard->stopQueueTimer();
 
         if (this->isGameTableOccupied())
@@ -361,5 +354,3 @@ void Websockets::playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType)
 
     emit MsgFromWebsocketsToChess("reset");
 }
-
-

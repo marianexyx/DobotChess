@@ -38,8 +38,8 @@ void ChessMovements::regularMoveSequence(Chess* pChess)
     pChess->movePieceWithManipulator(_pBoardMain, _PosMove.from, VM_GRAB);
     pChess->movePieceWithManipulator(_pBoardMain, _PosMove.to, VM_PUT);
 
-    pChess->SendMsgToTcp("move " + move); //todo: wbijam sie w private
-    //todo2: SendMsgToTcp robic w warstwie wyzej by nie powtarzac tego tutaj za kazdym razem
+    pChess->sendMsgToTcp("move " + move); //todo: wbijam sie w private
+    //todo2: sendMsgToTcp robic w warstwie wyzej by nie powtarzac tego tutaj za kazdym razem
     //todo3: nie znam "move"
 }
 
@@ -56,7 +56,7 @@ void ChessMovements::removeMoveSequence(Chess* pChess)
 
     this->regularMoveSequence(pChess);
 
-    pChess->SendMsgToTcp("move " + move);
+    pChess->sendMsgToTcp("move " + move);
 }
 
 void ChessMovements::restoreMoveSequence(Chess* pChess, short sPieceToRestore)
@@ -82,7 +82,7 @@ void ChessMovements::castlingMoveSequence(Chess* pChess)
     pChess->movePieceWithManipulator(_pBoardMain,
                                      this->findRookPosInCastling(_PosMove.to), VM_PUT);
 
-    this->SendMsgToTcp("move " + move);
+    this->sendMsgToTcp("move " + move);
 }
 
 void ChessMovements::enpassantMoveSequence(Chess* pChess)
@@ -113,7 +113,7 @@ void ChessMovements::enpassantMoveSequence(Chess* pChess)
                                      PieceToRemoveInEnpassant->getStartFieldPos(), VM_PUT);
     this->goToSafeRemovedFieldIfNeeded(*pChess);
 
-    this->SendMsgToTcp("move " + move);
+    this->sendMsgToTcp("move " + move);
 }
 //todo: po wszystkich ruchach czyscic zmienne globalne from/to jezeli jeszcze beda istniec
 

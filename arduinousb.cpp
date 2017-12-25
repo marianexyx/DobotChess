@@ -71,24 +71,29 @@ void ArduinoUsb::readUsbData()
         QsFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
 
         emit this->addTextToConsole(QsFullSerialMsg + "\n", LOG_USB_RECEIVED);
-        this->ManageMsgFromUsb(QsFullSerialMsg);
+        this->manageMsgFromUsb(QsFullSerialMsg);
 
         QByteA_data.clear();
         QsFullSerialMsg.clear();
     }
 }
 
-void ArduinoUsb::ManageMsgFromUsb(QString QsUsbMsg)
+void ArduinoUsb::manageMsgFromUsb(QString QStrMsg)
 {
-    if (QsUsbMsg == "reset") emit this->reset(); //zresetuj szachownicę i rozpocznij nową grę
-    else if (QsUsbMsg == "start") emit this->TcpQueueMsg(ARDUINO, "think 5000"); //think->save move -> undo
-    else if (QsUsbMsg.left(4) == "move") emit this->AIEnemySend(QsUsbMsg);
-    else if (QsUsbMsg.left(9) == "promoteTo") emit this->AIEnemySend(QsUsbMsg.left(10));
+    if (QStrMsg == "reset")
+        emit this->reset(); //zresetuj szachownicę i rozpocznij nową grę
+    else if (QStrMsg == "start")
+        emit this->TcpQueueMsg(ARDUINO, "think 5000"); //think->save move -> undo
+    else if (QStrMsg.left(4) == "move")
+        emit this->AIEnemySend(QStrMsg);
+    else if (QStrMsg.left(9) == "promoteTo")
+        emit this->AIEnemySend(QStrMsg.left(10));
     else
     {
-        emit this->addTextToConsole("ERROR: unknown command from usb: " + QsUsbMsg + "\n", LOG_USB_RECEIVED);
-        qDebug() << "ERROR: ArduinoUsb::ManageMsgFromUsb: unknown"
-                    " command from usb:" << QsUsbMsg;
+        emit this->addTextToConsole("ERROR: unknown command from usb: " +
+                                    QStrMsg + "\n", LOG_USB_RECEIVED);
+        qDebug() << "ERROR: ArduinoUsb::manageMsgFromUsb: unknown"
+                    " command from usb:" << QStrMsg;
     }
 }
 

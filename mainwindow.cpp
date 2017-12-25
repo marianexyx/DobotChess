@@ -627,7 +627,7 @@ void MainWindow::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     {
         QString lastMove = tcpMsgType.right(4);
         _pChessboard->findBoardPos(lastMove);
-        _pChess->TcpMoveOk();
+        _pChess->continueGameplay();
     }
     else
     {

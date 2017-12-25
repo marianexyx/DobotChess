@@ -11,6 +11,7 @@
 #include "piece.h"
 #include "websockets.h"
 #include "arduinousb.h"
+#include "client.h"
 #include "vars/board_axis.h"
 #include "vars/end_of_game_types.h"
 #include "chess/chess_timers.h"
@@ -27,12 +28,13 @@ ruch e2e4 wpada do obiektu szachow:
 -zakolejkowanie ruchu na dobocie
 -wykonanie zapytania o ruch na tcp
 -reagowanie na odpowiedzi z tcp*/
-
+//todo: szachy nie powinny raczej wiedzieć nic o graczu, który steruje grą
 class Chess: public QObject
 {
     Q_OBJECT
 
 private:
+    Clients* _pClientsList;
     Dobot* _pDobot;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
@@ -51,13 +53,9 @@ private:
 
     void startNewGameInChenard();
     void continueGameplay();
-    //TODO: friend dla podklas?
-    void Promote(QString msg);
-    void SendMsgToTcp(QString msg);
-    void TcpMoveOk(); //todo: czyli co sie dzieje dalej?
+    void sendMsgToTcp(QString msg);
     void reset(); //todo: reset czego?
     void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
-    void handleMove(QString QStrMove); //todo: czyli co?
     void movePieceWithManipulator(Chessboard *pRealBoard, PosOnBoard FieldPos,
                                   VERTICAL_MOVE vertMove = VM_NONE);
     void wrongTcpAnswer(QString msgType, QString respond);
@@ -65,8 +63,9 @@ private:
     bool compareArrays(short nArray1[][8], short nArray2[][8]);
 
 public:
-    Chess(Dobot* pDobot, Chessboard* pBoardMain, Chessboard* pBoardRemoved, ArduinoUsb* pUsb,
-          Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
+    Chess(Clients* pClientsList, Dobot* pDobot, Chessboard* pBoardMain,
+          Chessboard* pBoardRemoved, ArduinoUsb* pUsb, Websockets* pWebsockets,
+          TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
     ~Chess();
 
     void GameStarted();
