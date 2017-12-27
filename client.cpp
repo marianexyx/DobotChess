@@ -3,6 +3,7 @@
 void Clients::newClientSocket(QWebSocket *clientSocket)
 {
     Client newClient;
+    newClient.ID = this->getNextAvailableClientID();
     newClient.socket = clientSocket;
     newClient.name.clear();
     newClient.queue = -1;
@@ -287,7 +288,19 @@ Clients Clients::getClient(QWebSocket *clientSocket)
         if (client.socket == clientSocket)
             return client;
     }
-    qDebug() << "ERROR: Clients::getClient(): client not found";
+    qDebug() << "ERROR: Clients::getClient(QWebSocket): client not found";
+    Clients errorClient;
+    return errorClient;
+}
+
+Clients Clients::getClient(int64_t clientID)
+{
+    Q_FOREACH (Client client, _clients)
+    {
+        if (client.ID == clientID)
+            return client;
+    }
+    qDebug() << "ERROR: Clients::getClient(int64_t): client not found";
     Clients errorClient;
     return errorClient;
 }
@@ -571,4 +584,61 @@ bool Clients::isClientAPlayer(QWebSocket *clientSocket)
         return true;
     else return false;
 
+}
+
+bool Clients::isClientIDExists(int64_t ID)
+{
+    Q_FOREACH (Client client, _clients)
+    {
+        if (client.ID == ID)
+            return true;
+    }
+    return false;
+}
+
+int64_t Clients::getClientID(QWebSocket *clientSocket)
+{
+    Q_FOREACH (Client client, _clients)
+    {
+        if (client.socket == clientSocket)
+            return client.ID;
+    }
+    qDebug() << "ERROR: Clients::getClientID(): socket not found";
+    return 0;
+}
+
+int64_t Clients::getNextAvailableClientID()
+{
+    int64_t minID = std::numeric_limits<int64_t>::max();
+    int64_t maxID = 0;
+    Q_FOREACH (Client client, _clients)
+    {
+        if (client.ID > 0 && client.ID > maxID)
+            maxID = client.ID;
+    }
+    if (maxID > 0)
+    {
+        Q_FOREACH (Client client, _clients)
+        {
+            if (minID > client.ID && client.ID > 0)
+                minID = client.ID;
+        }
+    }
+    else return 0;
+
+    if (maxID - minID == 1)
+        return maxID+1;
+    else if (maxID - minID > 1)
+        return minID+1;
+    else
+    {
+        qDebug() << "ERROR: Clients::getNextAvailableClientID(): minID > maxID";
+        return 0;
+    }
+}
+
+void Clients::showClientsInForm()
+{
+    emit showClientsList(_clients);
+    emit setBoardDataLabels(std::to_string(_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
 }

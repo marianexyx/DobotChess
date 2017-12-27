@@ -21,7 +21,7 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
     _pChessStatus = pChessStatus;
     _pChess = pChess;
 
-    //TODO: to pewnie dałoby się wrzucić do odpwoiednich klas
+    //TODO: wrzucić do odpwoiednich klas
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),
@@ -30,9 +30,9 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobotValidators(); //wartości przymowane z klawiatury do wysłania na dobota
 
-    connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgForChenard(QString)));
+    connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgFromWebsockets(QString)));
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(int, QString)), _pTCPmsg, SLOT(TcpQueueMsg(int, QString)));
-    connect(_pArduinoUsb, SIGNAL(reset()), _pIgorBot, SLOT(resetPiecePositions()));
+    connect(_pArduinoUsb, SIGNAL(restoreGameToInitialState()), _pIgorBot, SLOT(resetPiecePositions()));
 
     //ui connects
     connect(_pDobotArm, SIGNAL(addTextToConsole(QString,LOG)),
@@ -78,29 +78,12 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
             this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
     connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
             this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
-
-    /*TODO: starać się stosować związki dwustronny obiektów zamiast uzywac emitów
-
-    class CBar;
-    class CFoo
-    {
-        private:
-            // wskaźnik do połączonego obiektu CBar
-            CBar* m_pBar;
-    };
-    class CBar
-    {
-        private:
-            // wskaźnik do połączonego obiektu CFoo
-            CFoo* m_pFoo;
-};
-    */
     connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)),
             _pChess, SLOT(checkMsgFromChenard(QString, QString)));
     connect(_pTCPmsg, SIGNAL(msgFromTcpToCore(QString, QString)),
             this, SLOT(checkMsgFromChenard(QString, QString)));
-    connect(_pWebSockets, SIGNAL(MsgFromWebsocketsToChess(QString)),
-            _pChess, SLOT(checkMsgForChenard(QString)));
+    connect(_pWebSockets, SIGNAL(msgFromWebsocketsToChess(QString, int64_t)),
+            _pChess, SLOT(checkMsgFromWebsockets(QString, int64_t)));
 
     this->initControl(); //init dobot JOG control
 
@@ -509,7 +492,7 @@ QString MainWindow::checkMoveForTcp(QString QsFT)
                  QsFT.at(3) == '5' || QsFT.at(3) == '6' || QsFT.at(3) == '7' || QsFT.at(3) == '8'))
         {
             QsRespond = "move " + QsFT;
-            _pIgorBot->checkMsgForChenard(QsRespond); //wyślij zapytanie o ruch jak z arduino
+            _pIgorBot->checkMsgFromWebsockets(QsRespond); //wyślij zapytanie o ruch jak z arduino
         }
         else QsRespond = "ERROR: MainWindow::checkMoveForTcp: Wrong square positions\n";
     }

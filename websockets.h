@@ -9,7 +9,8 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 #include <limits>
-#include "chessboard.h"
+#include "chessboard.h" //todo: tego tu nie powinno być
+#include "client.h"
 #include "vars/log.h"
 #include "vars/board_data_labels.h"
 #include "vars/players_types.h"
@@ -24,16 +25,16 @@ class Websockets: public QObject
     Q_OBJECT
 
 private:
-    QWebSocketServer *m_pWebSocketServer;
+    QWebSocketServer *_pWebSocketServer;
+    Clients* _pClients;
 
 private Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
     void socketDisconnected();
 
 public:
-    Websockets(quint16 port, QObject *parent = Q_NULLPTR);
+    Websockets(Clients* pClients, quint16 port, QObject *parent = Q_NULLPTR);
 
-    void sendToChess(QString QsMsgForChessClass);
-
+    void sendToChess(QString QStrMsg, int64_t clientID);
     void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
     void playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType);
 
@@ -48,7 +49,7 @@ public slots:
 
 signals:
     void addTextToConsole(QString, LOG);
-    void MsgFromWebsocketsToChess(QString QStrMsgFromWebsockets);
+    void msgFromWebsocketsToChess(QString QStrMsg, int64_t clientID);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
 
 };

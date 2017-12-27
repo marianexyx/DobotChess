@@ -16,7 +16,7 @@ struct Client //todo: class friend to Clients
     //TODO: ogarnąć ID- posługiwać się ID do przekazywania pomiędzy klasami info o kliencie...
     //...o którym mowa (np. w websocketach każde polecenie od klienta wysyłać z IDkiem do...
     //...klasy chess, gdzie tam dopiero sprawdzać czy dany gracz mógł to polecenie wysłać
-    unsigned long long ullId;
+    int64_t ID;
     QWebSocket *socket;
     QString name;
     PLAYER_TYPE type;
@@ -53,7 +53,8 @@ public:
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair);
 
     bool isClientInList(QWebSocket *clientSocket);
-    Clients getClient(QWebSocket *clientSocket);
+    Client getClient(QWebSocket *clientSocket);
+    Client getClient(int64_t clientID);
     QWebSocket *getClientSocket(QString playerName);
     QString getClientName(QWebSocket *clientSocket);
     QWebSocket *getNextQueuedClientSocket();
@@ -70,11 +71,18 @@ public:
     bool isClientNameExists(QString name);
     int getAmountOfQueuedClients();
     bool isClientAPlayer(QWebSocket *clientSocket);
+    bool isClientIDExists(int64_t ID);
+    int64_t getClientID(QWebSocket *clientSocket);
+    int64_t getNextAvailableClientID();
 
     //void testQueuedClients(); //test jednostkowy
 
+public slots:
+    void showClientsInForm();
+
 signals:
     void showClientsList(QList<Client>);
+    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
 };
 
 #endif // CLIENT_H

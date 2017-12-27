@@ -81,7 +81,7 @@ void ArduinoUsb::readUsbData()
 void ArduinoUsb::manageMsgFromUsb(QString QStrMsg)
 {
     if (QStrMsg == "reset")
-        emit this->reset(); //zresetuj szachownicę i rozpocznij nową grę
+        emit this->restoreGameToInitialState();
     else if (QStrMsg == "start")
         emit this->TcpQueueMsg(ARDUINO, "think 5000"); //think->save move -> undo
     else if (QStrMsg.left(4) == "move")

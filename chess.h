@@ -54,12 +54,12 @@ private:
     void startNewGameInChenard();
     void continueGameplay();
     void sendMsgToTcp(QString msg);
-    void reset(); //todo: reset czego?
+    void restoreGameToInitialState();
     void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
     void movePieceWithManipulator(Chessboard *pRealBoard, PosOnBoard FieldPos,
                                   VERTICAL_MOVE vertMove = VM_NONE);
     void wrongTcpAnswer(QString msgType, QString respond);
-    void playerClickedStart(QString QStrWhoClicked); //todo: typ, a nie string
+    void playerClickedStart(PLAYER_TYPE playerType);
     bool compareArrays(short nArray1[][8], short nArray2[][8]);
 
 public:
@@ -78,7 +78,7 @@ public:
 
 public slots:
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
-    void checkMsgForChenard(QString msg);
+    void checkMsgFromWebsockets(QString msg, int64_t clientID);
     void sendDataToPlayer(QString msg);
     void resetPiecePositions();
     QString getTableDataAsJSON();

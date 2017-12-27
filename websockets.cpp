@@ -1,15 +1,15 @@
 #include "websockets.h"
 
-Websockets::Websockets(quint16 port, QObject *parent):
+Websockets::Websockets(Clients *pClients, quint16 port, QObject *parent):
     QObject(parent),
     m_clients()
 {
-    m_pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
+    _pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
                                               QWebSocketServer::NonSecureMode,
                                               this);
-    if (m_pWebSocketServer->listen(QHostAddress::Any, port))
+    if (_pWebSocketServer->listen(QHostAddress::Any, port))
     {
-        connect(m_pWebSocketServer, &QWebSocketServer::newConnection,
+        connect(_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
 
         qDebug() << "WebSocket server listening on port" << port;
@@ -19,7 +19,7 @@ Websockets::Websockets(quint16 port, QObject *parent):
 
 Websockets::~Websockets()
 {
-    m_pWebSocketServer->close();
+    _pWebSocketServer->close();
 
     //póki mam jednen obiekt/ramię to nie jest mi to potrzebne
     //qDeleteAll(m_clients.begin(), m_clients.end());
@@ -29,15 +29,13 @@ Websockets::~Websockets()
 void Websockets::onNewConnection()
 {
     qDebug() << "Websockets::onNewConnection()";
-    QWebSocket *pSocket = m_pWebSocketServer->nextPendingConnection();
+    QWebSocket *pSocket = _pWebSocketServer->nextPendingConnection();
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
     this->newClientSocket(pSocket);
     emit addTextToConsole("New connection \n", LOG_WEBSOCKET);
-
-    emit setBoardDataLabels(std::to_string(m_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
-    emit showClientsList(m_clients);
+    _pClients->showClientsInForm();
 }
 
 //Q_FOREACH (QWebSocket *pNextClient, m_clients) ma być depreciated
@@ -50,25 +48,27 @@ void Websockets::receivedMsg(QString QStrWsMsgToProcess)
 {    
     if (QStrWsMsgToProcess != "keepConnected")
         qDebug() << "Websockets::receivedMsg (from site):" << QStrWsMsgToProcess;
+    else return;
 
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender()); //przysyłający
+    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender()); //przysyłający 
+    int64_t clientID = _pClients->getClientID(pClient);
 
-    if (QStrWsMsgToProcess == "keepConnected")
-        emit setBoardDataLabels(std::to_string(m_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
-    else if (QStrWsMsgToProcess == "newGame" || QStrWsMsgToProcess == "new")
-    {
-        QString QStrWhoSent = "";
-        if (pClient == this->getPlayerSocket(PT_WHITE))
-            QStrWhoSent = "WHITE";
-        else if (pClient == this->getPlayerSocket(PT_BLACK))
-            QStrWhoSent = "BLACK";
+    this->sendToChess(QStrWsMsg, clientID);
 
-        this->sendToChess(QStrWsMsgToProcess + " " + QStrWhoSent);
-    }
-    else if (QStrWsMsgToProcess.left(4) == "move")
-        this->sendToChess(QStrWsMsgToProcess);
-    else if (QStrWsMsgToProcess == "getTableDataAsJSON")
-        pClient->sendTextMessage(this->getTableDataAsJSON());
+//    if (QStrWsMsgToProcess == "newGame" || QStrWsMsgToProcess == "new")
+//    {
+//        QString QStrWhoSent = "";
+//        if (pClient == this->getPlayerSocket(PT_WHITE))
+//            QStrWhoSent = "WHITE";
+//        else if (pClient == this->getPlayerSocket(PT_BLACK))
+//            QStrWhoSent = "BLACK";
+
+//        this->sendToChess(QStrWsMsgToProcess + " " + QStrWhoSent);
+//    }
+//    else if (QStrWsMsgToProcess.left(4) == "move")
+//        this->sendToChess(QStrWsMsgToProcess);
+//    else if (QStrWsMsgToProcess == "getTableDataAsJSON")
+//        pClient->sendTextMessage(this->getTableDataAsJSON());
     else if (QStrWsMsgToProcess == "giveUp")
     {
         if (pClient) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam gdzie są...
@@ -234,11 +234,13 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: przepychac wiadomosci, nei r
     else qDebug() << "ERRROR: uknown Websockets::sendMsg() parameter:" << QStrWsMsg;
 }
 
-void Websockets::sendToChess(QString QsMsgForChessClass)
+//TODO: można stąd usunąć jeżeli komunikaty będą się wyświetlać w klasie chess
+void Websockets::sendToChess(QString QStrMsg, int64_t clientID)
 {
-    qDebug() << "Sending to 'chess' class: " << QsMsgForChessClass;
-    emit this->addTextToConsole("Sending to 'chess' class: " + QsMsgForChessClass + "\n", LOG_WEBSOCKET);
-    emit this->MsgFromWebsocketsToChess(QsMsgForChessClass);
+    qDebug() << "Sending to 'chess' class: " << QStrMsg;
+    emit this->addTextToConsole("Sending to 'chess' class: " + QStrMsg + "\n",
+                                LOG_WEBSOCKET);
+    emit this->msgFromWebsocketsToChess(QStrMsg, clientID);
 }
 
 void Websockets::socketDisconnected()
@@ -247,6 +249,7 @@ void Websockets::socketDisconnected()
 
     if (pClient) //todo: co to??? czyżby to że sprawdzam czy udało mi się zrzutować obiekt...
         //... z powyższej linjki?
+        //todo: wnętrze tej funkcji przerzucić do chess
     {
         if (this->isClientAPlayer(pClient))
             this->playerIsLeavingGame(pClient, ET_SOCKET_LOST);
@@ -332,6 +335,7 @@ void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
     }
 }
 
+//todo: przerzucić do chess
 void Websockets::playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType)
 {
     //todo: reszta stanow tu poki co nie pasuje, bo gracz nei wychodzi z gry, tylko...
@@ -352,5 +356,5 @@ void Websockets::playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType)
                                        playerTypeAsQStr(this->getClientType(pClient)) +
                                        " " + this->getTableDataAsJSON());
 
-    emit MsgFromWebsocketsToChess("reset");
+    emit msgFromWebsocketsToChess("reset");
 }

@@ -15,7 +15,7 @@ void ChessBot::UndoOk()
     _bUndo = true; //zapamiętaj że cofnięcie ruchu miało miejsce
     //niech się wykona cały ruch Igora, łącznie ze sprawdzeniem wszystkich...
     //...dziwnych ruchów tak aby też wykonał się dobrze mechanicznie
-    this->checkMsgForChenard("move " + _QStrAIPiecieFromTo);
+    this->checkMsgFromWebsockets("move " + _QStrAIPiecieFromTo);
 }
 
 void ChessBot::ThinkOk(QString msg)

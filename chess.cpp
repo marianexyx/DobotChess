@@ -151,7 +151,7 @@ void Chess::EndOfGame(QString msg)
     //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na...
     //...stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą...
     //...że nastąpił koniec gry
-    this->reset();
+    this->restoreGameToInitialState();
 }
 
 void Chess::resetBoardData() //todo: troche bodajze nieadekwatna nazwa
@@ -194,23 +194,25 @@ QString Chess::getTableDataAsJSON()
 {
     //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt",
     //"wtime":345581,"btime":300000,"queue":"empty"}
-    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + this->getPlayerName(PT_WHITE) +
-            "\",\"bplr\":\"" + this->getPlayerName(PT_BLACK) +
-            "\",\"turn\":\"" + _pChessboard->getStrWhoseTurn() +
-            "\",\"wtime\":" + QString::number(_pChessboard->getWhiteTimeLeft())  +
-            ",\"btime\":" + QString::number(_pChessboard->getBlackTimeLeft()) +
-            ",\"queue\":\"" + this->getQueuedClientsList();
+    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +
+            "\",\"bplr\":\"" + _pClientsList->getPlayerName(PT_BLACK) +
+            "\",\"turn\":\"" + _pStatus->getStrWhoseTurn() +
+            "\",\"wtime\":" + QString::number(_pTimers->getWhiteTimeLeft())  +
+            ",\"btime\":" + QString::number(_pTimers->getBlackTimeLeft()) +
+            ",\"queue\":\"" + _pClientsList->getQueuedClientsList();
 
     if (_pTimers->isStartTimerRunning())
     {
-        QString QStrWhiteClickedStart = this->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
-        QString QStrBlackClickedStart = this->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
+        QString QStrWhiteClickedStart =
+                _pClientsList->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
+        QString QStrBlackClickedStart =
+                _pClientsList->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
         QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
-                QString::number(_pChessboard->getStartTimeLeft());
+                QString::number(_pTimers->getStartTimeLeft());
     }
 
-    if (!_pChessStatus->getHistoryMoves().isEmpty())
-        QStrTableData += "\",\"history\":\"" + _pChessStatus->getHistoryMovesAsQStr();
+    if (!_pStatus->getHistoryMoves().isEmpty())
+        QStrTableData += "\",\"history\":\"" + _pStatus->getHistoryMovesAsQStr();
 
     QStrTableData += "\"}";
 
@@ -218,19 +220,13 @@ QString Chess::getTableDataAsJSON()
     return QStrTableData;
 }
 
-void Chess::reset() //todo: przemyśleć co tu musi być
+void Chess::restoreGameToInitialState() //todo: przemyśleć co tu musi być
 {
-    //todo: pewnie bota udało by się scalić z tą funkcją w pewnych momentach
-    if (_PlayerSource == WEBSITE)
-    {
-        _pStatus->setWhoseTurn(NO_TURN);
-        _pClientsList->resetPlayersStartConfirmInfo();
-        this->sendDataToPlayer("reseting");
-        _pTimers->resetGameTimers();
-        this->resetPiecePositions();
-    }
-    else
-        qDebug() << "ERROR: Chess::reset: _PlayerSource != WEBSITE. it ==" << _PlayerSource;
+    _pStatus->setWhoseTurn(NO_TURN);
+    _pClientsList->resetPlayersStartConfirmInfo();
+    this->sendDataToPlayer("reseting");
+    _pTimers->resetGameTimers();
+    this->resetPiecePositions();
 }
 
 void Chess::resetBoardCompleted()
@@ -238,13 +234,15 @@ void Chess::resetBoardCompleted()
     if (_PlayerSource == WEBSITE)
     {
         //TODO: prewencyjnie ustawić wszystkie wartości na startowe (rozpisać to: jakie, które...
-        //...i po co w sumie- tj. czy to nie występuje zawsze w otoczeniu Chess::reset()?)
+        //...i po co w sumie- tj. czy to nie występuje zawsze w otoczeniu Chess::restoreGameToInitialState()?)
 
-        //todo: raz wiadomość jest cała sklejana w websockecie, a raz geTableData jest doklejane w tym pliku
+        //todo: raz wiadomość jest cała sklejana w websockecie, a raz geTableData jest...
+        //...doklejane w tym pliku
         _pWebsockets->sendMsg("resetComplited");
     }
     else if (_PlayerSource == ARDUINO)
     {
+        //todo: nie startować automatycznie nowej gry?
         this->startNewGameInChenard();
     }
     else
@@ -258,22 +256,24 @@ void Chess::wrongTcpAnswer(QString msgType, QString respond)
                 respond << "for tcpMsgType = " << msgType;
 }
 
-void Chess::playerClickedStart(QString QStrWhoClicked)
+void Chess::playerClickedStart(PLAYER_TYPE playerType)
 {
-    if (QStrWhoClicked == "WHITE")
+    if (playerType == PT_WHITE)
     {
         _pWebsockets->setClientState(PT_WHITE, true);
         qDebug() << "white player clicked start";
     }
-    else if (QStrWhoClicked == "BLACK")
+    else if (playerType == PT_BLACK)
     {
         _pWebsockets->setClientState(PT_BLACK, true);
         qDebug() << "black player clicked start";
     }
-    else qDebug() << "ERROR:unknown playerClickedStart val:" << QStrWhoClicked;
+    else if (_PlayerSource == ARDUINO) qDebug() << "player clicked start";
+    else qDebug() << "ERROR:unknown playerClickedStart val:" << playerTypeAsQStr(playerType);
 
     if (_pWebsockets->isStartClickedByPlayer(PT_WHITE) &&
-            _pWebsockets->isStartClickedByPlayer(PT_BLACK))
+            _pWebsockets->isStartClickedByPlayer(PT_BLACK)
+            || _PlayerSource == ARDUINO)
     {
         qDebug() << "both players have clicked start. try to start game";
         _pTimers->stopQueueTimer();
@@ -285,149 +285,118 @@ void Chess::playerClickedStart(QString QStrWhoClicked)
 
 void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
-    //todo: długi syf
-    if (_PlayerSource == WEBSITE)
+    qDebug() << "Chess::checkMsgFromChenard: tcpMsgType=" << tcpMsgType <<
+                ", tcpRespond:" << tcpRespond;
+
+    //todo: pociąć tą funkcję na mniejsze kawałki
+
+    if(_PlayerSource == ARDUINO) this->checkAI();
+
+    if (tcpMsgType == "new")
     {
-        qDebug() << "WebChess::checkMsgFromChenard: tcpMsgType=" << tcpMsgType <<
-                    ", tcpRespond:" << tcpRespond;
-
-        if (tcpMsgType == "new")
+        //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
+        if (tcpRespond == "OK\n" || tcpRespond == "OK")
         {
-            //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
-            if (tcpRespond == "OK\n" || tcpRespond == "OK")
-            {
-                //pierwszy legal i status wyglądają zawsze tak samo:
-                _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
-                _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
-                              "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
-                this->GameStarted();
-            }
-            else
-                this->wrongTcpAnswer(tcpMsgType, tcpRespond);
-        }
-        else if (tcpMsgType.left(4) == "move")
-        {
-            //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego...
-            //...są 2 warunki poniżej
-            if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->continueGameplay();
-            else if (tcpRespond/*.left(8)*/ == "BAD_MOVE") this->BadMove(tcpRespond);
-            else this->wrongTcpAnswer(tcpMsgType, tcpRespond);
-        }
-        else if (tcpMsgType == "status")
-        {
-            _pStatus->saveStatusData(tcpRespond);
-
-            if (_pStatus->getFENGameState() == FGS_IN_PROGRESS)
-            {
-                this->sendMsgToTcp("history pgn");
-                this->continueGameplay(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi...
-                //...na legal wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął...
-                //...blokadę przed kojenym ruchem)
-            }
-            else if (_pStatus->getFENGameState() == FGS_WHITE_WON ||
-                     _pStatus->getFENGameState() == FGS_BLACK_WON ||
-                     _pStatus->getFENGameState() == FGS_DRAW)
-            {
-                _pStatus->clearLegalMoves();
-                _pStatus->clearHistoryMoves();
-                this->EndOfGame(tcpRespond);
-            }
-            else
-                this->wrongTcpAnswer(tcpMsgType, _pChessboard->getGameStatus());
-        }
-        else if (tcpMsgType.left(7) == "history" && tcpRespond.left(3) == "OK ")
-        {
-            qDebug() << "manage history tcp answer";
-            _pStatus->historyOk(tcpRespond);
-            _pWebsockets->sendMsg("history " + _pChessboard->getHisotyMovesAsQStr());
-            this->sendMsgToTcp("legal");
-            //todo: jeszcze odpowiedź na site
-        }
-        else if (tcpMsgType == "legal" && tcpRespond.left(3) == "OK ")
-        {
-            _pStatus->setLegalMoves(tcpRespond);
-        }
-        else qDebug() << "ERROR: WebChess:checkMsgFromChenard() received unknown tcpMsgType: "
-                      << tcpMsgType;
-    }
-    else if (_PlayerSource == ARDUINO)
-    {
-        this->checkAI();
-
-        if (tcpMsgType == "new" && (tcpRespond == "OK\n" || tcpRespond == "OK"))
-        {
-            this->sendMsgToTcp("status");
+            //pierwszy legal i status wyglądają zawsze tak samo:
+            _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
+            _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
+                          "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
             this->GameStarted();
         }
-        else if (tcpMsgType.left(4) == "move")
-        {
-            //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego 2 warunki
-            if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1") this->continueGameplay();
-            else if (tcpRespond.left(8) == "BAD_MOVE") this->BadMove(tcpRespond);
-            else wrongTcpAnswer(tcpMsgType, tcpRespond);
-        }
-        else if (tcpMsgType == "status")
-        {
-            _pChessboard->saveStatusData(tcpRespond);
-            if (_pChessboard->getGameStatus() == "*")
-            {
-                this->sendMsgToTcp("history pgn");
-            }
-            else
-            {
-                _pStatus->clearLegalMoves();
-                _pStatus->clearHistoryMoves();
-                this->EndOfGame(tcpRespond);
-            }
-        }
-        else if (tcpMsgType == "undo 1" && (tcpRespond == "OK\n" || tcpRespond == "OK"))
-        {
-            this->UndoOk();
-        }
-        else if (tcpMsgType == "think 5000" && (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
-        {
-            this->ThinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
-        }
-        else if (tcpMsgType == "legal" && (tcpRespond.left(3) == "OK "))
-        {
-            _pStatus->setLegalMoves(tcpRespond);
-        }
-        else wrongTcpAnswer(tcpMsgType, tcpRespond);
+        else
+            this->wrongTcpAnswer(tcpMsgType, tcpRespond);
     }
-    else
-        qDebug() << "ERROR: Chess::checkMsgFromChenard: unknown _PlayerSource val ="
-                 << _PlayerSource;
+    else if (tcpMsgType.left(4) == "move")
+    {
+        //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
+        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1")
+            this->continueGameplay();
+        else if (tcpRespond == "BAD_MOVE")
+            this->BadMove(tcpRespond);
+        else
+            this->wrongTcpAnswer(tcpMsgType, tcpRespond);
+    }
+    else if (tcpMsgType == "status")
+    {
+        _pStatus->saveStatusData(tcpRespond);
+
+        if (_pStatus->getFENGameState() == FGS_IN_PROGRESS)
+        {
+            this->sendMsgToTcp("history pgn");
+            this->continueGameplay(); //TODO: zrobić to kiedyś tak by dopiero w odpowiedzi...
+            //...na legal wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął...
+            //...blokadę przed kojenym ruchem)
+        }
+        else if (_pStatus->getFENGameState() == FGS_WHITE_WON ||
+                 _pStatus->getFENGameState() == FGS_BLACK_WON ||
+                 _pStatus->getFENGameState() == FGS_DRAW)
+        {
+            _pStatus->clearLegalMoves();
+            _pStatus->clearHistoryMoves();
+            this->EndOfGame(tcpRespond);
+        }
+        else
+            this->wrongTcpAnswer(tcpMsgType, _pStatus->getFENGameState());
+    }
+    else if (tcpMsgType.left(7) == "history" && tcpRespond.left(3) == "OK ")
+    {
+        _pStatus->historyOk(tcpRespond);
+        _pWebsockets->sendMsg("history " + _pStatus->getHisotyMovesAsQStr());
+        this->sendMsgToTcp("legal");
+    }
+    else if (tcpMsgType == "legal" && tcpRespond.left(3) == "OK ")
+        _pStatus->setLegalMoves(tcpRespond);
+    else if (tcpMsgType == "undo 1" && _PlayerSource == ARDUINO &&
+             (tcpRespond == "OK\n" || tcpRespond == "OK"))
+        this->UndoOk();
+    else if (tcpMsgType == "think 5000" && _PlayerSource == ARDUINO &&
+             (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
+        this->ThinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
+    else qDebug() << "ERROR: Chess:checkMsgFromChenard(): received unknown tcpMsgType:"
+                  << tcpMsgType;
 }
 
-void Chess::checkMsgForChenard(QString msg)
+void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
 {
-    //todo: upchac to ladnie
-    if (_PlayerSource == WEBSITE)
-    {
-        qDebug() << "WebChess::checkMsgForChenard: received: " << msg;
-        if (msgFromWs.left(7) == "newGame") this->playerClickedStart(msg.mid(8));
-        //todo: jeżeli da się tak zrobić promocję, to polecenie "promoteTo" można...
-        //...usunąć na korzyść powtórzenia samego "move" do obu poleceń
-        else if (msg.left(4) == "move") this->findAndSaveMoveAndSendItToTcp(msg.mid(5));
-        else if (msg.left(9) == "promoteTo") this->findAndSaveMoveAndSendItToTcp(msg.mid(10));
-        else if (msgFromWs.left(5) == "reset") this->reset();
-        else qDebug() << "ERROR: received not recognized msg in WebChess::checkMsgForChenard:"
-                      << msg;
-    }
-    else if (_PlayerSource == ARDUINO)
-    {
-        qDebug() << "IgorBot::checkMsgForChenard: received: " << msg;
-        if (msg == "new") this->startNewGameInChenard();
-        else if (msg.left(4) == "move") this->findAndSaveMoveAndSendItToTcp(msg.mid(5));
-        else if (msg.left(9) == "promoteTo") this->findAndSaveMoveAndSendItToTcp(msg.mid(10));
-        else if (msg.left(5) == "reset") this->resetPiecePositions();
-        else qDebug() << "ERROR: received not recognized msg in IgorBot::checkMsgForChenard:"
-                      << msg;
-    }
-    else
-        qDebug() << "ERROR: Chess::checkMsgForChenard: unknown _PlayerSource val ="
-                 << _PlayerSource;
+    qDebug() << "Chess::checkMsgFromWebsockets: received:" << msg;
 
+    Client client = _pClientsList->getClient(clientID);
+
+    if (msgFromWs == "newGame")
+    {
+        PLAYER_TYPE playerType = PT_NONE;
+        if (client == this->getPlayerSocket(PT_WHITE))
+            playerType = PT_WHITE;
+        else if (client == this->getPlayerSocket(PT_BLACK))
+            playerType = PT_BLACK;
+
+        this->playerClickedStart(playerType);
+    }
+    //todo: jeżeli da się tak zrobić promocję, to polecenie "promoteTo" można...
+    //...usunąć na korzyść powtórzenia samego "move" do obu poleceń
+    else if (msg.left(4) == "move")
+        this->findAndSaveMoveAndSendItToTcp(msg.mid(5));
+    else if (msg.left(9) == "promoteTo")
+        this->findAndSaveMoveAndSendItToTcp(msg.mid(10));
+    else if (QStrWsMsgToProcess == "getTableDataAsJSON")
+        _pWebsockets->sendMsg(this->getTableDataAsJSON());
+    else if (QStrWsMsgToProcess == "giveUp")
+    {
+        if (client) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam...
+            //...gdzie są QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
+        {
+            if (this->isClientAPlayer(client))
+                //todo: gdzieś tu skończyłem
+                this->playerIsLeavingGame(client, ET_GIVE_UP);
+            else
+                qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
+        }
+        else qDebug() << "ERROR: Chess::receivedMsg(): giveUp: !isset client";
+    }
+    else if (msg.left(5) == "reset")
+        this->restoreGameToInitialState();
+    else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received unknown msg:"
+                  << msg;
 }
 
 void Chess::resetPiecePositions()
