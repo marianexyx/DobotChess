@@ -54,123 +54,6 @@ void Websockets::receivedMsg(QString QStrWsMsgToProcess)
     int64_t clientID = _pClients->getClientID(pClient);
 
     this->sendToChess(QStrWsMsg, clientID);
-
-//    if (QStrWsMsgToProcess == "newGame" || QStrWsMsgToProcess == "new")
-//    {
-//        QString QStrWhoSent = "";
-//        if (pClient == this->getPlayerSocket(PT_WHITE))
-//            QStrWhoSent = "WHITE";
-//        else if (pClient == this->getPlayerSocket(PT_BLACK))
-//            QStrWhoSent = "BLACK";
-
-//        this->sendToChess(QStrWsMsgToProcess + " " + QStrWhoSent);
-//    }
-//    else if (QStrWsMsgToProcess.left(4) == "move")
-//        this->sendToChess(QStrWsMsgToProcess);
-//    else if (QStrWsMsgToProcess == "getTableDataAsJSON")
-//        pClient->sendTextMessage(this->getTableDataAsJSON());
-    else if (QStrWsMsgToProcess == "giveUp")
-    {
-        if (pClient) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam gdzie są...
-            //...QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-        {
-            if (this->isClientAPlayer(pClient))
-                this->playerIsLeavingGame(pClient, ET_GIVE_UP);
-            else qDebug() << "ERROR: Websockets::receivedMsg(): non-player tried to logout (hacker?)";
-        }
-        else qDebug() << "ERROR: Websockets::receivedMsg(): giveUp: !isset pClient";
-    }
-    else if (QStrWsMsgToProcess.left(5) == "sitOn")
-    {
-        if (this->getClientName(pClient) == "-1")
-        {
-            qDebug() << "ERROR: Websockets::receivedMsg(): sitOn: client not loggedIn";
-            return;
-        }
-
-        PLAYER_TYPE playerChair = playerTypeFromQStr(QStrWsMsgToProcess.mid(5));
-
-        _pChessboard->setWhoseTurn(NO_TURN);
-        if (!this->isPlayerChairEmpty(playerChair))
-        {
-            qDebug() << "ERROR: Websockets::receivedMsg(): client wanted to "
-                        "sit on occupied chair. client name:"
-                     << this->getClientName(pClient) << ", player name:" <<
-                        this->getPlayerName(playerChair);
-            return;
-        }
-        else
-            this->setPlayerType(pClient, playerChair);
-
-        if (this->isGameTableOccupied())
-            _pChessboard->startQueueTimer();
-
-        Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableDataAsJSON());
-    }
-    else if (QStrWsMsgToProcess == "standUp")
-    {
-        if (this->isClientAPlayer(pClient))
-        {
-            if (_pChessboard->getWhoseTurn() == NO_TURN)
-            {
-                this->clearPlayerType(this->getClientType(pClient));
-                _pChessboard->resetBoardData();
-
-                Q_FOREACH (Clients client, m_clients)
-                    client.socket->sendTextMessage(this->getTableDataAsJSON());
-            }
-            else
-            {
-                qDebug() << "ERROR: Websockets::receivedMsg(): player wanted to "
-                            "leave chair during game. client name:"
-                          << this->getClientName(pClient);
-                return;
-            }
-        }
-        else
-        {
-            qDebug() << "ERROR: Websockets::receivedMsg(): non-player client"
-                        " wanted to leave chair. client name:"
-                     << this->getClientName(pClient);
-            return;
-        }
-    }
-    else if (QStrWsMsgToProcess.left(3) == "im ")
-    {
-        QString QStrName = QStrWsMsgToProcess.mid(3);
-        if (this->isClientNameExists(QStrName))
-        {
-            this->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
-            if (this->isClientAPlayer(pClient))
-                this->playerIsLeavingGame(pClient, ET_SOCKET_LOST);
-            this->setClientName(pClient, QStrName);
-        }
-        else
-        {
-            this->setClientName(pClient, QStrName);
-            pClient->sendTextMessage(this->getTableDataAsJSON());
-        }
-    }
-    else if (QStrWsMsgToProcess.left(9) == "promoteTo")
-    {
-        this->sendToChess(QStrWsMsgToProcess);
-    }
-    else if (QStrWsMsgToProcess == "queueMe")
-    {
-        this->addClientToQueue(pClient);
-        Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableDataAsJSON());
-    }
-    else if (QStrWsMsgToProcess == "leaveQueue")
-    {
-        this->removeClientFromQueue(pClient);
-        Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(this->getTableDataAsJSON());
-    }
-    else  qDebug() << "ERROR: Websockets::receivedMsg(): unknown parameter:" << QStrWsMsgToProcess;
-
-    emit showClientsList(m_clients);
 }
 
 void Websockets::sendMsg(QString QStrWsMsg) //todo: przepychac wiadomosci, nei realizowac ich tutaj
@@ -178,12 +61,6 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: przepychac wiadomosci, nei r
     qDebug() << "Websockets::sendMsg() received:" << QStrWsMsg;
     emit addTextToConsole("sent: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
 
-    if (QStrWsMsg == "newOk" || QStrWsMsg.left(8) == "history " || QStrWsMsg.left(8) == "promoted" ||
-            QStrWsMsg == "reseting")
-    {
-        Q_FOREACH (Clients client, m_clients)
-            client.socket->sendTextMessage(QStrWsMsg);
-    }
     else if (QStrWsMsg.left(6) == "moveOk" || QStrWsMsg.left(7) == "badMove")
     {
         if (QStrWsMsg.right(7) == "promote" || QStrWsMsg.left(7) == "badMove")
@@ -232,6 +109,14 @@ void Websockets::sendMsg(QString QStrWsMsg) //todo: przepychac wiadomosci, nei r
             client.socket->sendTextMessage(QStrWsMsg + " " + this->getTableDataAsJSON());
     }
     else qDebug() << "ERRROR: uknown Websockets::sendMsg() parameter:" << QStrWsMsg;
+}
+
+void Websockets::sendMsg(int64_t ID, QString QStrWsMsg)
+{
+    if(!_pClients->isClientIDExists(ID)) return;
+
+    Client client = _pClientsList->getClient(ID);
+    client.socket->sendTextMessage(QStrWsMsg);
 }
 
 //TODO: można stąd usunąć jeżeli komunikaty będą się wyświetlać w klasie chess
@@ -357,4 +242,10 @@ void Websockets::playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType)
                                        " " + this->getTableDataAsJSON());
 
     emit msgFromWebsocketsToChess("reset");
+}
+
+void Websockets::sendMsgToAllClients(QString msg)
+{
+    Q_FOREACH (Clients client, _pClients->getClientsList())
+        client.socket->sendTextMessage(msg);
 }

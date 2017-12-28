@@ -6,6 +6,7 @@
 #include <QString>
 #include "chess.h"
 #include "chessboard.h"
+#include "websockets.h" //todo: to i inne dziedziczyć?
 #include "vars/sequence_types.h"
 #include "vars/board_axis.h"
 #include "vars/posotion_on_board.h"
@@ -16,6 +17,7 @@
 class ChessMovements
 {
 private:
+    Websockets* _pWebsockets;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
 
@@ -23,7 +25,8 @@ private:
     PosFromTo _PosMove;
 
 public:
-    ChessMovements(Chessboard* pBoardMain, Chessboard* pBoardRemoved);
+    ChessMovements(Websockets* pWebsockets, Chessboard* pBoardMain,
+                   Chessboard* pBoardRemoved);
     ~ChessMovements();
 
     void findAndSaveMoveAndSendItToTcp(QString QStrMove);

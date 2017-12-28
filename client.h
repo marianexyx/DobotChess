@@ -52,6 +52,7 @@ public:
     void resetPlayersStartConfirmInfo();
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair);
 
+    QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(QWebSocket *clientSocket);
     Client getClient(QWebSocket *clientSocket);
     Client getClient(int64_t clientID);

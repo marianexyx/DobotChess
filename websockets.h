@@ -35,8 +35,9 @@ public:
     Websockets(Clients* pClients, quint16 port, QObject *parent = Q_NULLPTR);
 
     void sendToChess(QString QStrMsg, int64_t clientID);
-    void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr);
-    void playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType);
+    void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr); //todo: przenieść
+    void playerIsLeavingGame(QWebSocket *pClient, END_TYPE leavingType); //todo: przenieść
+    void sendMsgToAllClients(QString msg);
 
     ~Websockets();
 
@@ -46,6 +47,7 @@ public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac sl
 
 public slots:
     void sendMsg(QString QStrWsMsg);
+    void sendMsg(int64_t ID, QString QStrWsMsg);
 
 signals:
     void addTextToConsole(QString, LOG);

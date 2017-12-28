@@ -38,7 +38,7 @@ private:
     Dobot* _pDobot;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
-    Websockets* _pWebsockets;
+    Websockets* _pWebsockets; //todo: da się z tej klasy pozbyć websocketow
     TCPMsgs* _pTCPMsgs;
     ArduinoUsb* _pUsb;
 
@@ -79,7 +79,7 @@ public:
 public slots:
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
     void checkMsgFromWebsockets(QString msg, int64_t clientID);
-    void sendDataToPlayer(QString msg);
+    void sendDataToClient(QString msg, int64_t clientID = -1);
     void resetPiecePositions();
     QString getTableDataAsJSON();
 

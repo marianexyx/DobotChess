@@ -1,7 +1,8 @@
 #include "chess_movements.h"
 
-ChessMovements::ChessMovements(Chessboard* pBoardMain, Chessboard* pBoardRemoved)
+ChessMovements::ChessMovements(Websockets *pWebsockets, Chessboard* pBoardMain, Chessboard* pBoardRemoved)
 {
+    _pWebsockets = pWebsockets;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
 
@@ -146,11 +147,13 @@ void ChessMovements::promoteToWhat(QString QStrMoveForFuturePromote)
 {
     //todo: ogarnac gdzies czyszczenie tej zmiennej po wszystkim i sprawdzanie czy nie probuje...
     //...uzywac gdzies tej zmiennej pustej
+    //todo: tu jest syf
     _pChessboard->QStrFuturePromote = QStrMoveForFuturePromote;
 
     _pChessboard->switchPlayersTimers();
-    this->sendDataToPlayer("moveOk " + QStrMoveForFuturePromote + " " +
-                           _pChessboard->getStrWhoseTurn() + " promote");
+    //todo: trochę chyba zmieniłem poniższą linijkę
+    _pWebsockets->sendMsgToAllClients("moveOk " + QStrMoveForFuturePromote + " " +
+                                      _pChessboard->getStrWhoseTurn() + " promote");
 }
 
 void ChessMovements::clearPosFromTo()
