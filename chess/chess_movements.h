@@ -50,7 +50,7 @@ public:
     void setMoveType(SEQUENCE_TYPE Type) { _moveType = Type; }
     PosFromTo getMove() const { return _PosMove; }
     SEQUENCE_TYPE getMoveType() const { return _moveType; }
-    void clearMove(); //todo: na koniec sprawdzić gdzie to implementować
+    void clearMove() { _PosMove.clear(); } //todo: sprawdzić gdzie to implementować w całym kodzie
 };
 
 #endif // CHESS_MOVEMENTS_H

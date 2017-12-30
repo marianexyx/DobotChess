@@ -25,16 +25,28 @@ ChessTimers::ChessTimers():
 }
 //private slots:
 
+//todo: połączyć 2 poniższe funkcje
 void ChessTimers::timeOutWhite()
 {
     this->resetGameTimers();
-    emit sendMsgToPlayer("timeOutWhite");
+
+    //todo: znowu nie wiadomo jak się odnieść do góry
+    pChess->playerIsLeavingGame(this->getPlayerSocket(playerTypeFromQStr(QStrWsMsg.right(5))),
+                              ET_TIMEOUT_GAME);
+    this->endOfGame(ET_TIMEOUT_GAME);
+
+    emit sendMsgToPlayer("timeOutWhite"); //todo: to all
 }
 
 void ChessTimers::timeOutBlack()
 {
     this->resetGameTimers();
-    emit sendMsgToPlayer("timeOutBlack");
+
+    pChess->playerIsLeavingGame(this->getPlayerSocket(playerTypeFromQStr(QStrWsMsg.right(5))),
+                              ET_TIMEOUT_GAME);
+    this->endOfGame(ET_TIMEOUT_GAME);
+
+    emit sendMsgToPlayer("timeOutBlack"); //todo: to all
 }
 
 void ChessTimers::updateTimeLabels()
@@ -52,7 +64,19 @@ void ChessTimers::updateTimeLabels()
 void ChessTimers::timeOutStartQueue()
 {
     this->stopQueueTimer();
-    emit sendMsgToPlayer("timeOutStartQueue");
+    //todo: można zamknać w funkcji clientlistowej (sprawdzić resztę powtórzeń)
+    if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    if (!this->isStartClickedByPlayer(PT_BLACK))
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+
+    _pClientsList->resetPlayersStartConfirmInfo();
+     this->stopQueueTimer();
+
+    if (this->isGameTableOccupied())
+        this->startQueueTimer();
+    emit sendMsgToPlayer("timeOutStartQueue"); //todo: 2 różne emity dla pojedyńczego klienta...
+    //... i dla wielu? jasne że nie- trzeba to jakoś ogarnąć
 }
 
 //public:

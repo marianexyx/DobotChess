@@ -40,7 +40,7 @@ void Chess::continueGameplay()
     {
         _pTimers->switchPlayersTimers();
         _pWebsockets->sendMsgToAllClients("moveOk " + _pMovements->getMove().asQStr() + " " +
-                                          turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
+                                          turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue")
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -123,7 +123,11 @@ void Chess::GameStarted()
 
 void Chess::BadMove(QString msg)
 {
-    this->sendDataToClient("badMove " + msg + " " + turnTypeAsQstr(_pStatus->getWhoseTurn()));
+    QString QStrMsgForActiveClient = "badMove " + msg + " "
+            + turnTypeAsQstr(_pStatus->getWhoseTurn());
+    int64_t activePlayerID = _pClientsList->getClientID(_pClientsList->getPlayerSocket(
+                                                            this->getActivePlayerType()));
+    this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
 }
 
 void Chess::EndOfGame(QString msg)
@@ -141,10 +145,8 @@ void Chess::EndOfGame(QString msg)
     //todo: ta funkcja bedzie gdzie indziej, dostepna rowniez dla arduino
     _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
 
-    //todo: troche dziwnie to tu jest że pobieram z obiektu websocket dane by mu je zaraz przesłać
     _pWebsockets->sendMsgToAllClients("moveOk " + _pMovements->getMove().asQStr() + " nt " +
-                                      endTypeAsQstr(ETWhoWon) + " " +
-                                      _pWebsockets->getTableDataAsJSON()); //todo: json przeniesc
+                                      endTypeAsQstr(ETWhoWon) + " " + this->getTableData());
     //todo: wysyłam wiadomość na websockety trochę nie z poziomu websocketów (czy większość...
     //...informacji leci od websocketów? sprawdzić, jeżeli tak to zobaczyć czy da się wysyłanie...
     //...każdego rodzaju inforacji upchać w websocketach dla porządku i czy jest taka potrzeba
@@ -190,7 +192,45 @@ bool Chess::isPiecesSetOk()
     return true;
 }
 
-QString Chess::getTableDataAsJSON()
+void Chess::playerIsLeavingGame(QWebSocket *pClient, END_TYPE LeavingType)
+{
+    //todo: reszta stanow tu poki co nie pasuje, bo gracz nei wychodzi z gry, tylko...
+    //... jest ona normalnie konczona. jak przeniose to do wlasciwych klas, to...
+    //...bedzie to mozna normlanie polaczyc
+    if (LeavingType != ET_SOCKET_LOST && LeavingType != ET_GIVE_UP &&
+            LeavingType != ET_TIMEOUT_GAME)
+    {
+        qDebug() << "ERROR: Chess::playerIsLeavingGame: wrong LeavingType val:" <<
+                    LeavingType;
+        return;
+    }
+
+    this->endOfGame(LeavingType, pClient); //end of game będzie przeniesiony do chess
+
+    _pWebsockets->sendMsgToAllClients(endTypeAsQstr(LeavingType) +
+                                      playerTypeAsQStr(this->getClientType(pClient)) +
+                                      " " + this->getTableData());
+;
+    this->restoreGameToInitialState();
+}
+
+PLAYER_TYPE Chess::getActivePlayerType()
+{
+    if (_pStatus->getWhoseTurn() == WHITE_TURN &&
+            _pClientsList->getPlayerSocket(PT_WHITE) != nullptr)
+        return PT_WHITE;
+    else if (_pStatus->getWhoseTurn() == BLACK_TURN &&
+             _pClientsList->getPlayerSocket(PT_BLACK) != nullptr)
+        return PT_BLACK;
+    else
+    {
+        qDebug() << "ERROR: Chess::getActivePlayerType(): wrong turn:" <<
+                    _pStatus->getWhoseTurn();
+        return PT_NONE;
+    }
+}
+
+QString Chess::getTableData()
 {
     //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt",
     //"wtime":345581,"btime":300000,"queue":"empty"}
@@ -216,7 +256,7 @@ QString Chess::getTableDataAsJSON()
 
     QStrTableData += "\"}";
 
-    qDebug() << "Websockets::getTableDataAsJSON(): QStrTableData =" << QStrTableData;
+    qDebug() << "Chess::getTableData(): QStrTableData =" << QStrTableData;
     return QStrTableData;
 }
 
@@ -239,6 +279,9 @@ void Chess::resetBoardCompleted()
 
         //todo: raz wiadomość jest cała sklejana w websockecie, a raz geTableData jest...
         //...doklejane w tym pliku
+        if (_pClientsList->isGameTableOccupied())
+            _pTimers->startQueueTimer();
+
         _pWebsockets->sendMsg("resetComplited");
     }
     else if (_PlayerSource == ARDUINO)
@@ -379,8 +422,8 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         this->findAndSaveMoveAndSendItToTcp(msg.mid(5));
     else if (msg.left(9) == "promoteTo")
         this->findAndSaveMoveAndSendItToTcp(msg.mid(10));
-    else if (msg == "getTableDataAsJSON")
-        _pWebsockets->sendMsg(this->getTableDataAsJSON());
+    else if (msg == "getTableData")
+        _pWebsockets->sendMsg(this->getTableData());
     else if (msg == "giveUp")
     {
         if (client.socket) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam...
@@ -388,7 +431,7 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         {
             if (_pClientsList->isClientAPlayer(client.socket))
                 //todo: gdzieś tu skończyłem
-                this->playerIsLeavingGame(client, ET_GIVE_UP); //todo: do zmiany
+                this->playerIsLeavingGame(client, ET_GIVE_UP); //todo: do zmiany (co?)
             else
                 qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
         }
@@ -419,7 +462,7 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         if (this->isGameTableOccupied())
             _pTimers->startQueueTimer();
 
-        _pWebsockets->sendMsgToAllClients(this->getTableDataAsJSON());
+        _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
     else if (QStrWsMsgToProcess == "standUp")
     {
@@ -431,7 +474,7 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
                 _pClientsList->clearPlayerType(_pClientsList->getClientType(client.socket));
                 this->resetBoardData();
 
-                _pWebsockets->sendMsgToAllClients(this->getTableDataAsJSON());
+                _pWebsockets->sendMsgToAllClients(this->getTableData());
             }
             else
             {
@@ -456,24 +499,24 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         {
             _pClientsList->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
             if (_pClientsList->isClientAPlayer(client.socket))
-                _pWebsockets->playerIsLeavingGame(client.socket, ET_SOCKET_LOST);
+                this->playerIsLeavingGame(client.socket, ET_SOCKET_LOST);
             _pClientsList->setClientName(client.socket, QStrName);
         }
         else
         {
             _pClientsList->setClientName(client.socket, QStrName);
-            this->sendDataToClient(this->getTableDataAsJSON());
+            this->sendDataToClient(this->getTableData());
         }
     }
     else if (QStrWsMsgToProcess == "queueMe")
     {
         _pClientsList->addClientToQueue(client.socket);
-        _pWebsockets->sendMsgToAllClients(this->getTableDataAsJSON());
+        _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
     else if (QStrWsMsgToProcess == "leaveQueue")
     {
         this->removeClientFromQueue(client.socket);
-        _pWebsockets->sendMsgToAllClients(this->getTableDataAsJSON());
+        _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
     else if (msg.left(5) == "reset")
         this->restoreGameToInitialState();

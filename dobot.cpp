@@ -204,6 +204,7 @@ void Dobot::QueuedIdList()
 bool Dobot::bIsMoveInAxisRange(float x, float y, float z)
 {
     bool check = true;
+    //todo: nie powinny być przekazywane dane z chessboardu (ie meiszać klas)
     if ( x < _pChessboard->getMinBoardAxis().x || x > _pChessboard->getMaxBoardAxis().x)
     {
         qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: X axis out of range <"

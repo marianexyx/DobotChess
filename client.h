@@ -16,6 +16,8 @@ struct Client //todo: class friend to Clients
     //TODO: ogarnąć ID- posługiwać się ID do przekazywania pomiędzy klasami info o kliencie...
     //...o którym mowa (np. w websocketach każde polecenie od klienta wysyłać z IDkiem do...
     //...klasy chess, gdzie tam dopiero sprawdzać czy dany gracz mógł to polecenie wysłać
+    //todo2: jednak możę te id niepotrzebne? zbyT gęsto używać socketów wszędzie. sprawdzić...
+    //...to najpierw
     int64_t ID;
     QWebSocket *socket;
     QString name;
@@ -73,6 +75,7 @@ public:
     int getAmountOfQueuedClients();
     bool isClientAPlayer(QWebSocket *clientSocket);
     bool isClientIDExists(int64_t ID);
+    //todo: niby getClientID, a jako parametr podaję socket
     int64_t getClientID(QWebSocket *clientSocket);
     int64_t getNextAvailableClientID();
 

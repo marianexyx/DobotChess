@@ -5,6 +5,7 @@
 
 #include <QString>
 #include <QTimer>
+#include "client.h" //todo: ogarnąć to...
 
 class ChessTimers
 {

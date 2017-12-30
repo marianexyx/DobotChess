@@ -30,6 +30,7 @@ struct PosFromTo
     PosOnBoard from;
     PosOnBoard to;
 
+    PosFromTo();
     PosFromTo(PosOnBoard PosFrom, PosOnBoard PosTo) { from = PosFrom, to = PosTo;}
     PosFromTo(LETTER fromL, DIGIT fromD, LETTER toL, DIGIT toD);
     PosFromTo(QString QStrMoveFromTo);
@@ -101,6 +102,14 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
 
 
 //PosFromTo:
+PosFromTo::PosFromTo()
+{
+    from.Letter = L_X;
+    from.Digit = D_X;
+    to.Letter = L_X;
+    to.Digit = D_X;
+}
+
 PosFromTo::PosFromTo(LETTER fromL, DIGIT fromD, LETTER toL, DIGIT toD)
 {
     from.Letter = fromL;

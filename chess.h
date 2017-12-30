@@ -73,7 +73,9 @@ public:
     void EndOfGame(QString msg);
     void resetBoardData();
     bool isPiecesSetOk();
+    void playerIsLeavingGame(QWebSocket *pClient, END_TYPE LeavingType);
 
+    PLAYER_TYPE getActivePlayerType();
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
 
 public slots:
@@ -81,7 +83,7 @@ public slots:
     void checkMsgFromWebsockets(QString msg, int64_t clientID);
     void sendDataToClient(QString msg, int64_t clientID = -1);
     void resetPiecePositions();
-    QString getTableDataAsJSON();
+    QString getTableData();
 
 signals:
     void addTextToConsole(QString, LOG);

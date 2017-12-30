@@ -270,6 +270,30 @@ void Clients::resetPlayersStartConfirmInfo()
         this->setClientState(PT_BLACK, false);
 }
 
+void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair)
+{
+    this->clearPlayerType(chair);
+
+    if (this->getQueuedClientsList() != "queueEmpty")
+    {
+        Clients nextQueuedClient;
+        if (this->isClientInList(getNextQueuedClientSocket()))
+            nextQueuedClient = this->getClient(this->getNextQueuedClientSocket());
+        else return;
+
+        this->removeClientFromQueue(nextQueuedClient.socket);
+        this->setPlayerType(nextQueuedClient.socket, chair);
+        this->setClientState(nextQueuedClient.socket, false);
+
+        emit this->setBoardDataLabels(this->getPlayerName(chair),
+                                      chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
+        qDebug() << "Clients::cleanChairAndPutThereNextQueuedClientIfExist(): new" <<
+                    playerTypeAsQStr(chair) << "player name =" << this->getPlayerName(chair);
+        emit this->addTextToConsole("New " + playerTypeAsQStr(chair) + " player: " +
+                                    this->getPlayerName(chair) + "\n", LOG_WEBSOCKET);
+    }
+}
+
 bool Clients::isClientInList(QWebSocket *clientSocket)
 {
     Q_FOREACH (Client client, _clients)

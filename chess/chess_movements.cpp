@@ -4,10 +4,7 @@ ChessMovements::ChessMovements(Websockets *pWebsockets, Chessboard* pBoardMain, 
 {
     _pWebsockets = pWebsockets;
     _pBoardMain = pBoardMain;
-    _pBoardRemoved = pBoardRemoved;
-
-    _PosFrom(L_X, D_X);
-    _PosTo(L_X, D_X);
+    _pBoardRemoved = pBoardRemoved;    
 }
 
 PosOnBoard ChessMovements::findKingPosInCastling(PosOnBoard FieldDest)
@@ -130,12 +127,12 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Chess *pChess)
     //...kaze dobotowi isc ruchami kolistymi na przegubach
     //todo: jeżeli szachownica remove ma wielokść normalnej, to te wartości ulegną zmianie
     DIGIT SafePosToDigit = D_X;
-    if (_PosTo.Digit == D_1) SafePosToDigit = D_2;
-    else if (_PosTo.Digit == D_8) SafePosToDigit = D_7;
+    if (_PosMove.to.Digit == D_1) SafePosToDigit = D_2;
+    else if (_PosMove.to.Digit == D_8) SafePosToDigit = D_7;
     else
     {
         qDebug() << "ERROR: ChessMovements::goToSafeRemovedField: unknown"
-                    " _PosTo.Digit value =" << _PosTo.Digit;
+                    " _PosMove.to.Digit value =" << _PosMove.to.Digit;
         return;
     }
 
@@ -147,18 +144,15 @@ void ChessMovements::promoteToWhat(QString QStrMoveForFuturePromote)
 {
     //todo: ogarnac gdzies czyszczenie tej zmiennej po wszystkim i sprawdzanie czy nie probuje...
     //...uzywac gdzies tej zmiennej pustej
-    //todo: tu jest syf
-    _pChessboard->QStrFuturePromote = QStrMoveForFuturePromote;
+    _pChessboard->QStrFuturePromote = QStrMoveForFuturePromote; //todo: to jest syf
 
-    _pChessboard->switchPlayersTimers();
+    _pTimers->switchPlayersTimers();
     //todo: trochę chyba zmieniłem poniższą linijkę
-    _pWebsockets->sendMsgToAllClients("moveOk " + QStrMoveForFuturePromote + " " +
-                                      _pChessboard->getStrWhoseTurn() + " promote");
+    //todo: jeżeli zdecyduję się wysyłać ifno do wszsytkich o każdym ruchu, to jak ogarnąć...
+    //...promote?
+    QString QStrMsgForActiveClient = "moveOk " + QStrMoveForFuturePromote + " " +
+            _pStatus->getStrWhoseTurn() + " promote";
+    int64_t activePlayerID = _pClientsList->getClientID(_pClientsList->getPlayerSocket(
+                                                            this->getActivePlayerType()));
+    this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
 }
-
-void ChessMovements::clearPosFromTo()
-{
-    _PosFrom(L_X, D_X);
-    _PosTo(L_X, D_X);
-}
-
