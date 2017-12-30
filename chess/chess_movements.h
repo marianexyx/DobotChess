@@ -21,15 +21,13 @@ private:
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
 
-    SEQUENCE_TYPE _moveType;
+    SEQUENCE_TYPE _MoveType; //todo: raczej lepiej by to było w statusie
     PosFromTo _PosMove;
 
 public:
     ChessMovements(Websockets* pWebsockets, Chessboard* pBoardMain,
                    Chessboard* pBoardRemoved);
     ~ChessMovements();
-
-    void findAndSaveMoveAndSendItToTcp(QString QStrMove);
 
     PosOnBoard findKingPosInCastling(PosOnBoard FieldDest);
     PosOnBoard findRookPosInCastling(PosOnBoard FieldDest);
@@ -44,12 +42,11 @@ public:
 
     void goToSafeRemovedFieldIfNeeded(Chess *pChess);
     //void BadMove(QString msg);
-    void promoteToWhat(QString QStrMoveForFuturePromote);
 
     void setMove(QString QStrMove) { _PosMove = PosFromTo::fromQStr(QStrMove); }
-    void setMoveType(SEQUENCE_TYPE Type) { _moveType = Type; }
+    void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }
     PosFromTo getMove() const { return _PosMove; }
-    SEQUENCE_TYPE getMoveType() const { return _moveType; }
+    SEQUENCE_TYPE getMoveType() const { return _MoveType; }
     void clearMove() { _PosMove.clear(); } //todo: sprawdzić gdzie to implementować w całym kodzie
 };
 

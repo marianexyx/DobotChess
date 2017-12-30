@@ -6,6 +6,7 @@
 #include <QString>
 #include <QTimer>
 #include "client.h" //todo: ogarnąć to...
+#include "vars/end_of_game_types.h"
 
 class ChessTimers
 {

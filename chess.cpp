@@ -1,6 +1,6 @@
 #include "chess.h"
 
-Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
+Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
              Chessboard *pBoardRemoved, ArduinoUsb *pUsb, Websockets* pWebsockets,
              TCPMsgs *pTCPMsgs, COMMUNICATION_TYPES PlayerSource)
 {
@@ -9,7 +9,7 @@ Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
     _pBot = new ChessBot;
     _pStatus = new ChessStatus;
 
-    _pClientsList = pClientsList;
+    _pClients = pClients;
     _pDobot = pDobot;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
@@ -121,16 +121,20 @@ void Chess::GameStarted()
     _pWebsockets->sendMsgToAllClients("newOk");
 }
 
-void Chess::BadMove(QString msg)
+void Chess::tellPlayerThatHeGaveBadMove(QString msg)
 {
+    qDebug() << "Chess::tellPlayerThatHeGaveBadMove:" << msg;
     QString QStrMsgForActiveClient = "badMove " + msg + " "
             + turnTypeAsQstr(_pStatus->getWhoseTurn());
-    int64_t activePlayerID = _pClientsList->getClientID(_pClientsList->getPlayerSocket(
+    int64_t activePlayerID = _pClients->getClientID(_pClients->getPlayer(
                                                             this->getActivePlayerType()));
     this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
 }
 
-void Chess::EndOfGame(QString msg)
+//todo: funkcja w sumie nic nie mówi o tym co dokładnie robi
+//todo: operować na kliencie, a nie sockecie
+//todo: połączyłem na pałę 2 funkcje. przejrzeć dokładnie
+void Chess::EndOfGame(QString msg, Client playerToClear)
 {
     END_TYPE ETWhoWon;
     if (msg.left(3) == "1-0") ETWhoWon = ET_WHIE_WON;
@@ -142,8 +146,36 @@ void Chess::EndOfGame(QString msg)
         return;
     }
 
-    //todo: ta funkcja bedzie gdzie indziej, dostepna rowniez dla arduino
-    _pWebsockets->endOfGame(ETWhoWon); //todo: odpalam endOfGame() w endOfGame(). robi to syf
+    QString QStrPlayer = "";
+    if (playerToClear != nullptr)
+        QStrPlayer = _pClients->getClientName(playerToClear) + ":";
+    qDebug() << "Chess::endOfGame():" << QStrPlayer << endTypeAsQstr(ETWhoWon);
+
+    this->resetBoardData();
+
+    switch(ETWhoWon)
+    {
+    case ET_WHIE_WON:
+    case ET_BLACK_WON:
+    case ET_DRAW:
+    case ET_TIMEOUT_GAME:
+        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        break;
+
+    case ET_GIVE_UP:
+    case ET_SOCKET_LOST:
+        if (_pClients->getClientType(playerToClear) == PT_WHITE)
+            _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        else if (_pClients->getClientType(playerToClear) == PT_BLACK)
+            _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        else qDebug() << "ERROR: Chess::endOfGame(): wrong player type:" << ETWhoWon;
+        break;
+
+    default:
+        qDebug() << "ERROR: Chess::endOfGame: unknown ETWhoWon val=" << ETWhoWon;
+        break;
+    }
 
     _pWebsockets->sendMsgToAllClients("moveOk " + _pMovements->getMove().asQStr() + " nt " +
                                       endTypeAsQstr(ETWhoWon) + " " + this->getTableData());
@@ -192,7 +224,40 @@ bool Chess::isPiecesSetOk()
     return true;
 }
 
-void Chess::playerIsLeavingGame(QWebSocket *pClient, END_TYPE LeavingType)
+void Chess::removeClient(int64_t clientID)
+{
+    Client client = _pClients->getClient(clientID);
+    if (client.socket) //todo: co to??? czyżby to że sprawdzam czy udało mi się zrzutować obiekt...
+        //... z powyższej linjki?
+    {
+        if (_pClients->isClientAPlayer(client))
+            this->playerIsLeavingGame(client, ET_SOCKET_LOST);
+        else
+        {
+            //todo: wyświetla mi się disconnect w dziwnym miejscu
+            qDebug() << "non-player disconnected";
+            emit addTextToConsole("non-player disconnected\n", LOG_WEBSOCKET);
+        }
+
+        client.socket->deleteLater();
+
+        qDebug() << "Chess::removeClient(): remove client from list";
+        for(int i = 0; i < _pClients->getClientsList().count(); ++i)
+        { //nie umiem obsłużyć removeAll na structurach
+          if(_pClients->getClientsList().at(i).socket == client.socket)
+          {
+            _pClients->getClientsList().removeAt(i);
+            break;
+          }
+        }
+    }
+
+    emit setBoardDataLabels(std::to_string(_pClients->getClientsList().size()).c_str(),
+                            BDL_SOCKETS_ONLINE);
+    emit showClientsList(_pClients->getClientsList());
+}
+
+void Chess::playerIsLeavingGame(Client player, END_TYPE LeavingType)
 {
     //todo: reszta stanow tu poki co nie pasuje, bo gracz nei wychodzi z gry, tylko...
     //... jest ona normalnie konczona. jak przeniose to do wlasciwych klas, to...
@@ -205,22 +270,59 @@ void Chess::playerIsLeavingGame(QWebSocket *pClient, END_TYPE LeavingType)
         return;
     }
 
-    this->endOfGame(LeavingType, pClient); //end of game będzie przeniesiony do chess
+    this->endOfGame(LeavingType, player);
 
     _pWebsockets->sendMsgToAllClients(endTypeAsQstr(LeavingType) +
-                                      playerTypeAsQStr(this->getClientType(pClient)) +
+                playerTypeAsQStr(this->getClientType(player) +
                                       " " + this->getTableData());
-;
+
     this->restoreGameToInitialState();
+}
+
+//todo: funkcja w sumie nic nie mówi o tym co dokładnie robi
+//todo: operować na kliencie, a nie sockecie
+//todo: połączyłem na pałę 2 funkcje. przejrzeć dokładnie
+void Chess::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
+{
+    QString QStrPlayer = "";
+    if (playerToClear != nullptr)
+        QStrPlayer = _pClients->getClientName(_pClients->getClient(playerToClear)) + ":";
+    qDebug() << "Websockets::endOfGame():" << QStrPlayer << endTypeAsQstr(EndType);
+
+    this->resetBoardData();
+
+    switch(EndType)
+    {
+    case ET_WHIE_WON:
+    case ET_BLACK_WON:
+    case ET_DRAW:
+    case ET_TIMEOUT_GAME:
+        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        break;
+
+    case ET_GIVE_UP:
+    case ET_SOCKET_LOST:
+        if (_pClients->getClientType(_pClients->getClient(playerToClear)) == PT_WHITE)
+            _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        else if (_pClients->getClientType(_pClients->getClient(playerToClear)) == PT_BLACK)
+            _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        else qDebug() << "ERROR: Chess::endOfGame(): wrong player type:" << EndType;
+        break;
+
+    default:
+        qDebug() << "ERROR: Chess::endOfGame: unknown EndType val=" << EndType;
+        break;
+    }
 }
 
 PLAYER_TYPE Chess::getActivePlayerType()
 {
     if (_pStatus->getWhoseTurn() == WHITE_TURN &&
-            _pClientsList->getPlayerSocket(PT_WHITE) != nullptr)
+            _pClients->getPlayerSocket(PT_WHITE) != nullptr)
         return PT_WHITE;
     else if (_pStatus->getWhoseTurn() == BLACK_TURN &&
-             _pClientsList->getPlayerSocket(PT_BLACK) != nullptr)
+             _pClients->getPlayerSocket(PT_BLACK) != nullptr)
         return PT_BLACK;
     else
     {
@@ -234,19 +336,19 @@ QString Chess::getTableData()
 {
     //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt",
     //"wtime":345581,"btime":300000,"queue":"empty"}
-    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +
-            "\",\"bplr\":\"" + _pClientsList->getPlayerName(PT_BLACK) +
+    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClients->getPlayerName(PT_WHITE) +
+            "\",\"bplr\":\"" + _pClients->getPlayerName(PT_BLACK) +
             "\",\"turn\":\"" + _pStatus->getStrWhoseTurn() +
             "\",\"wtime\":" + QString::number(_pTimers->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pTimers->getBlackTimeLeft()) +
-            ",\"queue\":\"" + _pClientsList->getQueuedClientsList();
+            ",\"queue\":\"" + _pClients->getQueuedClientsList();
 
     if (_pTimers->isStartTimerRunning())
     {
         QString QStrWhiteClickedStart =
-                _pClientsList->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
+                _pClients->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
         QString QStrBlackClickedStart =
-                _pClientsList->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
+                _pClients->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
         QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
                 QString::number(_pTimers->getStartTimeLeft());
     }
@@ -263,7 +365,7 @@ QString Chess::getTableData()
 void Chess::restoreGameToInitialState() //todo: przemyśleć co tu musi być
 {
     _pStatus->setWhoseTurn(NO_TURN);
-    _pClientsList->resetPlayersStartConfirmInfo();
+    _pClients->resetPlayersStartConfirmInfo();
     //todo:ogarnąć to że raz wysyłam info do WS poprzez wskaźnik do nich, a raz z tej klasy
     _pWebsockets->sendMsgToAllClients("reseting");
     _pTimers->resetGameTimers();
@@ -279,7 +381,7 @@ void Chess::resetBoardCompleted()
 
         //todo: raz wiadomość jest cała sklejana w websockecie, a raz geTableData jest...
         //...doklejane w tym pliku
-        if (_pClientsList->isGameTableOccupied())
+        if (_pClients->isGameTableOccupied())
             _pTimers->startQueueTimer();
 
         _pWebsockets->sendMsg("resetComplited");
@@ -313,7 +415,8 @@ void Chess::playerClickedStart(PLAYER_TYPE playerType)
         qDebug() << "black player clicked start";
     }
     else if (_PlayerSource == ARDUINO) qDebug() << "player clicked start";
-    else qDebug() << "ERROR:unknown playerClickedStart val:" << playerTypeAsQStr(playerType);
+    else qDebug() << "ERROR: Chess::playerClickedStart(): unknown playerClickedStart "
+                     "val:" << playerTypeAsQStr(playerType);
 
     if (_pWebsockets->isStartClickedByPlayer(PT_WHITE) &&
             _pWebsockets->isStartClickedByPlayer(PT_BLACK)
@@ -404,24 +507,22 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
 {
     qDebug() << "Chess::checkMsgFromWebsockets: received:" << msg;
 
-    Client client = _pClientsList->getClient(clientID);
+    Client client = _pClients->getClient(clientID);
 
     if (msgFromWs == "newGame")
     {
         PLAYER_TYPE PlayerType = PT_NONE;
-        if (client.socket == _pClientsList->getPlayerSocket(PT_WHITE))
+        if (client == _pClients->getPlayer(PT_WHITE))
             PlayerType = PT_WHITE;
-        else if (client.socket == _pClientsList->getPlayerSocket(PT_BLACK))
+        else if (client == _pClients->getPlayer(PT_BLACK))
             PlayerType = PT_BLACK;
 
         this->playerClickedStart(PlayerType);
     }
-    //todo: jeżeli da się tak zrobić promocję, to polecenie "promoteTo" można...
-    //...usunąć na korzyść powtórzenia samego "move" do obu poleceń
     else if (msg.left(4) == "move")
         this->findAndSaveMoveAndSendItToTcp(msg.mid(5));
     else if (msg.left(9) == "promoteTo")
-        this->findAndSaveMoveAndSendItToTcp(msg.mid(10));
+        this->findAndSaveMoveAndSendItToTcp(msg);
     else if (msg == "getTableData")
         _pWebsockets->sendMsg(this->getTableData());
     else if (msg == "giveUp")
@@ -429,8 +530,7 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         if (client.socket) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam...
             //...gdzie są QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
         {
-            if (_pClientsList->isClientAPlayer(client.socket))
-                //todo: gdzieś tu skończyłem
+            if (_pClients->isClientAPlayer(client))
                 this->playerIsLeavingGame(client, ET_GIVE_UP); //todo: do zmiany (co?)
             else
                 qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
@@ -439,7 +539,7 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
     }
     else if (msg.left(5) == "sitOn")
     {
-        if (_pClientsList->getClientName(client.socket) == "-1")
+        if (_pClients->getClientName(client) == "-1")
         {
             qDebug() << "ERROR: Chess::receivedMsg(): sitOn: client not loggedIn";
             return;
@@ -448,16 +548,16 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(msg.mid(5));
 
         _pStatus->setWhoseTurn(NO_TURN);
-        if (!_pClientsList->isPlayerChairEmpty(PlayerChair))
+        if (!_pClients->isPlayerChairEmpty(PlayerChair))
         {
             qDebug() << "ERROR: Chess::receivedMsg(): client wanted to "
                         "sit on occupied chair. client name:"
-                     << _pClientsList->getClientName(client.socket) << ", player name:" <<
-                        _pClientsList->getPlayerName(PlayerChair);
+                     << _pClients->getClientName(client) << ", player name:" <<
+                        _pClients->getPlayerName(PlayerChair);
             return;
         }
         else
-            _pClientsList->setPlayerType(client.socket, PlayerChair);
+            _pClients->setPlayerType(client, PlayerChair);
 
         if (this->isGameTableOccupied())
             _pTimers->startQueueTimer();
@@ -466,12 +566,11 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
     }
     else if (QStrWsMsgToProcess == "standUp")
     {
-        if (_pClientsList->isClientAPlayer(client.socket)) //todo: można sprawdzać...
-            //...po kliencie, a nie po sockiecie, jak w wielu innych
+        if (_pClients->isClientAPlayer(client))
         {
             if (_pStatus->getWhoseTurn() == NO_TURN)
             {
-                _pClientsList->clearPlayerType(_pClientsList->getClientType(client.socket));
+                _pClients->clearPlayerType(_pClients->getClientType(client));
                 this->resetBoardData();
 
                 _pWebsockets->sendMsgToAllClients(this->getTableData());
@@ -480,7 +579,7 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
             {
                 qDebug() << "ERROR: Chess::receivedMsg(): player wanted to "
                             "leave chair during game. client name:"
-                          << _pClientsList->getClientName(client.socket);
+                          << _pClients->getClientName(client);
                 return;
             }
         }
@@ -488,42 +587,44 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         {
             qDebug() << "ERROR: Chess::receivedMsg(): non-player client"
                         " wanted to leave chair. client name:"
-                     << _pClientsList->getClientName(client.socket);
+                     << _pClients->getClientName(client);
             return;
         }
     }
     else if (QStrWsMsgToProcess.left(3) == "im ")
     {
         QString QStrName = QStrWsMsgToProcess.mid(3);
-        if (_pClientsList->isClientNameExists(QStrName))
+        if (_pClients->isClientNameExists(QStrName))
         {
-            _pClientsList->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
-            if (_pClientsList->isClientAPlayer(client.socket))
-                this->playerIsLeavingGame(client.socket, ET_SOCKET_LOST);
-            _pClientsList->setClientName(client.socket, QStrName);
+            _pClients->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
+            if (_pClients->isClientAPlayer(client))
+                this->playerIsLeavingGame(client, ET_SOCKET_LOST);
+            _pClients->setClientName(client, QStrName);
         }
         else
         {
-            _pClientsList->setClientName(client.socket, QStrName);
+            _pClients->setClientName(client, QStrName);
             this->sendDataToClient(this->getTableData());
         }
     }
     else if (QStrWsMsgToProcess == "queueMe")
     {
-        _pClientsList->addClientToQueue(client.socket);
+        _pClients->addClientToQueue(client);
         _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
     else if (QStrWsMsgToProcess == "leaveQueue")
     {
-        this->removeClientFromQueue(client.socket);
+        this->removeClientFromQueue(client);
         _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
-    else if (msg.left(5) == "reset")
+    else if (QStrWsMsgToProcess == "reset")
         this->restoreGameToInitialState();
+    else if (QStrWsMsgToProcess == "clientLeft")
+        this->removeClient(clientID);
     else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received unknown msg:"
                   << msg;
 
-    _pClientsList->showClientsInForm();
+    _pClients->showClientsInForm();
 }
 
 void Chess::resetPiecePositions()
@@ -667,21 +768,35 @@ void Chess::resetPiecePositions()
 
 void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
 {
-    _pMovements->setMove(QStrMove);
+    if (QStrMove.left(9) == "promoteTo")
+    {
+        //todo: zabezpieczenia
+        QString QStrPromotionType = QStrMove.right(1);
+        QStrMove = _pMovements->getMove().asQStr() + QStrPromotionType;
+    }
+    //todo: troche nieadekwatne jest to że normalny przypadek złego ruchu czy promocji...
+    //...jest tu taj traktowany jako przerwanie i nie wykonujemy całej funkcji wg nazwy
+    else if (_pStatus->isMoveARequestForPromotion(QStrMove))
+    {
+        _pMovements->setMove(QStrMove);
+        _pStatus->askActivePlayerWhatPawnPromoteHeWants();
+        return;
+    }
+    else if (!_pStatus->isMoveLegal(QStrMove))
+    {
+        this->tellPlayerThatHeGaveBadMove;
+        return;
+    }
+
     _pMovements->setMoveType(_pStatus->findMoveType(QStrMove));
+    _pMovements->setMove(QStrMove); //todo: zapisywanie ruchu przed jego sprawdzeniem?
 
     switch(_pMovements->getMoveType())
     {
-    //todo: ST_PROMOTE_TO_WHAT to nie ruch- to brak ruchu. wywalic stad
-    /*case ST_PROMOTE_TO_WHAT: this->PromoteToWhat(move); break;*/
     case ST_REGULAR: _pMovements->regularMoveSequence(*this); break;
     case ST_REMOVING: _pMovements->removeMoveSequence(*this);  break;
-    //restore available only in reset command
-    //case ST_RESTORE: _pMovements->restoreMoveSequence(*this, );  break;
     case ST_ENPASSANT: _pMovements->enpassantMoveSequence(*this); break;
     case ST_CASTLING: this->castlingMovingSequence(); break;
-    //todo: bad_move to nie ruch- to brak ruchu. wywalic stad
-    /*case ST_BADMOVE: this->BadMove(move); break;*/
     case ST_PROMOTION: _pMovements->promoteMoveSequence(*this); break;
     case ST_NONE:
     default:
@@ -691,7 +806,6 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
     }
 
     this->sendMsgToTcp("move " + QStrMove);
-    //_pStatus->clearFuturePromote(); //todo: sprawdzic jak ogarniac czyszczenia po ruchu
 }
 
 //todo: jezeli movements beda dziedziczone, to to powinno byc wewnatrz tamtej klasy

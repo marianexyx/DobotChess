@@ -28,7 +28,7 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
                 if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
                 {
                     QStrBoardArray[nColumn][nRow] = QStrFENSign;
-                    if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn > 8 =" << nColumn;
+                    if (nColumn>7) qDebug() << "ERROR: ChessStatus::FENToBoard: nColumn > 8 =" << nColumn;
                     ++nColumn;
                 }
                 else //digits
@@ -36,7 +36,7 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
                     for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
                     {
                         QStrBoardArray[nColumn][nRow] = ".";
-                        if (nColumn>7) qDebug() << "ERROR: Chessboard::FENToBoard: nColumn > 8 =" << nColumn;
+                        if (nColumn>7) qDebug() << "ERROR: ChessStatus::FENToBoard: nColumn > 8 =" << nColumn;
                         ++nColumn;
                     }
                 }
@@ -45,7 +45,7 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
     }
     else
     {
-        qDebug() << "ERROR: Chessboard::FENToBoard: boardRows.size() != 8. Size = " << QStrFENBoardRows.size();
+        qDebug() << "ERROR: ChessStatus::FENToBoard: boardRows.size() != 8. Size = " << QStrFENBoardRows.size();
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
@@ -64,29 +64,30 @@ bool ChessStatus::isMoveRemoving()
     else return false;
 }
 
-bool ChessStatus::isMovePromotion(QString moveToTest)
+bool ChessStatus::isMovePromotion(QString QStrMoveToTest)
 {
-    if ((moveToTest == "q" || moveToTest == "r" || moveToTest == "b" || moveToTest == "k")
-            && moveToTest.length() == 1 )
+    if ((QStrMoveToTest.right(1) == "q" || QStrMoveToTest.right(1) == "r" ||
+         QStrMoveToTest.right(1) == "b" || QStrMoveToTest.right(1) == "k")
+            && QStrMoveToTest.length() == 5 )
         return true;
     else return false;
 }
 
-bool ChessStatus::isMoveCastling(QString moveToTest)
+bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 {
-    if ((moveToTest == "e1c1" && _QStrCastlings.contains("Q") && m_QStrBoard[4][0] == "K") ||
-            (moveToTest == "e1g1" && _QStrCastlings.contains("K") && m_QStrBoard[4][0] == "K") ||
-            (moveToTest == "e8c8" && _QStrCastlings.contains("q") && m_QStrBoard[4][7] == "k") ||
-            (moveToTest == "e8g8" && _QStrCastlings.contains("k") && m_QStrBoard[4][7] == "k"))
+    if ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q") && m_QStrBoard[4][0] == "K") ||
+            (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K") && m_QStrBoard[4][0] == "K") ||
+            (QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q") && m_QStrBoard[4][7] == "k") ||
+            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k") && m_QStrBoard[4][7] == "k"))
         return true;
     else return false;
 }
 
-bool ChessStatus::isMoveEnpassant(QString moveToTest)
+bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
     if (((m_QStrBoard[PieceFrom.Letter][PieceFrom.Digit] == "P" && m_WhoseTurn == WHITE_TURN) ||
          (m_QStrBoard[PieceFrom.Letter][PieceFrom.Digit] == "p" && m_WhoseTurn == BLACK_TURN)) &&
-            moveToTest.right(2) == _QStrEnpassant)
+            QStrMoveToTest.right(2) == _QStrEnpassant)
         return true;
     else return false;
 }
@@ -126,25 +127,38 @@ void ChessStatus::saveStatusData(QString status)
     }
     else
     {
-        qDebug() << "ERROR: Chessboard::saveStatusData: wrong QStrFENRecord size =" <<
+        qDebug() << "ERROR: ChessStatus::saveStatusData: wrong QStrFENRecord size =" <<
                     QStrFENRecord.size();
-        this->addTextToConsole("ERROR: Chessboard::saveStatusData: wrong QStrFENRecord size = "
+        this->addTextToConsole("ERROR: ChessStatus::saveStatusData: wrong QStrFENRecord size = "
                                + QStrFENRecord.size());
     }
 }
 
 SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 {
-    if (_legalMoves.contains(QStrMove + "q")) return ST_PROMOTE_TO_WHAT;
-    else if (_legalMoves.contains(QStrMove))
+     if (this->isMoveLegal(QStrMove))
     {
-        if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
+        if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT;
+        else if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
         else if (this->isMoveRemoving()) return ST_REMOVING;
-        else if (this->isMovePromotion()) return ST_PROMOTION;
+        else if (this->isMovePromotion(QStrMove)) return ST_PROMOTION;
         else return ST_REGULAR;
     }
-    else return ST_BADMOVE;
+     else
+     {
+         qDebug() << "ERROR: ChessStatus::findMoveType: move is illegal:" << QStrMove;
+         return ST_NONE;
+     }
+}
+
+void ChessStatus::askActivePlayerWhatPawnPromoteHeWants()
+{
+    //todo: trochę chyba zmieniłem poniższą linijkę (komunikacja ws<->www)
+    QString QStrMsgForActiveClient = "promoteToWhat";
+    int64_t activePlayerID = _pClients->getClientID(_pClients->getPlayer(
+                                                            this->getActivePlayerType()));
+    this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
 }
 
 void ChessStatus::setLegalMoves(QString msg)

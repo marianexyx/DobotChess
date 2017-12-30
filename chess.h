@@ -34,7 +34,7 @@ class Chess: public QObject
     Q_OBJECT
 
 private:
-    Clients* _pClientsList;
+    Clients* _pClients;
     Dobot* _pDobot;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
@@ -60,20 +60,23 @@ private:
                                   VERTICAL_MOVE vertMove = VM_NONE);
     void wrongTcpAnswer(QString msgType, QString respond);
     void playerClickedStart(PLAYER_TYPE playerType);
-    bool compareArrays(short nArray1[][8], short nArray2[][8]);
+    bool compareArrays(short nArray1[][8], short nArray2[][8]); //todo: do basic vars
 
 public:
-    Chess(Clients* pClientsList, Dobot* pDobot, Chessboard* pBoardMain,
+    Chess(Clients* pClients, Dobot* pDobot, Chessboard* pBoardMain,
           Chessboard* pBoardRemoved, ArduinoUsb* pUsb, Websockets* pWebsockets,
           TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
     ~Chess();
 
+    void findAndSaveMoveAndSendItToTcp(QString QStrMove);
     void GameStarted();
-    void BadMove(QString msg);
-    void EndOfGame(QString msg);
+    void tellPlayerThatHeGaveBadMove(QString msg);
+    void EndOfGame(QString msg, Client playerToClear);
     void resetBoardData();
     bool isPiecesSetOk();
-    void playerIsLeavingGame(QWebSocket *pClient, END_TYPE LeavingType);
+    void removeClient(int64_t clientID); //todo: taka sama nazwa jak w cliencie. zmienić coś
+    void playerIsLeavingGame(Client player, END_TYPE LeavingType); //todo: websocket param
+    void endOfGame(END_TYPE EndType, Client playerToClear /*= nullptr*/); //todo: websocket param
 
     PLAYER_TYPE getActivePlayerType();
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }

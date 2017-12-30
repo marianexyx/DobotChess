@@ -18,7 +18,6 @@ private:
     QString _QStrEnpassant;
     QStringList _legalMoves;
     QStringList _historyMoves;
-    PosFromTo _FuturePromoteMove;
 
     //todo: dodatkowo zawsze zwalniac potem pamiec- freeboard
     QString** FENToBoard(QString FENBoard);
@@ -28,12 +27,16 @@ public:
     ChessStatus();
     ~ChessStatus() {}
 
+    bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
+    bool isMoveARequestForPromotion(QString QStrMove){
+        return _legalMoves.contains(QStrMove + "q")? true : false; }
     bool isMoveRemoving();
-    bool isMoveCastling(QString moveToTest);
-    bool isMoveEnpassant(QString moveToTest);
-    bool isMovePromotion(QString moveToTest);
+    bool isMoveCastling(QString QStrMoveToTest);
+    bool isMoveEnpassant(QString QStrMoveToTest);
+    bool isMovePromotion(QString QStrMoveToTest);
     void saveStatusData(QString status);
     SEQUENCE_TYPE findMoveType(QString move);
+    void askActivePlayerWhatPawnPromoteHeWants();
 
     //todo: settery jako friend dla chess?
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
@@ -44,7 +47,6 @@ public:
     void setHistoryMoves(QString msg);
     void setHistoryMoves(QStringList historyMoves) { _historyMoves = historyMoves;
                                                      emit showHistoryMoves(_historyMoves); }
-    //void setFuturePromote(QString QStrMove) { _QStrFuturePromote = QStrMove; }
 
     FEN_GAME_STATE getFENGameState() const { return _FENGameState; }
     WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
@@ -53,11 +55,9 @@ public:
     QString getHisotyMovesAsQStr() const { return _historyMoves.join(" "); }
     QString getCastlings() const { return _QStrCastlings; }
     QString getEnpassant() const { return _QStrEnpassant; }
-    QString getFuturePromoteAsQStr() const { return _FuturePromoteMove.asQStr(); }
 
     void clearLegalMoves() { _legalMoves.clear(); emit showLegalMoves(_legalMoves);}
     void clearHistoryMoves() { _historyMoves.clear(); emit showHistoryMoves(_historyMoves); }
-    void clearFuturePromote() { _FuturePromoteMove.clear(); }
 
 signals: //todo: dziedziczyć jakoś?
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);

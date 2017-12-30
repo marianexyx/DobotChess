@@ -35,7 +35,6 @@ public:
     Websockets(Clients* pClients, quint16 port, QObject *parent = Q_NULLPTR);
 
     void sendToChess(QString QStrMsg, int64_t clientID);
-    void endOfGame(END_TYPE EndType, QWebSocket *playerToClear = nullptr); //todo: przenieść
     void sendMsgToAllClients(QString msg);
 
     ~Websockets();

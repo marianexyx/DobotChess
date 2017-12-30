@@ -31,8 +31,7 @@ void ChessTimers::timeOutWhite()
     this->resetGameTimers();
 
     //todo: znowu nie wiadomo jak się odnieść do góry
-    pChess->playerIsLeavingGame(this->getPlayerSocket(playerTypeFromQStr(QStrWsMsg.right(5))),
-                              ET_TIMEOUT_GAME);
+    pChess->playerIsLeavingGame(_pClients->getPlayer(PT_WHITE), ET_TIMEOUT_GAME);
     this->endOfGame(ET_TIMEOUT_GAME);
 
     emit sendMsgToPlayer("timeOutWhite"); //todo: to all
@@ -42,8 +41,7 @@ void ChessTimers::timeOutBlack()
 {
     this->resetGameTimers();
 
-    pChess->playerIsLeavingGame(this->getPlayerSocket(playerTypeFromQStr(QStrWsMsg.right(5))),
-                              ET_TIMEOUT_GAME);
+    pChess->playerIsLeavingGame(_pClients->getPlayer(PT_BLACK), ET_TIMEOUT_GAME);
     this->endOfGame(ET_TIMEOUT_GAME);
 
     emit sendMsgToPlayer("timeOutBlack"); //todo: to all
@@ -65,12 +63,12 @@ void ChessTimers::timeOutStartQueue()
 {
     this->stopQueueTimer();
     //todo: można zamknać w funkcji clientlistowej (sprawdzić resztę powtórzeń)
-    if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    if (!_pClients->isStartClickedByPlayer(PT_WHITE))
+        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-    _pClientsList->resetPlayersStartConfirmInfo();
+    _pClients->resetPlayersStartConfirmInfo();
      this->stopQueueTimer();
 
     if (this->isGameTableOccupied())
@@ -139,7 +137,7 @@ void ChessTimers::switchPlayersTimers()
         _blackTimer->start();
     }
     else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
-                     "white or black.  it's' ==" << getWhoseTurn();
+                     "white or black.  it's' ==" << _pStatus->getWhoseTurn(); //?
 }
 
 void ChessTimers::startQueueTimer()

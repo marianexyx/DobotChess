@@ -33,7 +33,7 @@ void Websockets::onNewConnection()
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
-    this->newClientSocket(pSocket);
+    this->newClient(pSocket);
     emit addTextToConsole("New connection \n", LOG_WEBSOCKET);
     _pClients->showClientsInForm();
 }
@@ -51,7 +51,7 @@ void Websockets::receivedMsg(QString QStrWsMsgToProcess)
     else return;
 
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender()); //przysyłający 
-    int64_t clientID = _pClients->getClientID(pClient);
+    int64_t clientID = _pClients->getClientID(_pClients->getClient(pClient));
 
     this->sendToChess(QStrWsMsg, clientID);
 }
@@ -69,7 +69,7 @@ void Websockets::sendMsg(int64_t ID, QString QStrWsMsg)
 {
     if(!_pClients->isClientIDExists(ID)) return;
 
-    Client client = _pClientsList->getClient(ID);
+    Client client = _pClients->getClient(ID);
     client.socket->sendTextMessage(QStrWsMsg);
 }
 
@@ -85,69 +85,8 @@ void Websockets::sendToChess(QString QStrMsg, int64_t clientID)
 void Websockets::socketDisconnected()
 {
     QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-
-    if (pClient) //todo: co to??? czyżby to że sprawdzam czy udało mi się zrzutować obiekt...
-        //... z powyższej linjki?
-        //todo: wnętrze tej funkcji przerzucić do chess
-    {
-        if (this->isClientAPlayer(pClient))
-            this->playerIsLeavingGame(pClient, ET_SOCKET_LOST);
-        else
-        {
-            //todo: wyświetla mi się disconnect w dziwnym miejscu
-            qDebug() << "non-player disconnected";
-            emit addTextToConsole("non-player disconnected\n", LOG_WEBSOCKET);
-        }
-
-        pClient->deleteLater();
-
-        qDebug() << "Websockets::socketDisconnected(): remove client from list";
-        for(int i = 0; i < m_clients.count(); ++i)
-        { //nie umiem obsłużyć removeAll na structurach
-          if(m_clients.at(i).socket == pClient)
-          {
-            m_clients.removeAt(i);
-            break;
-          }
-        }
-    }
-
-    emit setBoardDataLabels(std::to_string(m_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
-    emit showClientsList(m_clients);
-}
-
-//todo: funkcja w sumie nic nie mówi o tym co dokładnie robi. i znajduje si w zlej klasie
-void Websockets::endOfGame(END_TYPE EndType, QWebSocket *playerToClear)
-{
-    QString QStrPlayer = "";
-    if (playerToClear != nullptr) QStrPlayer = this->getClientName(playerToClear) + ":";
-    qDebug() << "Websockets::endOfGame():" << QStrPlayer << endTypeAsQstr(EndType);
-
-    _pChessboard->resetBoardData();
-
-    switch(EndType)
-    {
-    case ET_WHIE_WON:
-    case ET_BLACK_WON:
-    case ET_DRAW:
-    case ET_TIMEOUT_GAME:
-        this->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-        this->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
-        break;
-
-    case ET_GIVE_UP:
-    case ET_SOCKET_LOST:
-        if (this->getClientType(playerToClear) == PT_WHITE)
-            this->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-        else if (this->getClientType(playerToClear) == PT_BLACK)
-            this->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
-        else qDebug() << "ERROR: Websockets::endOfGame(): wrong player type:" << EndType;
-        break;
-
-    default:
-        qDebug() << "ERROR: Websockets::endOfGame: unknown EndType val=" << EndType;
-        break; 
-    }
+    int64_t clientID = _pClients->getClientID(_pClients->getClient(pClient));
+    emit sendToChess("clientLeft", clientID);
 }
 
 void Websockets::sendMsgToAllClients(QString msg)

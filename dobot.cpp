@@ -207,21 +207,21 @@ bool Dobot::bIsMoveInAxisRange(float x, float y, float z)
     //todo: nie powinny być przekazywane dane z chessboardu (ie meiszać klas)
     if ( x < _pChessboard->getMinBoardAxis().x || x > _pChessboard->getMaxBoardAxis().x)
     {
-        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: X axis out of range <"
+        qDebug() << "ERROR: Dobot::bIsMoveInAxisRange: X axis out of range <"
                  << _pChessboard->getMinBoardAxis().x  << "," <<
                     _pChessboard->getMaxBoardAxis().x << ">. x =" << x;
         check = false;
     }
     if ( y < _pChessboard->getMinBoardAxis().y || y > _pChessboard->getMaxBoardAxis().y)
     {
-        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Y axis out of range <"
+        qDebug() << "ERROR: Dobot::bIsMoveInAxisRange: Y axis out of range <"
                  << _pChessboard->getMinBoardAxis().y << ","
                  << _pChessboard->getMaxBoardAxis().y << ">. y =" << y;
         check = false;
     }
     if ( z < _pChessboard->getMinBoardAxis().z || z > _pChessboard->getMaxBoardAxis().z)
     {
-        qDebug() << "ERROR: Chessboard::bIsMoveInAxisRange: Z axis out of range <"
+        qDebug() << "ERROR: Dobot::bIsMoveInAxisRange: Z axis out of range <"
                  << _pChessboard->getMinBoardAxis().z << ","
                  << _pChessboard->getMaxBoardAxis().z << ">. z =" << z;
         check = false;

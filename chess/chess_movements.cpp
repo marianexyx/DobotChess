@@ -13,7 +13,7 @@ PosOnBoard ChessMovements::findKingPosInCastling(PosOnBoard FieldDest)
     KingFieldDest.Digit = FieldDest.Digit;
     if (FieldDest.Letter == L_C) KingFieldDest.Letter = L_A;
     else if (FieldDest.Letter == L_G) KingFieldDest.Letter = L_H;
-    else qDebug() << "ERRORChessMovements::findKingPosInCastling: "
+    else qDebug() << "ERROR: ChessMovements::findKingPosInCastling: "
                      "wrong FieldDest.Letter val =" << FieldDest.Letter;
     return KingFieldDest;
 }
@@ -24,12 +24,10 @@ PosOnBoard ChessMovements::findRookPosInCastling(PosOnBoard FieldDest)
     RookFieldDest.Digit = RookFieldDest.Digit;
     if (FieldDest.Letter == L_C) RookFieldDest.Letter = L_D;
     else if (FieldDest.Letter == L_G) RookFieldDest.Letter = L_F;
-    else qDebug() << "ERRORChessMovements::findKingPosInCastling: "
+    else qDebug() << "ERROR: ChessMovements::findKingPosInCastling: "
                      "wrong FieldDest.Letter val =" << FieldDest.Letter;
     return RookFieldDest;
 }
-
-
 
 void ChessMovements::regularMoveSequence(Chess* pChess)
 {
@@ -117,7 +115,7 @@ void ChessMovements::enpassantMoveSequence(Chess* pChess)
 
 void ChessMovements::promoteMoveSequence(Chess* pChess)
 {
-    //todo: niby sie rozni tylko przypisaniem innej bierki
+    //metoda przyda się na przyszłość
     this->regularMoveSequence(pChess);
 }
 
@@ -138,21 +136,4 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Chess *pChess)
 
     PosOnBoard safeRemovedField(L_D, SafePosToDigit);
     pChess->movePieceWithManipulator(_pBoardRemoved, safeRemovedField);
-}
-
-void ChessMovements::promoteToWhat(QString QStrMoveForFuturePromote)
-{
-    //todo: ogarnac gdzies czyszczenie tej zmiennej po wszystkim i sprawdzanie czy nie probuje...
-    //...uzywac gdzies tej zmiennej pustej
-    _pChessboard->QStrFuturePromote = QStrMoveForFuturePromote; //todo: to jest syf
-
-    _pTimers->switchPlayersTimers();
-    //todo: trochę chyba zmieniłem poniższą linijkę
-    //todo: jeżeli zdecyduję się wysyłać ifno do wszsytkich o każdym ruchu, to jak ogarnąć...
-    //...promote?
-    QString QStrMsgForActiveClient = "moveOk " + QStrMoveForFuturePromote + " " +
-            _pStatus->getStrWhoseTurn() + " promote";
-    int64_t activePlayerID = _pClientsList->getClientID(_pClientsList->getPlayerSocket(
-                                                            this->getActivePlayerType()));
-    this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
 }

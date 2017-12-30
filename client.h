@@ -42,41 +42,40 @@ private:
 public:
     Clients() {}
 
-    void newClientSocket(QWebSocket *clientSocket);
-    void setClientName(QWebSocket *clientSocket, QString name);
-    void setPlayerType(QWebSocket *clientSocket, PLAYER_TYPE type);
+    void newClient(QWebSocket *clientSocket);
+    void setClientName(Client client, QString name);
+    void setPlayerType(Client client, PLAYER_TYPE type);
     void clearPlayerType(PLAYER_TYPE type);
-    void setClientState(QWebSocket *clientSocket, bool state);
+    void setClientState(Client client, bool state);
     void setClientState(PLAYER_TYPE type, bool state);
-    void addClientToQueue(QWebSocket *clientSocket);
-    void removeClient(QWebSocket *clientSocket);
-    void removeClientFromQueue(QWebSocket *clientSocket);
+    void addClientToQueue(Client client);
+    void removeClient(Client client); //todo: nie używam tego wogle? to jak usuwałem wcześniej?
+    void removeClientFromQueue(Client client);
     void resetPlayersStartConfirmInfo();
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair);
 
     QList<Client> getClientsList() const { return _clients; }
-    bool isClientInList(QWebSocket *clientSocket);
+    bool isClientInList(Client client);
     Client getClient(QWebSocket *clientSocket);
     Client getClient(int64_t clientID);
+    Client getPlayer(PLAYER_TYPE type); //todo: typy z dużych? poczytać
     QWebSocket *getClientSocket(QString playerName);
-    QString getClientName(QWebSocket *clientSocket);
-    QWebSocket *getNextQueuedClientSocket();
+    QString getClientName(Client client);
+    Client getNextQueuedClient();
     QString getQueuedClientsList();
-    PLAYER_TYPE getClientType(QWebSocket *clientSocket);
+    PLAYER_TYPE getClientType(Client client);
     bool isPlayerChairEmpty(PLAYER_TYPE type);
     bool isGameTableOccupied();
-    int64_t getQueuedClient(QString name);
-    int64_t getQueuedClient(QWebSocket *clientSocket);
+    int64_t getClientPosInQueue(Client client);
     QWebSocket *getPlayerSocket(PLAYER_TYPE type);
     bool isStartClickedByPlayer(PLAYER_TYPE type);
     QString getPlayerName(PLAYER_TYPE type);
-    bool isClientInQueue(QWebSocket *clientSocket);
+    bool isClientInQueue(Client client);
     bool isClientNameExists(QString name);
     int getAmountOfQueuedClients();
-    bool isClientAPlayer(QWebSocket *clientSocket);
+    bool isClientAPlayer(Client client);
     bool isClientIDExists(int64_t ID);
-    //todo: niby getClientID, a jako parametr podaję socket
-    int64_t getClientID(QWebSocket *clientSocket);
+    int64_t getClientID(Client client);
     int64_t getNextAvailableClientID();
 
     //void testQueuedClients(); //test jednostkowy

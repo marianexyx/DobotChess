@@ -4,8 +4,8 @@
 #pragma once
 #include <QString>
 
+//todo: kilka z tych nie jest używana w ChessStatus::findMoveType
 enum SEQUENCE_TYPE { ST_NONE, //todo: trzeba to będzie podzielić na ruchy szachowe i ramienia
-                     ST_BADMOVE,
                      ST_REGULAR,
                      ST_PROMOTE_TO_WHAT,
                      ST_PROMOTION,
@@ -14,7 +14,7 @@ enum SEQUENCE_TYPE { ST_NONE, //todo: trzeba to będzie podzielić na ruchy szac
                      ST_CASTLING_KING,
                      ST_CASTLING_ROOK,
                      ST_REMOVING,
-                     ST_RESTORE,
+                     ST_RESTORE, //restore available only in reset command
                      ST_SERVICE };
 
 inline QString sequenceTypeAsQstr(SEQUENCE_TYPE ST)
@@ -23,7 +23,6 @@ inline QString sequenceTypeAsQstr(SEQUENCE_TYPE ST)
     switch(ST)
     {
     case ST_NONE: QStrType = "none" ; break;
-    case ST_BADMOVE: QStrType = "badMove" ; break;
     case ST_REGULAR: QStrType = "regular" ; break;
     case ST_PROMOTE_TO_WHAT: QStrType = "promoteToWhat" ; break;
     case ST_PROMOTION: QStrType = "promotion" ; break;
