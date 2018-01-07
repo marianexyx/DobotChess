@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "chess.h" //todo: skoro includuje chess.h, to prawie na pewno to powinien być jedyny include w podklasach
 #include <QString>
 #include <QTimer>
 #include "client.h" //todo: ogarnąć to...
@@ -11,6 +12,8 @@
 class ChessTimers
 {
 private:
+    Chess* _pChess;
+
     QTimer *_whiteTimer;
     QTimer *_blackTimer;
     QTimer *_updateLabelTimer;
@@ -27,7 +30,7 @@ private slots:
     void timeOutStartQueue();
 
 public:
-    ChessTimers();
+    ChessTimers(Chess* pChess);
 
     void startGameTimer();
     void stopBoardTimers();

@@ -1,9 +1,11 @@
 #include "chess_timers.h"
 
-ChessTimers::ChessTimers():
+ChessTimers::ChessTimers(Chess *pChess):
     _lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
     _lTimersStartQueue(1000*60*2)
 {
+    _pChess = pChess;
+
     _whiteTimer = new QTimer();
     _blackTimer = new QTimer();
     _updateLabelTimer = new QTimer();

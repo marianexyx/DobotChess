@@ -1,7 +1,10 @@
 #include "chess_status.h"
 
-ChessStatus::ChessStatus()
+ChessStatus::ChessStatus(Chess *pChess, Chessboard* pBoardMain)
 {
+    _pChess = pChess;
+    _pBoardMain = pBoardMain;
+
     _WhoseTurn = NO_TURN;
 }
 
@@ -45,7 +48,8 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
     }
     else
     {
-        qDebug() << "ERROR: ChessStatus::FENToBoard: boardRows.size() != 8. Size = " << QStrFENBoardRows.size();
+        qDebug() << "ERROR: ChessStatus::FENToBoard: boardRows.size() != 8. Size = " <<
+                    QStrFENBoardRows.size();
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
@@ -55,12 +59,9 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
 
 bool ChessStatus::isMoveRemoving()
 {
-    if (m_QStrBoard[PieceTo.Letter][PieceTo.Digit] != ".") //todo
-    {
-        qDebug() << "m_QStrBoard[PieceTo.Letter:" << pieceLetterPosAsQStr(PieceTo.Letter) << "][PieceTo.Digit:" <<
-                    PieceTo.Digit+1 << "] =" << m_QStrBoard[PieceTo.Letter][PieceTo.Digit];
+    PosFromTo MoveTo = _pChess->getMovementsPointer()->getMove().to;
+    if (_pBoardMain->getField(MoveTo)->getPieceNrOnField() > 0)
         return true;
-    }
     else return false;
 }
 
@@ -75,18 +76,27 @@ bool ChessStatus::isMovePromotion(QString QStrMoveToTest)
 
 bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 {
-    if ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q") && m_QStrBoard[4][0] == "K") ||
-            (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K") && m_QStrBoard[4][0] == "K") ||
-            (QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q") && m_QStrBoard[4][7] == "k") ||
-            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k") && m_QStrBoard[4][7] == "k"))
+    PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
+    PosOnBoard BlackKingStartFieldPos(L_E, D_8);
+    short sWhiteKingPieceNr = Field::startPieceNrOnField(WhiteKingStartFieldPos);
+    short sBlackKingPieceNr = Field::startPieceNrOnField(BlackKingStartFieldPos);
+
+    if (_pChess->isPieceStayOnItsStartingField(sWhiteKingPieceNr) &&
+         ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q")) ||
+            (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K"))) ||
+            _pChess->isPieceStayOnItsStartingField(sBlackKingPieceNr) &&
+            (QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q")) ||
+            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k")))
         return true;
     else return false;
 }
 
 bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
-    if (((m_QStrBoard[PieceFrom.Letter][PieceFrom.Digit] == "P" && m_WhoseTurn == WHITE_TURN) ||
-         (m_QStrBoard[PieceFrom.Letter][PieceFrom.Digit] == "p" && m_WhoseTurn == BLACK_TURN)) &&
+    PosFromTo MoveFrom = _pChess->getMovementsPointer()->getMove().from;
+    PIECE_TYPE piece = Piece::Type(_pBoardMain->getField(MoveFrom)->getPieceNrOnField());
+    if ((piece == P_PAWN && ((Piece::Color(piece) == PT_WHITE && _WhoseTurn == WHITE_TURN) ||
+                            (Piece::Color(piece) == PT_BLACK && _WhoseTurn == BLACK_TURN))) &&
             QStrMoveToTest.right(2) == _QStrEnpassant)
         return true;
     else return false;
@@ -134,33 +144,6 @@ void ChessStatus::saveStatusData(QString status)
     }
 }
 
-SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
-{
-     if (this->isMoveLegal(QStrMove))
-    {
-        if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT;
-        else if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
-        else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
-        else if (this->isMoveRemoving()) return ST_REMOVING;
-        else if (this->isMovePromotion(QStrMove)) return ST_PROMOTION;
-        else return ST_REGULAR;
-    }
-     else
-     {
-         qDebug() << "ERROR: ChessStatus::findMoveType: move is illegal:" << QStrMove;
-         return ST_NONE;
-     }
-}
-
-void ChessStatus::askActivePlayerWhatPawnPromoteHeWants()
-{
-    //todo: trochę chyba zmieniłem poniższą linijkę (komunikacja ws<->www)
-    QString QStrMsgForActiveClient = "promoteToWhat";
-    int64_t activePlayerID = _pClients->getClientID(_pClients->getPlayer(
-                                                            this->getActivePlayerType()));
-    this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
-}
-
 void ChessStatus::setLegalMoves(QString msg)
 {
     QStringList legalMoves = msg.split(QRegExp("\\s"));
@@ -201,7 +184,7 @@ WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
     else
     {
         return NO_TURN;
-        qDebug () << "ERROR: Chessboard::whoseTurn- unknown parameter:" << QStrWhoseTurn;
+        qDebug () << "ERROR: ChessStatus::whoseTurn- unknown parameter:" << QStrWhoseTurn;
     }
 }
 
@@ -212,7 +195,8 @@ QString ChessStatus::getStrWhoseTurn()
     else if (_WhoseTurn == NO_TURN) return "nt";
     else
     {
-        QString err = "ERROR: wrong turn type: " + QString::number(_WhoseTurn);
+        QString err = "ERROR: ChessStatus::getStrWhoseTurn(): wrong turn type: "
+                + QString::number(_WhoseTurn);
         return err;
     }
 }

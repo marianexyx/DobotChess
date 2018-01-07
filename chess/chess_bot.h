@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "chess.h"
 #include "arduinousb.h"
 #include "chessboard.h"
 #include "vars/basic_vars.h"
@@ -12,6 +13,8 @@ class ChessBot
     Q_OBJECT
 
 private:
+    Chess* _pChess;
+    Chessboard *_pBoardMain;
     ArduinoUsb *_pArduinoUsb; //reszta wskaznikow dziedziczona
 
     bool _bAI;
@@ -24,7 +27,7 @@ private:
     void checkAI();
 
 public:
-    ChessBot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb);
+    ChessBot(Chess* pChess, Chessboard *pBoardMain, ArduinoUsb *pArduinoUsb);
     ~ChessBot() {}
 
     //----------KOMUNIKACJA Z CHENARD----------//

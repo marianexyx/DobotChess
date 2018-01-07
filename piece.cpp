@@ -102,6 +102,8 @@ static short Piece::nr(PosOnBoard PieceLines)
     else return -1;
 }
 
+static PosOnBoard Pos(short sPieceNr);
+
 static short Piece::StartFieldNr(short sPieceNr)
 {
     if (!Piece::isInRange(sPieceNr)) return -1;

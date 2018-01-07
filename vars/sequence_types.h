@@ -4,7 +4,7 @@
 #pragma once
 #include <QString>
 
-//todo: kilka z tych nie jest używana w ChessStatus::findMoveType
+//todo: kilka z tych nie jest używana w findMoveType
 enum SEQUENCE_TYPE { ST_NONE, //todo: trzeba to będzie podzielić na ruchy szachowe i ramienia
                      ST_REGULAR,
                      ST_PROMOTE_TO_WHAT,

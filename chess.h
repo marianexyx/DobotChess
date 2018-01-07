@@ -29,6 +29,7 @@ ruch e2e4 wpada do obiektu szachow:
 -wykonanie zapytania o ruch na tcp
 -reagowanie na odpowiedzi z tcp*/
 //todo: szachy nie powinny raczej wiedzieć nic o graczu, który steruje grą
+
 class Chess: public QObject
 {
     Q_OBJECT
@@ -74,12 +75,19 @@ public:
     void EndOfGame(QString msg, Client playerToClear);
     void resetBoardData();
     bool isPiecesSetOk();
+    bool isPieceStayOnItsStartingField(short sPieceNr); //todo: wskaznik do piece?
     void removeClient(int64_t clientID); //todo: taka sama nazwa jak w cliencie. zmienić coś
     void playerIsLeavingGame(Client player, END_TYPE LeavingType); //todo: websocket param
     void endOfGame(END_TYPE EndType, Client playerToClear /*= nullptr*/); //todo: websocket param
 
     PLAYER_TYPE getActivePlayerType();
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
+
+    //todo: friends to rest of ingedients
+    ChessTimers* getTimersPointer() { return _pTimers; }
+    ChessMovements* getMovementsPointer() { return _pMovements; }
+    ChessBot* getBotPointer() { return _pBot; }
+    ChessStatus* getStatusPointer() { return _pStatus; }
 
 public slots:
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);

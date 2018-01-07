@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "chess.h"
 #include <QString>
 #include "chessboard.h"
 #include "vars/fen_game_state.h"
@@ -11,11 +12,14 @@ class ChessStatus
 {
 
 private:
+    Chess* _pChess;
+    Chessboard* _pBoardMain;
+
     FEN_GAME_STATE _FENGameState;
     QString _QStrBoard[8][8]; //todo:?? nazwać to jakiś tempem, albo używać obiektów
     WHOSE_TURN _WhoseTurn;
     QString _QStrCastlings;
-    QString _QStrEnpassant;
+    QString _QStrEnpassant; //f.e. "e5"
     QStringList _legalMoves;
     QStringList _historyMoves;
 
@@ -24,7 +28,7 @@ private:
     WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
 
 public:
-    ChessStatus();
+    ChessStatus(Chess* pChess, Chessboard* pBoardMain);
     ~ChessStatus() {}
 
     bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
@@ -35,8 +39,6 @@ public:
     bool isMoveEnpassant(QString QStrMoveToTest);
     bool isMovePromotion(QString QStrMoveToTest);
     void saveStatusData(QString status);
-    SEQUENCE_TYPE findMoveType(QString move);
-    void askActivePlayerWhatPawnPromoteHeWants();
 
     //todo: settery jako friend dla chess?
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }

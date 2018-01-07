@@ -4,10 +4,10 @@ Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
              Chessboard *pBoardRemoved, ArduinoUsb *pUsb, Websockets* pWebsockets,
              TCPMsgs *pTCPMsgs, COMMUNICATION_TYPES PlayerSource)
 {
-    _pTimers = new ChessTimers;
-    _pMovements = new ChessMovements;
-    _pBot = new ChessBot;
-    _pStatus = new ChessStatus;
+    _pTimers = new ChessTimers(*this);
+    _pMovements = new ChessMovements(*this);
+    _pBot = new ChessBot(*this);
+    _pStatus = new ChessStatus(*this);
 
     _pClients = pClients;
     _pDobot = pDobot;
@@ -222,6 +222,14 @@ bool Chess::isPiecesSetOk()
         }
     }
     return true;
+}
+
+bool Chess::isPieceStayOnItsStartingField(short sPieceNr)
+{
+    if (!Piece::isInRange(sPieceNr)) return 0;
+
+    Field* pStartFieldOfPiece = _pBoardMain->getField(Piece::StartFieldNr(sPieceNr));
+    if (sPieceNr == pStartFieldOfPiece->getPieceNrOnField());
 }
 
 void Chess::removeClient(int64_t clientID)
@@ -779,7 +787,13 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
     else if (_pStatus->isMoveARequestForPromotion(QStrMove))
     {
         _pMovements->setMove(QStrMove);
-        _pStatus->askActivePlayerWhatPawnPromoteHeWants();
+
+        //todo: trochę chyba zmieniłem poniższą linijkę (komunikacja ws<->www)
+        QString QStrMsgForActiveClient = "promoteToWhat";
+        int64_t activePlayerID = _pClients->getClientID(_pClients->getPlayer(
+                                                                this->getActivePlayerType()));
+        this->sendDataToClient(QStrMsgForActiveClient, activePlayerID);
+
         return;
     }
     else if (!_pStatus->isMoveLegal(QStrMove))
@@ -788,8 +802,9 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
         return;
     }
 
-    _pMovements->setMoveType(_pStatus->findMoveType(QStrMove));
-    _pMovements->setMove(QStrMove); //todo: zapisywanie ruchu przed jego sprawdzeniem?
+    //todo: poniższe możnaby nazwać np. saveMove i upchać do podklasy
+    _pMovements->setMoveType(_pMovements->findMoveType(QStrMove));
+    _pMovements->setMove(QStrMove);
 
     switch(_pMovements->getMoveType())
     {

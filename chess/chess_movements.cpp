@@ -1,7 +1,9 @@
 #include "chess_movements.h"
 
-ChessMovements::ChessMovements(Websockets *pWebsockets, Chessboard* pBoardMain, Chessboard* pBoardRemoved)
+ChessMovements::ChessMovements(Chess *pChess, Websockets *pWebsockets,
+                               Chessboard* pBoardMain, Chessboard* pBoardRemoved)
 {
+    _pChess = pChess;
     _pWebsockets = pWebsockets;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;    
@@ -113,9 +115,8 @@ void ChessMovements::enpassantMoveSequence(Chess* pChess)
 }
 //todo: po wszystkich ruchach czyscic zmienne globalne from/to jezeli jeszcze beda istniec
 
-void ChessMovements::promoteMoveSequence(Chess* pChess)
+void ChessMovements::promoteMoveSequence(Chess* pChess) //metoda przyda się na przyszłość
 {
-    //metoda przyda się na przyszłość
     this->regularMoveSequence(pChess);
 }
 
@@ -123,7 +124,6 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Chess *pChess)
 {
     //todo: mozliwe ze cale przjscia typu goToSafeRemovedField beda zbedne jezeli...
     //...kaze dobotowi isc ruchami kolistymi na przegubach
-    //todo: jeżeli szachownica remove ma wielokść normalnej, to te wartości ulegną zmianie
     DIGIT SafePosToDigit = D_X;
     if (_PosMove.to.Digit == D_1) SafePosToDigit = D_2;
     else if (_PosMove.to.Digit == D_8) SafePosToDigit = D_7;
@@ -136,4 +136,23 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Chess *pChess)
 
     PosOnBoard safeRemovedField(L_D, SafePosToDigit);
     pChess->movePieceWithManipulator(_pBoardRemoved, safeRemovedField);
+}
+
+SEQUENCE_TYPE ChessMovements::findMoveType(QString QStrMove)
+{
+     if (_pChess->getStatusPointer()->isMoveLegal(QStrMove))
+    {
+        if (_pChess->getStatusPointer()->isMoveLegal(QStrMove + "q")) //q == autotest for quenn promo
+            return ST_PROMOTE_TO_WHAT;
+        else if (_pChess->getStatusPointer()->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
+        else if (_pChess->getStatusPointer()->isMoveCastling(QStrMove)) return ST_CASTLING;
+        else if (_pChess->getStatusPointer()->isMoveRemoving()) return ST_REMOVING;
+        else if (_pChess->getStatusPointer()->isMovePromotion(QStrMove)) return ST_PROMOTION;
+        else return ST_REGULAR;
+    }
+     else
+     {
+         qDebug() << "ERROR: ChessMovements::findMoveType: move is illegal:" << QStrMove;
+         return ST_NONE;
+     }
 }
