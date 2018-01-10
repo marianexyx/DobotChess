@@ -3,11 +3,8 @@
 
 #pragma once
 
-#include "chess.h" //todo: skoro includuje chess.h, to prawie na pewno to powinien być jedyny include w podklasach
-#include <QString>
+#include "chess.h"
 #include <QTimer>
-#include "client.h" //todo: ogarnąć to...
-#include "vars/end_of_game_types.h"
 
 class ChessTimers
 {
@@ -23,17 +20,17 @@ private:
     const long _lTimersStartTime;
     const long _lTimersStartQueue;
 
+    void stopBoardTimers();
+
 private slots:
-    void timeOutWhite();
-    void timeOutBlack();
+    void playerTimeOut(PLAYER_TYPE player);
     void updateTimeLabels();
-    void timeOutStartQueue();
+    void timeOutStartQueue(); //todo: czyli że co
 
 public:
     ChessTimers(Chess* pChess);
 
     void startGameTimer();
-    void stopBoardTimers();
     void resetGameTimers();
     QString milisecToClockTime(long lMilis);
     void switchPlayersTimers();

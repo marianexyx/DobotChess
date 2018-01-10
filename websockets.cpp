@@ -56,21 +56,29 @@ void Websockets::receivedMsg(QString QStrWsMsgToProcess)
     this->sendToChess(QStrWsMsg, clientID);
 }
 
-void Websockets::sendMsg(QString QStrWsMsg) //todo: przepychac wiadomosci, nei realizowac ich tutaj
+void Websockets::sendMsg(QString QStrWsMsg, int64_t ID = -1)
 {
     qDebug() << "Websockets::sendMsg() received:" << QStrWsMsg;
-    emit addTextToConsole("sent: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
 
-    Q_FOREACH (Client client, _pClients->getClientsList())
+    if (ID == -1)
+    {
+        emit addTextToConsole("send to all: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
+
+        Q_FOREACH (Client client, _pClients->getClientsList())
+            client.socket->sendTextMessage(QStrWsMsg);
+    }
+    else if(!_pClients->isClientIDExists(ID))
+    {
+        qDebug() << "ERROR: Websockets::sendMsg: client ID doesn't exists";
+        return;
+    }
+    else
+    {
+        Client client = _pClients->getClient(ID);
+        emit addTextToConsole("send to: " + client.name + " " +
+                              QStrWsMsg + "\n", LOG_WEBSOCKET);
         client.socket->sendTextMessage(QStrWsMsg);
-}
-
-void Websockets::sendMsg(int64_t ID, QString QStrWsMsg)
-{
-    if(!_pClients->isClientIDExists(ID)) return;
-
-    Client client = _pClients->getClient(ID);
-    client.socket->sendTextMessage(QStrWsMsg);
+    }
 }
 
 //TODO: można stąd usunąć jeżeli komunikaty będą się wyświetlać w klasie chess

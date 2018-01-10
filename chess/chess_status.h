@@ -4,9 +4,6 @@
 #pragma once
 
 #include "chess.h"
-#include <QString>
-#include "chessboard.h"
-#include "vars/fen_game_state.h"
 
 class ChessStatus
 {
@@ -28,7 +25,7 @@ private:
     WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
 
 public:
-    ChessStatus(Chess* pChess, Chessboard* pBoardMain);
+    ChessStatus(Chess* pChess);
     ~ChessStatus() {}
 
     bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
@@ -39,6 +36,7 @@ public:
     bool isMoveEnpassant(QString QStrMoveToTest);
     bool isMovePromotion(QString QStrMoveToTest);
     void saveStatusData(QString status);
+    void resetStatusData();
 
     //todo: settery jako friend dla chess?
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
@@ -51,6 +49,7 @@ public:
                                                      emit showHistoryMoves(_historyMoves); }
 
     FEN_GAME_STATE getFENGameState() const { return _FENGameState; }
+    END_TYPE getFENGameStateAsEndType() const;
     WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
     QStringList getLegalMoves() const { return _legalMoves; }
     QStringList getHisotyMoves() const { return _historyMoves; }

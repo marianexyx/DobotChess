@@ -44,7 +44,8 @@ private slots:
 signals:
     void addTextToConsole(QString, LOG);
     void updatePortsComboBox(int);
-    void restoreGameToInitialState();
+    void sigRestoreGameToInitialState(); //future: nazwa gryzie się z funkcja robiącą...
+    //...w sumie coś innego
     void AIEnemySend(QString);
     void TcpQueueMsg(int, QString); //todo: usb nie powinno mieć dostępu bokiem do tcp
 };

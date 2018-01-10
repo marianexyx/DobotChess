@@ -18,35 +18,29 @@ ChessTimers::ChessTimers(Chess *pChess):
     _blackTimer->setSingleShot(true);
     _updateLabelTimer->setSingleShot(false);
     _startQueueTimer->setSingleShot(true);
-    connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(timeOutWhite()));
-    connect(_blackTimer, SIGNAL(timeout()), this, SLOT(timeOutBlack()));
+    connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_WHITE)));
+    connect(_blackTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_BLACK)));
     connect(_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
     connect(_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
     _nRemainingWhiteTime = _lTimersStartTime;
     _nRemainingBlackTime = _lTimersStartTime;
 }
-//private slots:
 
-//todo: połączyć 2 poniższe funkcje
-void ChessTimers::timeOutWhite()
+void ChessTimers::playerTimeOut(PLAYER_TYPE player)
 {
-    this->resetGameTimers();
+    QString QStrMsg;
+    switch(player)
+    {
+    case PT_WHITE: QStrMsg = "timeOutWhite"; break;
+    case PT_BLACK: QStrMsg = "timeOutBlack"; break;
+    default:
+        qDebug() << "ERROR: ChessTimers::playerTimeOut: unknwon PLAYER_TYPE:"
+                 << player;
+        return;
+    }
 
-    //todo: znowu nie wiadomo jak się odnieść do góry
-    pChess->playerIsLeavingGame(_pClients->getPlayer(PT_WHITE), ET_TIMEOUT_GAME);
-    this->endOfGame(ET_TIMEOUT_GAME);
-
-    emit sendMsgToPlayer("timeOutWhite"); //todo: to all
-}
-
-void ChessTimers::timeOutBlack()
-{
-    this->resetGameTimers();
-
-    pChess->playerIsLeavingGame(_pClients->getPlayer(PT_BLACK), ET_TIMEOUT_GAME);
-    this->endOfGame(ET_TIMEOUT_GAME);
-
-    emit sendMsgToPlayer("timeOutBlack"); //todo: to all
+    _pChess->restartGame(ET_TIMEOUT_GAME, _pChess->getClientsPointer()->getPlayer(player));
+    _pChess->sendDataToClient(QStrMsg);
 }
 
 void ChessTimers::updateTimeLabels()
@@ -63,14 +57,18 @@ void ChessTimers::updateTimeLabels()
 
 void ChessTimers::timeOutStartQueue()
 {
+    //todo: 2x stopQueueTimer() mamy tu
     this->stopQueueTimer();
-    //todo: można zamknać w funkcji clientlistowej (sprawdzić resztę powtórzeń)
-    if (!_pClients->isStartClickedByPlayer(PT_WHITE))
-        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    //todo: możnaby zamknać w funkcji clientlistowej (sprawdzić resztę powtórzeń)
+    //todo: poza tym z nazwy funkcji wogle nie wiadomo że to tu się dzieje
+    //cleanSleepyPlayersChairs
+    Clients pClients = _pChess->getClientsPointer();
+    if (!pClients->isStartClickedByPlayer(PT_WHITE))
+        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
-        _pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-    _pClients->resetPlayersStartConfirmInfo();
+    pClients->resetPlayersStartConfirmInfo();
      this->stopQueueTimer();
 
     if (this->isGameTableOccupied())
@@ -78,8 +76,6 @@ void ChessTimers::timeOutStartQueue()
     emit sendMsgToPlayer("timeOutStartQueue"); //todo: 2 różne emity dla pojedyńczego klienta...
     //... i dla wielu? jasne że nie- trzeba to jakoś ogarnąć
 }
-
-//public:
 
 void ChessTimers::startGameTimer()
 {
@@ -139,7 +135,7 @@ void ChessTimers::switchPlayersTimers()
         _blackTimer->start();
     }
     else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
-                     "white or black.  it's' ==" << _pStatus->getWhoseTurn(); //?
+                     "white or black.  it's' ==" << _pChess->getStatusPointer()->getWhoseTurn();
 }
 
 void ChessTimers::startQueueTimer()

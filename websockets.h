@@ -44,8 +44,7 @@ public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac sl
     void onNewConnection();
 
 public slots:
-    void sendMsg(QString QStrWsMsg);
-    void sendMsg(int64_t ID, QString QStrWsMsg); //todo: można je scalić, albo odróżniać
+    void sendMsg(QString QStrWsMsg, int64_t ID = -1);
 
 signals:
     void addTextToConsole(QString, LOG);

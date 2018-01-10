@@ -1,9 +1,9 @@
 #include "chess_status.h"
 
-ChessStatus::ChessStatus(Chess *pChess, Chessboard* pBoardMain)
+ChessStatus::ChessStatus(Chess *pChess)
 {
     _pChess = pChess;
-    _pBoardMain = pBoardMain;
+    _pBoardMain = _pChess->getBoardMainPointer();
 
     _WhoseTurn = NO_TURN;
 }
@@ -144,6 +144,14 @@ void ChessStatus::saveStatusData(QString status)
     }
 }
 
+void ChessStatus::resetStatusData()
+{
+    this->setWhoseTurn(NO_TURN);
+    this->clearLegalMoves();
+    this->clearHistoryMoves();
+    this->clearFormBoard();
+}
+
 void ChessStatus::setLegalMoves(QString msg)
 {
     QStringList legalMoves = msg.split(QRegExp("\\s"));
@@ -175,6 +183,21 @@ void ChessStatus::setHistoryMoves(QString msg)
     }
 
     this->setHistoryMoves(historyMoves);
+}
+
+END_TYPE ChessStatus::getFENGameStateAsEndType() const
+{
+    switch(_FENGameState)
+    {
+    case FGS_IN_PROGRESS: return ET_NONE; break;
+    case FGS_WHITE_WON: return ET_WHIE_WON; break;
+    case FGS_BLACK_WON: return ET_BLACK_WON; break;
+    case FGS_DRAW: return ET_DRAW; break;
+    default:
+        qDebug() << "ERROR: ChessStatus::getFENGameStateAsEndType():"
+                         "unknown _FENGameState val =" << _FENGameState;
+        return ET_NONE;
+    }
 }
 
 WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)

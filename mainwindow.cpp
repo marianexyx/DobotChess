@@ -32,7 +32,7 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
 
     connect(_pArduinoUsb, SIGNAL(AIEnemySend(QString)), _pIgorBot, SLOT(checkMsgFromWebsockets(QString)));
     connect(_pArduinoUsb, SIGNAL(TcpQueueMsg(int, QString)), _pTCPmsg, SLOT(TcpQueueMsg(int, QString)));
-    connect(_pArduinoUsb, SIGNAL(restoreGameToInitialState()), _pIgorBot, SLOT(resetPiecePositions()));
+    connect(_pArduinoUsb, SIGNAL(sigRestoreGameToInitialState()), _pIgorBot, SLOT(resetPiecePositions()));
 
     //ui connects
     connect(_pDobotArm, SIGNAL(addTextToConsole(QString,LOG)),
@@ -464,7 +464,7 @@ void MainWindow::on_AIBtn_clicked()
         ui->AIEnemyLineEdit->setEnabled(true);
     }
 
-    _pIgorBot->EnemyStart();
+    _pIgorBot->enemyStart();
 }
 
 void MainWindow::on_AIEnemySendBtn_clicked()

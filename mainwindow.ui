@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1180</width>
-    <height>749</height>
+    <width>1230</width>
+    <height>889</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,7 +52,7 @@
           <item row="0" column="0">
            <widget class="QGroupBox" name="groupBox_4">
             <property name="title">
-             <string>Chessboard</string>
+             <string>Main + removed</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_14">
              <item row="1" column="0">
@@ -65,13 +65,13 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>130</width>
+                 <width>180</width>
                  <height>150</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>130</width>
+                 <width>180</width>
                  <height>150</height>
                 </size>
                </property>
@@ -89,25 +89,13 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QGroupBox" name="groupBox_7">
+           <widget class="QGroupBox" name="groupBox_13">
             <property name="title">
-             <string>Legal</string>
+             <string>Chenard</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_15">
+            <layout class="QGridLayout" name="gridLayout_23">
              <item row="0" column="0">
-              <widget class="QPlainTextEdit" name="legalPTE">
-               <property name="minimumSize">
-                <size>
-                 <width>125</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Courier New</family>
-                </font>
-               </property>
-              </widget>
+              <widget class="QPlainTextEdit" name="plainTextEdit"/>
              </item>
             </layout>
            </widget>
@@ -322,6 +310,18 @@
           <string>Moves</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_19">
+          <item row="2" column="1">
+           <widget class="QGroupBox" name="groupBox_11">
+            <property name="title">
+             <string>ServoQueue</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_21">
+             <item row="0" column="0">
+              <widget class="QPlainTextEdit" name="servoQueuePTE"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
           <item row="0" column="1">
            <widget class="QGroupBox" name="groupBox_8">
             <property name="title">
@@ -340,7 +340,43 @@
             </layout>
            </widget>
           </item>
-          <item row="2" column="2">
+          <item row="0" column="2">
+           <widget class="QGroupBox" name="groupBox_10">
+            <property name="title">
+             <string>Queued</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_20">
+             <item row="0" column="0">
+              <widget class="QPlainTextEdit" name="queuedPTE"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QGroupBox" name="groupBox_7">
+            <property name="title">
+             <string>Legal</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_15">
+             <item row="0" column="0">
+              <widget class="QPlainTextEdit" name="legalPTE">
+               <property name="minimumSize">
+                <size>
+                 <width>125</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                </font>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="2" column="2" rowspan="2">
            <widget class="QGroupBox" name="groupBox_12">
             <property name="minimumSize">
              <size>
@@ -373,30 +409,6 @@
                 </size>
                </property>
               </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QGroupBox" name="groupBox_10">
-            <property name="title">
-             <string>Queued</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_20">
-             <item row="0" column="0">
-              <widget class="QPlainTextEdit" name="queuedPTE"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QGroupBox" name="groupBox_11">
-            <property name="title">
-             <string>ServoQueue</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_21">
-             <item row="0" column="0">
-              <widget class="QPlainTextEdit" name="servoQueuePTE"/>
              </item>
             </layout>
            </widget>
@@ -1278,7 +1290,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1180</width>
+     <width>1230</width>
      <height>21</height>
     </rect>
    </property>

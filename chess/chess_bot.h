@@ -4,9 +4,6 @@
 #pragma once
 
 #include "chess.h"
-#include "arduinousb.h"
-#include "chessboard.h"
-#include "vars/basic_vars.h"
 
 class ChessBot
 {
@@ -14,8 +11,6 @@ class ChessBot
 
 private:
     Chess* _pChess;
-    Chessboard *_pBoardMain;
-    ArduinoUsb *_pArduinoUsb; //reszta wskaznikow dziedziczona
 
     bool _bAI;
     bool _bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
@@ -27,7 +22,7 @@ private:
     void checkAI();
 
 public:
-    ChessBot(Chess* pChess, Chessboard *pBoardMain, ArduinoUsb *pArduinoUsb);
+    ChessBot(Chess* pChess);
     ~ChessBot() {}
 
     //----------KOMUNIKACJA Z CHENARD----------//
@@ -42,7 +37,7 @@ public:
     bool getAI() { return _bAI; } //todo: is...
 
 public slots:
-    void EnemyStart(); //ogólna funkcja sterująca (edit: todo: czym/jak/poco?)
+    void enemyStart(); //ogólna funkcja sterująca (edit: todo: czym/jak/poco? - nazwa funckji)
 
 };
 
