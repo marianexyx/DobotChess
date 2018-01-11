@@ -54,5 +54,5 @@ void ChessBot::enemyStart()
 {
     this->checkAI();
     //furture: a jak będzie z nowym resetem dla bota? olać póki nie potrzebuję
-    _pChess->resetPiecePositions();
+    _pChess->getResetsPointer()->resetPiecePositions();
 }

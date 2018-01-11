@@ -18,6 +18,7 @@
 #include "chess/chess_movements.h"
 #include "chess/chess_status.h"
 #include "chess/chess_bot.h"
+#include "chess/chess_resets.h"
 
 //TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami ...
 //...wejsciowymi (arduino/website)- sprawdzić czy to da radę
@@ -49,6 +50,7 @@ private:
     ChessMovements* _pMovements;
     ChessBot* _pBot;
     ChessStatus* _pStatus;
+    ChessResets _pResets;
 
     Piece* _pPiece[32];
 
@@ -56,12 +58,8 @@ private:
     void continueGameplay();
     void sendMsgToTcp(QString msg);
     void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
-    void movePieceWithManipulator(Chessboard *pRealBoard, PosOnBoard FieldPos,
-                                  VERTICAL_MOVE vertMove = VM_NONE);
     void wrongTcpAnswer(QString msgType, QString respond);
     void playerClickedStart(PLAYER_TYPE playerType);
-    bool compareArrays(short nArray1[][8], short nArray2[][8]); //todo: do basic vars, albo...
-    //...do chessboardu jako static
 
 public:
     Chess(Clients* pClients, Dobot* pDobot, Chessboard* pBoardMain,
@@ -72,15 +70,17 @@ public:
     void findAndSaveMoveAndSendItToTcp(QString QStrMove);
     void GameStarted();
     void tellPlayerThatHeGaveBadMove(QString msg);
-    void restartGame(END_TYPE ETWhoWon, Client* PlayerToClear = nullptr);
     bool isPiecesSetOk();
     bool isPieceStayOnItsStartingField(short sPieceNr); //todo: wskaznik do piece?
-    void removeClient(int64_t clientID); //todo: taka sama nazwa jak w cliencie. zmienić coś
+    void removeClient(int64_t clientID); //todo: taka sama nazwa jak w cliencie. zmienić...
+    //...coś. a może da się tego pozbyć?
+    void movePieceWithManipulator(Chessboard *pRealBoard, PosOnBoard FieldPos,
+                                  VERTICAL_MOVE vertMove = VM_NONE);
 
     PLAYER_TYPE getActivePlayerType();
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
 
-    //todo: friends to rest of ingedients
+    //todo: friends to rest of ingredients
     //todo: nie wszystkie potrzebne
     Clients* getClientsPointer() { return _pClients; }
     Dobot* getDobotPointer() { return _pDobot; }
@@ -95,13 +95,13 @@ public:
     ChessMovements* getMovementsPointer() { return _pMovements; }
     ChessBot* getBotPointer() { return _pBot; }
     ChessStatus* getStatusPointer() { return _pStatus; }
+    ChessResets* getResetsPointer() { return _pResets; }
 
 public slots:
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
     void checkMsgFromWebsockets(QString msg, int64_t clientID);
     //todo: sendDataToClient- trochę insunuacja że wysyłam dane tylko do 1 klienta
     void sendDataToClient(QString msg, int64_t clientID = -1);
-    void resetPiecePositions();
     QString getTableData();
 
 signals:
