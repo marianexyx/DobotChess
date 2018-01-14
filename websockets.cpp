@@ -44,61 +44,43 @@ void Websockets::onNewConnection()
 
 //TODO2: obsuga komend serwisowych przez websockety
 
-void Websockets::receivedMsg(QString QStrWsMsgToProcess)
+void Websockets::receivedMsg(QString QStrMsg)
 {    
-    if (QStrWsMsgToProcess != "keepConnected")
-        qDebug() << "Websockets::receivedMsg (from site):" << QStrWsMsgToProcess;
+    if (QStrMsg != "keepConnected")
+        qDebug() << "Websockets::receivedMsg (from site):" << QStrMsg;
     else return;
 
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender()); //przysyłający 
-    int64_t clientID = _pClients->getClientID(_pClients->getClient(pClient));
-
-    this->sendToChess(QStrWsMsg, clientID);
+    QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
+    emit this->msgFromWebsocketsToChess(QStrMsg, _pClients->getClient(pSocket));
 }
 
-void Websockets::sendMsg(QString QStrWsMsg, int64_t ID = -1)
+void Websockets::sendMsgToClient(QString QStrMsg, Client* pClient)
 {
-    qDebug() << "Websockets::sendMsg() received:" << QStrWsMsg;
+    qDebug() << "Websockets::sendMsgToClient() received:" << QStrMsg;
 
-    if (ID == -1)
+    if (pClient == nullptr)
     {
-        emit addTextToConsole("send to all: " + QStrWsMsg + "\n", LOG_WEBSOCKET);
-
-        Q_FOREACH (Client client, _pClients->getClientsList())
-            client.socket->sendTextMessage(QStrWsMsg);
-    }
-    else if(!_pClients->isClientIDExists(ID))
-    {
-        qDebug() << "ERROR: Websockets::sendMsg: client ID doesn't exists";
+        qDebug() << "ERROR: Websockets::sendMsgToClient: pClient == nullptr";
         return;
     }
     else
     {
         Client client = _pClients->getClient(ID);
-        emit addTextToConsole("send to: " + client.name + " " +
-                              QStrWsMsg + "\n", LOG_WEBSOCKET);
-        client.socket->sendTextMessage(QStrWsMsg);
+        emit addTextToConsole("send to: " + client.name + " " + QStrMsg + "\n", LOG_WEBSOCKET);
+        client.socket->sendTextMessage(QStrMsg);
     }
 }
 
-//TODO: można stąd usunąć jeżeli komunikaty będą się wyświetlać w klasie chess
-void Websockets::sendToChess(QString QStrMsg, int64_t clientID)
+void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
-    qDebug() << "Sending to 'chess' class: " << QStrMsg;
-    emit this->addTextToConsole("Sending to 'chess' class: " + QStrMsg + "\n",
-                                LOG_WEBSOCKET);
-    emit this->msgFromWebsocketsToChess(QStrMsg, clientID);
+    emit addTextToConsole("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
+
+    Q_FOREACH (Client client, _pClients->getClientsList())
+        client.socket->sendTextMessage(QStrMsg);
 }
 
 void Websockets::socketDisconnected()
 {
-    QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-    int64_t clientID = _pClients->getClientID(_pClients->getClient(pClient));
-    emit sendToChess("clientLeft", clientID);
-}
-
-void Websockets::sendMsgToAllClients(QString msg)
-{
-    Q_FOREACH (Clients client, _pClients->getClientsList())
-        client.socket->sendTextMessage(msg);
+    QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
+    emit this->msgFromWebsocketsToChess("clientLeft", _pClients->getClient(pSocket));
 }

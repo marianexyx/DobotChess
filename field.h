@@ -38,9 +38,10 @@ public:
     Point3D getLocation3D() const { return _Location3D; }
     bool isFieldOccupied(bool bErrorLog = false);
     short getNr() const { return _sNr; }
+    PosOnBoard getPos() const { return Field::Pos(_sNr); }
     QString getNrAsQStr() const { return Field::nrAsQStr(_sNr); }
-    short getPieceNrOnField() const { return _sPieceOnField; }
-    short getStartPieceNrOnField() const { return _sStartPieceNrOnField; }
+    short getPieceNrOnField() const { return _sPieceOnField; } //todo: wskaźnik do bierki?
+    short getStartPieceNrOnField() const { return _sStartPieceNrOnField; } //todo: wskaźnik do bierki?
 };
 
 #endif // FIELD_H

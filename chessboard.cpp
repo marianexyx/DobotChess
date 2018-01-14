@@ -149,23 +149,22 @@ QString Chessboard::arrayBoardAsQStr(QString QStrBoard[8][8])
     return board;
 }
 
-void Chessboard::setPieceOnField(short sPassedPiece, short sDestFieldNr)
+void Chessboard::setPieceOnField(short sPassedPiece, Field* pField)
 {
     if (!Piece::isInRange(sPassedPiece)) return;
     if (this->isFieldOccupied(sPassedPiece), true) return;
     if (this->isPieceExistsOnBoard(sPassedPiece, true)) return;
 
-    _pField[sDestFieldNr].setPieceOnField(sPassedPiece);
+    pField->setPieceOnField(sPassedPiece);
     qDebug() << "Chessboard::setPieceOnField- new pieceNr:" << sPassedPiece
              << "on fieldNr:" << sDestFieldNr;
 }
 
-void Chessboard::clearField(short sNrToClear)
+void Chessboard::clearField(Field *pField)
 {
-    qDebug() << "Chessboard::clearField: clearing field:" << Field::nrAsQStr(nNrToClear) <<
-                ". old piece =" << _pField[sNrToClear]->getPieceOnField() <<
-                ", now it will be == 0";
-    _pField[sNrToClear]->clear();
+    qDebug() << "Chessboard::clearField: clearing field:" << pField->getNrAsQStr() <<
+                ". old piece =" << pField->getPieceNrOnField() << ", now it will be == 0";
+    pField->clearField();
 }
 
 bool Chessboard::isPointInLocationLimits(Point3D point)

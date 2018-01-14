@@ -8,81 +8,104 @@ ChessMovements::ChessMovements(Chess *pChess)
 
 }
 
-PosOnBoard ChessMovements::findKingPosInCastling(PosOnBoard FieldDest)
+Field* ChessMovements::findKingFieldInCastling(Field* pField)
 {
-    PosOnBoard KingFieldDest;
-    KingFieldDest.Digit = FieldDest.Digit;
-    if (FieldDest.Letter == L_C) KingFieldDest.Letter = L_A;
-    else if (FieldDest.Letter == L_G) KingFieldDest.Letter = L_H;
-    else qDebug() << "ERROR: ChessMovements::findKingPosInCastling: "
-                     "wrong FieldDest.Letter val =" << FieldDest.Letter;
-    return KingFieldDest;
+    PosFromTo KingFieldDest;
+    KingFieldDest.Digit = pField->getPos().Digit;
+    if (pField->getPos().Letter == L_C) KingFieldDest.Letter = L_A;
+    else if (pField->getPos().Letter == L_G) KingFieldDest.Letter = L_H;
+    else qDebug() << "ERROR: ChessMovements::findKingFieldInCastling: "
+                     "wrong FieldDest.Letter val =" << pField->getPos().Letter;
+    return _pChess->getBoardMainPointer()->getField(KingFieldDest);
 }
 
-PosOnBoard ChessMovements::findRookPosInCastling(PosOnBoard FieldDest)
+Field* ChessMovements::findRookFieldInCastling(Field* pField)
 {
-    PosOnBoard RookFieldDest;
-    RookFieldDest.Digit = RookFieldDest.Digit;
-    if (FieldDest.Letter == L_C) RookFieldDest.Letter = L_D;
-    else if (FieldDest.Letter == L_G) RookFieldDest.Letter = L_F;
-    else qDebug() << "ERROR: ChessMovements::findKingPosInCastling: "
-                     "wrong FieldDest.Letter val =" << FieldDest.Letter;
-    return RookFieldDest;
+    PosFromTo RookFieldDest;
+    RookFieldDest.Digit = pField->getPos().Digit;
+    if (pField->getPos().Letter == L_C) RookFieldDest.Letter = L_D;
+    else if (pField->getPos().Letter == L_G) RookFieldDest.Letter = L_F;
+    else qDebug() << "ERROR: ChessMovements::findKingFieldInCastling: "
+                     "wrong FieldDest.Letter val =" << pField->getPos().Letter;
+    return _pChess->getBoardMainPointer()->getField(RookFieldDest);
 }
 
-void ChessMovements::regularMoveSequence()
+void ChessMovements::doMoveSequence(SEQUENCE_TYPE MoveType, PosFromTo Move)
 {
-    _pChess->movePieceWithManipulator(_pBoardMain, _PosMove.from, VM_GRAB);
-    _pChess->movePieceWithManipulator(_pBoardMain, _PosMove.to, VM_PUT);
+    Field* pFieldFrom = _pChess->getBoardMainPointer()->getField(Move.from);
+    Field* pFieldTo = _pChess->getBoardMainPointer()->getField(Move.to);
+
+    switch(MoveType)
+    {
+    case ST_REGULAR: this->regularMoveSequence(pFieldFrom, pFieldTo); break;
+    case ST_REMOVING:
+        this->removeMoveSequence(pFieldTo);
+        this->regularMoveSequence(pFieldFrom, pFieldTo);
+        break;
+    case ST_ENPASSANT: this->enpassantMoveSequence(pFieldFrom, pFieldTo); break;
+    case ST_CASTLING: this->castlingMoveSequence(pFieldFrom, pFieldTo); break;
+    case ST_PROMOTION: this->promoteMoveSequence(pFieldFrom, pFieldTo); break;
+    case ST_NONE:
+    default:
+        qDebug() << "ERROR: ChessMovements::doMoveSequence(): wrong MoveType:"
+                 << sequenceTypeAsQstr(MoveType);
+        break;
+    }
 }
 
-void ChessMovements::removeMoveSequence()
+void ChessMovements::regularMoveSequence(Field* pFrom, Field* pTo)
 {
-    short sPieceNrToRemove = _pBoardMain->getField(_PosMove.to)->getPieceNrOnField();
-    Piece* PieceToRemove = _pChess->getPiece(sPieceNrToRemove);
-
-    _pChess->movePieceWithManipulator(_pBoardMain, _PosMove.to, VM_GRAB);
-    this->goToSafeRemovedFieldIfNeeded();
-    _pChess->movePieceWithManipulator(_pBoardRemoved,
-                                     PieceToRemove->getStartFieldPos(), VM_PUT);
-    this->goToSafeRemovedFieldIfNeeded();
-
-    this->regularMoveSequence();
+    _pChess->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB);
+    _pChess->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT);
 }
 
-void ChessMovements::restoreMoveSequence(short sPieceToRestore)
-{
-    Piece* PieceToRestore = _pChess->getPiece(sPieceToRestore);
+void ChessMovements::removeMoveSequence(Field* pFieldWithPieceToRemove)
+{    
+    //find and safe piece on board, before grabbing (i.e. till it stands on board)
+    short sPieceNrToRemove = pFieldWithPieceToRemove->getPieceNrOnField();
+    if (!Piece::isInRange(sPieceNrToRemove)) return;
+    Piece* pPieceToRemove = _pChess->getPiece(sPieceNrToRemove);
 
-    this->goToSafeRemovedFieldIfNeeded();
-    _pChess->movePieceWithManipulator(_pBoardRemoved,
-                                     PieceToRestore->getStartFieldPos(), VM_GRAB);
-    this->goToSafeRemovedFieldIfNeeded();
-    _pChess->movePieceWithManipulator(_pBoardMain,
-                                     PieceToRestore->getStartFieldPos(), VM_PUT);
+    _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
+
+    Field* pFieldForPieceToRemove =
+            _pChess->getBoardRemovedPointer()->getField(pPieceToRemove->getStartFieldPos());
+
+    this->goToSafeRemovedFieldIfNeeded(pFieldForPieceToRemove);
+    _pChess->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove, VM_PUT);
+    this->goToSafeRemovedFieldIfNeeded(pFieldForPieceToRemove);
 }
 
-void ChessMovements::castlingMoveSequence()
+void ChessMovements::restoreMoveSequence(Piece *pPieceToRestore)
 {
-    _pChess->movePieceWithManipulator(_pBoardMain,
-                                     this->findKingPosInCastling(_PosMove.from), VM_GRAB);
-    _pChess->movePieceWithManipulator(_pBoardMain,
-                                     this->findKingPosInCastling(_PosMove.to), VM_PUT);
-    _pChess->movePieceWithManipulator(_pBoardMain,
-                                     this->findRookPosInCastling(_PosMove.from), VM_GRAB);
-    _pChess->movePieceWithManipulator(_pBoardMain,
-                                     this->findRookPosInCastling(_PosMove.to), VM_PUT);
+    Field* pFieldOnBoardMain =
+            _pChess->getBoardMainPointer()->getField(pPieceToRestore->getStartFieldPos());
+    Field* pFieldOnBoardRemoved =
+            _pChess->getBoardRemovedPointer()->getField(pPieceToRestore->getStartFieldPos());
+
+    this->goToSafeRemovedFieldIfNeeded(pFieldOnBoardRemoved);
+    _pChess->movePieceWithManipulator(_pBoardRemoved, pFieldOnBoardRemoved, VM_GRAB);
+    this->goToSafeRemovedFieldIfNeeded(pFieldOnBoardRemoved);
+    _pChess->movePieceWithManipulator(_pBoardMain, pFieldOnBoardMain, VM_PUT);
 }
 
-void ChessMovements::enpassantMoveSequence()
+void ChessMovements::castlingMoveSequence(Field *pFrom, Field *pTo)
 {
-    _pChess->movePieceWithManipulator(_pBoardMain, _PosMove.from, VM_GRAB);
-    _pChess->movePieceWithManipulator(_pBoardMain, _PosMove.to, VM_PUT);
+    _pChess->movePieceWithManipulator(_pBoardMain, this->findKingFieldInCastling(pFrom), VM_GRAB);
+    _pChess->movePieceWithManipulator(_pBoardMain, this->findKingFieldInCastling(pTo), VM_PUT);
+    _pChess->movePieceWithManipulator(_pBoardMain, this->findRookFieldInCastling(pFrom), VM_GRAB);
+    _pChess->movePieceWithManipulator(_pBoardMain, this->findRookFieldInCastling(pTo), VM_PUT);
+}
 
-    PosOnBoard PosOfPieceToRemoveInEnpassant = _PosMove.to;
-    if (_PosMove.from.Digit < _PosMove.to.Digit) //white move
+void ChessMovements::enpassantMoveSequence(Field *pFrom, Field *pTo)
+{
+    _pChess->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB);
+    _pChess->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT);
+
+    PosOnBoard PosOfPieceToRemoveInEnpassant = pTo->getPos();
+    if (pFrom->getPos().Digit < pTo->getPos().Digit) //white move
         PosOfPieceToRemoveInEnpassant.Digit -= 1;
-    else if (_PosMove.from.Digit > _PosMove.to.Digit) //black move
+    else if (pFrom->getPos().Digit > pTo->getPos().Digit) //black move
         PosOfPieceToRemoveInEnpassant.Digit += 1;
     else
     {
@@ -91,40 +114,50 @@ void ChessMovements::enpassantMoveSequence()
         return;
     }
 
-    Field* FieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
-    short sPieceNrToRemoveInEnpassant = FieldWithPieceToRemove->getPieceNrOnField();
-    Piece* PieceToRemoveInEnpassant = _pChess->getPiece(sPieceNrToRemoveInEnpassant);
+    Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
+    Piece* pPieceToRemoveInEnpassant =
+            _pChess->getPiece(pFieldWithPieceToRemove->getPieceNrOnField());
 
-    _pChess->movePieceWithManipulator(_pBoardMain,
-                                     PosOfPieceToRemoveInEnpassant, VM_GRAB);
-    this->goToSafeRemovedFieldIfNeeded();
-    _pChess->movePieceWithManipulator(_pBoardRemoved,
-                                     PieceToRemoveInEnpassant->getStartFieldPos(), VM_PUT);
-    this->goToSafeRemovedFieldIfNeeded();
+    _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
+
+    Field* pFieldForPieceToRemove =
+            _pChess->getBoardRemovedPointer()->getField(
+                pPieceToRemoveInEnpassant->getStartFieldPos());
+
+    this->goToSafeRemovedFieldIfNeeded(pFieldForPieceToRemove);
+    _pChess->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove, VM_PUT);
+    this->goToSafeRemovedFieldIfNeeded(pFieldForPieceToRemove);
 }
-//todo: po wszystkich ruchach czyscic zmienne globalne from/to jezeli jeszcze beda istniec
 
-void ChessMovements::promoteMoveSequence() //metoda przyda się na przyszłość
+void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //metoda przyda się na przyszłość
 {
-    this->regularMoveSequence();
+    this->regularMoveSequence(pFrom, pTo);
 }
 
-void ChessMovements::goToSafeRemovedFieldIfNeeded()
+void ChessMovements::goToSafeRemovedFieldIfNeeded(Field* pFieldDest)
 {
     //todo: mozliwe ze cale przjscia typu goToSafeRemovedField beda zbedne jezeli...
     //...kaze dobotowi isc ruchami kolistymi na przegubach
-    DIGIT SafePosToDigit = D_X;
-    if (_PosMove.to.Digit == D_1) SafePosToDigit = D_2;
-    else if (_PosMove.to.Digit == D_8) SafePosToDigit = D_7;
+    if (pFieldDest->getPos().Letter >= L_D)
+    {
+        return; //no need for safe move
+    }
     else
     {
-        qDebug() << "ERROR: ChessMovements::goToSafeRemovedField: unknown"
-                    " _PosMove.to.Digit value =" << _PosMove.to.Digit;
-        return;
-    }
+        DIGIT SafePosToDigit = D_X;
+        if (pFieldDest->getPos().Digit <= D_2) SafePosToDigit = D_2;
+        else if (pFieldDest->getPos().Digit >= D_7) SafePosToDigit = D_7;
+        else
+        {
+            qDebug() << "ERROR: ChessMovements::goToSafeRemovedField(): unknown"
+                        " digit value =" << pFieldDest->getPos().Digit;
+            return;
+        }
 
-    PosOnBoard safeRemovedField(L_D, SafePosToDigit);
-    _pChess->movePieceWithManipulator(_pBoardRemoved, safeRemovedField);
+        PosOnBoard SafeRemovedFieldPos(L_D, SafePosToDigit);
+        Field* pSafeRemovedField = _pChess->getBoardRemovedPointer()->getField(SafeRemovedFieldPos);
+        _pChess->movePieceWithManipulator(_pBoardRemoved, pSafeRemovedField);
+    }
 }
 
 SEQUENCE_TYPE ChessMovements::findMoveType(QString QStrMove)

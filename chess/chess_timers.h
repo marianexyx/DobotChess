@@ -41,9 +41,6 @@ public:
     int getBlackTimeLeft();
     int getStartTimeLeft() { return _startQueueTimer->remainingTime(); }
     bool isStartTimerRunning() { return _startQueueTimer->isActive(); }
-
-signals:
-    void sendMsgToPlayer(QString QStrMsgForPlayer);
 };
 
 #endif // CHESS_TIMERS_H

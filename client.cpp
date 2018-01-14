@@ -231,9 +231,22 @@ void Clients::removeClient(Client client)
     {
         if (cl == client)
         {
+            cl.socket->deleteLater();
+
             if(!_clients.removeOne(cl))
                 qDebug() << "ERROR: Clients::removeClient- client not found";;
+
             return;
+
+            //info: erlier working code in chess class:
+            /*for(int i = 0; i < _pClients->getClientsList().count(); ++i)
+            { //nie męczyć się teraz z obsługą removeAll na structurach
+              if(_pClients->getClientsList().at(i).socket == pClient->socket)
+              {
+                _pClients->getClientsList().removeAt(i);
+                break;
+              }
+            }*/
         }
     }
 }

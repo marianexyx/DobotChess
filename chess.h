@@ -56,7 +56,7 @@ private:
 
     void startNewGameInChenard();
     void continueGameplay();
-    void sendMsgToTcp(QString msg);
+    void sendMsgToTcp(QString QStrMsg);
     void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
     void wrongTcpAnswer(QString msgType, QString respond);
     void playerClickedStart(PLAYER_TYPE playerType);
@@ -67,29 +67,27 @@ public:
           TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
     ~Chess();
 
+    void sendDataToClient(QString QStrMsg, Client* pClient);
+    void sendDataToAllClients(QString QStrMsg);
+
     void findAndSaveMoveAndSendItToTcp(QString QStrMove);
-    void GameStarted();
+    void gameStarted();
     void tellPlayerThatHeGaveBadMove(QString msg);
     bool isPiecesSetOk();
-    bool isPieceStayOnItsStartingField(short sPieceNr); //todo: wskaznik do piece?
-    void removeClient(int64_t clientID); //todo: taka sama nazwa jak w cliencie. zmienić...
-    //...coś. a może da się tego pozbyć?
-    void movePieceWithManipulator(Chessboard *pRealBoard, PosOnBoard FieldPos,
+    bool isPieceStayOnItsStartingField(Piece* pPiece);
+    Field* searchForPieceActualFieldOnMainBoad(Piece* pPiece);
+    bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);
+    void removeClient(Client* pClient);
+    void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE vertMove = VM_NONE);
 
     PLAYER_TYPE getActivePlayerType();
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
 
     //todo: friends to rest of ingredients
-    //todo: nie wszystkie potrzebne
     Clients* getClientsPointer() { return _pClients; }
-    Dobot* getDobotPointer() { return _pDobot; }
     Chessboard* getBoardMainPointer() { return _pBoardMain; }
     Chessboard* getBoardRemovedPointer() { return _pBoardRemoved; }
-    //todo: da się z tej klasy pozbyć websocketow
-    Websockets* getWebsocketsPointer() { return _pWebsockets; }
-    TCPMsgs* getTCPMsgsPointer() { return _pTCPMsgs; }
-    ArduinoUsb* getUsbPointer() { return _pUsb; }
 
     ChessTimers* getTimersPointer() { return _pTimers; }
     ChessMovements* getMovementsPointer() { return _pMovements; }
@@ -99,9 +97,7 @@ public:
 
 public slots:
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
-    void checkMsgFromWebsockets(QString msg, int64_t clientID);
-    //todo: sendDataToClient- trochę insunuacja że wysyłam dane tylko do 1 klienta
-    void sendDataToClient(QString msg, int64_t clientID = -1);
+    void checkMsgFromWebsockets(QString QStrMsg, Client* pClient);
     QString getTableData();
 
 signals:

@@ -43,13 +43,14 @@ public:
     Clients() {}
 
     void newClient(QWebSocket *clientSocket);
+    //todo: czy nie powienen był używać samych wskaźników do clientów?
     void setClientName(Client client, QString name);
     void setPlayerType(Client client, PLAYER_TYPE type);
     void clearPlayerType(PLAYER_TYPE type);
     void setClientState(Client client, bool state);
     void setClientState(PLAYER_TYPE type, bool state);
     void addClientToQueue(Client client);
-    void removeClient(Client client); //todo: nie używam tego wogle? to jak usuwałem wcześniej?
+    void removeClient(Client client);
     void removeClientFromQueue(Client client);
     void resetPlayersStartConfirmInfo();
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair);

@@ -9,7 +9,6 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 #include <limits>
-#include "chessboard.h" //todo: tego tu nie powinno być
 #include "client.h"
 #include "vars/log.h"
 #include "vars/board_data_labels.h"
@@ -32,25 +31,21 @@ private Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac s
     void socketDisconnected();
 
 public:
-    Websockets(Clients* pClients, quint16 port, QObject *parent = Q_NULLPTR);
-
-    void sendToChess(QString QStrMsg, int64_t clientID);
-    void sendMsgToAllClients(QString msg);
-
+    Websockets(Clients* pClients, quint16 port, QObject* parent = Q_NULLPTR);
     ~Websockets();
 
 public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
-    void receivedMsg(QString QStrWbstMsgToProcess);
+    void receivedMsg(QString QStrMsg);
     void onNewConnection();
 
 public slots:
-    void sendMsg(QString QStrWsMsg, int64_t ID = -1);
+    void sendMsgToClient(QString QStrMsg, Client* pClient);
+    void sendMsgToAllClients(QString QStrMsg);
 
 signals:
     void addTextToConsole(QString, LOG);
-    void msgFromWebsocketsToChess(QString QStrMsg, int64_t clientID);
+    void msgFromWebsocketsToChess(QString QStrMsg, Client* pClient);
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
-
 };
 
 #endif // Websockets_H

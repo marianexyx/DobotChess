@@ -40,8 +40,8 @@ public:
     ~Chessboard();
 
     BOARD getBoardType() const { return _BoardType; }
-    void setPieceOnField(short sPassedPiece, short sDestFieldNr); //todo: friend dla chwytaka?
-    void clearField(short sNrToClear);
+    void setPieceOnField(short sPassedPiece, Field *pField); //todo: friend dla chwytaka?
+    void clearField(Field* pField);
     bool isPointInLocationLimits(Point3D point);
     bool isPieceExistsOnBoard(short sPieceID, bool bErrorLog = false);
     Field* getField(short sFieldNr) const { return _pField[sFieldNr]; }

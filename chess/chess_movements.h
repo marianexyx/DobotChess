@@ -13,24 +13,24 @@ private:
     Chessboard* _pBoardRemoved;
 
     SEQUENCE_TYPE _MoveType; //todo: raczej lepiej by to było w statusie
-    PosFromTo _PosMove;
+    PosFromTo _PosMove; //todo: gdzieś po wszystkim tą zmienną trzeba prewencyjnie zerować. gdzie?
 
 public:
     ChessMovements(Chess* pChess);
     ~ChessMovements();
 
-    PosOnBoard findKingPosInCastling(PosOnBoard FieldDest);
-    PosOnBoard findRookPosInCastling(PosOnBoard FieldDest);
-    void goToSafeRemovedFieldIfNeeded();
+    Field *findKingFieldInCastling(Field *pField);
+    Field *findRookFieldInCastling(Field *pField);
+    void goToSafeRemovedFieldIfNeeded(Field *pFieldDest);
     SEQUENCE_TYPE findMoveType(QString move);
 
-    //todo: wszystkie ruchy powinny byc jako friend dla chess
-    void regularMoveSequence();
-    void removeMoveSequence();
-    void restoreMoveSequence(short sPieceToRestore);
-    void castlingMoveSequence();
-    void enpassantMoveSequence();
-    void promoteMoveSequence();
+    void doMoveSequence(SEQUENCE_TYPE MoveType, PosFromTo Move);
+    void regularMoveSequence(Field *pFrom, Field *pTo);
+    void removeMoveSequence(Field* pFieldWithPieceToRemove);
+    void restoreMoveSequence(Piece* pPieceToRestore);
+    void castlingMoveSequence(Field *pFrom, Field *pTo);
+    void enpassantMoveSequence(Field *pFrom, Field *pTo);
+    void promoteMoveSequence(Field *pFrom, Field *pTo);
 
     void setMove(QString QStrMove) { _PosMove = PosFromTo::fromQStr(QStrMove); }
     void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }

@@ -22,9 +22,6 @@ Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
 
     for (int i=1; i>=32; ++i)
         *_pPiece[i] = new Piece(i);
-
-    //todo: przy zrobionych nowych odniesieniach connect raczej zbędny
-    connect(_pTimers, SIGNAL(sendMsgToPlayer(QString)), this, SLOT(sendDataToClient(QString)));
 }
 
 Chess::~Chess()
@@ -35,6 +32,36 @@ Chess::~Chess()
     delete _pStatus;
 }
 
+void Chess::sendDataToClient(QString QStrMsg, Client *pClient)
+{
+    qDebug() << "Chess::sendDataToClient(): Sending to" << communicationTypeAsQStr(_PlayerSource)
+             << ":" << QStrMsg;
+    this->addTextToConsole("Sending msg to " + communicationTypeAsQStr(_PlayerSource) + ": "
+                           + QStrMsg, LOG_CORE);
+
+    if (_PlayerSource == WEBSITE)
+    {
+        _pWebsockets->sendMsgToClient(QStrMsg, pClient);
+    }
+    else if (_PlayerSource == ARDUINO)
+    {
+        //future: nieujednolicone typy komunikatów web z arduino są, przez co...
+        //...takie dziwne zmiany w locie (wynika to z virtualow i dziedziwczenia)
+        if (QStrMsg.contains("promote")) QStrMsg = "promote";
+        else if (QStrMsg.contains("newOk")) QStrMsg = "started";
+        else if (QStrMsg.contains("badMove")) QStrMsg = "BAD_MOVE";
+
+        _pUsb->sendDataToUsb(QStrMsg);
+    }
+    else
+        qDebug() << "ERROR: Chess::sendDataToClient: unknown _PlayerSource val ="
+                 << _PlayerSource;
+}
+
+void Chess::sendDataToAllClients(QString QStrMsg) //todo: czegoś tu brakuje możę?
+{
+    _pWebsockets->sendMsgToAllClients(QStrMsg);
+}
 
 void Chess::continueGameplay()
 {
@@ -67,32 +94,6 @@ void Chess::continueGameplay()
     this->sendMsgToTcp("status");
 }
 
-void Chess::sendDataToClient(QString msg, int64_t clientID = -1)
-{
-    qDebug() << "Sending to" << communicationTypeAsQStr(_PlayerSource) << ":" << msg;
-    this->addTextToConsole("Sending to " + communicationTypeAsQStr(_PlayerSource) + ": "
-                           + msg, LOG_CORE);
-
-    if (_PlayerSource == WEBSITE)
-    {
-        _pWebsockets->sendMsg(msg, clientID);
-    }
-    else if (_PlayerSource == ARDUINO)
-    {
-        //todo: nieujednolicone typy komunikatów web z arduino są, przez co...
-        //...takie dziwne zmiany w locie (wynika to z virtualow i dziedziwczenia)
-        if (msg.contains("promote")) msg = "promote";
-        else if (msg.contains("newOk")) msg = "started";
-        else if (msg.contains("badMove")) msg = "BAD_MOVE";
-
-        _pUsb->sendDataToUsb(msg);
-    }
-    else
-        qDebug() << "ERROR: Chess::sendDataToClient: unknown _PlayerSource val ="
-                 << _PlayerSource;
-}
-
-
 void Chess::startNewGameInChenard() //przesyłanie prośby o nową grę na TCP
 {
     //TODO: dodać więcej zabezpieczeń (inne nazwy, typy itd) i reagować na nie jakoś
@@ -106,14 +107,14 @@ void Chess::startNewGameInChenard() //przesyłanie prośby o nową grę na TCP
         qDebug() << "ERROR: Chess::startNewGameInChenard(): Wrong players names";
 }
 
-void Chess::sendMsgToTcp(QString msg)
+void Chess::sendMsgToTcp(QString QStrMsg)
 {
-    qDebug() << "Sending to tcp:" << msg;
-    this->addTextToConsole("Sending to tcp:" + msg + "\n", LOG_CORE);
-    _pTCPMsgs->TcpQueueMsg(_PlayerSource, msg);
+    qDebug() << "Sending to tcp:" << QStrMsg;
+    this->addTextToConsole("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
+    _pTCPMsgs->TcpQueueMsg(_PlayerSource, QStrMsg);
 }
 
-void Chess::GameStarted()
+void Chess::gameStarted()
 {
     qDebug() << "Sending 'newOk' to player";
     this->addTextToConsole("newGame\n", LOG_CORE);
@@ -158,42 +159,41 @@ bool Chess::isPiecesSetOk()
     return true;
 }
 
-bool Chess::isPieceStayOnItsStartingField(short sPieceNr)
+bool Chess::isPieceStayOnItsStartingField(Piece* pPiece)
 {
-    if (!Piece::isInRange(sPieceNr)) return 0;
+    if (pPiece == nullptr) return false;
 
-    Field* pStartFieldOfPiece = _pBoardMain->getField(Piece::StartFieldNr(sPieceNr));
-    if (sPieceNr == pStartFieldOfPiece->getPieceNrOnField());
+    Field* pStartFieldOfPiece = _pBoardMain->getField(pPiece->getStartFieldNr());
+    if (pPiece->getNr() == pStartFieldOfPiece->getPieceNrOnField())
+        return true;
+    else return false;
+}
+
+Field* Chess::searchForPieceActualFieldOnMainBoad(Piece* pPiece)
+{
+    for (short sField=1; sField>=64; ++sField)
+    {
+        Field* pField = _pChess->getBoardMainPointer()->getField(sField);
+        if (pPiece->getNr() == pField->getPieceNrOnField())
+            return pField;
+    }
+
+    return nullptr;
 }
 
 //todo: prześledzić dokładnie to co się dzieje w tej funkcji
-void Chess::removeClient(int64_t clientID)
+void Chess::removeClient(Client* pClient)
 {
-    Client client = _pClients->getClient(clientID);
-    if (client.socket) //todo: co to??? czyżby to że sprawdzam czy udało mi się...
-        //...zrzutować obiekt z powyższej linjki?
+    if (_pClients->isClientAPlayer(pClient))
+        this->restartGame(ET_SOCKET_LOST, pClient);
+    else
     {
-        if (_pClients->isClientAPlayer(client))
-            this->restartGame(ET_SOCKET_LOST, client);
-        else
-        {
-            //todo: wyświetla mi się disconnect w dziwnym miejscu
-            qDebug() << "non-player disconnected";
-            emit addTextToConsole("non-player disconnected\n", LOG_WEBSOCKET);
-        }
-
-        client.socket->deleteLater();
-
-        qDebug() << "Chess::removeClient(): remove client from list";
-        for(int i = 0; i < _pClients->getClientsList().count(); ++i)
-        { //nie męczyć się teraz z obsługą removeAll na structurach
-          if(_pClients->getClientsList().at(i).socket == client.socket)
-          {
-            _pClients->getClientsList().removeAt(i);
-            break;
-          }
-        }
+        //todo: strange behavior with those info- seen more then we should
+        qDebug() << "non-player disconnected";
+        emit addTextToConsole("non-player disconnected\n", LOG_WEBSOCKET);
     }
+
+    _pClients->removeClient(pClient);
 
     emit setBoardDataLabels(std::to_string(_pClients->getClientsList().size()).c_str(),
                             BDL_SOCKETS_ONLINE);
@@ -248,6 +248,8 @@ QString Chess::getTableData()
 
 void Chess::resetBoardCompleted()
 {
+    qDebug() << "Chess::resetBoardCompleted()";
+
     if (_PlayerSource == WEBSITE)
     {
         //TODO: prewencyjnie ustawić wszystkie wartości na startowe (rozpisać to: jakie,...
@@ -258,7 +260,7 @@ void Chess::resetBoardCompleted()
         if (_pClients->isGameTableOccupied())
             _pTimers->startQueueTimer();
 
-        _pWebsockets->sendMsg("resetComplited");
+        _pWebsockets->sendMsgToClient("resetComplited");
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -323,7 +325,7 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
             _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
                           "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
-            this->GameStarted();
+            this->gameStarted();
         }
         else
             this->wrongTcpAnswer(tcpMsgType, tcpRespond);
@@ -377,81 +379,73 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
                   << tcpMsgType;
 }
 
-void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
+//todo: funkcja ma 120 linii kodu...
+void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
 {
-    qDebug() << "Chess::checkMsgFromWebsockets: received:" << msg;
+    qDebug() << "Chess::checkMsgFromWebsockets(): received:" << QStrMsg;
+    emit this->addTextToConsole("received: " + QStrMsg + "\n", LOG_CORE);
 
-    Client client = _pClients->getClient(clientID);
-
-    if (msgFromWs == "newGame")
+    if (QStrMsg == "newGame")
     {
         PLAYER_TYPE PlayerType = PT_NONE;
-        if (client == _pClients->getPlayer(PT_WHITE))
+        if (pClient == _pClients->getPlayer(PT_WHITE))
             PlayerType = PT_WHITE;
-        else if (client == _pClients->getPlayer(PT_BLACK))
+        else if (pClient == _pClients->getPlayer(PT_BLACK))
             PlayerType = PT_BLACK;
 
         this->playerClickedStart(PlayerType);
     }
-    else if (msg.left(4) == "move")
-        this->findAndSaveMoveAndSendItToTcp(msg.mid(5));
-    else if (msg.left(9) == "promoteTo")
-        this->findAndSaveMoveAndSendItToTcp(msg);
-    else if (msg == "getTableData")
-        _pWebsockets->sendMsg(this->getTableData());
-    else if (msg == "giveUp")
+    else if (QStrMsg.left(4) == "move") this->findAndSaveMoveAndSendItToTcp(QStrMsg.mid(5));
+    else if (QStrMsg.left(9) == "promoteTo") this->findAndSaveMoveAndSendItToTcp(QStrMsg);
+    else if (QStrMsg == "getTableData") _pWebsockets->sendMsgToClient(this->getTableData(), pClient);
+    else if (QStrMsg == "giveUp")
     {
-        if (client.socket) //todo: zrozumieć to i dać w razie czego więcej tych warunków tam...
-            //...gdzie są QWebSocket *pClient = qobject_cast<QWebSocket *>(sender());
-        {
-            if (_pClients->isClientAPlayer(client))
-                this->restartGame(ET_GIVE_UP, client);
-            else
-                qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
-        }
-        else qDebug() << "ERROR: Chess::receivedMsg(): giveUp: !isset client";
+        if (_pClients->isClientAPlayer(pClient))
+            this->restartGame(ET_GIVE_UP, pClient);
+        else
+            qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
     }
-    else if (msg.left(5) == "sitOn")
+    else if (QStrMsg.left(5) == "sitOn")
     {
-        if (_pClients->getClientName(client) == "-1")
+        if (_pClients->getClientName(pClient) == "-1")
         {
             qDebug() << "ERROR: Chess::receivedMsg(): sitOn: client not loggedIn";
             return;
         }
 
-        PLAYER_TYPE PlayerChair = playerTypeFromQStr(msg.mid(5));
+        PLAYER_TYPE PlayerChair = playerTypeFromQStr(QStrMsg.mid(5));
 
         _pStatus->setWhoseTurn(NO_TURN);
         if (!_pClients->isPlayerChairEmpty(PlayerChair))
         {
             qDebug() << "ERROR: Chess::receivedMsg(): client wanted to "
                         "sit on occupied chair. client name:"
-                     << _pClients->getClientName(client) << ", player name:" <<
+                     << _pClients->getClientName(pClient) << ", player name:" <<
                         _pClients->getPlayerName(PlayerChair);
             return;
         }
         else
-            _pClients->setPlayerType(client, PlayerChair);
+            _pClients->setPlayerType(pClient, PlayerChair);
 
         if (this->isGameTableOccupied())
             _pTimers->startQueueTimer();
 
         _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
-    else if (QStrWsMsgToProcess == "standUp")
+    else if (QStrMsg == "standUp")
     {
-        if (_pClients->isClientAPlayer(client))
+        if (_pClients->isClientAPlayer(pClient))
         {
             if (_pStatus->getWhoseTurn() == NO_TURN)
             {
-                _pClients->clearPlayerType(_pClients->getClientType(client));
+                _pClients->clearPlayerType(_pClients->getClientType(pClient));
                 _pWebsockets->sendMsgToAllClients(this->getTableData());
             }
             else
             {
                 qDebug() << "ERROR: Chess::receivedMsg(): player wanted to "
                             "leave chair during game. client name:"
-                          << _pClients->getClientName(client);
+                          << _pClients->getClientName(pClient);
                 return;
             }
         }
@@ -459,40 +453,39 @@ void Chess::checkMsgFromWebsockets(QString msg, int64_t clientID)
         {
             qDebug() << "ERROR: Chess::receivedMsg(): non-player client"
                         " wanted to leave chair. client name:"
-                     << _pClients->getClientName(client);
+                     << _pClients->getClientName(pClient);
             return;
         }
     }
-    else if (QStrWsMsgToProcess.left(3) == "im ")
+    else if (QStrMsg.left(3) == "im ")
     {
-        QString QStrName = QStrWsMsgToProcess.mid(3);
+        QString QStrName = QStrMsg.mid(3);
         if (!_pClients->isClientNameExists(QStrName))
         {
-            _pClients->setClientName(client, QStrName);
+            _pClients->setClientName(pClient, QStrName);
             this->sendDataToClient(this->getTableData());
         }
         else //double login
         {
             _pClients->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
-            if (_pClients->isClientAPlayer(client))
-                this->restartGame(ET_SOCKET_LOST, client);
-            _pClients->setClientName(client, QStrName);
+            if (_pClients->isClientAPlayer(pClient))
+                this->restartGame(ET_SOCKET_LOST, pClient);
+            _pClients->setClientName(pClient, QStrName);
         }
     }
-    else if (QStrWsMsgToProcess == "queueMe")
+    else if (QStrMsg == "queueMe")
     {
-        _pClients->addClientToQueue(client);
+        _pClients->addClientToQueue(pClient);
         _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
-    else if (QStrWsMsgToProcess == "leaveQueue")
+    else if (QStrMsg == "leaveQueue")
     {
-        this->removeClientFromQueue(client);
+        this->removeClientFromQueue(pClient);
         _pWebsockets->sendMsgToAllClients(this->getTableData());
     }
-    else if (QStrWsMsgToProcess == "clientLeft")
-        this->removeClient(clientID);
+    else if (QStrMsg == "clientLeft") this->removeClient(pClient);
     else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received unknown msg:"
-                  << msg;
+                  << QStrMsg;
 
     _pClients->showClientsInForm();
 }
@@ -525,33 +518,19 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
         return;
     }
 
-    //todo: całe poniższe możnaby nazwać np. saveMove i upchać do podklasy movements
     _pMovements->setMoveType(_pMovements->findMoveType(QStrMove));
     _pMovements->setMove(QStrMove);
-    switch(_pMovements->getMoveType())
-    {
-    case ST_REGULAR: _pMovements->regularMoveSequence(); break;
-    case ST_REMOVING: _pMovements->removeMoveSequence();  break;
-    case ST_ENPASSANT: _pMovements->enpassantMoveSequence(); break;
-    case ST_CASTLING: _pMovements->castlingMoveSequence(); break;
-    case ST_PROMOTION: _pMovements->promoteMoveSequence(); break;
-    case ST_NONE:
-    default:
-        qDebug() << "ERROR: Chess::findAndSaveMoveAndSendItToTcp: wrong MoveType:"
-                 << _pMovements->getMoveType();
-        break;
-    }
+    _pMovements->doMoveSequence(_pMovements->getMoveType(), _pMovements->getMove());
 
     this->sendMsgToTcp("move " + QStrMove);
 }
 
-//todo: jezeli movements beda dziedziczone, to to powinno byc wewnatrz tamtej klasy
-void Chess::movePieceWithManipulator(Chessboard* pRealBoard, PosOnBoard FieldPos,
+void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field *pField,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {
     if (pRealBoard->getBoardType() != B_MAIN && pRealBoard->getBoardType() != B_REMOVED)
     {
-        qDebug() << "ERROR: Chess::movePieceWithManipulator: board isnt real. board ="
+        qDebug() << "ERROR: Chess::movePieceWithManipulator(): board isnt real. board ="
                  << boardTypeAsQstr(pRealBoard->getBoardType());
         return;
     }
@@ -559,23 +538,32 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, PosOnBoard FieldPos
     if (vertMove == VM_GRAB)
     {
         if (!this->isPiecesSetOk()) return;
-        short sPieceNrOnField = pRealBoard->getField(FieldPos)->getPieceNrOnField();
-        if (!Piece::isInRange(sPieceNrOnField)) return;
+        if (!Piece::isInRange(pField->getPieceNrOnField())) return;
 
-        _pDobot->setItemInGripper(sPieceNrOnField);
-        pRealBoard->clearField(Field::nr(FieldPos));
+        _pDobot->setItemInGripper(pField->getPieceNrOnField());
+        pRealBoard->clearField(pField);
         if (!this->isPiecesSetOk()) return;
     }
     else if (vertMove == VM_PUT)
     {
         if (!this->isPiecesSetOk()) return;
-        pRealBoard->setPieceOnField(_pDobot->getItemInGripper(), Field::nr(FieldPos));
+        pRealBoard->setPieceOnField(_pDobot->getItemInGripper(), pField);
         _pDobot->clearGripper();
         if (!this->isPiecesSetOk()) return;
     }
 
-    Point3D xyz = pRealBoard->getField(Field::nr(FieldPos))->getLocation3D();
+    Point3D xyz = pField->getLocation3D();
     _pDobot->doMoveSequence(xyz, vertMove);
 }
 
+bool Chess::isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2)
+{
+    for (short sField=1; sField>=64; ++sField)
+    {
+        if (pBoard1->getField(sField)->getPieceNrOnField() !=
+                pBoard2->getField(sField)->getPieceNrOnField())
+            return false;
+    }
 
+    return true;
+}

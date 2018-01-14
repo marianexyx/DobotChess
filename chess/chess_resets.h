@@ -13,14 +13,13 @@ private:
     ChessStatus* _pStatus;
 
     bool isPieceSetOnStartFields();
-    short searchForMissingPieceActualFieldOnMainBoad(Piece* piece);
+    void sendEndGameMsgToAllClients(END_TYPE WhoWon);
+    void changePlayersOnChairs(END_TYPE WhoWon, Client* PlayerToClear);
 
 public:
     ChessResets(Chess* pChess);
 
     void restartGame(END_TYPE WhoWon, Client* PlayerToClear = nullptr);
-    void changePlayersOnChairs(END_TYPE WhoWon, Client* PlayerToClear); //todo: private?
-    void sendEndGameMsgToAllClients(END_TYPE WhoWon); //todo: private?
     void resetPiecePositions();
 
 };

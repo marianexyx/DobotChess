@@ -63,18 +63,18 @@ void ChessTimers::timeOutStartQueue()
     //todo: poza tym z nazwy funkcji wogle nie wiadomo że to tu się dzieje
     //cleanSleepyPlayersChairs
     Clients pClients = _pChess->getClientsPointer();
-    if (!pClients->isStartClickedByPlayer(PT_WHITE))
-        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    if (!pClients.isStartClickedByPlayer(PT_WHITE))
+        pClients.cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
-        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        pClients.cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-    pClients->resetPlayersStartConfirmInfo();
+    pClients.resetPlayersStartConfirmInfo();
      this->stopQueueTimer();
 
     if (this->isGameTableOccupied())
         this->startQueueTimer();
-    emit sendMsgToPlayer("timeOutStartQueue"); //todo: 2 różne emity dla pojedyńczego klienta...
-    //... i dla wielu? jasne że nie- trzeba to jakoś ogarnąć
+
+    _pChess->sendDataToAllClients("timeOutStartQueue");
 }
 
 void ChessTimers::startGameTimer()
