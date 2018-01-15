@@ -58,7 +58,7 @@ PosOnBoard::PosOnBoard(int nL, int nD)
     {
         Letter = L_X;
         Digit = D_X;
-        qDebug() << "ERROR: PosOnBoard: parameters out of range: nL =" << nL
+        qDebug() << "ERROR: PosOnBoard(int nL, int nD): parameters out of range: nL =" << nL
                  << ", nD =" << nD;
     }
 }
@@ -91,7 +91,7 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
     else
     {
         Letter = pieceLetterPos(QStrBoardPos.left(1));
-        Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt() - 1);
+        Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt());
     }
     if (Letter == L_X || Digit == D_X)
         qDebug() << "WARNING: PosOnBoard(QString QStrBoardPos): parameter is X: "
@@ -132,7 +132,7 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
 {
     if (QStrMoveFromTo.length() != 4)
     {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat: parameter length != 4."
+        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): parameter length != 4."
                     ". it ==" << QStrMoveFromTo.length();
         return false;
     }
@@ -142,7 +142,7 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
     if (QString::number(QStrMoveFromTo.mid(2,1)) < 1 ||
             QString::number(QStrMoveFromTo.mid(2,1)) > 8)
     {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat: pieceFromDigit is out"
+        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceFromDigit is out"
                     " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.mid(2,1));
         return false;
     }
@@ -151,7 +151,7 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
     if (QString::number(QStrMoveFromTo.mid(4,1)) < 1 ||
             QString::number(QStrMoveFromTo.right(1)) > 8)
     {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat: pieceToDigit is out"
+        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceToDigit is out"
                     " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
         return false;
     }

@@ -11,7 +11,6 @@
 
 //todo: zastanowić sę gdzie umieścić tą klasęm zanim na dobre zakotwiczę ją w programie
 
-//http://szymonsiarkiewicz.pl/poradniki/kurs-qt/kurs-qt-komunikacja-z-baza-danych/
 class sql
 {
 

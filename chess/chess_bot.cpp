@@ -33,7 +33,7 @@ void ChessBot::wrongTcpAnswer(QString msgType, QString respond)
 {
     this->checkAI();
 
-    //TODO: zapanować jakoś nad tymi sygnałami konsoli
+    //future: zapanować jakoś nad tymi sygnałami konsoli
     emit _pChess->addTextToConsole("ERROR: ChessBot::wrongTcpAnswer(): unknown tcpRespond = " +
                                 respond + "for tcpMsgType = " + msgType + "\n", LOG_CORE);
     qDebug() << "ERROR: ChessBot::checkMsgFromChenard(): unknown tcpRespond = " <<

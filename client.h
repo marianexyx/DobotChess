@@ -13,11 +13,6 @@
 
 struct Client //todo: class friend to Clients
 {
-    //TODO: ogarnąć ID- posługiwać się ID do przekazywania pomiędzy klasami info o kliencie...
-    //...o którym mowa (np. w websocketach każde polecenie od klienta wysyłać z IDkiem do...
-    //...klasy chess, gdzie tam dopiero sprawdzać czy dany gracz mógł to polecenie wysłać
-    //todo2: jednak możę te id niepotrzebne? zbyT gęsto używać socketów wszędzie. sprawdzić...
-    //...to najpierw
     int64_t ID;
     QWebSocket *socket;
     QString name;
@@ -43,7 +38,7 @@ public:
     Clients() {}
 
     void newClient(QWebSocket *clientSocket);
-    //todo: czy nie powienen był używać samych wskaźników do clientów?
+    //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w działaniu
     void setClientName(Client client, QString name);
     void setPlayerType(Client client, PLAYER_TYPE type);
     void clearPlayerType(PLAYER_TYPE type);
@@ -57,10 +52,10 @@ public:
 
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(Client client);
-    Client getClient(QWebSocket *clientSocket);
-    Client getClient(int64_t clientID);
-    Client getPlayer(PLAYER_TYPE type); //todo: typy z dużych? poczytać
-    QWebSocket *getClientSocket(QString playerName);
+    Client* getClient(QWebSocket *clientSocket);
+    Client* getClient(int64_t clientID);
+    Client* getPlayer(PLAYER_TYPE type); //todo: typy z dużych? poczytać
+    QWebSocket* getClientSocket(QString playerName);
     QString getClientName(Client client);
     Client getNextQueuedClient();
     QString getQueuedClientsList();
@@ -68,8 +63,9 @@ public:
     bool isPlayerChairEmpty(PLAYER_TYPE type);
     bool isGameTableOccupied();
     int64_t getClientPosInQueue(Client client);
-    QWebSocket *getPlayerSocket(PLAYER_TYPE type);
+    QWebSocket* getPlayerSocket(PLAYER_TYPE type);
     bool isStartClickedByPlayer(PLAYER_TYPE type);
+    bool isStartClickedByBothPlayers();
     QString getPlayerName(PLAYER_TYPE type);
     bool isClientInQueue(Client client);
     bool isClientNameExists(QString name);

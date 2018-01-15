@@ -350,6 +350,7 @@ void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString &textChan
     else ui->sendSimulatedMsgBtn->setEnabled(false);
 }
 
+//TODO: do zmiany
 void MainWindow::on_sendSimulatedMsgBtn_clicked()
 {
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
@@ -361,7 +362,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 QStrServiceMsg = QStrServiceMsg.mid(7);
 
             LETTER serviceLetterPos = pieceLetterPos(QStrServiceMsg.left(1));
-            DIGIT serviceDigitPos = static_cast<DIGIT>(QStrServiceMsg.mid(1,1).toInt() - 1);
+            DIGIT serviceDigitPos = static_cast<DIGIT>(QStrServiceMsg.mid(1,1).toInt());
 
             if (QStrServiceMsg.right(1) != "r")
             {

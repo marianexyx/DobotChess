@@ -1,7 +1,7 @@
 #include "client.h"
 
 //todo: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
-void Clients::newClient(QWebSocket *clientSocket)
+void Clients::newClient(QWebSocket* clientSocket)
 {
     Client newClient;
     newClient.ID = this->getNextAvailableClientID();
@@ -317,48 +317,45 @@ bool Clients::isClientInList(Client client)
     return false;
 }
 
-Clients Clients::getClient(QWebSocket *clientSocket)
+Clients* Clients::getClient(QWebSocket* clientSocket)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.socket == clientSocket)
-            return cl;
+            return *cl;
     }
     qDebug() << "ERROR: Clients::getClient(QWebSocket): client not found";
-    Clients errorClient;
-    return errorClient;
+    return nullptr;
 }
 
-Clients Clients::getClient(int64_t clientID)
+Clients* Clients::getClient(int64_t clientID)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.ID == clientID)
-            return cl;
+            return *cl;
     }
     qDebug() << "ERROR: Clients::getClient(int64_t): client not found";
-    Clients errorClient;
-    return errorClient;
+    return nullptr;
 }
 
-Client Clients::getPlayer(PLAYER_TYPE type)
+Client* Clients::getPlayer(PLAYER_TYPE type)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.type == type)
-            return cl;
+            return *cl;
     }
     qDebug() << "ERROR: Clients::getPlayer(PLAYER_TYPE): client not found";
-    Clients errorClient;
-    return errorClient;
+    return nullptr;
 }
 
-QWebSocket *Clients::getClientSocket(QString playerName)
+QWebSocket* Clients::getClientSocket(QString playerName)
 {
     Q_FOREACH (Client client, _clients)
     {
         if (client.name == playerName)
-            return client.socket;
+            return *client.socket;
     }
     return nullptr;
 }
@@ -544,6 +541,14 @@ bool Clients::isStartClickedByPlayer(PLAYER_TYPE type)
                   << type;
         return false;
     }
+}
+
+bool Clients::isStartClickedByBothPlayers()
+{
+    if (this->isStartClickedByPlayer(PT_WHITE) &&
+            this->isStartClickedByPlayer(PT_BLACK))
+        return true;
+    else return false;
 }
 
 QString Clients::getPlayerName(PLAYER_TYPE type)

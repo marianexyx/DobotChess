@@ -7,28 +7,28 @@
 //todo: zastanowić się nad przypisywaniem liczb od 1 do 8
 enum LETTER
 {
-    L_X = -1,
-    L_A = 0,
-    L_B = 1,
-    L_C = 2,
-    L_D = 3,
-    L_E = 4,
-    L_F = 5,
-    L_G = 6,
-    L_H = 7
+    L_X = 0,
+    L_A = 1,
+    L_B = 2,
+    L_C = 3,
+    L_D = 4,
+    L_E = 5,
+    L_F = 6,
+    L_G = 7,
+    L_H = 8
 };
 
 enum DIGIT
 {
-    D_X = -1,
-    D_1 = 0,
-    D_2 = 1,
-    D_3 = 2,
-    D_4 = 3,
-    D_5 = 4,
-    D_6 = 5,
-    D_7 = 6,
-    D_8 = 7
+    D_X = 0,
+    D_1 = 1,
+    D_2 = 2,
+    D_3 = 3,
+    D_4 = 4,
+    D_5 = 5,
+    D_6 = 6,
+    D_7 = 7,
+    D_8 = 8
 };
 
 inline LETTER pieceLetterPos(QString QStrLetter)
@@ -66,8 +66,7 @@ inline QString pieceLetterPosAsQStr(LETTER letter)
     case L_H: QStrLetter = "h"; break;
     default:
         qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): "
-                    "Unknown letter value =" <<
-                    letter;
+                    "Unknown letter value =" << letter;
         break;
     }
 

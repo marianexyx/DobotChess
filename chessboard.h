@@ -40,13 +40,13 @@ public:
     ~Chessboard();
 
     BOARD getBoardType() const { return _BoardType; }
-    void setPieceOnField(short sPassedPiece, Field *pField); //todo: friend dla chwytaka?
+    void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
     void clearField(Field* pField);
     bool isPointInLocationLimits(Point3D point);
-    bool isPieceExistsOnBoard(short sPieceID, bool bErrorLog = false);
+    bool isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     Field* getField(short sFieldNr) const { return _pField[sFieldNr]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)]; }
-    short getFieldNrWithGivenPieceNrIfExists(short sPieceNr);
+    Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
     Point3D getMinBoardAxis() const { return _MinBoard; }
     Point3D getMaxBoardAxis() const { return _MaxBoard; }
 

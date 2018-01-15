@@ -310,14 +310,26 @@
           <string>Moves</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_19">
-          <item row="2" column="1">
-           <widget class="QGroupBox" name="groupBox_11">
+          <item row="4" column="1">
+           <widget class="QGroupBox" name="groupBox_7">
             <property name="title">
-             <string>ServoQueue</string>
+             <string>Legal</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_21">
+            <layout class="QGridLayout" name="gridLayout_15">
              <item row="0" column="0">
-              <widget class="QPlainTextEdit" name="servoQueuePTE"/>
+              <widget class="QPlainTextEdit" name="legalPTE">
+               <property name="minimumSize">
+                <size>
+                 <width>125</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <family>Courier New</family>
+                </font>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -343,7 +355,7 @@
           <item row="0" column="2">
            <widget class="QGroupBox" name="groupBox_10">
             <property name="title">
-             <string>Queued</string>
+             <string>Queued on core</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_20">
              <item row="0" column="0">
@@ -352,31 +364,19 @@
             </layout>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QGroupBox" name="groupBox_7">
+          <item row="1" column="1" rowspan="3">
+           <widget class="QGroupBox" name="groupBox_11">
             <property name="title">
-             <string>Legal</string>
+             <string>ServoQueue</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_15">
+            <layout class="QGridLayout" name="gridLayout_21">
              <item row="0" column="0">
-              <widget class="QPlainTextEdit" name="legalPTE">
-               <property name="minimumSize">
-                <size>
-                 <width>125</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <family>Courier New</family>
-                </font>
-               </property>
-              </widget>
+              <widget class="QPlainTextEdit" name="servoQueuePTE"/>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="2" column="2" rowspan="2">
+          <item row="4" column="2">
            <widget class="QGroupBox" name="groupBox_12">
             <property name="minimumSize">
              <size>
@@ -411,6 +411,21 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="1" column="2" rowspan="3">
+           <widget class="QGroupBox" name="groupBox_14">
+            <property name="title">
+             <string>Queued on Dobot</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_24">
+             <item row="0" column="0">
+              <widget class="QPlainTextEdit" name="queuedOnDobot"/>
+             </item>
+            </layout>
+            <zorder>plainTextEdit_2</zorder>
+            <zorder>plainTextEdit_2</zorder>
+            <zorder>queuedOnDobot</zorder>
            </widget>
           </item>
          </layout>

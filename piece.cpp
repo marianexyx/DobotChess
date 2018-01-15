@@ -115,19 +115,23 @@ static short Piece::StartFieldNr(short sPieceNr)
 static PosOnBoard Piece::StartFieldPos(short sPieceNr)
 {
     PosOnBoard PieceLines;
-
     if (!Piece::isInRange(sPieceNr)) return PieceLines;
 
     if (sPiecedNr % 8 != 0)
     {
-        PieceLines.Digit = sPiecedNr / 8;
-        PieceLines.Letter  = (sPiecedNr - 1) - (PieceLines.Digit * 8);
+        PieceLines.Digit = (sPiecedNr / 8) + 1;
+        PieceLines.Letter  = sPiecedNr - (PieceLines.Digit * 8);
     }
     else
     {
-        PieceLines.Digit = (sPiecedNr / 8) - 1;
-        PieceLines.Letter = 7;
+        PieceLines.Digit = (sPiecedNr / 8);
+        PieceLines.Letter = 8;
     }
+
+    if (PieceLines.Letter < 1 || PieceLines.Letter > 8 ||
+            PieceLines.Digit < 1 || PieceLines.Digit > 8)
+        qDebug() << "ERROR: Field::StartFieldPos(): PieceLines out of range: letter ="
+                 << PieceLines.Letter << ", Digit =" << PieceLines.Digit;
 
     return PieceLines;
 }

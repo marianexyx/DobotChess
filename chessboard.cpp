@@ -19,9 +19,8 @@ Chessboard::Chessboard(BOARD boardType)
             for (int letter = 0; letter <= 7; letter++)
             {
                 PosOnBoard pos;
-                pos.Letter = static_cast<LETTER>(letter);
-                pos.Digit = static_cast<DIGIT>(digit);
-                short sFieldeNr = Piece::nr(pos);
+                pos.Letter = static_cast<LETTER>(letter+1);
+                pos.Digit = static_cast<DIGIT>(digit+1);
 
                 Point3D p3D;
                 p3D.x = a1_x +
@@ -34,7 +33,7 @@ Chessboard::Chessboard(BOARD boardType)
                         digit*(((a8_z-a1_z)/7.f)+((letter/14.f)*(((a1_z-h1_z)/7.f)-((a8_z-h8_z)/7.f))))-
                         letter*(((a1_z-h1_z)/7.f)-((digit/14.f)*(((h8_z-h1_z)/7.f)-((a8_z-a1_z)/7.f))));
 
-                _pField[sFieldeNr]->setLocation3D(p3D);
+                _pField[Piece::nr(pos)]->setField3DLocation(p3D);
             }
         }
     }
@@ -46,14 +45,14 @@ Chessboard::Chessboard(BOARD boardType)
         double removedWhiteFurther_x = 259.0;
         /*double removedWhiteFurther_y = 169.3;*/
         double removedWhiteFurther_z = -19.5;
+
         for (int column=0; column<=1; column++)
         {
             for (int row=0; row<=7; row++)
             {
                 PosOnBoard pos;
-                pos.Letter = static_cast<LETTER>(column);
-                pos.Digit = static_cast<DIGIT>(row);
-                short sFieldeNr = Piece::nr(pos);
+                pos.Letter = static_cast<LETTER>(column+1);
+                pos.Digit = static_cast<DIGIT>(row+1);
 
                 Point3D p3D;
                 p3D.x = removedWhiteCloser_x +
@@ -63,7 +62,7 @@ Chessboard::Chessboard(BOARD boardType)
                 p3D.z = removedWhiteCloser_z +
                         row*((removedWhiteFurther_z - removedWhiteCloser_z)/7.f);
 
-                _pField[sFieldeNr]->setLocation3D(p3D);
+                _pField[Piece::nr(pos)]->setField3DLocation(p3D);
             }
         }
 
@@ -71,16 +70,16 @@ Chessboard::Chessboard(BOARD boardType)
         double removedBlackCloser_y = -148.4;
         double removedBlackCloser_z = -23.2;
         double removedBlackFurther_x = 267.2;
-        /*double removedBlackFurther_y = */ ;
+        //double removedBlackFurther_y =  ; //unused on removed board
         double removedBlackFurther_z = -19.4;
+
         for (int column=2; column<=3; column++)
         {
             for (int row=0; row<=7; row++)
             {
                 PosOnBoard pos;
-                pos.Letter = static_cast<LETTER>(column);
-                pos.Digit = static_cast<DIGIT>(row);
-                short sFieldeNr = Piece::nr(pos);
+                pos.Letter = static_cast<LETTER>(column+1);
+                pos.Digit = static_cast<DIGIT>(row+1);
 
                 Point3D p3D;
                 p3D.x = removedBlackCloser_x +
@@ -90,7 +89,7 @@ Chessboard::Chessboard(BOARD boardType)
                 p3D.z = removedBlackCloser_z +
                         row*((removedBlackFurther_z - removedBlackCloser_z)/7.f);
 
-                _pField[sFieldeNr]->setLocation3D(p3D);
+                _pField[Piece::nr(pos)]->setField3DLocation(p3D);
             }
         }
     }
@@ -149,21 +148,20 @@ QString Chessboard::arrayBoardAsQStr(QString QStrBoard[8][8])
     return board;
 }
 
-void Chessboard::setPieceOnField(short sPassedPiece, Field* pField)
+void Chessboard::setPieceOnField(Piece* pPiece, Field* pField)
 {
-    if (!Piece::isInRange(sPassedPiece)) return;
-    if (this->isFieldOccupied(sPassedPiece), true) return;
-    if (this->isPieceExistsOnBoard(sPassedPiece, true)) return;
+    if (pField->isFieldOccupied(true)) return;
+    if (this->isPieceExistsOnBoard(pPiece, true)) return;
 
-    pField->setPieceOnField(sPassedPiece);
-    qDebug() << "Chessboard::setPieceOnField- new pieceNr:" << sPassedPiece
-             << "on fieldNr:" << sDestFieldNr;
+    pField->setPieceOnField(pPiece);
+    qDebug() << "Chessboard::setPieceOnField(): new pieceNr:" << pPiece->getNr()
+             << "on fieldNr:" << pField->getNrAsQStr();
 }
 
 void Chessboard::clearField(Field *pField)
 {
-    qDebug() << "Chessboard::clearField: clearing field:" << pField->getNrAsQStr() <<
-                ". old piece =" << pField->getPieceNrOnField() << ", now it will be == 0";
+    qDebug() << "Chessboard::clearField(): clearing field:" << pField->getNrAsQStr() <<
+                ". old piece =" << pField->getPieceOnField()->getNr() << ", now it will be == 0";
     pField->clearField();
 }
 
@@ -175,24 +173,28 @@ bool Chessboard::isPointInLocationLimits(Point3D point)
         return true;
     else
     {
-        qDebug() << "ERROR: Chessboard::isPointInLocationLimits: point out of sight. x,y,z="
+        qDebug() << "ERROR: Chessboard::isPointInLocationLimits(): point out of sight. x,y,z="
                  << point.x << point.y << point.z;
         return false;
     }
 }
 
-bool Chessboard::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
+bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false)
 {
-    if (!Piece::isInRange(sPieceNr)) return false;
+    if (pPiece != nullptr)
+    {
+        qDebug() << "ERROR: Chessboard::isPieceExistsOnBoard(): piece can't be nullptr";
+        return false;
+    }
 
     for (int i=1; i>=64; ++i)
     {
-        if (_pField[i]->getPieceOnField() == sPieceNr)
+        if (_pField[i]->getPieceOnField() == pPiece)
         {
             if (bErrorLog)
             {
-                qDebug() << "ERROR: Chessboard::setPiecePosition: this piece "
-                            "already exist on board. piece =" << sPieceNr <<
+                qDebug() << "ERROR: Chessboard::isPieceExistsOnBoard(): this piece "
+                            "already exist on board. piece =" << pPiece->getNr() <<
                             "on field =" << _pField[i]->getNrAsQStr();
             }
             return true;
@@ -201,15 +203,15 @@ bool Chessboard::isPieceExistsOnBoard(short sPieceNr, bool bErrorLog = false)
     return false;
 }
 
-short Chessboard::getFieldNrWithGivenPieceNrIfExists(short sPieceNr)
+Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
 {
-    if (this->isPieceExistsOnBoard(sPieceNr, true))
+    if (this->isPieceExistsOnBoard(pPiece, true))
     {
         for (int i=1; i>=64; ++i)
         {
-            if (_pField[i]->getPieceOnField() == sPieceNr)
-                return _pField[i]->getPieceOnField();
+            if (_pField[i]->getPieceOnField() == pPiece)
+                return _pField[i];
         }
     }
-    else return 0;
+    else return nullptr;
 }

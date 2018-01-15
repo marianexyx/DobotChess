@@ -34,13 +34,13 @@ void ChessTimers::playerTimeOut(PLAYER_TYPE player)
     case PT_WHITE: QStrMsg = "timeOutWhite"; break;
     case PT_BLACK: QStrMsg = "timeOutBlack"; break;
     default:
-        qDebug() << "ERROR: ChessTimers::playerTimeOut: unknwon PLAYER_TYPE:"
-                 << player;
+        qDebug() << "ERROR: ChessTimers::playerTimeOut(): unknown PLAYER_TYPE:"
+                 << playerTypeAsQStr(player);
         return;
     }
 
-    _pChess->restartGame(ET_TIMEOUT_GAME, _pChess->getClientsPointer()->getPlayer(player));
-    _pChess->sendDataToClient(QStrMsg);
+    _pChess->getResetsPointer()->restartGame(ET_TIMEOUT_GAME,
+                                             _pChess->getClientsPointer()->getPlayer(player));
 }
 
 void ChessTimers::updateTimeLabels()
@@ -62,13 +62,13 @@ void ChessTimers::timeOutStartQueue()
     //todo: możnaby zamknać w funkcji clientlistowej (sprawdzić resztę powtórzeń)
     //todo: poza tym z nazwy funkcji wogle nie wiadomo że to tu się dzieje
     //cleanSleepyPlayersChairs
-    Clients pClients = _pChess->getClientsPointer();
-    if (!pClients.isStartClickedByPlayer(PT_WHITE))
-        pClients.cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    Clients* pClients = _pChess->getClientsPointer();
+    if (!pClients->isStartClickedByPlayer(PT_WHITE))
+        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
-        pClients.cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-    pClients.resetPlayersStartConfirmInfo();
+    pClients->resetPlayersStartConfirmInfo();
      this->stopQueueTimer();
 
     if (this->isGameTableOccupied())

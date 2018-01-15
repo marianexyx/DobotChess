@@ -42,12 +42,12 @@ void Websockets::onNewConnection()
 //na korzyść: "for (QWebSocket *pClient : qAsConst(m_clients))"
 //póki nie zmieniam wersji to może tak zostać
 
-//TODO2: obsuga komend serwisowych przez websockety
+//TODO: obsuga komend serwisowych przez websockety
 
 void Websockets::receivedMsg(QString QStrMsg)
 {    
     if (QStrMsg != "keepConnected")
-        qDebug() << "Websockets::receivedMsg (from site):" << QStrMsg;
+        qDebug() << "Websockets::receivedMsg():" << QStrMsg;
     else return;
 
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
@@ -56,18 +56,17 @@ void Websockets::receivedMsg(QString QStrMsg)
 
 void Websockets::sendMsgToClient(QString QStrMsg, Client* pClient)
 {
-    qDebug() << "Websockets::sendMsgToClient() received:" << QStrMsg;
+    qDebug() << "Websockets::sendMsgToClient(): received:" << QStrMsg;
 
     if (pClient == nullptr)
     {
-        qDebug() << "ERROR: Websockets::sendMsgToClient: pClient == nullptr";
+        qDebug() << "ERROR: Websockets::sendMsgToClient(): pClient == nullptr";
         return;
     }
     else
     {
-        Client client = _pClients->getClient(ID);
-        emit addTextToConsole("send to: " + client.name + " " + QStrMsg + "\n", LOG_WEBSOCKET);
-        client.socket->sendTextMessage(QStrMsg);
+        emit addTextToConsole("send to: " + pClient->name + " " + QStrMsg + "\n", LOG_WEBSOCKET);
+        pClient->socket->sendTextMessage(QStrMsg);
     }
 }
 

@@ -14,7 +14,7 @@ class Field
 {
 private:
     short _sNr;
-    short _sPieceOnField;
+    Piece* _pPieceOnField;
     short _sStartPieceNrOnField;
     Point3D _Location3D;
 
@@ -32,7 +32,7 @@ public:
     static short startPieceNrOnField(PosOnBoard FieldLines);
 
     void setField3DLocation(Point3D Point) { _Location3D = Point; }
-    void setPieceOnField(short sPieceNr);
+    void setPieceOnField(Piece* pPiece);
     void clearField();
 
     Point3D getLocation3D() const { return _Location3D; }
@@ -40,8 +40,8 @@ public:
     short getNr() const { return _sNr; }
     PosOnBoard getPos() const { return Field::Pos(_sNr); }
     QString getNrAsQStr() const { return Field::nrAsQStr(_sNr); }
-    short getPieceNrOnField() const { return _sPieceOnField; } //todo: wskaźnik do bierki?
-    short getStartPieceNrOnField() const { return _sStartPieceNrOnField; } //todo: wskaźnik do bierki?
+    Piece* getPieceOnField() const { return _pPieceOnField; }
+    short getStartPieceNrOnField() const { return _sStartPieceNrOnField; }
 };
 
 #endif // FIELD_H

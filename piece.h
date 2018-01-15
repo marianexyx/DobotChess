@@ -21,6 +21,8 @@ public:
     Piece(short sPieceID);
     ~Piece();
 
+    bool operator ==(const class Piece& st) { return m_sPieceID == st.getNr(); }
+
     static double dMaxPieceHeight = 50.f;
 
     static bool isInRange(short sPieceNr);

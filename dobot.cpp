@@ -232,7 +232,7 @@ void Dobot::setItemInGripper(short sGrippersItemID)
 {
     if (!this->isGripperEmpty())
     {
-        qDebug() << "ERROR: Dobot::isGripperEmpty()- it isn't. item nr in gripper: "
+        qDebug() << "ERROR: Dobot::isGripperEmpty(): it isn't. item nr in gripper: "
                  << _sGrippersItemID << ". passed item nr as par:" << sGrippersItemID;
         return;
     }
@@ -244,7 +244,7 @@ void Dobot::clearGripper()
 {
     if (!this->isGripperEmpty())
     {
-        qDebug() << "ERROR: Dobot::isGripperEmpty()- it isn't. item nr in gripper: "
+        qDebug() << "ERROR: Dobot::isGripperEmpty(): it isn't. item nr in gripper: "
                  << _sGrippersItemID << ". passed item nr as par:" << sGrippersItemID;
         return;
     }
@@ -407,6 +407,7 @@ void Dobot::gripperAngle(float fDutyCycle)
     SetIOPWM(&m_gripperServo, false, NULL);
 }
 
+//todo: stary kod do wyjebanie. poszukać takich więcej
 ///TYPY RUCHÓW PO PLANSZY
 void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type)
 {

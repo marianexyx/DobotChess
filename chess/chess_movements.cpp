@@ -62,9 +62,12 @@ void ChessMovements::regularMoveSequence(Field* pFrom, Field* pTo)
 void ChessMovements::removeMoveSequence(Field* pFieldWithPieceToRemove)
 {    
     //find and safe piece on board, before grabbing (i.e. till it stands on board)
-    short sPieceNrToRemove = pFieldWithPieceToRemove->getPieceNrOnField();
-    if (!Piece::isInRange(sPieceNrToRemove)) return;
-    Piece* pPieceToRemove = _pChess->getPiece(sPieceNrToRemove);
+    Piece* pPieceToRemove = pFieldWithPieceToRemove->getPieceOnField();
+    if (pPieceToRemove == nullptr)
+    {
+        qDebug() << "ERROR: ChessMovements::removeMoveSequence(): piece can't be nullptr";
+        return;
+    }
 
     _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
 
@@ -109,14 +112,13 @@ void ChessMovements::enpassantMoveSequence(Field *pFrom, Field *pTo)
         PosOfPieceToRemoveInEnpassant.Digit += 1;
     else
     {
-        qDebug() << "ERROR: ChessMovements::enpassantMoveSequence: no move "
-                     "detected is digits axis (digits abs(from-to)==0)";
+        qDebug() << "ERROR: ChessMovements::enpassantMoveSequence(): no move "
+                     "detected in digits axis (digits abs(from-to)==0)";
         return;
     }
 
     Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
-    Piece* pPieceToRemoveInEnpassant =
-            _pChess->getPiece(pFieldWithPieceToRemove->getPieceNrOnField());
+    Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField();
 
     _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
 

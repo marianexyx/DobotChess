@@ -6,7 +6,7 @@ Field::Field(short sFieldNr)
         _sNr = sFieldNr;
     else return;
 
-    _sPieceOnField = 0;
+    _pPieceOnField = nullptr;
 
     _sStartPieceNrOnField = Field::startPieceNrOnField(sFieldNr);
 
@@ -33,14 +33,19 @@ static PosOnBoard Field::Pos(short sFieldNr)
 
     if (sFieldNr % 8 != 0)
     {
-        FieldLines.Digit = sFieldNr / 8;
-        FieldLines.Letter  = (sFieldNr - 1) - (FieldLines.Digit * 8);
+        FieldLines.Digit = (sFieldNr / 8) + 1;
+        FieldLines.Letter  = sFieldNr - (FieldLines.Digit * 8);
     }
     else
     {
-        FieldLines.Digit = (sFieldNr / 8) - 1;
-        FieldLines.Letter = 7;
+        FieldLines.Digit = (sFieldNr / 8);
+        FieldLines.Letter = 8;
     }
+
+    if (FieldLines.Letter < 1 || FieldLines.Letter > 8 ||
+            FieldLines.Digit < 1 || FieldLines.Digit > 8)
+        qDebug() << "ERROR: Field::Pos(): FieldLines out of range: letter ="
+                 << FieldLines.Letter << ", Digit =" << FieldLines.Digit;
 
     return FieldLines;
 }
@@ -77,24 +82,31 @@ static short startPieceNrOnField(PosOnBoard FieldLines)
     return Field::startPieceNrOnField(sFieldID);
 }
 
-void Field::setPieceOnField(short sPieceNr)
+void Field::setPieceOnField(Piece *pPiece)
 {
-    if (!Piece::isInRange(sPieceNr)) return;
-    else _sPieceOnField = sPieceNr;
+    if (pPiece != nullptr)
+    {
+        qDebug() << "ERROR: Field::setPieceOnField(): piece can't be nullptr";
+        return;
+    }
+    else _pPieceOnField = pPiece;
 }
 
 void Field::clearField()
 {
-    if (_sPieceOnField >= 0)
-        qDebug() << "ERROR: Field::clearField: field is already clear. field ="
-                 << Field::nrAsQStr(_sNr) << ", piece nr on it =" << _sPieceOnField;
-    _sPieceOnField = 0;
+    if (_pPieceOnField != nullptr)
+        qDebug() << "ERROR: Field::clearField(): field is already clear. field ="
+                 << Field::nrAsQStr(_sNr) << ", piece nr on it =" << _pPieceOnField->getNr();
+    _pPieceOnField = nullptr;
 }
 bool Field::isFieldOccupied(bool bErrorLog = false)
 {
-    if (bErrorLog)
-        qDebug() << "ERROR: Field::isFieldOccupied: field is already occupied by"
-                    " another piece, field =" << _sNr << ", piece =" << _sPieceOnField;
-
-    return _sPieceOnField > 0 ? true : false;
+    if (_pPieceOnField != nullptr)
+    {
+        return true;
+        if (bErrorLog)
+            qDebug() << "ERROR: Field::isFieldOccupied: field is already occupied by"
+                        " another piece, field =" << _sNr << ", piece =" << _pPieceOnField->getNr();
+    }
+    else return false;
 }

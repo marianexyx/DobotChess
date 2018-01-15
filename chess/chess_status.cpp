@@ -31,7 +31,8 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
                 if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
                 {
                     QStrBoardArray[nColumn][nRow] = QStrFENSign;
-                    if (nColumn>7) qDebug() << "ERROR: ChessStatus::FENToBoard: nColumn > 8 =" << nColumn;
+                    if (nColumn > D_8) qDebug() << "ERROR: ChessStatus::FENToBoard(): nColumn"
+                                                   " > 8 =" << nColumn;
                     ++nColumn;
                 }
                 else //digits
@@ -39,7 +40,8 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
                     for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
                     {
                         QStrBoardArray[nColumn][nRow] = ".";
-                        if (nColumn>7) qDebug() << "ERROR: ChessStatus::FENToBoard: nColumn > 8 =" << nColumn;
+                        if (nColumn > D_8) qDebug() << "ERROR: ChessStatus::FENToBoard(): nColumn"
+                                                       " > 8 =" << nColumn;
                         ++nColumn;
                     }
                 }
@@ -60,7 +62,7 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
 bool ChessStatus::isMoveRemoving()
 {
     PosFromTo MoveTo = _pChess->getMovementsPointer()->getMove().to;
-    if (_pBoardMain->getField(MoveTo)->getPieceNrOnField() > 0)
+    if (_pBoardMain->getField(MoveTo)->getPieceOnField() != nullptr)
         return true;
     else return false;
 }
@@ -95,9 +97,9 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
     PosFromTo MoveFrom = _pChess->getMovementsPointer()->getMove().from;
-    PIECE_TYPE piece = Piece::Type(_pBoardMain->getField(MoveFrom)->getPieceNrOnField());
-    if ((piece == P_PAWN && ((Piece::Color(piece) == PT_WHITE && _WhoseTurn == WHITE_TURN) ||
-                            (Piece::Color(piece) == PT_BLACK && _WhoseTurn == BLACK_TURN))) &&
+    PIECE_TYPE PieceType = _pBoardMain->getField(MoveFrom)->getPieceOnField()->getType();
+    if ((PieceType == P_PAWN && ((Piece::Color(PieceType) == PT_WHITE && _WhoseTurn == WHITE_TURN)
+            || (Piece::Color(PieceType) == PT_BLACK && _WhoseTurn == BLACK_TURN))) &&
             QStrMoveToTest.right(2) == _QStrEnpassant)
         return true;
     else return false;

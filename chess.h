@@ -40,7 +40,7 @@ private:
     Dobot* _pDobot;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
-    Websockets* _pWebsockets; //todo: da się z tej klasy pozbyć websocketow
+    Websockets* _pWebsockets;
     TCPMsgs* _pTCPMsgs;
     ArduinoUsb* _pUsb;
 
@@ -54,12 +54,12 @@ private:
 
     Piece* _pPiece[32];
 
-    void startNewGameInChenard();
+    void coreIsReadyForNewGame();
+    void playerWantToStartNewGame(PLAYER_TYPE playerType);
+    void startNewGameInChenard(bool bService = false);
     void continueGameplay();
     void sendMsgToTcp(QString QStrMsg);
-    void resetBoardCompleted(); //todo: czyli co sie dzieje dalej?
-    void wrongTcpAnswer(QString msgType, QString respond);
-    void playerClickedStart(PLAYER_TYPE playerType);
+    void wrongTcpAnswer(QString msgType, QString respond); 
 
 public:
     Chess(Clients* pClients, Dobot* pDobot, Chessboard* pBoardMain,
@@ -67,13 +67,13 @@ public:
           TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
     ~Chess();
 
-    void sendDataToClient(QString QStrMsg, Client* pClient);
+    void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
     void sendDataToAllClients(QString QStrMsg);
 
     void findAndSaveMoveAndSendItToTcp(QString QStrMove);
-    void gameStarted();
-    void tellPlayerThatHeGaveBadMove(QString msg);
-    bool isPiecesSetOk();
+    void gameStarted(); //todo: czyli co?
+    void tellPlayerThatHeGaveBadMove(QString QStrMsg);
+    bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece);
     Field* searchForPieceActualFieldOnMainBoad(Piece* pPiece);
     bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);

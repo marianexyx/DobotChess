@@ -12,7 +12,7 @@ private:
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
 
-    SEQUENCE_TYPE _MoveType; //todo: raczej lepiej by to było w statusie
+    SEQUENCE_TYPE _MoveType;
     PosFromTo _PosMove; //todo: gdzieś po wszystkim tą zmienną trzeba prewencyjnie zerować. gdzie?
 
 public:

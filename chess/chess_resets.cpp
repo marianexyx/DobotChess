@@ -1,6 +1,6 @@
 #include "chess_resets.h"
 
-ChessResets::ChessResets(Chess *pChess)
+ChessResets::ChessResets(Chess* pChess)
 {
     _pChess = pChess;
     _pClients = _pChess->getClientsPointer();
@@ -29,7 +29,7 @@ void ChessResets::restartGame(END_TYPE WhoWon, Client* PlayerToClear = nullptr)
     //...że nastąpił koniec gry (patrz niżej)
     //future: info reseting powinno na stronie wyskakiwać zawsze, jak napotkamy koniec gry- samo...
     //... z siebie. nie potrzeba tego wysyłać za każdym razem
-    _pChess->sendDataToClient("reseting");
+    _pChess->sendDataToAllClients("reseting");
 
     this->resetPiecePositions();
 }
@@ -88,13 +88,13 @@ void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon)
         //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
         //...o ruchach będą wyciągane z "history"
         QString QStrMove = _pChess->getMovementsPointer()->getMove().asQStr();
-        _pChess->sendDataToClient("moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon) +
+        _pChess->sendDataToAllClients("moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon) +
                                   " " + _pChess->getTableData());
         break;
     case ET_TIMEOUT_GAME:
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
-        _pChess->sendDataToClient(endTypeAsQstr(WhoWon) +
+        _pChess->sendDataToAllClients(endTypeAsQstr(WhoWon) +
                      playerTypeAsQStr(PlayerToClear->type) + " " + _pChess->getTableData());
         break;
     default:
@@ -120,14 +120,11 @@ void ChessResets::resetPiecePositions()
             for (short sField=1; sField>=64; ++sField)
             {
                 Field* pExaminedField = pBoardMain->getField(sField);
-                Piece* pPieceOnExaminedField;
-                if (Piece::isInRange(pExaminedField->getPieceNrOnField()))
-                    pPieceOnExaminedField = _pChess->getPiece(pExaminedField->getPieceNrOnField());
-                else pPieceOnExaminedField = nullptr;
+                Piece* pPieceOnExaminedField = pExaminedField->getPieceOnField();
 
                 if (!_pChess->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
-                    if (pExaminedField->getPieceNrOnField() == 0) //checking field is empty
+                    if (pExaminedField->getPieceOnField() == nullptr) //checking field is empty
                     {
                         Piece* pMissingPiece = _pChess->getPiece(pExaminedField->getStartPieceNrOnField());
                         Field* pMissingPieceActualFieldOnMainBoard =
@@ -141,8 +138,7 @@ void ChessResets::resetPiecePositions()
                     {
                         Field* pFieldToPutAsidePiece =
                                 pBoardMain->getField(pPieceOnExaminedField->getStartFieldNr());
-                        Piece* pPieceOnPutAsideField =
-                                _pChess->getPiece(pFieldToPutAsidePiece->getPieceNrOnField());
+                        Piece* pPieceOnPutAsideField = pFieldToPutAsidePiece->getPieceOnField();
                         Field* pStartFieldOfPieceOnPutAsideField =
                                 pBoardMain->getField(pPieceOnPutAsideField->getStartFieldNr());
 
@@ -164,7 +160,7 @@ void ChessResets::resetPiecePositions()
         while (!this->isPieceSetOnStartFields() || !isLoopStuck);
     }
 
-     _pChess->resetBoardCompleted();
+     _pChess->coreIsReadyForNewGame();
 }
 
 bool ChessResets::isPieceSetOnStartFields()
@@ -172,7 +168,8 @@ bool ChessResets::isPieceSetOnStartFields()
     for (short sField=1; sField>=64; ++sField)
     {
         Field* pField = _pChess->getBoardMainPointer()->getField(sField);
-        if (pField->getStartPieceNrOnField() != pField->getPieceNrOnField())
+        Piece* pStartingPieceOnField = _pChess->getPiece(pField->getStartPieceNrOnField());
+        if (pStartingPieceOnField != pField->getPieceOnField())
             return false;
     }
 
