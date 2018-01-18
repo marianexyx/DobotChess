@@ -25,7 +25,7 @@ private:
 private slots:
     void playerTimeOut(PLAYER_TYPE player);
     void updateTimeLabels();
-    void timeOutStartQueue(); //todo: czyli że co
+    void timeOutStartQueue();
 
 public:
     ChessTimers(Chess* pChess);

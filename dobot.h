@@ -11,7 +11,6 @@
 #include <limits>
 #include "DobotDll.h"
 #include "DobotType.h"
-#include "chessboard.h"
 #include "arduinousb.h"
 #include "vars/log.h"
 #include "vars/basic_vars.h"
@@ -23,8 +22,7 @@
 
 struct ArmPosForCurrentCmdQueuedIndex
 {
-    unsigned long long index;
-    SEQUENCE_TYPE sequence;
+    int64_t index;
     DOBOT_MOVE move;
     float x;
     float y;
@@ -42,7 +40,7 @@ struct PtpCmdActualVal //todo: mozna stosować point3d, a r dawać zawsze domysl
 
 struct ServoArduino
 {
-    unsigned long long index;
+    int64_t index;
     bool isGripperOpen;
 };
 
@@ -51,7 +49,6 @@ class Dobot: public QObject
     Q_OBJECT
 
 private:
-    Chessboard *_pChessboard;
     ArduinoUsb *_pArduinoUsb;
 
     short _sGrippersItemID;
@@ -64,14 +61,15 @@ private:
     HOMEParams HomeChess;
     Pose pose;
     PtpCmdActualVal m_PtpCmdActualVal, retreatYPlus, retreatYMinus, middleAboveBoard;
+    Point3D _lastGivenPoint, _realTimePoint;
     PTPCmd ptpCmd;
     WAITCmd gripperMoveDelay; //komenda mówiąca dobotowi, że ma nic nie robić przez chwilę...
     //...podczas gdy musi się do końca wykonać komenda zamykania chwytaka zanim ruszy dalej
 
-    unsigned long long m_ullCoreQueuedCmdIndex; //aktualny index kolejki w pamięci systemu
-    unsigned long long m_ullDobotQueuedCmdIndex; //aktualny id kolejki ruchu wykonywany przez dobota
-    //Id nigdy się nie resetuje, bo raczej nie dobiję do 18 triliardów ruchów (unsigned long long)
-    unsigned long long m_ullRetreatIndex; //id na którym ramie ma się odsunąć, by nie zasłaniać obrazu kamerki
+    int64_t m_ullCoreQueuedCmdIndex; //aktualny index kolejki w pamięci systemu
+    int64_t m_ullDobotQueuedCmdIndex; //aktualny id kolejki ruchu wykonywany przez dobota
+    //Id nigdy się nie resetuje, bo raczej nie dobiję do 18 triliardów ruchów (int64_t)
+    int64_t m_ullRetreatIndex; //id na którym ramie ma się odsunąć, by nie zasłaniać obrazu kamerki
     unsigned int m_uiQueuedCmdLeftSpace; //ile zostało miejsca w pamięci dobota
     ArmPosForCurrentCmdQueuedIndex m_posIdx; //dane ramienia przypisane do danego indexu dobota
     QList<ArmPosForCurrentCmdQueuedIndex> QueuedCmdIndexList; //kolejka (lista) zapytań do dobota
@@ -82,7 +80,7 @@ private:
     void checkPWM();
 
 public:
-    Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb);
+    Dobot(ArduinoUsb* pArduinoUsb);
 
     void refreshBtn();
     void initDobot();
@@ -91,36 +89,32 @@ public:
 
     void gripperAngle(float fDutyCycle);
 
-    void pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type); //todo: do chessboardu?
-    void doMoveSequence(Point3D dest3D, VERTICAL_MOVE vertMove = VM_NONE);
-    void gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type);
-    void wait(int nMs, SEQUENCE_TYPE sequence);
-    void addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence = ST_NONE,
-                      float x = ACTUAL_POS, float y = ACTUAL_POS,
-                      float z = ACTUAL_POS, float r = ACTUAL_POS);
-    void armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type); //todo: do chessboardu?
-    void removePiece(int nPieceRowPos, int nPieceColumnPos); //todo: do chessboardu?
-    void writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence = ST_NONE, QString QStrMoveFromOrTo = NULL);
+    void doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump);
+    void gripperState(DOBOT_MOVE state);
+    void wait(int nMs);
+    void addCmdToList(DOBOT_MOVE Move, Point3D point = _lastGivenPoint);
+    void armUpDown(DOBOT_MOVE ArmDestination, double dHeight);
+    void writeMoveTypeInConsole(DOBOT_MOVE MoveState);
     void QueuedIdList();
-    bool bIsMoveInAxisRange(float x, float y, float z);
+    bool bIsMoveInAxisRange(Point3D point);
 
     //metody dostępowe do pól
     void setItemInGripper(short sGrippersItemID);
     void clearGripper();
-    void setCoreQueuedCmdIndex(unsigned long long ullCoreQueuedCmdIndex)
+    void setCoreQueuedCmdIndex(int64_t ullCoreQueuedCmdIndex)
     { m_ullCoreQueuedCmdIndex = ullCoreQueuedCmdIndex; }
-    void setDobotQueuedCmdIndex(unsigned long long ullDobotQueuedCmdIndex)
+    void setDobotQueuedCmdIndex(int64_t ullDobotQueuedCmdIndex)
     { m_ullDobotQueuedCmdIndex = ullDobotQueuedCmdIndex; }
-    void setRetreatIndex(unsigned long long ullRetreatIndex)
+    void setRetreatIndex(int64_t ullRetreatIndex)
     { m_ullRetreatIndex = ullRetreatIndex; }
     void setQueuedCmdLeftSpace(unsigned int uiQueuedCmdLeftSpace)
     { m_uiQueuedCmdLeftSpace = uiQueuedCmdLeftSpace; }
 
     bool isGripperEmpty() const { return _sGrippersItemID == 0 ? true : false; }
     short getItemInGripper() const { return _sGrippersItemID; }
-    unsigned long long getCoreQueuedCmdIndex() const { return m_ullCoreQueuedCmdIndex; }
-    unsigned long long getDobotQueuedCmdIndex() const { return m_ullDobotQueuedCmdIndex; }
-    unsigned long long getRetreatIndex() const { return m_ullRetreatIndex; }
+    int64_t getCoreQueuedCmdIndex() const { return m_ullCoreQueuedCmdIndex; }
+    int64_t getDobotQueuedCmdIndex() const { return m_ullDobotQueuedCmdIndex; }
+    int64_t getRetreatIndex() const { return m_ullRetreatIndex; }
     unsigned int getQueuedCmdLeftSpace() const { return m_uiQueuedCmdLeftSpace; }
     float getHomePos(char ch);
     float getmiddleAboveBoardPos(char ch);

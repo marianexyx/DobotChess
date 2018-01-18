@@ -1,16 +1,14 @@
 #include "dobot.h"
 
 
-//TODO: nie mam wogle sprawdzane czy jakiekolwiek dane dotarły do dobota. program wypuszcza dane na...
-//...usb i zakłada że ruch się wykonał bez sprawdzania tego.
-
 //TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian tylko kalibracyjnych
+//todo4: w całej klasie dobot ie powinna się pojawić ani 1 linia kodu z której by wynikało że...
+//...ma onacoś wspólnego z szachami
 
-Dobot::Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb):
+Dobot::Dobot(ArduinoUsb *pArduinoUsb):
     m_fGripOpened(6.9f),
     m_fGripClosed(7.55f)
 {
-    _pChessboard = pChessboard;
     _pArduinoUsb = pArduinoUsb;
 
     _sGrippersItemID = 0;
@@ -30,7 +28,7 @@ Dobot::Dobot(Chessboard *pChessboard, ArduinoUsb *pArduinoUsb):
     m_gripperServo.address = 4;
     m_gripperServo.frequency = 50;
     m_gripperServo.dutyCycle = m_fGripOpened;
-    
+
     ptpCmd.ptpMode = PTPMOVLXYZMode; //typ ruchu to kartezjański liniowy.
     //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
     
@@ -105,6 +103,7 @@ void Dobot::QueuedIdList()
                            m_ullCoreQueuedCmdIndex, QueuedCmdIndexList.size(),
                            firstPosId.index); //todo: zastrukturyzować
 
+    //servo
     if (!arduinoGripperStateList.isEmpty())
     {
         if (arduinoGripperStateList.first().index <= m_ullDobotQueuedCmdIndex)
@@ -196,38 +195,17 @@ void Dobot::QueuedIdList()
         qDebug() << "Dobot::QueuedIdList(): retreat";
         PtpCmdActualVal retreatId;
         retreatId = (pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
-        addCmdToList(DM_TO_POINT, ST_NONE, retreatId.x, retreatId.y, retreatId.z, retreatId.r);
-        m_ullRetreatIndex = std::numeric_limits<unsigned long long>::max();
+        addCmdToList(DM_TO_POINT, retreatId.x, retreatId.y, retreatId.z);
+        m_ullRetreatIndex = std::numeric_limits<int64_t>::max();
     }
 }
 
-bool Dobot::bIsMoveInAxisRange(float x, float y, float z)
+bool Dobot::bIsMoveInAxisRange(Point3D point)
 {
-    bool check = true;
-    //todo: nie powinny być przekazywane dane z chessboardu (ie meiszać klas)
-    if ( x < _pChessboard->getMinBoardAxis().x || x > _pChessboard->getMaxBoardAxis().x)
-    {
-        qDebug() << "ERROR: Dobot::bIsMoveInAxisRange: X axis out of range <"
-                 << _pChessboard->getMinBoardAxis().x  << "," <<
-                    _pChessboard->getMaxBoardAxis().x << ">. x =" << x;
-        check = false;
-    }
-    if ( y < _pChessboard->getMinBoardAxis().y || y > _pChessboard->getMaxBoardAxis().y)
-    {
-        qDebug() << "ERROR: Dobot::bIsMoveInAxisRange: Y axis out of range <"
-                 << _pChessboard->getMinBoardAxis().y << ","
-                 << _pChessboard->getMaxBoardAxis().y << ">. y =" << y;
-        check = false;
-    }
-    if ( z < _pChessboard->getMinBoardAxis().z || z > _pChessboard->getMaxBoardAxis().z)
-    {
-        qDebug() << "ERROR: Dobot::bIsMoveInAxisRange: Z axis out of range <"
-                 << _pChessboard->getMinBoardAxis().z << ","
-                 << _pChessboard->getMaxBoardAxis().z << ">. z =" << z;
-        check = false;
-    }
-    return check;
+    //todo: zrobic jeszcze prewencyjnie wewnetrzny kod blokad
+    return true;
 }
+
 void Dobot::setItemInGripper(short sGrippersItemID)
 {
     if (!this->isGripperEmpty())
@@ -407,263 +385,73 @@ void Dobot::gripperAngle(float fDutyCycle)
     SetIOPWM(&m_gripperServo, false, NULL);
 }
 
-//todo: stary kod do wyjebanie. poszukać takich więcej
-///TYPY RUCHÓW PO PLANSZY
-void Dobot::pieceFromTo(DOBOT_MOVE partOfSequence, LETTER letter, DIGIT digit, SEQUENCE_TYPE Type)
-{
-    float f_xFromTo, f_yFromTo, f_zFromTo, f_rFromTo;
-
-    if (letter >= L_A && letter <= L_H && digit >= D_1 && digit <= D_8)
-    { //todo: powtórzony kod zabezpieczeń z Dobot::armUpDown
-        if ((Type == ST_REMOVING && partOfSequence == DM_TO) || (Type == ST_RESTORE && partOfSequence == DM_FROM))
-        {
-            int nRemPieceNr;
-            PosOnBoard remPieceDest;
-
-            if (Type == ST_REMOVING)
-            {
-                if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
-                {
-                    nRemPieceNr = _pChessboard->nGripperPiece; //bierka z planszy w chwytaku do usunięcia
-                    remPieceDest.Letter = _pChessboard->fieldNrToPosOnBoard(nRemPieceNr).Letter;
-                    remPieceDest.Digit = _pChessboard->fieldNrToPosOnBoard(nRemPieceNr).Digit;
-                }
-                else
-                {
-                    qDebug() << "ERROR: Dobot::pieceFromTo: ST_REMOVING: wrong _pChessboard->nGripperPiece value:" <<
-                                _pChessboard->nGripperPiece;
-                    return;
-                }
-            }
-            else if (Type == ST_RESTORE) //dla restore() pozycja pola na obszarze usuniętych musi...
-                //...być podana wprost do pieceFromTo()
-            {
-                //dla ST_RESTORE wartość nGripperPiece nie zadziała, bo nie ma jeszcze nic w chwytaku
-                remPieceDest.Letter = letter;
-                remPieceDest.Digit = digit;
-            }
-
-            f_xFromTo = _pChessboard->m_adRemovedPiecesPositions_x[remPieceDest.Letter][remPieceDest.Digit];
-            f_yFromTo = _pChessboard->m_adRemovedPiecesPositions_y[remPieceDest.Letter][remPieceDest.Digit];
-            f_zFromTo = _pChessboard->m_adRemovedPiecesPositions_z[remPieceDest.Letter][remPieceDest.Digit];
-            f_rFromTo = ACTUAL_POS;
-        }
-        else //ruchy FromTo, łapanie bierki do zbijania, puszczanie bierki przywróconej
-        {
-            f_xFromTo = _pChessboard->m_adChessboardPositions_x[letter][digit];
-            f_yFromTo = _pChessboard->m_adChessboardPositions_y[letter][digit];
-            f_zFromTo = _pChessboard->m_adChessboardPositions_z[letter][digit];
-            f_rFromTo = ACTUAL_POS;
-        }
-    }
-    else
-    {
-        qDebug() << "ERROR: Dobot::pieceFromTo: wrong letter/digit value=" <<
-                     pieceLetterPosAsQStr(letter) << "," << digit+1;
-        return;
-    }
-    
-    if (this->bIsMoveInAxisRange(f_xFromTo, f_yFromTo, f_zFromTo))
-        //zabezpieczenia odległościowe. todo: da się je ustawić jako alarmy w odobcie?
-    {
-        ArmPosForCurrentCmdQueuedIndex actualPosIdx;
-        actualPosIdx = QueuedCmdIndexList.first();
-
-        if (f_zFromTo != actualPosIdx.z && (f_xFromTo != actualPosIdx.x || f_yFromTo != actualPosIdx.y))
-        {
-            this->addCmdToList(DM_TO_POINT, Type, f_xFromTo, f_yFromTo, f_zFromTo +
-                               Piece::dMaxPieceHeight, f_rFromTo);
-
-            QString QStrMoveFromOrTo = pieceLetterPosAsQStr(letter) + QString::number(digit+1);
-            this->writeMoveTypeInConsole(partOfSequence, Type, QStrMoveFromOrTo);
-            qDebug() << "Dobot::pieceFromTo:" << dobotMoveAsQstr(partOfSequence) << "letter ="
-                     << pieceLetterPosAsQStr(letter) << ", digit =" << digit+1 <<
-                        ", sequenceType =" << sequenceTypeAsQstr(Type);
-        }
-        else
-        {
-            qDebug() << "ERROR: Dobot::pieceFromTo: tried to move Z axis with X or Y axis";
-            return;
-        }
-    }
-    else return;
-    
-    _pChessboard->PieceActualPos.Letter = letter; //todo: wrzucić to do warunków na letter/digit
-    _pChessboard->PieceActualPos.Digit = digit;
-}
-
-void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE vertMove = VM_NONE)
+void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump)
 {
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
-    SEQUENCE_TYPE Type = ST_NONE; //todo: typ do wyrzucenia z addCmdToList
-    if (vertMove == VM_GRAB)
-        this->gripperState(DM_OPEN, Type);
+    if (VertMove == VM_GRAB)
+        this->gripperState(DM_OPEN);
 
-    this->addCmdToList(DM_TO_POINT, Type, dest3D.x, dest3D.y, dest3D.z +
-                       Piece::dMaxPieceHeight, 0);
+    dest3D.z += dJump;
+    this->addCmdToList(DM_TO_POINT, dest3D);
 
-    if (vertMove == VM_NONE) return;
+    if (VertMove == VM_NONE) return;
 
-    this->armUpDown(DM_DOWN, DM_FROM, Type); //todo: usunąć "DOBOT_MOVE"
+    this->armUpDown(DM_DOWN, dest3D - dJump); //todo: usunąć "DOBOT_MOVE"
 
-    if (vertMove == VM_PUT)
-        this->gripperState(DM_OPEN, Type);
-    else if (vertMove == VM_GRAB)
-        this->gripperState(DM_CLOSE, Type);
+    if (VertMove == VM_PUT)
+        this->gripperState(DM_OPEN);
+    else if (VertMove == VM_GRAB)
+        this->gripperState(DM_CLOSE);
 
-    this->armUpDown(DM_UP, DM_TO, Type);
+    this->armUpDown(DM_UP, );
 }
 
-void Dobot::gripperState(DOBOT_MOVE state, SEQUENCE_TYPE Type)
+void Dobot::gripperState(DOBOT_MOVE State)
 {
-    qDebug() << "Dobot::gripperState:" << (state == DM_OPEN ? "open" : "close");
-    this->addCmdToList(state, Type);
-    this->writeMoveTypeInConsole(state, Type);
+    qDebug() << "Dobot::gripperState:" << (State == DM_OPEN ? "open" : "close");
+    this->addCmdToList(State);
+    this->writeMoveTypeInConsole(State);
 }
 
-void Dobot::wait(int nMs, SEQUENCE_TYPE sequence)
+//todo: niech wait zawsze samo się odpala jak zamykam chwytak
+void Dobot::wait(int nMs) //todo: wait for motors
 {
-    gripperMoveDelay.timeout = nMs; //czekaj chwilę po dojściu na pozycję by silniki...
-    //...chwytaka zdążyły się ruszyć, zanim ramię zacznie wykonywać kolejny ruch
-    this->addCmdToList(DM_WAIT, sequence);
-    this->writeMoveTypeInConsole(DM_WAIT, sequence);
+    gripperMoveDelay.timeout = nMs;
+    this->addCmdToList(DM_WAIT);
+    this->writeMoveTypeInConsole(DM_WAIT);
 }
 
-void Dobot::armUpDown(DOBOT_MOVE armDestination, DOBOT_MOVE partOfSequence, SEQUENCE_TYPE Type)
-{ //TODO: cała ta metoda to syf jeżeli chodzi o przejrzystość i nazewnictwo funkcji
-    //todo2: ruch up/down powinien byc zaszyty w innych ruchach. jego dedukcja powinna sie...
-    //...opierac na podstawie sprawdzania czy ramie trzyma jakas bierke, cyz po nia idzie
-    float f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown;
-    //pozycje obszaru bierek usuniętych
-    if (Type == ST_REMOVING && partOfSequence == DM_TO) //jeżeli odstawiamy bierkę na obszar zbitych...
-    {
-        //TODO2: zastrukturyzować, spakować w funkcję
-        //todo3: uporządkować kod zabezpieczeń
-        //todo4: w całej klasie dobot ie powinna się pojawić ani 1 linia kodu z której by wynikało że...
-        //...ma onacoś wspólnego z szachami
-
-        if (_pChessboard->nGripperPiece >= 1 && _pChessboard->nGripperPiece <= 32)
-        {
-            qDebug() << "Dobot::armUpDown: nGripperPiece =" << _pChessboard->nGripperPiece
-                     << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
-
-            f_xUpDown = _pChessboard->m_adRemovedPiecesPositions_x
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit];
-            f_yUpDown = _pChessboard->m_adRemovedPiecesPositions_y
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit];
-            if (armDestination == DM_UP) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit] +
-                    Piece::dMaxPieceHeight;
-            else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Letter]
-                    [_pChessboard->fieldNrToPosOnBoard(_pChessboard->nGripperPiece).Digit];
-            f_rUpDown = ACTUAL_POS;
-        }
-        else
-        {
-            qDebug() << "ERROR: Dobot::armUpDown: ST_REMOVING: wrong _pChessboard->nGripperPiece value:" <<
-                         _pChessboard->nGripperPiece;
-            return;
-        }
-    }
-    else if (Type == ST_RESTORE && partOfSequence == DM_FROM) //...lub pochwycamy bierkę z obszaru zbitych
-    {
-        if (_pChessboard->PieceActualPos.Letter >= L_A && _pChessboard->PieceActualPos.Letter <= L_H &&
-                _pChessboard->PieceActualPos.Digit >= D_1 && _pChessboard->PieceActualPos.Digit <= D_8)
-        {
-            qDebug() << "Dobot::armUpDown: nRemovingRWPos =" << pieceLetterPosAsQStr(_pChessboard->PieceActualPos.Letter)
-                     << _pChessboard->PieceActualPos.Digit << ", isArmGoingUp?: " << (armDestination == DM_UP ? "up" : "down");
-
-            f_xUpDown = _pChessboard->m_adRemovedPiecesPositions_x
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            f_yUpDown = _pChessboard->m_adRemovedPiecesPositions_y
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            if (armDestination == DM_UP) f_zUpDown = Piece::dMaxPieceHeight +
-                    _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adRemovedPiecesPositions_z
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            f_rUpDown = ACTUAL_POS;
-        }
-        else qDebug() << "ERROR: Dobot::armUpDown: ST_RESTORE: wrong _pChessboard->PieceActualPos value:" <<
-                         _pChessboard->PieceActualPos.Letter << "," << _pChessboard->PieceActualPos.Digit;
-    }
-    else //pozycje na szachownicy
-    {
-        if (_pChessboard->PieceActualPos.Letter >= L_A && _pChessboard->PieceActualPos.Letter <= L_H &&
-             _pChessboard->PieceActualPos.Digit >= D_1 && _pChessboard->PieceActualPos.Digit <= D_8)
-        {
-            qDebug() << "Dobot::armUpDown: PieceActualPos =" << pieceLetterPosAsQStr(_pChessboard->PieceActualPos.Letter)
-                     << _pChessboard->PieceActualPos.Digit+1 << ", isArmGoingUp?:" <<
-                        (armDestination == DM_UP ? "up" : "down");
-
-            f_xUpDown = _pChessboard->m_adChessboardPositions_x
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            f_yUpDown = _pChessboard->m_adChessboardPositions_y
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            if (armDestination == DM_UP) f_zUpDown = Piece::dMaxPieceHeight +
-                    _pChessboard->m_adChessboardPositions_z
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            else if (armDestination == DM_DOWN) f_zUpDown = _pChessboard->m_adChessboardPositions_z
-                    [_pChessboard->PieceActualPos.Letter][_pChessboard->PieceActualPos.Digit];
-            f_rUpDown = ACTUAL_POS;
-        }
-        else qDebug() << "ERROR: Dobot::armUpDown: NORMAL: wrong _pChessboard->PieceActualPos value:" <<
-                         _pChessboard->PieceActualPos.Letter << "," << _pChessboard->PieceActualPos.Digit;
-    }
-
-    if (_pChessboard->bIsMoveInAxisRange(f_xUpDown, f_yUpDown, f_zUpDown))
-    {
-        ArmPosForCurrentCmdQueuedIndex actualPosIdx;
-        if (!QueuedCmdIndexList.isEmpty())
-            actualPosIdx = QueuedCmdIndexList.first();
-        else
-        {
-            actualPosIdx.sequence = ST_SERVICE;
-            actualPosIdx.move = armDestination;
-        }
-
-        //qDebug() << "Previous move parameteres: x y z=" << actualPosIdx.x << actualPosIdx.y << actualPosIdx.z;
-        if (f_zUpDown != actualPosIdx.z && (f_xUpDown != actualPosIdx.x || f_yUpDown != actualPosIdx.y))
-        {
-            this->addCmdToList(DM_TO_POINT, Type, f_xUpDown, f_yUpDown, f_zUpDown, f_rUpDown);
-            this->writeMoveTypeInConsole(armDestination, Type);
-        }
-        else
-        {
-            qDebug() << "ERROR: Dobot::armUpDown: tried to move Z axis with X or Y axis";
-            return;
-        }
-    }
-    else return;
-}
-
-//TODO: chyba to się niczym nie różni od Dobot::pieceFromTo oprócz szachownicy/usuniętych...
-//... - używam tego tylko w funkcji serwisowej- pozbyć się tego
-void Dobot::removePiece(int nPieceRowPos, int nPieceColumnPos)
+void Dobot::armUpDown(DOBOT_MOVE ArmDestination, double dHeight)
 {
-    float f_xRemove = _pChessboard->m_adRemovedPiecesPositions_x[nPieceRowPos][nPieceColumnPos];
-    float f_yRemove = _pChessboard->m_adRemovedPiecesPositions_y[nPieceRowPos][nPieceColumnPos];
-    float f_zRemove = _pChessboard->m_adRemovedPiecesPositions_z[nPieceRowPos][nPieceColumnPos];
-    float f_rRemove = ACTUAL_POS;
-    qDebug() << "Dobot::removePiece values: x =" << f_xRemove << ", y =" << f_yRemove << ", z =" <<
-                Piece::dMaxPieceHeight << ", r =" << f_rRemove;
+    if (ArmDestination != DM_UP && ArmDestination != DM_DOWN)
+    {
+        qDebug() << "ERROR: Dobot::armUpDown(): wrong armDestination val ="
+                 << dobotMoveAsQstr(ArmDestination);
+        return;
+    }
 
-    this->addCmdToList(DM_TO_POINT, ST_REMOVING, f_xRemove, f_yRemove,
-                       f_zRemove + Piece::dMaxPieceHeight, f_rRemove);
+    //qDebug() << "ERROR: Dobot::armUpDown: tried to move Z axis with X or Y axis";
+
+    //todo3: uporządkować kod zabezpieczeń
+
+    //todo: m_PtpCmdActualVal zmienic nazwe punktu (lub dodac kolejny) na cos w stylu...
+    //..."lastDest3D", i odrozniac to gdzie jest ramie, od tego gdzie bylo ostatnio
+
+    Point3D dest3D = m_PtpCmdActualVal;
+    dest3D.z = dHeight;
+
+    this->addCmdToList(ArmDestination, dest3D);
 }
-/// END OF: TYPY RUCHÓW PO PLANSZY
 
-void Dobot::addCmdToList(DOBOT_MOVE move, SEQUENCE_TYPE sequence, float x, float y, float z, float r)
+//todo: przyjmowanie punktu jako ruchu
+//todo: jak wyjebie stąd servo, to DOBOT_MOVE będzie zbędny?
+void Dobot::addCmdToList(DOBOT_MOVE Move, Point3D point = _lastGivenPoint)
 {
     //todo: usuwać z tablicy wiadomości na dobota wiadomości te które już poszły (może minus 1)
     m_ullCoreQueuedCmdIndex += 1; //aktualne id ruchu = +1 większe od ostatniego
     m_posIdx.index = m_ullCoreQueuedCmdIndex;
     m_posIdx.sequence = sequence;
-    m_posIdx.move = move;
+    m_posIdx.move = Move;
     m_posIdx.x = (x != ACTUAL_POS) ? x : m_PtpCmdActualVal.x;
     m_posIdx.y = (y != ACTUAL_POS) ? y : m_PtpCmdActualVal.y;
     m_posIdx.z = (z != ACTUAL_POS) ? z : m_PtpCmdActualVal.z;
@@ -708,41 +496,25 @@ void Dobot::checkPWM()
     }
 }
 
-void Dobot::writeMoveTypeInConsole(DOBOT_MOVE moveState, SEQUENCE_TYPE sequence, QString QStrMoveFromOrTo)
+//todo: do chess wrzucic to
+void Dobot::writeMoveTypeInConsole(DOBOT_MOVE MoveState)
 {
-    QString QsConsoleMsg;
-    switch(sequence)
+    QString QStrMsg;
+
+    switch(MoveState)
     {
-    case ST_REGULAR: QsConsoleMsg = "normal"; break;
-    case ST_CASTLING_KING: QsConsoleMsg = "castling(king)"; break;
-    case ST_CASTLING_ROOK: QsConsoleMsg = "castling(rook)"; break;
-    case ST_ENPASSANT: QsConsoleMsg = "enpassant"; break;
-    case ST_PROMOTION: QsConsoleMsg = "promotion"; break;
-    case ST_REMOVING: QsConsoleMsg = "remove"; break;
-    case ST_RESTORE: QsConsoleMsg = "restore"; break;
-    case ST_SERVICE: QsConsoleMsg = "service"; break;
-    default: QsConsoleMsg = "ERROR. Dobot::writeMoveTypeInConsole: Wrong movement type: " +
-                static_cast<QString>(sequence) + "\n"; break;
-    }
-    
-    QString QsSecondMsg;
-    switch(moveState)
-    {
-    //case DM_TO_POINT: QsSecondMsg = ""; break; //todo: czy da się usunąć ten typ?
-    case DM_FROM: QsSecondMsg = "piece from " + QStrMoveFromOrTo + "\n"; break;
-    case DM_TO: QsSecondMsg = "piece to " + QStrMoveFromOrTo + "\n"; break;
-    case DM_WAIT: QsSecondMsg = "wait " + QString::number(gripperMoveDelay.timeout) + " ms\n"; break;
-    case DM_OPEN: QsSecondMsg = "gripper opened\n"; break;
-    case DM_CLOSE: QsSecondMsg = "gripper closed\n"; break;
-    case DM_UP: QsSecondMsg = "arm up\n"; break;
-    case DM_DOWN: QsSecondMsg = "arm down\n"; break;
-    case DM_INDIRECT: QsSecondMsg = "indirect\n"; break;
-    default:
-        QsSecondMsg = "ERROR. Dobot::writeMoveTypeInConsole: Wrong movement state: " +
-                static_cast<QString>(moveState) + "\n"; break;
+    case DM_TO_POINT: QStrMsg = ""; break;
+    case DM_WAIT: QStrMsg = "wait " + QString::number(gripperMoveDelay.timeout) +
+                " ms\n"; break;
+    case DM_OPEN: QStrMsg = "gripper opened\n"; break;
+    case DM_CLOSE: QStrMsg = "gripper closed\n"; break;
+    case DM_UP: QStrMsg = "arm up\n"; break;
+    case DM_DOWN: QStrMsg = "arm down\n"; break;
+    default: QStrMsg = "ERROR: Dobot::writeMoveTypeInConsole(): wrong movement state: " +
+                dobotMoveAsQstr(moveState) + "\n"; break;
     }
 
-    emit this->addTextToConsole(QsConsoleMsg + " piece move: " + QsSecondMsg, LOG_DOBOT);
+    emit this->addTextToConsole(QStrMsg, LOG_DOBOT);
 }
 
 

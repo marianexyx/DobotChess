@@ -4,7 +4,7 @@
 enum GAME_STATUS
 {
     //GS_
-
+    //ERROR: jeżeli napotkam coś dziwnego, to wejdź w ten tryb
     /*
      * TURN_NONE
     WAITING_FOR_PLAYERS

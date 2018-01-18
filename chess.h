@@ -20,8 +20,6 @@
 #include "chess/chess_bot.h"
 #include "chess/chess_resets.h"
 
-//TODO: nie tworzyć dziedziczenia. tworzyć osobno obiekty z różnymi parametrami ...
-//...wejsciowymi (arduino/website)- sprawdzić czy to da radę
 /*todo2: na pierwszy rzut oka i po kolei powinno być widać to tu się dzieje:
 ruch e2e4 wpada do obiektu szachow:
 -sprawdzane jest ze statusu czy ruch był mozliwy
@@ -75,7 +73,7 @@ public:
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece);
-    Field* searchForPieceActualFieldOnMainBoad(Piece* pPiece);
+    Field* searchForPieceActualFieldOnMainBoard(Piece* pPiece);
     bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);
     void removeClient(Client* pClient);
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,

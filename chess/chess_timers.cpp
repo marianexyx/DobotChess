@@ -57,24 +57,19 @@ void ChessTimers::updateTimeLabels()
 
 void ChessTimers::timeOutStartQueue()
 {
-    //todo: 2x stopQueueTimer() mamy tu
     this->stopQueueTimer();
-    //todo: możnaby zamknać w funkcji clientlistowej (sprawdzić resztę powtórzeń)
-    //todo: poza tym z nazwy funkcji wogle nie wiadomo że to tu się dzieje
-    //cleanSleepyPlayersChairs
+    pClients->resetPlayersStartConfirmInfo();
+
     Clients* pClients = _pChess->getClientsPointer();
     if (!pClients->isStartClickedByPlayer(PT_WHITE))
         pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
         pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-    pClients->resetPlayersStartConfirmInfo();
-     this->stopQueueTimer();
-
     if (this->isGameTableOccupied())
         this->startQueueTimer();
 
-    _pChess->sendDataToAllClients("timeOutStartQueue");
+    _pChess->sendDataToAllClients(_pChess->getTableData());
 }
 
 void ChessTimers::startGameTimer()

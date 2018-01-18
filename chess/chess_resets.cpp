@@ -111,7 +111,6 @@ void ChessResets::resetPiecePositions()
         Chessboard tempBoard;
         Chessboard* pBoardMain = _pChess->getBoardMainPointer();
         ChessMovements* pMoves = _pChess->getMovementsPointer();
-        bool isLoopStuck = false;
 
         do
         {
@@ -154,10 +153,10 @@ void ChessResets::resetPiecePositions()
             if (_pChess->isPieceSetOnBoardsIdentical(*tempBoard, pBoardMain))
             {
                 qDebug() << "ERROR: ChessResets::resetPiecePositions(): boards are identical";
-                isLoopStuck = true;
+                break;
             }
         }
-        while (!this->isPieceSetOnStartFields() || !isLoopStuck);
+        while (!this->isPieceSetOnStartFields());
     }
 
      _pChess->coreIsReadyForNewGame();

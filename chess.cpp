@@ -188,7 +188,7 @@ bool Chess::isPieceStayOnItsStartingField(Piece* pPiece)
     else return false;
 }
 
-Field* Chess::searchForPieceActualFieldOnMainBoad(Piece* pPiece)
+Field* Chess::searchForPieceActualFieldOnMainBoard(Piece* pPiece)
 {
     if (pPiece == nullptr)
     {
@@ -209,7 +209,7 @@ Field* Chess::searchForPieceActualFieldOnMainBoad(Piece* pPiece)
 void Chess::removeClient(Client* pClient)
 {
     if (_pClients->isClientAPlayer(pClient))
-        this->restartGame(ET_SOCKET_LOST, pClient);
+        _pResets->restartGame(ET_SOCKET_LOST, pClient);
     else
     {
         //future: strange behavior with those info- seen more then we should
@@ -376,7 +376,7 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
                  _pStatus->getFENGameState() == FGS_BLACK_WON ||
                  _pStatus->getFENGameState() == FGS_DRAW)
         {
-            this->restartGame(_pStatus->getFENGameStateAsEndType());
+            _pResets->restartGame(_pStatus->getFENGameStateAsEndType());
         }
         else
             this->wrongTcpAnswer(tcpMsgType, _pStatus->getFENGameState());
@@ -421,7 +421,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
     else if (QStrMsg == "giveUp")
     {
         if (_pClients->isClientAPlayer(pClient))
-            this->restartGame(ET_GIVE_UP, pClient);
+            _pResets->restartGame(ET_GIVE_UP, pClient);
         else
             qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
     }
@@ -489,7 +489,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
         {
             _pClients->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
             if (_pClients->isClientAPlayer(pClient))
-                this->restartGame(ET_SOCKET_LOST, pClient);
+                _pResets->restartGame(ET_SOCKET_LOST, pClient);
             _pClients->setClientName(pClient, QStrName);
         }
     }
@@ -576,7 +576,7 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field *pField,
     }
 
     Point3D xyz = pField->getLocation3D();
-    _pDobot->doMoveSequence(xyz, vertMove);
+    _pDobot->doMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
 }
 
 bool Chess::isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2)

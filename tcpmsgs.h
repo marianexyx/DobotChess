@@ -8,7 +8,7 @@
 
 struct TcpMsgMetadata
 {
-    unsigned long long ullTcpID;
+    int64_t ullTcpID;
     int nSender;
     QString QStrMsgForTcp;
 };
@@ -24,7 +24,7 @@ private:
     bool m_bWaitingForReadyRead; //flaga dzięki której zablokujemy możliwość wykonywania od razu...
     //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
     //...na którego odpowiedź(przetworzenie) z TCP czekamy
-    unsigned long long m_ullID; //nr zapytania do tcp
+    int64_t m_ullID; //nr zapytania do tcp
     void doTcpConnect();
 
 private slots:
