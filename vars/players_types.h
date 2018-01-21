@@ -11,8 +11,6 @@ enum PLAYER_TYPE
     PT_BLACK
 };
 
-//TODO: includować to wszędzie gdzie używam zmiennych biały/czarny czy white/black
-
 inline QString playerTypeAsQStr(PLAYER_TYPE PT)
 {
     QString QStrType;

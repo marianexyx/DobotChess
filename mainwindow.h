@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
+    explicit MainWindow(Websockets *pWebSockets, Chessboard *pBoardMain,
                         TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                         ChessStatus* pChessStatus, Chess *pChess, QWidget *parent = 0);
 
@@ -46,7 +46,7 @@ private:
 
     Dobot *_pDobotArm;
     Websockets *_pWebSockets;
-    Chessboard *_pChessboard;
+    Chessboard *_pBoardMain;
     TCPMsgs *_pTCPmsg;
     ArduinoUsb *_pArduinoUsb;
     ChessStatus* _pChessStatus;
@@ -82,7 +82,7 @@ private slots:
     void on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged);
     void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
-    void showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex> list);
+    void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
     void showArduinoGripperStateList(QList<ServoArduino> list);
 
     //websocket slots

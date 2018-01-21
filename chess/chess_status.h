@@ -60,7 +60,7 @@ public:
     void clearLegalMoves() { _legalMoves.clear(); emit showLegalMoves(_legalMoves);}
     void clearHistoryMoves() { _historyMoves.clear(); emit showHistoryMoves(_historyMoves); }
 
-signals: //todo: dziedziczyć jakoś?
+signals: //todo: dziedziczyć jakoś? albo wywoływać * z pchess
     void setBoardDataLabels(QString, BOARD_DATA_LABELS);
     void showLegalMoves(QStringList);
     void showHistoryMoves(QStringList);

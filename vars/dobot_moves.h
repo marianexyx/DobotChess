@@ -4,6 +4,7 @@
 #pragma once
 #include <QString>
 
+//todo: przenieść do folderu dobot (bez vertical move)
 enum DOBOT_MOVE { DM_TO_POINT,
                   DM_HOME,
                   DM_WAIT,

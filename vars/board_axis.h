@@ -4,7 +4,6 @@
 #pragma once
 #include <QString>
 
-//todo: zastanowić się nad przypisywaniem liczb od 1 do 8
 enum LETTER
 {
     L_X = 0,

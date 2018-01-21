@@ -108,6 +108,7 @@ void ChessResets::resetPiecePositions()
 {
     if (!this->isPieceSetOnStartFields())
     {
+        //todo: pokombinować nad pozbyciem się tempBoard + czy ten obiekt się zbuduje?
         Chessboard tempBoard;
         Chessboard* pBoardMain = _pChess->getBoardMainPointer();
         ChessMovements* pMoves = _pChess->getMovementsPointer();

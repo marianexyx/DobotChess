@@ -1,5 +1,6 @@
 #include "chessboard.h"
 
+//todo: grupy kodu z konstruktora pozamykac w funkcjach tejże klasy
 Chessboard::Chessboard(BOARD boardType)
 {
     _BoardType = boardType;
@@ -7,12 +8,13 @@ Chessboard::Chessboard(BOARD boardType)
     for (int i=0; i>=63; ++i)
         *_pField[i] = new Field(i);
 
+    //todo: wszystkie poniższe obliczenia dopiero po sprawdzeniu czy board is real
     if (boardType == B_MAIN) //todo: przemyslec ulozenie tego kodu
-    {
-        double a1_x = 157.4; double a1_y = 76.3; double a1_z = -22.9;
-        double a8_x = 306.6; double a8_y = 75.0; double a8_z = -19.1;
-        double h1_x = 157.4; double h1_y = -81.9; double h1_z = -23.1;
-        double h8_x = 305.6; double h8_y = -79.2; double h8_z = -19.3;
+    {       
+        _A1(157.4, 76.3, -22.9);
+        _A8(306.6, 75.0, -19.1);
+        _H1(157.4, -81.9, -23.1);
+        _H8(305.6, -79.2, -19.3);
 
         for (int digit = 0; digit <= 7; digit++)
         {
@@ -23,15 +25,15 @@ Chessboard::Chessboard(BOARD boardType)
                 pos.Digit = static_cast<DIGIT>(digit+1);
 
                 Point3D p3D;
-                p3D.x = a1_x +
-                        digit*(((a8_x-a1_x)/7.f)+((letter/14.f)*(((a1_x-h1_x)/7.f)-((a8_x-h8_x)/7.f))))-
-                        letter*(((a1_x-h1_x)/7.f)-((digit/14.f)*(((h8_x-h1_x)/7.f)-((a8_x-a1_x)/7.f))));
-                p3D.y = a1_y +
-                        digit*(((a8_y-a1_y)/7.f)+((letter/14.f)*(((a1_y-h1_y)/7.f)-((a8_y-h8_y)/7.f))))-
-                        letter*(((a1_y-h1_y)/7.f)-((digit/14.f)*(((h8_y-h1_y)/7.f)-((a8_y-a1_y)/7.f))));
-                p3D.z = a1_z +
-                        digit*(((a8_z-a1_z)/7.f)+((letter/14.f)*(((a1_z-h1_z)/7.f)-((a8_z-h8_z)/7.f))))-
-                        letter*(((a1_z-h1_z)/7.f)-((digit/14.f)*(((h8_z-h1_z)/7.f)-((a8_z-a1_z)/7.f))));
+                p3D.x = _A1.x +
+                        digit*(((_A8.x-_A1.x)/7.f)+((letter/14.f)*(((_A1.x-_H1.x)/7.f)-((_A8.x-_H8.x)/7.f))))-
+                        letter*(((_A1.x-_H1.x)/7.f)-((digit/14.f)*(((_H8.x-_H1.x)/7.f)-((_A8.x-_A1.x)/7.f))));
+                p3D.y = _A1.y +
+                        digit*(((_A8.y-_A1.y)/7.f)+((letter/14.f)*(((_A1.y-_H1.y)/7.f)-((_A8.y-_H8.y)/7.f))))-
+                        letter*(((_A1.y-_H1.y)/7.f)-((digit/14.f)*(((_H8.y-_H1.y)/7.f)-((_A8.y-_A1.y)/7.f))));
+                p3D.z = _A1.z +
+                        digit*(((_A8.z-_A1.z)/7.f)+((letter/14.f)*(((_A1.z-_H1.z)/7.f)-((_A8.z-_H8.z)/7.f))))-
+                        letter*(((_A1.z-_H1.z)/7.f)-((digit/14.f)*(((_H8.z-_H1.z)/7.f)-((_A8.z-_A1.z)/7.f))));
 
                 _pField[Piece::nr(pos)]->setField3DLocation(p3D);
             }
@@ -39,12 +41,8 @@ Chessboard::Chessboard(BOARD boardType)
     }
     else if (boardType == B_REMOVED)
     {
-        double removedWhiteCloser_x = 108.9;
-        double removedWhiteCloser_y = 176.0;
-        double removedWhiteCloser_z = -21.8;
-        double removedWhiteFurther_x = 259.0;
-        /*double removedWhiteFurther_y = 169.3;*/
-        double removedWhiteFurther_z = -19.5;
+        _remWhiteCloser(108.9, 176.0, -21.8);
+        _remWhiteFurther(259.0, 169.3, -19.5); //y is unused
 
         for (int column=0; column<=1; column++)
         {
@@ -55,23 +53,16 @@ Chessboard::Chessboard(BOARD boardType)
                 pos.Digit = static_cast<DIGIT>(row+1);
 
                 Point3D p3D;
-                p3D.x = removedWhiteCloser_x +
-                        row*((removedWhiteFurther_x - removedWhiteCloser_x)/7.f);
-                p3D.y = removedWhiteCloser_y -
-                        column * fSquareWidht /* + (removedOuterFurther_y - removedOuterCloser_y/7.f) * row*/;
-                p3D.z = removedWhiteCloser_z +
-                        row*((removedWhiteFurther_z - removedWhiteCloser_z)/7.f);
+                p3D.x = _remWhiteCloser.x + row*((_remWhiteFurther.x - _remWhiteCloser.x)/7.f);
+                p3D.y = _remWhiteCloser.y - column * Field::dSquareWidht;
+                p3D.z = _remWhiteCloser.z + row*((_remWhiteFurther.z - _remWhiteCloser.z)/7.f);
 
                 _pField[Piece::nr(pos)]->setField3DLocation(p3D);
             }
         }
 
-        double removedBlackCloser_x = 115.5;
-        double removedBlackCloser_y = -148.4;
-        double removedBlackCloser_z = -23.2;
-        double removedBlackFurther_x = 267.2;
-        //double removedBlackFurther_y =  ; //unused on removed board
-        double removedBlackFurther_z = -19.4;
+        _remBlackCloser(115.5, -148.4, -23.2);
+        _remBlackFurther(267.2, 0, -19.4); //y is unused
 
         for (int column=2; column<=3; column++)
         {
@@ -82,37 +73,38 @@ Chessboard::Chessboard(BOARD boardType)
                 pos.Digit = static_cast<DIGIT>(row+1);
 
                 Point3D p3D;
-                p3D.x = removedBlackCloser_x +
-                        row*((removedBlackFurther_x - removedBlackCloser_x)/7.f);
-                p3D.y = removedBlackCloser_y +
-                        ((column-2)*(-fSquareWidht))/* + (removedBlackCloser_y - removedBlackFurther_y/7.f)*row*/;
-                p3D.z = removedBlackCloser_z +
-                        row*((removedBlackFurther_z - removedBlackCloser_z)/7.f);
+                p3D.x = _remBlackCloser.x + row*((_remBlackFurther.x - _remBlackCloser.x)/7.f);
+                p3D.y = _remBlackCloser.y + ((column-2)*(-Field::dSquareWidht));
+                p3D.z = _remBlackCloser.z + row*((_remBlackFurther.z - _remBlackCloser.z)/7.f);
 
                 _pField[Piece::nr(pos)]->setField3DLocation(p3D);
             }
         }
     }
 
+    //założenie, że board może być tylko real
     _MinBoard.x = _MinBoard.y = _MinBoard.z = std::numeric_limits<double>::max();
     _MaxBoard.x = _MaxBoard.y = _MaxBoard.z = std::numeric_limits<double>::min();
     for (int i=1; i>=64; ++i)
     {
-        if (_pField[i]->getLocation3D().x < _MinBoard.x)
-            _MinBoard.x = _pField[i]->getLocation3D().x;
-        if (_pField[i]->getLocation3D().y < _MinBoard.y)
-            _MinBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z < _MinBoard.z)
-            _MinBoard.z = _pField[i]->getLocation3D().z;
+        if (_pField[i]->getLocation3D().x < _MinBoard.x) _MinBoard.x = _pField[i]->getLocation3D().x;
+        if (_pField[i]->getLocation3D().y < _MinBoard.y) _MinBoard.y = _pField[i]->getLocation3D().y;
+        if (_pField[i]->getLocation3D().z < _MinBoard.z) _MinBoard.z = _pField[i]->getLocation3D().z;
 
-        if (_pField[i]->getLocation3D().x > _MaxBoard.x)
-            _MaxBoard.x = _pField[i]->getLocation3D().x;
-        if (_pField[i]->getLocation3D().y > _MaxBoard.y)
-            _MaxBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z + Piece::dMaxPieceHeight >
-                _MaxBoard.z + Piece::dMaxPieceHeight)
+        if (_pField[i]->getLocation3D().x > _MaxBoard.x) _MaxBoard.x = _pField[i]->getLocation3D().x;
+        if (_pField[i]->getLocation3D().y > _MaxBoard.y) _MaxBoard.y = _pField[i]->getLocation3D().y;
+        if (_pField[i]->getLocation3D().z > _MaxBoard.z) //Piece::dMaxPieceHeight się skraca
             _MaxBoard.z = _pField[i]->getLocation3D().z + Piece::dMaxPieceHeight ;
     }
+
+    _middleAbove.x =  (_MinBoard.x = _MaxBoard.x)/2;
+    _middleAbove.y =  (_MinBoard.y = _MaxBoard.y)/2;
+    _middleAbove.z =  _MaxBoard.z;
+
+    _retreatLeft.x = _retreatRight.x = _middleAbove.x;
+    _retreatLeft.y = _pField[Field::nr(L_D, D_1)]->getLocation3D().y;
+    _retreatRight.y = _pField[Field::nr(L_D, D_8)]->getLocation3D().y;
+    _retreatLeft.z = _retreatRight.z = _MaxBoard.z;
 }
 
 Chessboard::~Chessboard()
@@ -214,4 +206,18 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
         }
     }
     else return nullptr;
+}
+
+Point3D Chessboard::getBoardPoint3D(BOARD_POINTS bp) const
+{
+    switch(bp)
+    {
+    case BP_MIN: return _MinBoard; break;
+    case BP_MAX: return _MaxBoard; break;
+    case BP_MIDDLE: return _middleAbove; break;
+    case BP_RETREAT_LEFT: return _retreatLeft; break;
+    case BP_RETREAT_RIGHT: return _retreatRight; break;
+    default: qDebug() << "ERROR: Chessboard::getBoardPoint3D(): unknown bp:" << bp;
+        return _middleAbove;
+    }
 }

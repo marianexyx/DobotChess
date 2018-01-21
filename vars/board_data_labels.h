@@ -25,8 +25,8 @@ inline QString boardDataLabelsAsQstr(BOARD_DATA_LABELS BDL)
     QString QStrBoardLbl;
     switch(BDL)
     {
-    case BDL_SOCKETS_ONLINE: QStrBoardLbl = "socketsonline" ; break;
-    case BDL_WHITE_NAME: QStrBoardLbl = "whitename" ; break;
+    case BDL_SOCKETS_ONLINE: QStrBoardLbl = "socketsOnline" ; break;
+    case BDL_WHITE_NAME: QStrBoardLbl = "whiteName" ; break;
     case BDL_BLACK_NAME: QStrBoardLbl = "blackName" ; break;
     case BDL_TURN: QStrBoardLbl = "turn" ; break;
     case BDL_GAME_STATUS: QStrBoardLbl = "gameStatus" ; break;

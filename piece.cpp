@@ -95,8 +95,8 @@ static PIECE_TYPE Piece::Type(short sPieceNr)
 
 static short Piece::nr(PosOnBoard PieceLines)
 {
-    short sPieceNr = static_cast<short>(PieceLines.Letter + 1) +
-            static_cast<short>(PieceLines.Digit)*8;
+    short sPieceNr = static_cast<short>(PieceLines.Letter) +
+            static_cast<short>(PieceLines.Digit - 1) * 8;
 
     if (Piece::isInRange(sPieceNr)) return sPieceNr;
     else return -1;

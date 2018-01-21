@@ -52,11 +52,17 @@ static PosOnBoard Field::Pos(short sFieldNr)
 
 static short Field::nr(PosOnBoard FieldLines)
 {
-    short sFieldNr = static_cast<short>(FieldLines.Letter + 1) +
-            static_cast<short>(FieldLines.Digit)*8;
+    short sFieldNr = static_cast<short>(FieldLines.Letter) +
+            static_cast<short>(FieldLines.Digit - 1) * 8;
 
     if (Field::isInRange(sFieldNr)) return sFieldNr;
     else return -1;
+}
+
+static short nr(LETTER let, DIGIT dig)
+{
+    PosOnBoard FieldLines(let, dig);
+    return Field::nr(FieldLines);
 }
 
 static QString Field::nrAsQStr(short sFieldNr)

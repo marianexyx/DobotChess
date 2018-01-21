@@ -14,7 +14,6 @@
 #include "piece.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
-#include "vars/dobot_moves.h"
 #include "vars/board_data_labels.h"
 #include "vars/sequence_types.h"
 #include "vars/board_types.h"
@@ -28,12 +27,17 @@
 //info: bez makra QOBCJECT. ta szachownica ma by w 100% zalezna
 //info: szachownica nie powinna być tworzona z bierkami- to...
 //...gra o tym decyduje gdzie i jakie są
+enum BOARD_POINTS { BP_MIN, BP_MAX, BP_MIDDLE, BP_RETREAT_LEFT, BP_RETREAT_RIGHT };
+
 class Chessboard
 {
 private:
     BOARD _BoardType;
     Field* _pField[64];
-    Point3D _MinBoard, _MaxBoard;
+    Point3D _MinBoard, _MaxBoard, _middleAbove, _retreatLeft, _retreatRight;
+    Point3D  _A1, _A8, _H1, _H8;
+    //todo: mylące nazwy:
+    Point3D _remWhiteCloser, _remWhiteFurther, _remBlackCloser, _remBlackFurther;
 
 public:
     Chessboard(BOARD boardType);
@@ -47,8 +51,7 @@ public:
     Field* getField(short sFieldNr) const { return _pField[sFieldNr]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
-    Point3D getMinBoardAxis() const { return _MinBoard; }
-    Point3D getMaxBoardAxis() const { return _MaxBoard; }
+    Point3D getBoardPoint3D(BOARD_POINTS bp) const;
 
     //void showBoardInDebug(); //nie przerabiac poki niepotrzebne
     //todo: double pointers + freeboard:

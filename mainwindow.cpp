@@ -3,7 +3,7 @@
 
 QT_USE_NAMESPACE
 
-MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
+MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pBoardMain,
                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                        ChessStatus *pChessStatus, Chess *pChess, QWidget *parent) :
     QMainWindow(parent),
@@ -15,13 +15,13 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pChessboard,
 
     _pDobotArm = pDobotArm;
     _pWebSockets = pWebSockets;
-    _pChessboard = pChessboard;
+    _pBoardMain = pBoardMain;
     _pTCPmsg = pTCPmsg;
     _pArduinoUsb = pArduinoUsb;
     _pChessStatus = pChessStatus;
     _pChess = pChess;
 
-    //TODO: wrzucić do odpwoiednich klas
+    //TODO: wrzucić do odpwoiednich klas (chyba się da)
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),
@@ -387,9 +387,9 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_calibrateBtn_clicked()
 {
-    if (ui->xLabel->text().toInt() == _pDobotArm->getHomePos('x') &&
-            ui->yLabel->text().toInt() == _pDobotArm->getHomePos('y') &&
-            ui->zLabel->text().toInt() == _pDobotArm->getHomePos('z'))
+    if (ui->xLabel->text().toInt() == _pDobotArm->getHomePos().x &&
+            ui->yLabel->text().toInt() == _pDobotArm->getHomePos().y &&
+            ui->zLabel->text().toInt() == _pDobotArm->getHomePos().z)
     {
         _pDobotArm->addCmdToList(DM_HOME);
     }
@@ -550,32 +550,32 @@ void MainWindow::on_closeGripperBtn_clicked()
     _pDobotArm->gripperState(DM_CLOSE, ST_SERVICE);
 }
 
+//todo: do zmiany
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawićî jako stałe z xmla
     qDebug() << "Placing arm above the chessboard.";
     _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
-                             _pDobotArm->getHomePos('z'));
+    _pDobotArm->addCmdToList(DM_TO_POINT, _pDobotArm->getHomePos());
     //todo: te liczby nazwać tym gdzie i czy są
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
-                             _pDobotArm->getmiddleAboveBoardPos('y'),
-                             _pDobotArm->getmiddleAboveBoardPos('z'));
+    Point3D rightBottomLowerMainBoardSafeCorner(_pDobotArm->getHomePos().x, -103,
+                                                _pDobotArm->getHomePos().z); //todo: ogarnąć to x2
+    _pDobotArm->addCmdToList(DM_TO_POINT, rightBottomLowerMainBoardSafeCorner);
+    Point3D rightBottomHigherMainBoardSafeCorner(_pDobotArm->getHomePos().x, -103,
+                                                _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
+    _pDobotArm->addCmdToList(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
+    _pDobotArm->addCmdToList(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
 }
-//retreatYPlus, retreatYMinus, middleAboveBoard;
 
 void MainWindow::on_startDtPosBtn_clicked()
 {
     qDebug() << "Returning safely to the DM_HOME positions.";
     _pDobotArm->addTextToConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getmiddleAboveBoardPos('x'),
-                             _pDobotArm->getmiddleAboveBoardPos('y'),
-                             _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getmiddleAboveBoardPos('z'));
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), -103, _pDobotArm->getHomePos('z'));
-    _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, _pDobotArm->getHomePos('x'), _pDobotArm->getHomePos('y'),
-                             _pDobotArm->getHomePos('z'));
+    Point3D rightBottomHigherMainBoardSafeCorner(_pDobotArm->getHomePos().x, -103,
+                                                _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
+    _pDobotArm->addCmdToList(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
+    Point3D rightBottomLowerMainBoardSafeCorner(_pDobotArm->getHomePos().x, -103,
+                                                _pDobotArm->getHomePos().z); //todo: ogarnąć to x2
+    _pDobotArm->addCmdToList(DM_TO_POINT, _pDobotArm->getHomePos());
 }
 
 void MainWindow::on_SimulateFromUsbBtn_clicked()
@@ -626,10 +626,10 @@ void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
     else ui->sendTcpBtn->setEnabled(false);
 }
 
-void MainWindow::showActualDobotQueuedCmdIndexList(QList<ArmPosForCurrentCmdQueuedIndex> list)
+void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
 {
     QString QStrQueuedList;
-    ArmPosForCurrentCmdQueuedIndex item;
+    DobotMove item;
 
     for(int i=0; i<list.count(); ++i)
     {

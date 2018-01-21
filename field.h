@@ -22,11 +22,12 @@ public:
     Field(short sFieldID);
     ~Field();
 
-    static double dSquareWidht = 21.f;
+    static double dSquareWidht = 21.f; //todo: xml (albo w sumie obliczać można)
 
     static bool isInRange(short sFieldNr);
     static PosOnBoard Pos(short sFieldNr);
     static short nr(PosOnBoard FieldLines);
+    static short nr(LETTER let, DIGIT dig);
     static QString nrAsQStr(short sFieldNr);
     static short startPieceNrOnField(short sFieldNr);
     static short startPieceNrOnField(PosOnBoard FieldLines);
