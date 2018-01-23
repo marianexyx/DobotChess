@@ -12,16 +12,16 @@
 class Piece
 {
 private:
-    short m_sPieceID;
-    PIECE_TYPE m_PieceType;
-    PLAYER_TYPE m_PieceColor;
-    short m_sStartFieldID;
+    short _sPieceID;
+    PIECE_TYPE _PieceType;
+    PLAYER_TYPE _PieceColor;
+    short _sStartFieldID;
 
 public:
     Piece(short sPieceID);
     ~Piece();
 
-    bool operator ==(const class Piece& st) { return m_sPieceID == st.getNr(); }
+    bool operator ==(const class Piece& st) { return _sPieceID == st.getNr(); }
 
     static double dMaxPieceHeight = 50.f;
 
@@ -34,11 +34,11 @@ public:
     static short StartFieldNr(short sPieceNr);
     static PosOnBoard StartFieldPos(short sPieceNr);
 
-    short getNr() const { return m_sPieceID; }
-    PIECE_TYPE getType() const { return m_PieceType; }
-    PLAYER_TYPE getColor() const { return m_PieceColor; }
-    short getStartFieldNr() const { return m_sStartFieldID; }
-    PosOnBoard getStartFieldPos() const { return Piece::StartFieldPos(m_sPieceID); }
+    short getNr() const { return _sPieceID; }
+    PIECE_TYPE getType() const { return _PieceType; }
+    PLAYER_TYPE getColor() const { return _PieceColor; }
+    short getStartFieldNr() const { return _sStartFieldID; }
+    PosOnBoard getStartFieldPos() const { return Piece::StartFieldPos(_sPieceID); }
 };
 
 #endif // PIECE_H

@@ -32,13 +32,9 @@ public:
                         TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
                         ChessStatus* pChessStatus, Chess *pChess, QWidget *parent = 0);
 
-    virtual ~MainWindow(); //todo: tutaj virtual?
-
-/*protected:
-    void closeEvent(QCloseEvent *);*/ //TODO: to się może chyba przydać
+    virtual ~MainWindow();
 
 public slots:
-
     void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
 
 private:
@@ -52,11 +48,8 @@ private:
     ChessStatus* _pChessStatus;
     Chess *_pChess;
 
-    void refreshBtn();
     void initDobot();
     void initControl();
-    //sprawdź czy w line edicie jest wpisany ruch w poprawnym formacie
-    QString checkMoveForTcp(QString QsFT);
 
 private slots:
     void onChangedMode();

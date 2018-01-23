@@ -1,62 +1,68 @@
 #include "dobot.h"
 
 //TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian tylko kalibracyjnych
-//todo4: w całej klasie dobot ie powinna się pojawić ani 1 linia kodu z której by wynikało że...
-//...ma onacoś wspólnego z szachami
 
-Dobot::Dobot(ArduinoUsb *pArduinoUsb, DobotQueue pQueue)
+Dobot::Dobot(ArduinoUsb *pArduinoUsb)
 {
-    _pQueue = pQueue;
     _pArduinoUsb = pArduinoUsb;
 
-    _sGrippersItemID = 0;
+    _pQueue = new DobotQueue(*this);
+    _pServo = new DobotServo(*this);
+
+    _sItemIDInGripper = 0;
     
-    _connectStatus = false;
+    _bConnectedToDobot = false;
 
     _lastGivenPoint(200,0,25);
 
-    _Home.x = 140;
+    _Home.x = 140; //todo: home ciągnąć z xml
     _Home.y = 0;
     _Home.z = 10;
     _Home.r = 0;
-
-    _gripperServo.address = 4;
-    _gripperServo.frequency = 50;
-    _gripperServo.dutyCycle = _fGripOpened;
 }
 
 void Dobot::onPeriodicTaskTimer()
 {
-    PeriodicTask(); //zapytuj się dobota co tam u niego co chwilę
-    QTimer *periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer");
-    periodicTaskTimer->start();
+    PeriodicTask(); //check dobot actual data
+    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
+    periodicTaskTimer->start(); //auto restart timer
 }
 
 void Dobot::onGetPoseTimer()
 {
-    QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
-    GetPose(&_pose);
-    
-    emit JointLabelText(QString::number(_pose.jointAngle[0]), 1);
-    emit JointLabelText(QString::number(_pose.jointAngle[1]), 2);
-    emit JointLabelText(QString::number(_pose.jointAngle[2]), 3);
-    emit JointLabelText(QString::number(_pose.jointAngle[3]), 4);
-    
-    emit AxisLabelText(QString::number(_pose.x), 'x');
-    emit AxisLabelText(QString::number(_pose.y), 'y');
-    emit AxisLabelText(QString::number(_pose.z), 'z');
-    emit AxisLabelText(QString::number(_pose.r), 'r');
+    QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer"); //find timer by name
 
-    getPoseTimer->start();
-    
-    _pQueue->queuedIDList();
-    this->checkPWM();
-    //TODO: to tu  powoduje to deziorientację będąc w tym miejscu.
+    this->saveActualDobotPosition();
+    _pQueue->parseNextMoveToArmIfPossible();
+
+    getPoseTimer->start(); //auto restart timer
+}
+
+void Dobot::saveActualDobotPosition()
+{
+    Pose pose;
+    GetPose(&pose); //from dobot
+
+    _realTimePoint.x = pose.x;
+    _realTimePoint.y = pose.y;
+    _realTimePoint.z = pose.z;
+
+    emit JointLabelText(QString::number(pose.jointAngle[0]), 1);
+    emit JointLabelText(QString::number(pose.jointAngle[1]), 2);
+    emit JointLabelText(QString::number(pose.jointAngle[2]), 3);
+    emit JointLabelText(QString::number(pose.jointAngle[3]), 4);
+
+    emit AxisLabelText(QString::number(pose.x), 'x');
+    emit AxisLabelText(QString::number(pose.y), 'y');
+    emit AxisLabelText(QString::number(pose.z), 'z');
+    emit AxisLabelText(QString::number(pose.r), 'r');
 }
 
 bool Dobot::bIsMoveInAxisRange(Point3D point)
 {
     //todo: zrobic jeszcze prewencyjnie wewnetrzny kod blokad
+    //...max ciągnąć z xml
+    //...i pouswstawiać to tam gdzie trzeba
     return true;
 }
 
@@ -65,93 +71,72 @@ void Dobot::setItemInGripper(short sGrippersItemID)
     if (!this->isGripperEmpty())
     {
         qDebug() << "ERROR: Dobot::isGripperEmpty(): it isn't. item nr in gripper: "
-                 << _sGrippersItemID << ". passed item nr as par:" << sGrippersItemID;
+                 << _sItemIDInGripper << ". passed item nr as par:" << sGrippersItemID;
         return;
     }
 
-    _sGrippersItemID = sGrippersItemID;
+    _sItemIDInGripper = sGrippersItemID;
 }
 
 void Dobot::clearGripper()
 {
-    if (!this->isGripperEmpty())
+    if (this->isGripperEmpty())
     {
-        qDebug() << "ERROR: Dobot::isGripperEmpty(): it isn't. item nr in gripper: "
-                 << _sGrippersItemID << ". passed item nr as par:" << sGrippersItemID;
+        qDebug() << "ERROR: Dobot::clearGripper(): gripper is already empty";
         return;
     }
 
-    _sGrippersItemID = 0;
+    _sItemIDInGripper = 0;
 }
 
 Point3D Dobot::getHomePos()
 {
-    Point3D home(_Home); //todo: home ciągnąć z xml
+    Point3D home(_Home);
     return home;
 }
 
 void Dobot::onConnectDobot()
 {
-    if (!_connectStatus)
+    if (!_bConnectedToDobot)
     {
-        if (ConnectDobot(0, 115200) != DobotConnect_NoError) emit DobotErrorMsgBox();
-        _connectStatus = true;
+        if (ConnectDobot(0, 115200) != DobotConnect_NoError)
+            emit DobotErrorMsgBox();
+        _bConnectedToDobot = true;
         qDebug() << "Dobot connection success";
         this->addTextToConsole("Dobot connected \n", LOG_DOBOT);
 
+        //create dobot periodic timer
         QTimer *periodicTaskTimer = new QTimer(this);
         periodicTaskTimer->setObjectName("periodicTaskTimer");
         connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
         periodicTaskTimer->setSingleShot(true);
         periodicTaskTimer->start(5);
-        //ciągle dostaję błąd: QObject::startTimer: Timers can only be used with threads started with QThread
+        //future: ciągle dostaję błąd: "QObject::startTimer: Timers can only...
+        //...be used with threads started with QThread", jednak ciągle to działa.
 
+        //create dobot pose timer
         QTimer *getPoseTimer = new QTimer(this);
         getPoseTimer->setObjectName("getPoseTimer");
         connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
         getPoseTimer->setSingleShot(true);
         getPoseTimer->start(200);
 
-        this->refreshBtn();
         this->initDobot();
-        
-        int result = GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID); //sprawdź aktualny id i zapisz w zmiennej
-        if (result == DobotCommunicate_NoError)
-        {
-            emit this->QueueLabels(_unQueuedCmdLeftSpace, _n64RealTimeDobotActualID,
-                                   _n64CoreQueuedCmdID, QueuedCmdIDList.size(),
-                                   firstPosId.index);
-        }
-        else
-        {
-            qDebug() << "ERROR: Dobot::onConnectDobot(): GetQueuedCmdCurrentID gone wrong";
-            this->addTextToConsole("ERROR: Dobot::onConnectDobot(): "
-                                   "GetQueuedCmdCurrentID gone wrong \n", LOG_DOBOT);
-        }
-
-        _n64CoreQueuedCmdID = _n64RealTimeDobotActualID; //jeśli dobot przed aktualnym uruchomieniem programu...
-        //...wykonywał jakieś ruchy, to startowy index na core byłby normalnie mniejszy od aktualnego
+        _pQueue->saveIDFromConnectedDobot(); //1st check
     }
     else
     {
         QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
         getPoseTimer->stop();
-        _connectStatus = false;
-        refreshBtn();
+        _bConnectedToDobot = false;
         DisconnectDobot();
     }
 }
 
-void Dobot::refreshBtn() //niby button, ale używamy póki co tylko jako funkcja
-{
-    if(_connectStatus) emit RefreshDobotButtonsStates(false);
-    else emit RefreshDobotButtonsStates(true);
-}
-
 void Dobot::initDobot()
 {
-    SetCmdTimeout(3000); //Command timeout
-    SetQueuedCmdClear(); //clear old commands
+    SetCmdTimeout(3000); //command timeout
+    SetQueuedCmdClear(); //clear commands queue on arm
     SetQueuedCmdStartExec(); //set the queued command running
     
     char deviceSN[64];
@@ -162,8 +147,7 @@ void Dobot::initDobot()
     
     uint8_t majorVersion, minorVersion, revision;
     GetDeviceVersion(&majorVersion, &minorVersion, &revision);
-    
-    
+        
     emit deviceLabels(deviceSN, deviceName, QString::number(majorVersion) + "." +
                       QString::number(minorVersion) + "." +
                       QString::number(revision));
@@ -171,8 +155,8 @@ void Dobot::initDobot()
     //set the end effector parameters
     EndEffectorParams endEffectorParams;
     memset(&endEffectorParams, 0, sizeof(endEffectorParams));
-    endEffectorParams.xBias = 71.6f; //59.7f; TODO: wcześniej była ta wartość. co
-    //ona oznacza w praktyce?
+    endEffectorParams.xBias = 71.6f; //59.7f; TODO: wcześniej była ta wartość. co...
+    //...ona oznacza w praktyce?
     SetEndEffectorParams(&endEffectorParams, false, NULL);
     
     JOGJointParams jogJointParams;
@@ -220,22 +204,13 @@ void Dobot::initDobot()
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
-//TODO: tu nie zadziała to
-void Dobot::gripperAngle(float fDutyCycle)
-{
-    //uwaga: wykonuje się to polecenie bez kolejki
-    if (fDutyCycle != 0) _gripperServo.dutyCycle = fDutyCycle;
-    qDebug() << "_gripperServo.dutyCycle = " << fDutyCycle;
-    SetIOPWM(&_gripperServo, false, NULL);
-}
-
 void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump)
 {
     if (this->isPointTotallyDiffrent(dest3D)) return;
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
     if (VertMove == VM_GRAB)
-        this->gripperState(DM_OPEN);
+        this->addCmdToList(DM_OPEN);
 
     dest3D.z += dJump;
     this->addCmdToList(DM_TO_POINT, dest3D);
@@ -246,9 +221,9 @@ void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, dou
     this->armUpDown(DM_DOWN, dest3D - dJump);
 
     if (VertMove == VM_PUT)
-        this->gripperState(DM_OPEN);
+        this->addCmdToList(DM_OPEN);
     else if (VertMove == VM_GRAB)
-        this->gripperState(DM_CLOSE);
+        this->addCmdToList(DM_CLOSE);
 
     this->armUpDown(DM_UP, dest3D);
 }
@@ -279,31 +254,14 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
     else return true;
 }
 
-void Dobot::gripperState(DOBOT_MOVE State)
-{
-    qDebug() << "Dobot::gripperState:" << (State == DM_OPEN ? "open" : "close");
-    this->addCmdToList(State);
-    this->writeMoveTypeInConsole(State);
-
-    if (State == DM_CLOSE)
-        this->wait(400);
-}
-
-void Dobot::wait(int nMs) //for motors
-{
-    _gripperMoveDelay.timeout = nMs;
-    this->addCmdToList(DM_WAIT);
-    this->writeMoveTypeInConsole(DM_WAIT);
-}
-
-void Dobot::addCmdToList(DOBOT_MOVE Move, Point3D point = _lastGivenPoint)
+void Dobot::addCmdToList(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint)
 {
     _lastGivenPoint = point;
 
-    _pQueue->addCmdToList(Move, point);
+    _pQueue->addCmdToList(Type, point);
 }
 
-void Dobot::armUpDown(DOBOT_MOVE ArmDestination, double dHeight)
+void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
 {
     if (ArmDestination != DM_UP && ArmDestination != DM_DOWN)
     {
@@ -312,63 +270,26 @@ void Dobot::armUpDown(DOBOT_MOVE ArmDestination, double dHeight)
         return;
     }
 
-    //todo: uporządkować kod zabezpieczeń
-
     Point3D dest3D = _lastGivenPoint;
     dest3D.z = dHeight;
 
     this->addCmdToList(ArmDestination, dest3D);
 }
 
-void Dobot::checkPWM()
-{
-    IOPWM gripperControl;
-    if (gripperControl.address != 0 && gripperControl.frequency != 0 && gripperControl.dutyCycle != 0)
-    {
-        GetIOPWM(&gripperControl);
-
-        if (gripperControl.address!= 4 )
-        {
-            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" << gripperControl.address;
-            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.address!= 4. val =" +
-                                   QString::number(gripperControl.address) + "\n", LOG_DOBOT);
-        }
-        if (gripperControl.frequency != 50)
-        {
-            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" << gripperControl.address;
-            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.frequency != 50. val =" +
-                                   QString::number(gripperControl.frequency) + "\n", LOG_DOBOT);
-        }
-        if (gripperControl.dutyCycle != _fGripOpened && gripperControl.dutyCycle != _fGripClosed)
-        {
-            qDebug() << "ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" << gripperControl.dutyCycle;
-            this->addTextToConsole("ERROR: Dobot::checkPWM(): gripperControl.dutyCycle!= 4 && !=7.40f. val =" +
-                                   QString::number(gripperControl.dutyCycle) + "\n", LOG_DOBOT);
-        }
-    }
-}
-
-void Dobot::writeMoveTypeInConsole(DOBOT_MOVE MoveState)
+void Dobot::writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType)
 {
     QString QStrMsg;
 
-    switch(MoveState)
+    switch(MoveType)
     {
     case DM_TO_POINT: QStrMsg = ""; break;
-    case DM_WAIT: QStrMsg = "wait " + QString::number(_gripperMoveDelay.timeout) +
-                " ms\n"; break;
     case DM_OPEN: QStrMsg = "gripper opened\n"; break;
     case DM_CLOSE: QStrMsg = "gripper closed\n"; break;
     case DM_UP: QStrMsg = "arm up\n"; break;
     case DM_DOWN: QStrMsg = "arm down\n"; break;
     default: QStrMsg = "ERROR: Dobot::writeMoveTypeInConsole(): wrong movement state: "
-                + dobotMoveAsQstr(MoveState) + "\n"; break;
+                + dobotMoveAsQstr(MoveType) + "\n"; break;
     }
 
     emit this->addTextToConsole(QStrMsg, LOG_DOBOT);
-}
-
-void Dobot::closeEvent(QCloseEvent *)
-{
-    //TODO: w oryginale też jest puste od nowszej wersji. usunąć?
 }

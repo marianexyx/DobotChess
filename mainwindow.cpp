@@ -70,13 +70,11 @@ MainWindow::MainWindow(Websockets *pWebSockets, Chessboard *pBoardMain,
             this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobotArm, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));
-    connect(_pDobotArm, SIGNAL(QueueLabels(int,int,int,int,int)),
+    connect(_pDobotArm, SIGNAL(queueLabels(int,int,int,int,int)),
             this, SLOT(setQueueLabels(int,int,int,int,int)));
     connect(_pArduinoUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
-    connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
-            this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
-    connect(_pDobotArm, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
+    connect(_pDobotArm->getServoPointer(), SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
             this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
     connect(_pTCPmsg, SIGNAL(msgFromTcpToWeb(QString, QString)),
             _pChess, SLOT(checkMsgFromChenard(QString, QString)));
@@ -223,21 +221,29 @@ void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QStri
     ui->DeviceInfoLabel->setText(QSdeviceVersion);
 }
 
-//TODO: dodać tu kod actual_state
 void MainWindow::onPTPsendBtnClicked()
 {
     qDebug() << "sendBtn clicked";
 
-    int nPtpCmd_x = ui->xPTPEdit->text().toFloat();
-    int nPtpCmd_y = ui->yPTPEdit->text().toFloat();
-    int nPtpCmd_z = ui->zPTPEdit->text().toFloat();
-    int nPtpCmd_r = ui->rPTPEdit->text().toFloat();
-    if (nPtpCmd_x != 0 && nPtpCmd_y != 0 && nPtpCmd_z != 0) // dla wygody zera są zabronione
-        _pDobotArm->addCmdToList(DM_TO_POINT, ST_SERVICE, nPtpCmd_x, nPtpCmd_y, nPtpCmd_z, nPtpCmd_r);
+    //point
+    bool bConversionXOk, bConversionYOk, bConversionZOk;
 
-    float fServoDutyCycle = ui->servoGripperEdit->text().toFloat();
-    if (fServoDutyCycle !=0)
-        _pDobotArm->gripperAngle(fServoDutyCycle);
+    Point3D point;
+    float xPTE = ui->xPTPEdit->text().toFloat(&bConversionXOk);
+    float yPTE = ui->yPTPEdit->text().toFloat(&bConversionYOk);
+    float zPTE = ui->zPTPEdit->text().toFloat(&bConversionZOk);
+
+    point.x = bConversionXOk ? xPTE : _pDobotArm->getLastGivenPoint().x;
+    point.y = bConversionYOk ? yPTE : _pDobotArm->getLastGivenPoint().y;
+    point.z = bConversionZOk ? zPTE : _pDobotArm->getLastGivenPoint().z;
+
+    _pDobotArm->addCmdToList(DM_TO_POINT, point);
+
+    //servo
+    bool bConversionServoOk;
+    float fServoDutyCycle = ui->servoGripperEdit->text().toFloat(&bConversionServoOk);
+    if (bConversionServoOk)
+        _pDobotArm->changeGripperAngle(fServoDutyCycle);
 }
 
 void MainWindow::showDobotErrorMsgBox()
@@ -246,8 +252,7 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-//TODO2: ogarnąć aby w tej metodzie znalazło się wywoływanie wszystkich...
-//...qDebug, by nie robić tego wszędzie.
+//TODO: niech tutaj qDebug wywołuje się automatycznie kopiując wpadającą wiadomość
 void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = LOG_NOTHING)
 {
     QString QsLogType = "<" + logAsQstr(msgType) + ">: ";
@@ -471,35 +476,9 @@ void MainWindow::on_AIBtn_clicked()
 void MainWindow::on_AIEnemySendBtn_clicked()
 {
     _pIgorBot->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
-    QString QsAIEnemySend = this->checkMoveForTcp(ui->AIEnemyLineEdit->text());
-    this->writeInConsole(QsAIEnemySend, LOG_MAINWINDOW);
-    qDebug() << QsAIEnemySend;
-}
 
-QString MainWindow::checkMoveForTcp(QString QsFT)
-{
-    QString QsRespond;
-    if (QsFT.length() == 4 || (QsFT.length() == 5 && (QsFT.right(1) == "q" || QsFT.right(1) == "r" ||
-                                                      QsFT.right(1) == "b" || QsFT.right(1) == "k")))
-    {
-        //TODO: nie ogarniam wyrażeń regularnych:
-        if ((QsFT.at(0) == 'a' || QsFT.at(0) == 'b' || QsFT.at(0) == 'c' || QsFT.at(0) == 'd' ||
-             QsFT.at(0) == 'e' || QsFT.at(0) == 'f' || QsFT.at(0) == 'g' || QsFT.at(0) == 'h') &&
-                (QsFT.at(1) == '1' || QsFT.at(1) == '2' || QsFT.at(1) == '3' || QsFT.at(1) == '4' ||
-                 QsFT.at(1) == '5' || QsFT.at(1) == '6' || QsFT.at(1) == '7' || QsFT.at(1) == '8') &&
-                (QsFT.at(2) == 'a' || QsFT.at(2) == 'b' || QsFT.at(2) == 'c' || QsFT.at(2) == 'd' ||
-                 QsFT.at(2) == 'e' || QsFT.at(2) == 'f' || QsFT.at(2) == 'g' || QsFT.at(2) == 'h') &&
-                (QsFT.at(3) == '1' || QsFT.at(3) == '2' || QsFT.at(3) == '3' || QsFT.at(3) == '4' ||
-                 QsFT.at(3) == '5' || QsFT.at(3) == '6' || QsFT.at(3) == '7' || QsFT.at(3) == '8'))
-        {
-            QsRespond = "move " + QsFT;
-            _pIgorBot->checkMsgFromWebsockets(QsRespond); //wyślij zapytanie o ruch jak z arduino
-        }
-        else QsRespond = "ERROR: MainWindow::checkMoveForTcp: Wrong square positions\n";
-    }
-    else QsRespond = "ERROR: MainWindow::checkMoveForTcp: Wrong lenght of move cmd\n";
-
-    return QsRespond;
+    if (PosFromTo::isMoveInProperFormat(ui->AIEnemyLineEdit->text()))
+        _pChess->findAndSaveMoveAndSendItToTcp(ui->AIEnemyLineEdit->text());
 }
 
 void MainWindow::updatePortsComboBox(int nUsbPorst)
@@ -528,32 +507,33 @@ void MainWindow::on_reloadPortsBtn_clicked()
     _pArduinoUsb->searchDevices();
 }
 
-void MainWindow::on_sendUsbBtn_clicked() //wyślij wiadomość na usb
+void MainWindow::on_sendUsbBtn_clicked()
 {
-    if(_pArduinoUsb->usbInfo == NULL) //by coś wysyłać musi istnieć wybrany jakiś port
+    if(_pArduinoUsb->usbInfo == NULL)
         this->writeInConsole("None port selected\n", LOG_USB);
     else
     {
-        _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text()); //wyślij na usb wiadomość z pola textowego
-        ui->usbCmdLine->clear(); // wyczyść pole textowe
+        _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text());
+        ui->usbCmdLine->clear();
     }
 }
 
 void MainWindow::on_openGripperBtn_clicked()
 {
-    _pDobotArm->gripperState(DM_OPEN, ST_SERVICE);
+    _pDobotArm->addCmdToList(DM_OPEN);
 }
 
 
 void MainWindow::on_closeGripperBtn_clicked()
 {
-    _pDobotArm->gripperState(DM_CLOSE, ST_SERVICE);
+    _pDobotArm->addCmdToList(DM_CLOSE);
 }
 
 //todo: do zmiany
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawićî jako stałe z xmla
     qDebug() << "Placing arm above the chessboard.";
+    //todo: bezsensowny zawijaniec przez klasy:
     _pDobotArm->addTextToConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
     _pDobotArm->addCmdToList(DM_TO_POINT, _pDobotArm->getHomePos());
     //todo: te liczby nazwać tym gdzie i czy są
@@ -634,7 +614,7 @@ void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
     for(int i=0; i<list.count(); ++i)
     {
        item = list.at(i);
-       QStrQueuedList += QString::number(item.index) + ". " +  dobotMoveAsQstr(item.move) +
+       QStrQueuedList += QString::number(item.index) + ". " +  dobotMoveAsQstr(item.type) +
                " " + sequenceTypeAsQstr(item.sequence) + QString::number(item.x) + " " +
                QString::number(item.y) + " " + QString::number(item.z) + "\n";
     }

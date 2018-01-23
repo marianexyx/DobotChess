@@ -7,33 +7,34 @@
 struct DobotMove
 {
     int64_t ID;
-    DOBOT_MOVE move;
+    DOBOT_MOVE_TYPE type;
     Point3D xyz;
 };
 
 class DobotQueue
 {
 private:
+    Dobot* _pDobot;
+    DobotServo* _pServo;
+
     int64_t _n64CoreQueuedCmdID;
     int64_t _n64RealTimeDobotActualID;
     uint _unQueuedCmdLeftSpace;
-    QList<DobotMove> _QueuedCmdIDList;
-    DobotMove _cmd; //todo: nazwa?
-    DobotMove _firstPosId, _lastPosId, _takenPosId; //todo: używam tego chyba tylko lokalnie
+    QList<DobotMove> _queuedCmdIDList;
+    DobotMove _lowestIDMoveInList;
     int64_t _n64RetreatID; //todo: czy to potrzebne? gdyby na każde nowe zapytanie sprawdzać w ...
     //...pętli czy maxymalny ID == aktualny ID, i robić retreat zawsze kiedy są one ==, po czym ...
     //... wyłączać pętlę, póki nie pojawi się nic nowego w addCmd
-    PTPCmd _ptpCmd;
-    QList<ServoArduino> _arduinoGripperStates;
-    const float _fGripOpened, _fGripClosed;
 
 public:
-    DobotQueue();
+    DobotQueue(Dobot* pDobot);
 
-    void queuedIDList();
-    void retreat();
-    void queuePhysicalMoveOnArm(DOBOT_MOVE Move);
-    void addCmdToList(DOBOT_MOVE Move, Point3D point);
+    void parseNextMoveToArmIfPossible();
+    //void retreat();
+    void queuePhysicalMoveOnArm(DobotMove move);
+    void addCmdToList(DOBOT_MOVE_TYPE Type, Point3D point);
+    void saveIDFromConnectedDobot();
+    //bool isDobotCmdsLeftSpaceEmpty();
 
     void setCoreQueuedCmdID(int64_t n64CmdID) { _n64CoreQueuedCmdID = n64CmdID; }
     void setDobotQueuedCmdID(int64_t n64CmdID) { _n64RealTimeDobotActualID = n64CmdID; }
@@ -44,6 +45,7 @@ public:
     int64_t getDobotQueuedCmdID() const { return _n64RealTimeDobotActualID; }
     int64_t getRetreatID() const { return _n64RetreatID; }
     uint getQueuedCmdLeftSpace() const { return _unQueuedCmdLeftSpace; }
+    int64_t getRealTimeDobotActualID() const { return _n64RealTimeDobotActualID; }
 
 signals:
     void showActualDobotQueuedCmdIDList(QList<DobotMove>);

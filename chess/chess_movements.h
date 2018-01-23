@@ -13,7 +13,8 @@ private:
     Chessboard* _pBoardRemoved;
 
     SEQUENCE_TYPE _MoveType;
-    PosFromTo _PosMove; //todo: gdzieś po wszystkim tą zmienną trzeba prewencyjnie zerować. gdzie?
+    PosFromTo _PosMove; //todo: gdzieś po wszystkim ...
+    //...tą zmienną trzeba prewencyjnie zerować. gdzie?
 
 public:
     ChessMovements(Chess* pChess);

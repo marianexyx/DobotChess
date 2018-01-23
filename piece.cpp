@@ -3,12 +3,12 @@
 Piece::Piece(short sPieceID)
 {
     if (Piece::isInRange(sPieceID))
-        m_PieceType = Piece::Type(sPieceID);
+        _PieceType = Piece::Type(sPieceID);
     else return;
 
-    m_sPieceID = sPieceID;
-    m_PieceColor = Piece::Color(sPieceID);
-    m_sStartFieldID = Piece::StartFieldNr(sPieceID);
+    _sPieceID = sPieceID;
+    _PieceColor = Piece::Color(sPieceID);
+    _sStartFieldID = Piece::StartFieldNr(sPieceID);
 }
 
 static bool Piece::isInRange(short sPieceNr)

@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     client.cpp \
     chess/chess_resets.cpp \
     xml_reader.cpp \
-    dobot/dobot_queue.cpp
+    dobot/dobot_queue.cpp \
+    dobot/dobot_servo.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -72,7 +73,8 @@ HEADERS  +=  \
     client.h \
     chess/chess_resets.h \
     xml_reader.h \
-    dobot/dobot_queue.h
+    dobot/dobot_queue.h \
+    dobot/dobot_servo.h
 
 FORMS    += mainwindow.ui
 
