@@ -9,12 +9,12 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 #include <limits>
+#include "typeinfo"
 #include "client.h"
 #include "vars/log.h"
 #include "vars/board_data_labels.h"
 #include "vars/players_types.h"
 #include "vars/end_of_game_types.h"
-#include "typeinfo"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)
@@ -43,9 +43,8 @@ public slots:
     void sendMsgToAllClients(QString QStrMsg);
 
 signals:
-    void addTextToConsole(QString, LOG);
+    void addTextToLogPTE(QString, LOG);
     void msgFromWebsocketsToChess(QString QStrMsg, Client* pClient);
-    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
 };
 
 #endif // Websockets_H

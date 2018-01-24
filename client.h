@@ -81,8 +81,9 @@ public slots:
     void showClientsInForm();
 
 signals:
+    void addTextToLogPTE(QString, LOG);
     void showClientsList(QList<Client>);
-    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
+    void setBoardDataLabel(QString, BOARD_DATA_LABEL);
 };
 
 #endif // CLIENT_H

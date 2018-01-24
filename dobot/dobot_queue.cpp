@@ -59,7 +59,7 @@ void DobotQueue::parseNextMoveToArmIfPossible()
     if (_unQueuedCmdLeftSpace <= 0)
     {
         qDebug() << "ERROR: Dobot queue memory  full. data overflown/lost. Stop arm.";
-        this->addTextToConsole("ERROR: Dobot queue memory full. Stop arm.\n", LOG_DOBOT);
+        emit _pDobot->addTextToLogPTE("ERROR: Dobot queue memory full. Stop arm.\n", LOG_DOBOT);
         SetQueuedCmdForceStopExec(); //stop arm
     }
 }*/
@@ -86,7 +86,8 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
         break;
     case DM_HOME:
     {
-        this->addTextToConsole("HOMECmd: recalibrating arm...\n", LOG_DOBOT);
+        emit _pDobot->addTextToLogPTE("HOMECmd: recalibrating arm...\n", LOG_DOBOT);
+
         HOMECmd HOME;
         HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
         int result = SetHOMECmd(&HOME, true, &move.ID);

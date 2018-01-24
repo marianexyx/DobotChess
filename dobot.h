@@ -1,6 +1,7 @@
 #ifndef DOBOT_H
 #define DOBOT_H
 
+#pragma once
 #include <QObject>
 #include <QMessageBox>
 #include <QDebug>
@@ -39,6 +40,7 @@ private:
 
 public:
     Dobot(ArduinoUsb* pArduinoUsb);
+    ~Dobot();
 
     void saveActualDobotPosition();
     void initDobot();
@@ -70,14 +72,13 @@ public slots:
     void onGetPoseTimer();
 
 signals: //GUI mainWindow
-    void addTextToConsole(QString, LOG);
+    void addTextToLogPTE(QString, LOG);
     void JointLabelText(QString QSLabelText, short sJoint);
     void AxisLabelText(QString QSAxisLabelText, char chAxis);
     void RefreshDobotButtonsStates(bool bDobotButtonsStates);
     void deviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
     void DobotErrorMsgBox();
     void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
-    void setBoardDataLabels(QString, BOARD_DATA_LABELS);
 };
 
 #endif // DOBOT_H

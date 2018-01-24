@@ -18,13 +18,13 @@ class TCPMsgs: public QObject
     Q_OBJECT
 
 private:
-    QTcpSocket *socket;
+    QTcpSocket* socket;
     QList<TcpMsgMetadata> TCPMsgsList;
 
-    bool m_bWaitingForReadyRead; //flaga dzięki której zablokujemy możliwość wykonywania od razu...
+    bool _bWaitingForReadyRead; //flaga dzięki której zablokujemy możliwość wykonywania od razu...
     //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
     //...na którego odpowiedź(przetworzenie) z TCP czekamy
-    int64_t m_ullID; //nr zapytania do tcp
+    int64_t _n64MsgID; //nr zapytania do tcp
     void doTcpConnect();
 
 private slots:
@@ -41,7 +41,7 @@ public slots:
     void TcpQueueMsg(int nSender, QString msg);
 
 signals:
-    void addTextToConsole(QString, LOG);
+    void addTextToLogPTE(QString, LOG);
     void msgFromTcpToWeb(QString, QString);
     void msgFromTcpToArd(QString, QString);
     void msgFromTcpToCore(QString, QString);

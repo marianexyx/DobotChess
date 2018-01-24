@@ -2,7 +2,7 @@
 #define POSOTION_ON_BOARD_H
 
 #pragma once
-
+#include "chess/chess_status.h"
 #include "QString"
 #include "vars/board_axis.h"
 
@@ -130,43 +130,41 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
 
 static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
 {
-    if (QStrMoveFromTo.length() != 4 && QStrMoveFromTo.length() != 5)
+    if  (QStrMoveFromTo.length() == 4 || QStrMoveFromTo.length() == 5)
+    {
+        if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)
+            return false;
+
+        if (QString::number(QStrMoveFromTo.mid(2,1)) < 1 ||
+                QString::number(QStrMoveFromTo.mid(2,1)) > 8)
+        {
+            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceFromDigit is out"
+                        " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.mid(2,1));
+            return false;
+        }
+
+        if (pieceLetterPos(QStrMoveFromTo.mid(3,1)) == L_X)
+            return false;
+
+        if (QString::number(QStrMoveFromTo.mid(4,1)) < 1 ||
+                QString::number(QStrMoveFromTo.mid(4,1)) > 8)
+        {
+            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceToDigit is out"
+                        " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
+            return false;
+        }
+        //todo: upewnic sie ze ten warunek jest ok
+        if (!QStrMoveFromTo.length() != 4 && !ChessStatus::isMovePromotion(QStrMoveFromTo))
+        {
+            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): last char isn't "
+                        " promotion char:" << QStrMoveFromTo.right(1);
+            return false;
+        }
+    }
+    else
     {
         qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): wrong length:"
                  << QStrMoveFromTo.length();
-        return false;
-    }
-
-    if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)
-        return false;
-
-    if (QString::number(QStrMoveFromTo.mid(2,1)) < 1 ||
-            QString::number(QStrMoveFromTo.mid(2,1)) > 8)
-    {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceFromDigit is out"
-                    " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.mid(2,1));
-        return false;
-    }
-
-    if (pieceLetterPos(QStrMoveFromTo.mid(3,1)) == L_X)
-        return false;
-
-    if (QString::number(QStrMoveFromTo.mid(4,1)) < 1 ||
-            QString::number(QStrMoveFromTo.mid(4,1)) > 8)
-    {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceToDigit is out"
-                    " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
-        return false;
-    }
-
-    if ((QStrMoveFromTo.right(1) == "q" || QStrMoveFromTo.right(1) == "Q" ||
-         QStrMoveFromTo.right(1) == "r" || QStrMoveFromTo.right(1) == "R" ||
-         QStrMoveFromTo.right(1) == "b" || QStrMoveFromTo.right(1) == "B" ||
-         QStrMoveFromTo.right(1) == "k" || QStrMoveFromTo.right(1) == "K")
-            && QStrMoveFromTo.length() == 5)
-    {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): last char isn't "
-                    " promotion char:" << QStrMoveFromTo.right(1);
         return false;
     }
 

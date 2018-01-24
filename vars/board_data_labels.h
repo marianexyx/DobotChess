@@ -4,7 +4,7 @@
 #pragma once
 #include <QString>
 
-enum BOARD_DATA_LABELS
+enum BOARD_DATA_LABEL
 {
     BDL_SOCKETS_ONLINE,
     BDL_WHITE_NAME,
@@ -20,7 +20,7 @@ enum BOARD_DATA_LABELS
     BDL_QUEUE_TIME
 };
 
-inline QString boardDataLabelsAsQstr(BOARD_DATA_LABELS BDL)
+inline QString boardDataLabelsAsQstr(BOARD_DATA_LABEL BDL)
 {
     QString QStrBoardLbl;
     switch(BDL)

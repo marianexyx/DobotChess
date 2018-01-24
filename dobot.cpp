@@ -21,6 +21,12 @@ Dobot::Dobot(ArduinoUsb *pArduinoUsb)
     _Home.r = 0;
 }
 
+Dobot::~Dobot()
+{
+    delete _pQueue;
+    delete _pServo;
+}
+
 void Dobot::onPeriodicTaskTimer()
 {
     PeriodicTask(); //check dobot actual data
@@ -101,9 +107,9 @@ void Dobot::onConnectDobot()
     {
         if (ConnectDobot(0, 115200) != DobotConnect_NoError)
             emit DobotErrorMsgBox();
+
         _bConnectedToDobot = true;
-        qDebug() << "Dobot connection success";
-        this->addTextToConsole("Dobot connected \n", LOG_DOBOT);
+        emit this->addTextToLogPTE("Dobot connected \n", LOG_DOBOT);
 
         //create dobot periodic timer
         QTimer *periodicTaskTimer = new QTimer(this);
@@ -291,5 +297,5 @@ void Dobot::writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType)
                 + dobotMoveAsQstr(MoveType) + "\n"; break;
     }
 
-    emit this->addTextToConsole(QStrMsg, LOG_DOBOT);
+    emit this->addTextToLogPTE(QStrMsg, LOG_DOBOT);
 }

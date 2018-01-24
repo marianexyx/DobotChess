@@ -2,7 +2,6 @@
 #define CHESS_TIMERS_H
 
 #pragma once
-
 #include "chess.h"
 #include <QTimer>
 

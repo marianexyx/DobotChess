@@ -3,8 +3,8 @@
 
 TCPMsgs::TCPMsgs()
 {
-    m_bWaitingForReadyRead = false;
-    m_ullID = 0;
+    _bWaitingForReadyRead = false;
+    _n64MsgID = 0;
 }
 
 void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
@@ -12,11 +12,11 @@ void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
     qDebug() << "TCPMsgs::queueMsgs received msg: " << msg << ", sender = " << nSender;
 
     TcpMsgMetadata QStrReceivedData;
-    QStrReceivedData.ullTcpID = ++m_ullID;
+    QStrReceivedData.ullTcpID = ++_n64MsgID;
     QStrReceivedData.nSender = nSender;
     QStrReceivedData.QStrMsgForTcp = msg;
     TCPMsgsList << QStrReceivedData; //wrzuć do kontenera wiadomość
-    if (!TCPMsgsList.isEmpty() && !m_bWaitingForReadyRead)
+    if (!TCPMsgsList.isEmpty() && !_bWaitingForReadyRead)
     {
         //zaczekaj z wykonywaniem kolejnego zapytania do TCP z kontenera...
         //...jeżeli czekamy aktualnie na przetworzenie jakiejś odpowiedzi z TCP
@@ -27,7 +27,7 @@ void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
 //rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
 void TCPMsgs::doTcpConnect()
 {
-    m_bWaitingForReadyRead = true;
+    _bWaitingForReadyRead = true;
 
     socket = new QTcpSocket(this);
 
@@ -50,30 +50,28 @@ void TCPMsgs::doTcpConnect()
 
     if(!socket->waitForConnected(5000))
     {
-        emit addTextToConsole("Error12:" + socket->errorString() + "\n", LOG_TCP);
+        qDebug() << "ERROR: TCPMsgs::doTcpConnect():" << socket->errorString();
     }
 }
 
 void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
 {
-    switch (socketError) {
+    switch (socketError)
+    {
     case QAbstractSocket::RemoteHostClosedError:
         break; //server protocol ends with the server closing the connection
     case QAbstractSocket::HostNotFoundError:
-        qDebug() << "ERROR: TCPMsgs: The host was not found. Please check the"
-                    "host name and port settings." ;
-        emit addTextToConsole("ERROR: TCPMsgs: The host was not found. Please check the"
-                              "host name and port settings.\n", LOG_TCP);
+        qDebug() << "ERROR: TCPMsgs::doTcpConnect(): The host was not found. Please "
+                    "check the host name and port settings." ;
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        qDebug() << "ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
-                    "running, and check that the host name and port settings are correct.";
-        emit addTextToConsole("ERROR: TCPMsgs: The connection was refused by the peer. Make sure the server is "
-                              "running, and check that the host name and port settings are correct.\n", LOG_TCP);
+        qDebug() << "ERROR: TCPMsgs::doTcpConnect(): The connection was refused by the "
+                    "peer. Make sure the server is running, and check that the host name "
+                    "and port settings are correct.";
         break;
     default:
-        qDebug() << "ERROR: TCPMsgs: The following error occurred:" << socket->errorString();
-        emit addTextToConsole("ERROR: TCPMsgs: The following error occurred: " + socket->errorString() + "\n", LOG_TCP);
+        qDebug() << "ERROR: TCPMsgs::doTcpConnect(): The following error occurred:"
+                 << socket->errorString();
     }
 }
 
@@ -92,7 +90,7 @@ void TCPMsgs::connected()
         //todo: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
         socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
 
-        emit addTextToConsole("wrote to TCP: " + QabMsgArrayed, LOG_TCP);
+        emit this->addTextToLogPTE("wrote to TCP: " + QabMsgArrayed, LOG_TCP);
     }
     else
     {
@@ -135,7 +133,7 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
         if (QStrMsgFromTcp.right(1) != "\n")
             QStrMsgFromTcp += "\n";
 
-        emit addTextToConsole("tcp answer: " + QStrMsgFromTcp, LOG_TCP);
+        emit this->addTextToLogPTE("tcp answer: " + QStrMsgFromTcp, LOG_TCP);
 
         TcpMsgMetadata QStrData;
         if (!TCPMsgsList.isEmpty())
@@ -160,21 +158,22 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
         case TEST:
             emit this->msgFromTcpToCore(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
             break;
-        default: qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData parameter =" <<
-                             QStrData.nSender;
-            break;
+        default:
+            qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData parameter ="
+                          << QStrData.nSender;
         }
     }
     else if (QStrMsgFromTcp.isEmpty())
     {
-        qDebug() << "WARNING: TCPMsgs::readyRead() received empty msg.";
+        qDebug() << "WARNING: TCPMsgs::readyRead(): received empty msg.";
         return;
     }
     else if (QStrMsgFromTcp == "\n")
-        qDebug() << "WARNING: TCPMsgs::readyRead() received '\\n' msg.";
-    else qDebug() << "WARNING: TCPMsgs::readyRead() received:" << QStrMsgFromTcp;
+        qDebug() << "WARNING: TCPMsgs::readyRead(): received '\\n' msg.";
+    else
+        qDebug() << "WARNING: TCPMsgs::readyRead(): received:" << QStrMsgFromTcp;
 
-    m_bWaitingForReadyRead = false;
+    _bWaitingForReadyRead = false;
 
     if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
     {

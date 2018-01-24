@@ -2,28 +2,18 @@
 #define CHESSBOARD_H
 
 #pragma once
-
 #include <QtMath>
-#include "QString"
 #include "QObject"
-#include "qdebug.h"
 #include <vector>
 #include <typeinfo>
 #include <limits>
 #include "field.h"
 #include "piece.h"
-#include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
 #include "vars/sequence_types.h"
-#include "vars/board_types.h"
 #include "vars/turn_types.h"
-#include "vars/players_types.h"
-#include "vars/board_types.h"
-#include "vars/posotion_on_board.h"
-#include "vars/piece_type.h" //todo: includowac caly folder
 
-//todo: chessboard powinno być tworzone tylko wewnątrz partii szachów?
 //info: bez makra QOBCJECT. ta szachownica ma by w 100% zalezna
 //info: szachownica nie powinna być tworzona z bierkami- to...
 //...gra o tym decyduje gdzie i jakie są
@@ -34,34 +24,42 @@ class Chessboard
 private:
     BOARD _BoardType;
     Field* _pField[64];
-    Point3D _MinBoard, _MaxBoard, _middleAbove, _retreatLeft, _retreatRight;
     Point3D  _A1, _A8, _H1, _H8;
-    //todo: mylące nazwy:
-    Point3D _remWhiteCloser, _remWhiteFurther, _remBlackCloser, _remBlackFurther;
+    Point3D _remWhiteCloserOuter, _remWhiteFurtherInner;
+    Point3D _remBlackCloserOuter, _remBlackFurtherInner;
+    Point3D _MinBoard, _MaxBoard, _middleAbove, _retreatLeft, _retreatRight;
+
+    void calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8, Point3D H1, Point3D H8);
+    void calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOuter,
+          Point3D whiteFutherInner, Point3D blackCloserOuter, Point3D blackFutherInner);
+    void calculateMarginal3DValues();
+    void calculateMiddleAbovePoint();
+    void calculateRetreatPoints();
 
 public:
-    Chessboard(BOARD boardType);
+    Chessboard(BOARD boardType); //todo: friend dla chess
     ~Chessboard();
 
-    BOARD getBoardType() const { return _BoardType; }
-    void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
-    void clearField(Field* pField);
+    void emitBoardToForm(QString QStrBoard) { emit this->showBoardInForm(QStrBoard); }
     bool isPointInLocationLimits(Point3D point);
     bool isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
+    void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
+    BOARD getBoardType() const { return _BoardType; }
+    Point3D getBoardPoint3D(BOARD_POINTS bp) const;
     Field* getField(short sFieldNr) const { return _pField[sFieldNr]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
-    Point3D getBoardPoint3D(BOARD_POINTS bp) const;
+    void clearField(Field* pField);
 
-    //void showBoardInDebug(); //nie przerabiac poki niepotrzebne
+    //void showBoardInDebug(); //todo
     //todo: double pointers + freeboard:
     static QString arrayBoardAsQStr(QString QStrBoard[8][8]);
+    static bool isBoardReal(BOARD boardType, bool bErrorLog = false);
 
 signals:
-    void addTextToConsole(QString);
     void showBoardInForm(QString);
+    void setBoardDataLabel(QString, BOARD_DATA_LABEL);
     void clearFormBoard();
-    void setBoardDataLabels(QString, BOARD_DATA_LABELS); //todo
 };
 
 #endif // CHESSBOARD_H

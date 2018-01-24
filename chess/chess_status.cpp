@@ -67,10 +67,12 @@ bool ChessStatus::isMoveRemoving()
     else return false;
 }
 
-bool ChessStatus::isMovePromotion(QString QStrMoveToTest)
+static bool ChessStatus::isMovePromotion(QString QStrMoveToTest)
 {
-    if ((QStrMoveToTest.right(1) == "q" || QStrMoveToTest.right(1) == "r" ||
-         QStrMoveToTest.right(1) == "b" || QStrMoveToTest.right(1) == "k")
+    if ((QStrMoveToTest.right(1) == "q" || QStrMoveToTest.right(1) == "Q" ||
+         QStrMoveToTest.right(1) == "r" || QStrMoveToTest.right(1) == "R" ||
+         QStrMoveToTest.right(1) == "b" || QStrMoveToTest.right(1) == "B" ||
+         QStrMoveToTest.right(1) == "k" || QStrMoveToTest.right(1) == "K")
             && QStrMoveToTest.length() == 5 )
         return true;
     else return false;
@@ -113,38 +115,34 @@ void ChessStatus::saveStatusData(QString status)
     if (QStrFENRecord.size() == 7)
     {
          _FENGameState = FENGameState(QStrFENRecord.at(0));
-        qDebug() << "FEN game state =" << QStrFENRecord.at(0);
-        emit setBoardDataLabels(QStrFENRecord.at(0), BDL_GAME_STATUS);
+        qDebug() << "ChessStatus::saveStatusData(): FEN game state =" << QStrFENRecord.at(0);
+        emit _pChess->setBoardDataLabel(QStrFENRecord.at(0), BDL_GAME_STATUS);
 
         QString QStrFENBoard = QStrFENRecord.at(1);
-        qDebug() << "QStrFENBoard =" << QStrFENBoard;
+        qDebug() << "ChessStatus::saveStatusData(): QStrFENBoard =" << QStrFENBoard;
         this->FENToBoard(QStrFENBoard);
-        emit showBoardInForm(Chessboard::arrayBoardToQStr(_QStrBoard));
+        _pBoardMain->emitBoardToForm(Chessboard::arrayBoardToQStr(_QStrBoard));
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
-        qDebug() << "QStrWhoseTurn =" << QStrWhoseTurn;
-        this->setWhoseTurn(whoseTurn(QStrWhoseTurn));
-        emit setBoardDataLabels(this->getStrWhoseTurn(), BDL_TURN);
+        qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
+        _WhoseTurn = this->whoseTurn(QStrWhoseTurn);
+        emit _pChess->setBoardDataLabel(this->getStrWhoseTurn(), BDL_TURN);
 
         _QStrCastlings = QStrFENRecord.at(3);
-        qDebug() << "QStrCastlings =" << _QStrCastlings;
-        emit setBoardDataLabels(_QStrCastlings, BDL_CASTLINGS);
+        qDebug() << "ChessStatus::saveStatusData(): QStrCastlings =" << _QStrCastlings;
+        emit _pChess->setBoardDataLabel(_QStrCastlings, BDL_CASTLINGS);
 
         _QStrEnpassant = QStrFENRecord.at(4);
-        qDebug() << "QStrEnpassant =" << _QStrEnpassant;
-        emit setBoardDataLabels(_QStrEnpassant, BDL_ENPASSANT);
+        qDebug() << "ChessStatus::saveStatusData(): QStrEnpassant =" << _QStrEnpassant;
+        emit _pChess->setBoardDataLabel(_QStrEnpassant, BDL_ENPASSANT);
 
         QString QStrHalfmoveClock = QStrFENRecord.at(5);
         QString QStrFullmoveNumber = QStrFENRecord.at(6);
-        emit setBoardDataLabels(QStrHalfmoveClock + "/" + QStrFullmoveNumber , BDL_MOVES);
+        emit _pChess->setBoardDataLabel(QStrHalfmoveClock + "/" + QStrFullmoveNumber , BDL_MOVES);
     }
     else
-    {
-        qDebug() << "ERROR: ChessStatus::saveStatusData: wrong QStrFENRecord size =" <<
-                    QStrFENRecord.size();
-        this->addTextToConsole("ERROR: ChessStatus::saveStatusData: wrong QStrFENRecord size = "
-                               + QStrFENRecord.size());
-    }
+        qDebug() << "ERROR: ChessStatus::saveStatusData(): wrong QStrFENRecord size ="
+                 << QStrFENRecord.size();
 }
 
 void ChessStatus::resetStatusData()
@@ -210,7 +208,7 @@ WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
     else
     {
         return NO_TURN;
-        qDebug () << "ERROR: ChessStatus::whoseTurn- unknown parameter:" << QStrWhoseTurn;
+        qDebug () << "ERROR: ChessStatus::whoseTurn(); unknown parameter:" << QStrWhoseTurn;
     }
 }
 

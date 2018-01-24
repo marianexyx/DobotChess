@@ -2,7 +2,6 @@
 #define CHESS_MOVEMENTS_H
 
 #pragma once
-
 #include "chess.h"
 
 class ChessMovements

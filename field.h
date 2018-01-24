@@ -3,10 +3,8 @@
 
 #pragma once
 
-#include "QString"
 #include "piece.h"
 #include "vars/basic_vars.h"
-#include "vars/posotion_on_board.h"
 
 //todo: udałoby się dziedziczyć chessboard po field'zie. settery mogłyby by być wtedy...
 //... protected, a gettery public (sprawdzić)

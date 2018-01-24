@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "QDebug"
 #include "QString"
 #include "vars/piece_type.h"
 #include "vars/players_types.h"

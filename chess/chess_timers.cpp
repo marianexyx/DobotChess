@@ -46,13 +46,17 @@ void ChessTimers::playerTimeOut(PLAYER_TYPE player)
 void ChessTimers::updateTimeLabels()
 {
     if (_whiteTimer->isActive())
-        emit setBoardDataLabels(milisecToClockTime(_whiteTimer->remainingTime()), BDL_WHITE_TIME);
+        emit _pChess->setBoardDataLabel(this->milisecToClockTime(_whiteTimer->remainingTime()),
+                                       BDL_WHITE_TIME);
     else if (_blackTimer->isActive())
-        emit setBoardDataLabels(milisecToClockTime(_blackTimer->remainingTime()), BDL_BLACK_TIME);
+        emit _pChess->setBoardDataLabel(this->milisecToClockTime(_blackTimer->remainingTime()),
+                                       BDL_BLACK_TIME);
 
     if (_startQueueTimer->isActive())
-        emit setBoardDataLabels(milisecToClockTime(_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
-    else setBoardDataLabels(milisecToClockTime(_lTimersStartQueue), BDL_QUEUE_TIME);
+        emit _pChess->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
+                                       BDL_QUEUE_TIME);
+
+    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_lTimersStartQueue), BDL_QUEUE_TIME);
 }
 
 void ChessTimers::timeOutStartQueue()
@@ -92,8 +96,8 @@ void ChessTimers::resetGameTimers()
     _blackTimer->setInterval(_lTimersStartTime);
     _nRemainingWhiteTime = _whiteTimer->interval();
     _nRemainingBlackTime = _blackTimer->interval();
-    emit setBoardDataLabels(milisecToClockTime(_lTimersStartTime), BDL_WHITE_TIME);
-    emit setBoardDataLabels(milisecToClockTime(_lTimersStartTime), BDL_BLACK_TIME);
+    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_lTimersStartTime), BDL_WHITE_TIME);
+    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_lTimersStartTime), BDL_BLACK_TIME);
 }
 
 QString ChessTimers::milisecToClockTime(long lMilis)
@@ -106,7 +110,8 @@ QString ChessTimers::milisecToClockTime(long lMilis)
         QString QStrMinsPrefix, QStrSecsPrefix;
         nMins >= 10 ? QStrMinsPrefix = "" : QStrMinsPrefix = "0";
         nSecs >= 10 ? QStrSecsPrefix = "" : QStrSecsPrefix = "0";
-        return QStrMinsPrefix + QString::number(nMins) + ":" + QStrSecsPrefix + QString::number(nSecs);
+        return QStrMinsPrefix + QString::number(nMins) + ":" + QStrSecsPrefix
+                + QString::number(nSecs);
     }
     else return "00:00";
 }
@@ -139,7 +144,8 @@ void ChessTimers::startQueueTimer()
     qDebug() << "Chessboard::startQueueTimer()";
     _startQueueTimer->stop();
     _startQueueTimer->setInterval(_lTimersStartQueue);
-    emit setBoardDataLabels(milisecToClockTime(_startQueueTimer->remainingTime()), BDL_QUEUE_TIME);
+    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
+                                   BDL_QUEUE_TIME);
     _startQueueTimer->start();
     _updateLabelTimer->start();
 }

@@ -1,19 +1,15 @@
 #ifndef CHESS_H
 #define CHESS_H
 
-#include <QString>
+#pragma once
 #include <QScrollBar>
-#include <QDebug>
 #include <QRegularExpression>
 #include "dobot.h"
 #include "chessboard.h"
 #include "tcpmsgs.h"
-#include "piece.h"
 #include "websockets.h"
 #include "arduinousb.h"
-#include "client.h"
-#include "vars/board_axis.h"
-#include "vars/end_of_game_types.h"
+#include "vars/fen_game_state.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_status.h"
@@ -27,7 +23,6 @@ ruch e2e4 wpada do obiektu szachow:
 -zakolejkowanie ruchu na dobocie
 -wykonanie zapytania o ruch na tcp
 -reagowanie na odpowiedzi z tcp*/
-//todo: szachy nie powinny raczej wiedzieć nic o graczu, który steruje grą
 
 class Chess: public QObject
 {
@@ -57,7 +52,6 @@ private:
     void startNewGameInChenard(bool bService = false);
     void continueGameplay();
     void sendMsgToTcp(QString QStrMsg);
-    void wrongTcpAnswer(QString msgType, QString respond); 
 
 public:
     Chess(Clients* pClients, Dobot* pDobot, Chessboard* pBoardMain,
@@ -69,7 +63,7 @@ public:
     void sendDataToAllClients(QString QStrMsg);
 
     void findAndSaveMoveAndSendItToTcp(QString QStrMove);
-    void gameStarted(); //todo: czyli co?
+    void startNewGameInCore();
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece);
@@ -99,7 +93,10 @@ public slots:
     QString getTableData();
 
 signals:
-    void addTextToConsole(QString, LOG);
+    void addTextToLogPTE(QString, LOG);
+    void setBoardDataLabel(QString, BOARD_DATA_LABEL);
+    void showLegalMoves(QStringList);
+    void showHistoryMoves(QStringList);
 };
 
 #endif // CHESS_H

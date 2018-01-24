@@ -30,14 +30,13 @@ Chess::~Chess()
     delete _pMovements;
     delete _pBot;
     delete _pStatus;
+    delete _pResets;
 }
 
 void Chess::sendDataToClient(QString QStrMsg, Client* pClient = nullptr)
 {
-    qDebug() << "Chess::sendDataToClient(): Sending to" << communicationTypeAsQStr(_PlayerSource)
-             << ":" << QStrMsg;
-    this->addTextToConsole("Sending msg to " + communicationTypeAsQStr(_PlayerSource) + ": "
-                           + QStrMsg, LOG_CORE);
+    emit this->addTextToLogPTE("Sending msg to " + communicationTypeAsQStr(_PlayerSource)
+                                + ": " + QStrMsg, LOG_CORE);
 
     if (_PlayerSource == WEBSITE)
     {
@@ -123,16 +122,19 @@ void Chess::startNewGameInChenard(bool bService = false)
 
 void Chess::sendMsgToTcp(QString QStrMsg)
 {
-    qDebug() << "Chess::sendMsgToTcp():" << QStrMsg;
-    this->addTextToConsole("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
+    emit this->addTextToLogPTE("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
 
     _pTCPMsgs->TcpQueueMsg(_PlayerSource, QStrMsg);
 }
 
-void Chess::gameStarted()
+void Chess::startNewGameInCore()
 {
-    qDebug() << "Sending 'newOk' to clients";
-    this->addTextToConsole("new game\n", LOG_CORE);
+    emit this->addTextToLogPTE("new game\n", LOG_CORE);
+
+    //pierwszy legal i status wyglądają zawsze tak samo:
+    _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
+    _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 "
+                            "d2d4 e2e3 e2e4 f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
 
     _pTimers->resetGameTimers();
     _pTimers->startGameTimer();
@@ -210,18 +212,14 @@ void Chess::removeClient(Client* pClient)
 {
     if (_pClients->isClientAPlayer(pClient))
         _pResets->restartGame(ET_SOCKET_LOST, pClient);
-    else
-    {
-        //future: strange behavior with those info- seen more then we should
-        qDebug() << "non-player disconnected";
-        emit addTextToConsole("non-player disconnected\n", LOG_CORE);
-    }
+    else //future: strange behavior with those info- seen more often then we should
+        emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
 
     _pClients->removeClient(pClient);
 
-    emit setBoardDataLabels(std::to_string(_pClients->getClientsList().size()).c_str(),
+    emit this->setBoardDataLabel(std::to_string(_pClients->getClientsList().size()).c_str(),
                             BDL_SOCKETS_ONLINE);
-    emit showClientsList(_pClients->getClientsList());
+    emit _pClients->showClientsList(_pClients->getClientsList());
 }
 
 PLAYER_TYPE Chess::getActivePlayerType()
@@ -291,12 +289,6 @@ void Chess::coreIsReadyForNewGame()
                   << communicationTypeAsQStr(_PlayerSource);
 }
 
-void Chess::wrongTcpAnswer(QString msgType, QString respond)
-{
-    qDebug() << "ERROR: IgorBot::wrongTcpAnswer(): unknown tcpRespond = " <<
-                respond << "for tcpMsgType = " << msgType;
-}
-
 void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
 {
     if (playerType == PT_WHITE)
@@ -327,38 +319,34 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
     }
 }
 
+//todo: pociąć tą funkcję na mniejsze kawałki
 void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
-    qDebug() << "Chess::checkMsgFromChenard: tcpMsgType=" << tcpMsgType <<
+    qDebug() << "Chess::checkMsgFromChenard(): tcpMsgType=" << tcpMsgType <<
                 ", tcpRespond:" << tcpRespond;
 
-    //todo: pociąć tą funkcję na mniejsze kawałki
+    if(_PlayerSource == ARDUINO)
+        this->checkAI();
 
-    if(_PlayerSource == ARDUINO) this->checkAI();
-
+    //future: zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są...
+    //...czasami 2 warunki typu 'ok'
     if (tcpMsgType == "new")
     {
-        //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
-        if (tcpRespond == "OK\n" || tcpRespond == "OK")
-        {
-            //pierwszy legal i status wyglądają zawsze tak samo:
-            _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
-            _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 "
-                          "f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
-            this->gameStarted();
-        }
+        if (tcpRespond == "OK\n" || tcpRespond == "OK")            
+            this->startNewGameInCore();
         else
-            this->wrongTcpAnswer(tcpMsgType, tcpRespond);
+            qDebug() << "ERROR: Chess::checkMsgFromChenard(): unknown tcpRespond="
+                     << tcpRespond << "for tcpMsgType =" << tcpMsgType;
     }
     else if (tcpMsgType.left(4) == "move")
     {
-        //zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są 2 warunki
         if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1")
             this->continueGameplay();
         else if (tcpRespond == "BAD_MOVE")
-            this->BadMove(tcpRespond);
+            this->tellPlayerThatHeGaveBadMove(tcpRespond);
         else
-            this->wrongTcpAnswer(tcpMsgType, tcpRespond);
+            qDebug() << "ERROR: Chess::checkMsgFromChenard(): unknown tcpRespond="
+                     << tcpRespond << "for tcpMsgType =" << tcpMsgType;
     }
     else if (tcpMsgType == "status")
     {
@@ -379,7 +367,8 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
             _pResets->restartGame(_pStatus->getFENGameStateAsEndType());
         }
         else
-            this->wrongTcpAnswer(tcpMsgType, _pStatus->getFENGameState());
+            qDebug() << "ERROR: Chess::checkMsgFromChenard(): unknown tcpRespond="
+                     << _pStatus->getFENGameState() << "for tcpMsgType =" << tcpMsgType;
     }
     else if (tcpMsgType.left(7) == "history" && tcpRespond.left(3) == "OK ")
     {
@@ -391,10 +380,10 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
         _pStatus->setLegalMoves(tcpRespond);
     else if (tcpMsgType == "undo 1" && _PlayerSource == ARDUINO &&
              (tcpRespond == "OK\n" || tcpRespond == "OK"))
-        this->UndoOk();
+        _pBot->undoOk();
     else if (tcpMsgType == "think 5000" && _PlayerSource == ARDUINO &&
              (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
-        this->ThinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
+        _pBot->thinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
     else qDebug() << "ERROR: Chess:checkMsgFromChenard(): received unknown tcpMsgType:"
                   << tcpMsgType;
 }
@@ -402,8 +391,7 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 //todo: funkcja ma 120 linii kodu...
 void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
 {
-    qDebug() << "Chess::checkMsgFromWebsockets(): received:" << QStrMsg;
-    emit this->addTextToConsole("received: " + QStrMsg + "\n", LOG_CORE);
+    emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
 
     if (QStrMsg == "newGame")
     {
@@ -515,6 +503,7 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
     if (QStrMove.left(9) == "promoteTo")
     {
         //todo: zabezpieczenia
+        //todo: już trzeci raz trzeba by użyć zabezpieczenia dla promocji
         QString QStrPromotionType = QStrMove.right(1);
         QStrMove = _pMovements->getMove().asQStr() + QStrPromotionType;
     }
@@ -547,12 +536,7 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
 void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field *pField,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {
-    if (pRealBoard->getBoardType() != B_MAIN && pRealBoard->getBoardType() != B_REMOVED)
-    {
-        qDebug() << "ERROR: Chess::movePieceWithManipulator(): board isnt real. board ="
-                 << boardTypeAsQstr(pRealBoard->getBoardType());
-        return;
-    }
+    if (!Chessboard::isBoardReal(pRealBoard->getBoardType())) return;
 
     if (vertMove == VM_GRAB)
     {

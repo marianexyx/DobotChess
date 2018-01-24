@@ -14,7 +14,6 @@
 #include "DobotType.h"
 #include "websockets.h"
 #include "dobot.h"
-#include "chess/chess_status.h"
 #include "chess.h"
 #include "client.h"
 
@@ -28,9 +27,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Websockets *pWebSockets, Chessboard *pBoardMain,
-                        TCPMsgs *pTCPmsg, ArduinoUsb *pArduinoUsb, Dobot *pDobotArm,
-                        ChessStatus* pChessStatus, Chess *pChess, QWidget *parent = 0);
+    explicit MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
+                        Chessboard* pBoardRemoved, TCPMsgs* pTCPmsg, ArduinoUsb* pArduinoUsb,
+                        Dobot* pDobot, Chess* pChess, Client* pClient, QWidget* parent = 0);
 
     virtual ~MainWindow();
 
@@ -40,15 +39,15 @@ public slots:
 private:
     Ui::MainWindow *ui;
 
-    Dobot *_pDobotArm;
-    Websockets *_pWebSockets;
-    Chessboard *_pBoardMain;
-    TCPMsgs *_pTCPmsg;
-    ArduinoUsb *_pArduinoUsb;
-    ChessStatus* _pChessStatus;
-    Chess *_pChess;
+    Dobot* _pDobot;
+    Websockets* _pWebSockets;
+    Chessboard* _pBoardMain;
+    Chessboard* _pBoardRemoved;
+    TCPMsgs* _pTCPmsg;
+    ArduinoUsb* _pArduinoUsb;
+    Client* _pClient;
+    Chess* _pChess;
 
-    void initDobot();
     void initControl();
 
 private slots:
@@ -59,7 +58,7 @@ private slots:
 
     //sloty do używania GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG msgType);
-    void setBoardDataLabels(QString QStrLabel, BOARD_DATA_LABELS labelType);
+    void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType);
     void showBoard(QString QStrBoard);
     void clearFormBoard();
     void showLegalMoves(QStringList legalMoves);

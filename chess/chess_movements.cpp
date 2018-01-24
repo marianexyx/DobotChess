@@ -170,7 +170,7 @@ SEQUENCE_TYPE ChessMovements::findMoveType(QString QStrMove)
         else if (pStatus->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (pStatus->isMoveCastling(QStrMove)) return ST_CASTLING;
         else if (pStatus->isMoveRemoving()) return ST_REMOVING;
-        else if (pStatus->isMovePromotion(QStrMove)) return ST_PROMOTION;
+        else if (ChessStatus::isMovePromotion(QStrMove)) return ST_PROMOTION;
         else return ST_REGULAR;
     }
      else

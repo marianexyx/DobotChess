@@ -2,7 +2,6 @@
 #define CHESS_BOT_H
 
 #pragma once
-
 #include "chess.h"
 
 class ChessBot
@@ -18,19 +17,15 @@ private:
     bool _bIsIgorsAiSimulatedAsPlayer2;
     QString _QStrAIPiecieFromTo; //zapamiętany kolejny ruch bota czekający na wywołanie
 
-    void wrongTcpAnswer(QString msgType, QString respond);
-    void checkAI();
-
 public:
     ChessBot(Chess* pChess);
     ~ChessBot() {}
 
-    //----------KOMUNIKACJA Z CHENARD----------//
-    void UndoOk(); //future: i co dalej to robi?
-    void ThinkOk(QString msg); //future: i co dalej to robi?
+    void undoOk(); //future: i co dalej to robi?
+    void thinkOk(QString QStrMsg); //future: i co dalej to robi?
+    void checkAI();
 
-    //-----METODY-DOSTĘPOWE-DO-PÓL-----//
-    void setAI(bool bAI)                { _bAI = bAI; } //future: wszystkie nazwy "AI" zamienić na "Igor"
+    void setAI(bool bAI) { _bAI = bAI; } //future: wszystkie nazwy "AI" zamienić na "Igor"
     void setAIAsPlayer2(bool bIsAIAsP2) { _bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
 
     bool getAIAsPlayer2() { return _bIsIgorsAiSimulatedAsPlayer2; } //future: is...
@@ -38,7 +33,6 @@ public:
 
 public slots:
     void enemyStart(); //ogólna funkcja sterująca (edit: future: czym/jak/poco? - nazwa funckji)
-
 };
 
 #endif // CHESS_BOT_H

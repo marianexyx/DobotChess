@@ -21,7 +21,6 @@ public:
 
     void restartGame(END_TYPE WhoWon, Client* PlayerToClear = nullptr);
     void resetPiecePositions();
-
 };
 
 #endif // CHESS_RESETS_H

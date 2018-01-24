@@ -68,17 +68,15 @@ void Clients::setPlayerType(Client client, PLAYER_TYPE type)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setPlayerType: new" <<
-                            playerTypeAsQStr(_clients.at(nClientPos).type) << "player:" <<
-                            this->getPlayerName(type) ;
-                emit this->addTextToConsole("New " + playerTypeAsQStr(_clients.at(nClientPos).type)
+;
+                emit this->addTextToLogPTE("New " + playerTypeAsQStr(_clients.at(nClientPos).type)
                                             + " player: " + this->getPlayerName(type) +
                                             "\n", LOG_CORE);
-                emit setBoardDataLabels(this->getPlayerName(type),
+                emit this->setBoardDataLabel(this->getPlayerName(type),
                                         type == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
             }
             else
-                qDebug() << "ERROR: Clients::setPlayerType: iteration error. iter val ="
+                qDebug() << "ERROR: Clients::setPlayerType(): iteration error. iter val ="
                          << nClientPos;
 
             return;
@@ -218,11 +216,12 @@ void Clients::addClientToQueue(Client client)
             else qDebug() << "ERROR: Clients::addClientToQueue: iteration error. iter val ="
                           << nClientPos;
 
-            emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+            emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
+                                         BDL_QUEUE_PLAYERS);
             return;
         }
     }
-    emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
 void Clients::removeClient(Client client)
@@ -266,11 +265,12 @@ void Clients::removeClientFromQueue(Client client)
             else qDebug() << "ERROR: Clients::removeClientFromQueue: iteration error. iter val ="
                           << nClientPos;
 
-            emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+            emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
+                                         BDL_QUEUE_PLAYERS);
             return;
         }
     }
-    emit setBoardDataLabels(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
 void Clients::resetPlayersStartConfirmInfo()
@@ -297,11 +297,9 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE chair)
         this->setPlayerType(nextQueuedClient, chair);
         this->setClientState(nextQueuedClient, false);
 
-        emit this->setBoardDataLabels(this->getPlayerName(chair),
+        emit this->setBoardDataLabel(this->getPlayerName(chair),
                                       chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
-        qDebug() << "Clients::cleanChairAndPutThereNextQueuedClientIfExist(): new" <<
-                    playerTypeAsQStr(chair) << "player name =" << this->getPlayerName(chair);
-        emit this->addTextToConsole("New " + playerTypeAsQStr(chair) + " player: " +
+        emit this->addTextToLogPTE("New " + playerTypeAsQStr(chair) + " player: " +
                                     this->getPlayerName(chair) + "\n", LOG_CORE);
     }
 }
@@ -681,6 +679,6 @@ int64_t Clients::getNextAvailableClientID()
 
 void Clients::showClientsInForm()
 {
-    emit showClientsList(_clients);
-    emit setBoardDataLabels(std::to_string(_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
+    emit this->showClientsList(_clients);
+    emit this->setBoardDataLabel(std::to_string(_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
 }

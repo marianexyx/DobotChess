@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QDebug>
-#include <QSerialPort> //obsługa portu
-#include <QSerialPortInfo> //dostarczanie informacji o porcie
+#include <QSerialPort>
+#include <QSerialPortInfo>
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 
@@ -16,9 +16,9 @@ public:
     ArduinoUsb();
     ~ArduinoUsb();
 
-    QList <QSerialPortInfo> availablePort; //lista portów pod którymi są urządzenia
-    const QSerialPortInfo *usbInfo; //obecnie wybrany serial port
-    QSerialPort *usbPort; //obecnie otwarty port
+    QList <QSerialPortInfo> availablePort;
+    const QSerialPortInfo* usbInfo;
+    QSerialPort* usbPort;
     QString QsFullSerialMsg;
 
     void sendDataToUsb(QString QsMsg);
@@ -26,7 +26,7 @@ public:
     void manageMsgFromUsb(QString QStrMsg);
 
 private:
-    QByteArray QByteA_data; // tablica niezorganizowanych danych przypływających z usb
+    QByteArray QByteA_data; //tablica niezorganizowanych danych przypływających z usb
 
     void receive(); //odbieranie wiadomości z usb
 
@@ -42,7 +42,7 @@ private slots:
     //todo: sygnały wiedzą że klasa ma związek z szachami. usb powinno tylko przepychać dane...
     //...w 2 strony
 signals:
-    void addTextToConsole(QString, LOG);
+    void addTextToLogPTE(QString, LOG);
     void updatePortsComboBox(int);
     void sigRestoreGameToInitialState(); //future: nazwa gryzie się z funkcja robiącą...
     //...w sumie coś innego
