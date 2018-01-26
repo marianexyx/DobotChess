@@ -32,7 +32,7 @@ public:
     static PIECE_TYPE Type(char cFENSign);
     static PIECE_TYPE Type(short sPieceNr);
     static short nr(PosOnBoard PieceLines);
-    static short StartFieldNr(short sPieceNr);
+    static short startFieldNr(short sPieceNr);
     static PosOnBoard StartFieldPos(short sPieceNr);
 
     short getNr() const { return _sPieceID; }

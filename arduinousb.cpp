@@ -6,7 +6,7 @@ ArduinoUsb::ArduinoUsb()
     usbInfo = NULL; //wartośc wskażnika obecnie wybranego portu ustgawiamy na pustą wartość
     this->searchDevices(); //wyszukujemy obecnie podłączone urządzenia usb
 
-    connect(usbPort, SIGNAL(readyRead()), this, SLOT(readUsbData()));
+    connect(usbPort, readyRead(), this, readUsbData());
 }
 
 //aktualizowanie listy z urządzeniami
@@ -68,26 +68,11 @@ void ArduinoUsb::readUsbData()
         QsFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
 
         emit this->addTextToLogPTE(QsFullSerialMsg + "\n", LOG_USB_RECEIVED);
-        this->manageMsgFromUsb(QsFullSerialMsg);
+        emit this->msgFromUsbToChess(QsFullSerialMsg);
 
         QByteA_data.clear();
         QsFullSerialMsg.clear();
     }
-}
-
-void ArduinoUsb::manageMsgFromUsb(QString QStrMsg)
-{
-    if (QStrMsg == "reset")
-        emit this->sigRestoreGameToInitialState();
-    else if (QStrMsg == "start")
-        emit this->TcpQueueMsg(ARDUINO, "think 5000"); //think->save move -> undo
-    else if (QStrMsg.left(4) == "move")
-        emit this->AIEnemySend(QStrMsg);
-    else if (QStrMsg.left(9) == "promoteTo")
-        emit this->AIEnemySend(QStrMsg.left(10));
-    else
-        qDebug() << "ERROR: ArduinoUsb::manageMsgFromUsb(): unknown"
-                    " command from usb:" << QStrMsg;
 }
 
 ArduinoUsb::~ArduinoUsb()

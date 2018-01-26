@@ -15,6 +15,7 @@ private:
     bool isPieceSetOnStartFields();
     void sendEndGameMsgToAllClients(END_TYPE WhoWon);
     void changePlayersOnChairs(END_TYPE WhoWon, Client* PlayerToClear);
+    bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);
 
 public:
     ChessResets(Chess* pChess);

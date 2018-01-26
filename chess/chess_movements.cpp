@@ -61,12 +61,8 @@ void ChessMovements::regularMoveSequence(Field* pFrom, Field* pTo)
 void ChessMovements::removeMoveSequence(Field* pFieldWithPieceToRemove)
 {    
     //find and safe piece on board, before grabbing (i.e. till it stands on board)
-    Piece* pPieceToRemove = pFieldWithPieceToRemove->getPieceOnField();
-    if (pPieceToRemove == nullptr)
-    {
-        qDebug() << "ERROR: ChessMovements::removeMoveSequence(): piece can't be nullptr";
-        return;
-    }
+    Piece* pPieceToRemove = pFieldWithPieceToRemove->getPieceOnField(true);
+    if (pPieceToRemove == nullptr) return;
 
     _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
 
@@ -115,7 +111,7 @@ void ChessMovements::enpassantMoveSequence(Field *pFrom, Field *pTo)
     }
 
     Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
-    Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField();
+    Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField(true);
 
     _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
 
@@ -164,9 +160,7 @@ SEQUENCE_TYPE ChessMovements::findMoveType(QString QStrMove)
 
      if (pStatus->isMoveLegal(QStrMove))
     {
-        if (pStatus->isMoveLegal(QStrMove + "q"))
-            //q == autotest for quenn promo
-            return ST_PROMOTE_TO_WHAT;
+        if (pStatus->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promo autotest
         else if (pStatus->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (pStatus->isMoveCastling(QStrMove)) return ST_CASTLING;
         else if (pStatus->isMoveRemoving()) return ST_REMOVING;

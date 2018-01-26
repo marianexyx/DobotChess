@@ -33,9 +33,6 @@ public:
 
     virtual ~MainWindow();
 
-public slots:
-    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
-
 private:
     Ui::MainWindow *ui;
 
@@ -65,7 +62,7 @@ private slots:
     void showHistoryMoves(QStringList historyMoves);
 
     //dobot slots
-    void setDobotValidators();
+    void setDobot_UI_PTE_Validators();
     void setJointLabelText(QString QSJointLabelText, short sJoint);
     void setAxisLabelText(QString QSAxisLabelText, char chAxis);
     void setDobotButtonsStates(bool bDobotButtonsStates);
@@ -73,7 +70,7 @@ private slots:
     void showDobotErrorMsgBox();
     void on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged);
     void on_sendSimulatedMsgBtn_clicked();
-    void setQueueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
+    void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
     void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
     void showArduinoGripperStateList(QList<ServoArduino> list);
 
@@ -82,7 +79,6 @@ private slots:
     void on_upBtn_clicked();
     void on_downBtn_clicked();
     void on_resetDobotIndexBtn_clicked();
-    void on_executeDobotComandsBtn_clicked();
     void on_AIBtn_clicked();
     void on_AIEnemySendBtn_clicked();
     void showClientsList(QList<Clients> list);

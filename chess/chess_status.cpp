@@ -8,57 +8,6 @@ ChessStatus::ChessStatus(Chess *pChess)
     _WhoseTurn = NO_TURN;
 }
 
-QString **ChessStatus::FENToBoard(QString FENBoard)
-{
-    QString** QStrBoardArray = create2DArray();
-
-    QStringList QStrFENBoardRows = FENBoard.split(QRegExp("/"));
-    std::reverse(QStrFENBoardRows.begin(), QStrFENBoardRows.end());
-    if (QStrFENBoardRows.size() == 8)
-    {
-        QRegExp rxEmpty("\\d");
-        for (int nRow=0; nRow<=7; ++nRow)
-        {
-            int nColumn = 0;
-            QString QStrFENBoardRow = QStrFENBoardRows.at(nRow);
-            QStringList FENSigns = QStrFENBoardRow.split("");
-            FENSigns.removeFirst();
-            FENSigns.removeLast();
-
-            for (int nFENSignPos=0; nFENSignPos<FENSigns.size(); ++nFENSignPos)
-            {
-                QString QStrFENSign = FENSigns.at(nFENSignPos);
-                if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
-                {
-                    QStrBoardArray[nColumn][nRow] = QStrFENSign;
-                    if (nColumn > D_8) qDebug() << "ERROR: ChessStatus::FENToBoard(): nColumn"
-                                                   " > 8 =" << nColumn;
-                    ++nColumn;
-                }
-                else //digits
-                {
-                    for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
-                    {
-                        QStrBoardArray[nColumn][nRow] = ".";
-                        if (nColumn > D_8) qDebug() << "ERROR: ChessStatus::FENToBoard(): nColumn"
-                                                       " > 8 =" << nColumn;
-                        ++nColumn;
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        qDebug() << "ERROR: ChessStatus::FENToBoard: boardRows.size() != 8. Size = " <<
-                    QStrFENBoardRows.size();
-        for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
-            qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
-    }
-
-    return QStrBoardArray;
-}
-
 bool ChessStatus::isMoveRemoving()
 {
     PosFromTo MoveTo = _pChess->getMovementsPointer()->getMove().to;
@@ -67,7 +16,7 @@ bool ChessStatus::isMoveRemoving()
     else return false;
 }
 
-static bool ChessStatus::isMovePromotion(QString QStrMoveToTest)
+static bool ChessStatus::isMovePromotion(QString QStrMoveToTest, bool bErrorLog = false)
 {
     if ((QStrMoveToTest.right(1) == "q" || QStrMoveToTest.right(1) == "Q" ||
          QStrMoveToTest.right(1) == "r" || QStrMoveToTest.right(1) == "R" ||
@@ -75,7 +24,13 @@ static bool ChessStatus::isMovePromotion(QString QStrMoveToTest)
          QStrMoveToTest.right(1) == "k" || QStrMoveToTest.right(1) == "K")
             && QStrMoveToTest.length() == 5 )
         return true;
-    else return false;
+    else
+    {
+        if (bErrorLog)
+            qDebug() << "ERROR:: ChessStatus::isMovePromotion(): it's not. Move ="
+                     << QStrMoveToTest;
+        return false;
+    }
 }
 
 bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
@@ -120,8 +75,7 @@ void ChessStatus::saveStatusData(QString status)
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "ChessStatus::saveStatusData(): QStrFENBoard =" << QStrFENBoard;
-        this->FENToBoard(QStrFENBoard);
-        _pBoardMain->emitBoardToForm(Chessboard::arrayBoardToQStr(_QStrBoard));
+        emit _pBoardMain->showBoardInForm(QStrFENBoard);
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
@@ -147,10 +101,11 @@ void ChessStatus::saveStatusData(QString status)
 
 void ChessStatus::resetStatusData()
 {
+    _pChess->getMovementsPointer()->clearMove();
     this->setWhoseTurn(NO_TURN);
     this->clearLegalMoves();
     this->clearHistoryMoves();
-    this->clearFormBoard();
+    emit _pBoardMain->clearFormBoard();
 }
 
 void ChessStatus::setLegalMoves(QString msg)

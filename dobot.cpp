@@ -114,7 +114,7 @@ void Dobot::onConnectDobot()
         //create dobot periodic timer
         QTimer *periodicTaskTimer = new QTimer(this);
         periodicTaskTimer->setObjectName("periodicTaskTimer");
-        connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
+        connect(periodicTaskTimer, timeout(), this, onPeriodicTaskTimer());
         periodicTaskTimer->setSingleShot(true);
         periodicTaskTimer->start(5);
         //future: ciągle dostaję błąd: "QObject::startTimer: Timers can only...
@@ -123,7 +123,7 @@ void Dobot::onConnectDobot()
         //create dobot pose timer
         QTimer *getPoseTimer = new QTimer(this);
         getPoseTimer->setObjectName("getPoseTimer");
-        connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
+        connect(getPoseTimer, timeout(), this, onGetPoseTimer());
         getPoseTimer->setSingleShot(true);
         getPoseTimer->start(200);
 
@@ -216,10 +216,10 @@ void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, dou
 
     //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
     if (VertMove == VM_GRAB)
-        this->addCmdToList(DM_OPEN);
+        this->addArmMoveToQueue(DM_OPEN);
 
     dest3D.z += dJump;
-    this->addCmdToList(DM_TO_POINT, dest3D);
+    this->addArmMoveToQueue(DM_TO_POINT, dest3D);
 
     if (VertMove == VM_NONE) return;
 
@@ -227,9 +227,9 @@ void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, dou
     this->armUpDown(DM_DOWN, dest3D - dJump);
 
     if (VertMove == VM_PUT)
-        this->addCmdToList(DM_OPEN);
+        this->addArmMoveToQueue(DM_OPEN);
     else if (VertMove == VM_GRAB)
-        this->addCmdToList(DM_CLOSE);
+        this->addArmMoveToQueue(DM_CLOSE);
 
     this->armUpDown(DM_UP, dest3D);
 }
@@ -260,11 +260,11 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
     else return true;
 }
 
-void Dobot::addCmdToList(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint)
+void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint)
 {
     _lastGivenPoint = point;
 
-    _pQueue->addCmdToList(Type, point);
+    _pQueue->addArmMoveToQueue(Type, point);
 }
 
 void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
@@ -279,7 +279,7 @@ void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
     Point3D dest3D = _lastGivenPoint;
     dest3D.z = dHeight;
 
-    this->addCmdToList(ArmDestination, dest3D);
+    this->addArmMoveToQueue(ArmDestination, dest3D);
 }
 
 void Dobot::writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType)

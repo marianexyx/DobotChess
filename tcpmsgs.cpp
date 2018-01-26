@@ -4,18 +4,19 @@
 TCPMsgs::TCPMsgs()
 {
     _bWaitingForReadyRead = false;
-    _n64MsgID = 0;
+    _n64CmdID = 0;
 }
 
-void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
+void TCPMsgs::queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd)
 {
-    qDebug() << "TCPMsgs::queueMsgs received msg: " << msg << ", sender = " << nSender;
+    qDebug() << "TCPMsgs::queueCmd(): cmd =" << QStrCmd << ", sender ="
+             << communicationTypeAsQStr(nSender);
 
     TcpMsgMetadata QStrReceivedData;
-    QStrReceivedData.ullTcpID = ++_n64MsgID;
+    QStrReceivedData.ullTcpID = ++_n64CmdID;
     QStrReceivedData.nSender = nSender;
-    QStrReceivedData.QStrMsgForTcp = msg;
-    TCPMsgsList << QStrReceivedData; //wrzuć do kontenera wiadomość
+    QStrReceivedData.QStrMsgForTcp = QStrCmd;
+    TCPMsgsList << QStrReceivedData;
     if (!TCPMsgsList.isEmpty() && !_bWaitingForReadyRead)
     {
         //zaczekaj z wykonywaniem kolejnego zapytania do TCP z kontenera...
@@ -24,7 +25,7 @@ void TCPMsgs::TcpQueueMsg(int nSender, QString msg)
     }
 }
 
-//rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp.
+//rozmowa z tcp. każde 1 polecenie tworzy 1 instancję rozmowy z tcp
 void TCPMsgs::doTcpConnect()
 {
     _bWaitingForReadyRead = true;
@@ -32,15 +33,15 @@ void TCPMsgs::doTcpConnect()
     socket = new QTcpSocket(this);
 
     //każde nowe zapytanie jest nowym połączeniem
-    connect(socket, SIGNAL(connected()),this, SLOT(connected()));
-    connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
-    connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
+    connect(socket, connected(),this, connected());
+    connect(socket, disconnected(),this, disconnected());
+    connect(socket, bytesWritten(qint64),this, bytesWritten(qint64)); //to mi raczej zbędne
     connect(socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
             this, displayError);
 
-    qDebug() << "TCPMsgs: connecting...";
+    qDebug() << "TCPMsgs::doTcpConnect(): connecting...";
 
     socket->abort(); //pozwoli to zakończyć stare połączenie jeżeli jeszcze nie zostało zerwane...
     //...by można było stworzyć nowe
@@ -82,12 +83,13 @@ void TCPMsgs::connected()
     {
         QStrData = TCPMsgsList.last();
 
-        qDebug() << "TCPMsgs: Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
+        qDebug() << "TCPMsgs::connected(): Connected. Parsing msg to chenard:"
+                 << QStrData.QStrMsgForTcp;
 
         QByteArray QabMsgArrayed;
         QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n"); //przetworzenie parametru dla funkcji write()
         // send msg to tcp from sender. chenard rozumie koniec wiadomości poprzez "\n"
-        //todo: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
+        //future: mozliwe ze tu wyzej tworzone sa wiadomosci konczace sie na "\n\n"?
         socket->write(QabMsgArrayed); //write wysyła wiadomość (w bajtach) na server przez tcp
 
         emit this->addTextToLogPTE("wrote to TCP: " + QabMsgArrayed, LOG_TCP);
@@ -106,28 +108,30 @@ void TCPMsgs::disconnected()
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
 {
-    qDebug() << "TCPMsgs: " << QString::number(bytes) << " bytes written...";
+    qDebug() << "TCPMsgs::bytesWritten(): " << QString::number(bytes) << " bytes written...";
 }
 
 void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej wysłanej wiadmoności
 {
-    qDebug() << "TCPMsgs: reading...";
+    qDebug() << "TCPMsgs::readyRead(): reading...";
 
     QString QStrMsgFromTcp;
     do
     {
         if (!QStrMsgFromTcp.isEmpty())
-            qDebug() << "WARNING: TCPMsgs::readyRead- needed to read data from socket 1 more time";
+            qDebug() << "WARNING: TCPMsgs::readyRead- needed to read data from"
+                        " socket 1 more time";
 
         QStrMsgFromTcp += socket->readAll();
 
         if (socket->bytesAvailable() > 0)
-            qDebug() << "WARNING: TCPMsgs::readyRead- socket->bytesAvailable() > 0 after 1st read";
+            qDebug() << "WARNING: TCPMsgs::readyRead- socket->bytesAvailable() > 0"
+                        " after 1st read";
     }
     while (socket->bytesAvailable() > 0);
 
-    //TODO: dostaję czasem rozklejone końcówki w bodajże kolejnej wiadomości: "" lub "/n". Póki co...
-    //zostało to naprawione półśrodkiem
+    //future: dostaję czasem rozklejone końcówki w bodajże kolejnej wiadomości: '' lub
+    //'/n'. Póki co zostało to naprawione półśrodkiem
     if (!QStrMsgFromTcp.isEmpty() && QStrMsgFromTcp != "\n") //jeżeli nie jest to końcówka/syf
     {
         if (QStrMsgFromTcp.right(1) != "\n")
@@ -144,24 +148,11 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
             return;
         }
 
-        qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender <<
-                    ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
+        qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender
+                 << ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp ="
+                 << QStrMsgFromTcp;
 
-        switch (QStrData.nSender)
-        {
-        case WEBSITE:
-            emit this->msgFromTcpToWeb(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            break;
-        case ARDUINO:
-            emit this->msgFromTcpToArd(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            break;
-        case TEST:
-            emit this->msgFromTcpToCore(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
-            break;
-        default:
-            qDebug() << "ERROR: TCPMsgs::readyRead(): unknown QStrData parameter ="
-                          << QStrData.nSender;
-        }
+        emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
     }
     else if (QStrMsgFromTcp.isEmpty())
     {
@@ -175,7 +166,8 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
 
     _bWaitingForReadyRead = false;
 
-    if (!TCPMsgsList.isEmpty()) //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
+    //jeżeli pozostały jeszcze jakieś zapytania do tcp do przetworzenia
+    if (!TCPMsgsList.isEmpty())
     {
         this->doTcpConnect(); //to je wykonaj
     }

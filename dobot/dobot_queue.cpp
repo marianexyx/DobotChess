@@ -47,7 +47,7 @@ void DobotQueue::parseNextMoveToArmIfPossible()
         qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): retreat";
         PtpCmdActualVal retreatId;
         retreatId = (_pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
-        addCmdToList(DM_TO_POINT, retreatId.x, retreatId.y, retreatId.z);
+        addArmMoveToQueue(DM_TO_POINT, retreatId.x, retreatId.y, retreatId.z);
         _n64RetreatID = std::numeric_limits<int64_t>::max();
     }
 }*/
@@ -58,7 +58,6 @@ void DobotQueue::parseNextMoveToArmIfPossible()
     GetQueuedCmdLeftSpace(&_unQueuedCmdLeftSpace);
     if (_unQueuedCmdLeftSpace <= 0)
     {
-        qDebug() << "ERROR: Dobot queue memory  full. data overflown/lost. Stop arm.";
         emit _pDobot->addTextToLogPTE("ERROR: Dobot queue memory full. Stop arm.\n", LOG_DOBOT);
         SetQueuedCmdForceStopExec(); //stop arm
     }
@@ -84,9 +83,9 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
     case DM_CLOSE:
         _pServo->closeGripper(move.ID);
         break;
-    case DM_HOME:
+    case DM_CALIBRATE:
     {
-        emit _pDobot->addTextToLogPTE("HOMECmd: recalibrating arm...\n", LOG_DOBOT);
+        emit _pDobot->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
         HOMECmd HOME;
         HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
@@ -106,7 +105,7 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
     }
 }
 
-void DobotQueue::addCmdToList(DOBOT_MOVE_TYPE Type, Point3D point)
+void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
     //todo: usuwać z tablicy wiadomości na dobota wiadomości te które już poszły (może minus 1)
     _n64CoreQueuedCmdID += 1; //aktualne id ruchu = +1 większe od ostatniego

@@ -32,7 +32,7 @@ public:
     void parseNextMoveToArmIfPossible();
     //void retreat();
     void queuePhysicalMoveOnArm(DobotMove move);
-    void addCmdToList(DOBOT_MOVE_TYPE Type, Point3D point);
+    void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void saveIDFromConnectedDobot();
     //bool isDobotCmdsLeftSpaceEmpty();
 

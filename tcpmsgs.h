@@ -24,7 +24,7 @@ private:
     bool _bWaitingForReadyRead; //flaga dzięki której zablokujemy możliwość wykonywania od razu...
     //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
     //...na którego odpowiedź(przetworzenie) z TCP czekamy
-    int64_t _n64MsgID; //nr zapytania do tcp
+    int64_t _n64CmdID;
     void doTcpConnect();
 
 private slots:
@@ -38,13 +38,11 @@ public:
     TCPMsgs();
 
 public slots:
-    void TcpQueueMsg(int nSender, QString msg);
+    void queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd);
 
 signals:
     void addTextToLogPTE(QString, LOG);
-    void msgFromTcpToWeb(QString, QString);
-    void msgFromTcpToArd(QString, QString);
-    void msgFromTcpToCore(QString, QString);
+    void msgFromTcpToChess(QString, QString);
 };
 
 #endif // TCPMSGS_H

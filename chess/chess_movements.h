@@ -12,8 +12,7 @@ private:
     Chessboard* _pBoardRemoved;
 
     SEQUENCE_TYPE _MoveType;
-    PosFromTo _PosMove; //todo: gdzieś po wszystkim ...
-    //...tą zmienną trzeba prewencyjnie zerować. gdzie?
+    PosFromTo _PosMove;
 
 public:
     ChessMovements(Chess* pChess);
@@ -36,7 +35,7 @@ public:
     void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }
     PosFromTo getMove() const { return _PosMove; }
     SEQUENCE_TYPE getMoveType() const { return _MoveType; }
-    void clearMove() { _PosMove.clear(); } //todo: sprawdzić gdzie to implementować w całym kodzie
+    void clearMove() { _PosMove.clear(); }
 };
 
 #endif // CHESS_MOVEMENTS_H

@@ -12,8 +12,7 @@ void ChessResets::restartGame(END_TYPE WhoWon, Client* PlayerToClear = nullptr)
 {
     //info
     QString QStrPlayer = "";
-    if (PlayerToClear != nullptr)
-        QStrPlayer = _pClients->getClientName(PlayerToClear) + ":";
+    if (PlayerToClear != nullptr) QStrPlayer = _pClients->getClientName(PlayerToClear) + ":";
     qDebug() << "Chess::restartGame():" << QStrPlayer << endTypeAsQstr(WhoWon);
 
     //reset data
@@ -77,6 +76,18 @@ void ChessResets::changePlayersOnChairs(END_TYPE WhoWon, Client* PlayerToClear)
     }
 }
 
+bool ChessResets::isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2)
+{
+    for (short sField=1; sField>=64; ++sField)
+    {
+        if (pBoard1->getField(sField)->getPieceOnField() !=
+                pBoard2->getField(sField)->getPieceOnField())
+            return false;
+    }
+
+    return true;
+}
+
 void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon)
 {
     switch(WhoWon)
@@ -124,12 +135,12 @@ void ChessResets::resetPiecePositions()
 
                 if (!_pChess->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
-                    if (pExaminedField->getPieceOnField() == nullptr) //checking field is empty
+                    if (pExaminedField->getPieceOnField() == nullptr) //if checking field is empty
                     {
                         Piece* pMissingPiece = _pChess->getPiece(pExaminedField->getStartPieceNrOnField());
                         Field* pMissingPieceActualFieldOnMainBoard =
                                 _pChess->searchForPieceActualFieldOnMainBoad(pMissingPiece);
-                        if (pMissingPieceActualFieldOnMainBoard != nullptr) //exists on mainboard
+                        if (pMissingPieceActualFieldOnMainBoard != nullptr) //if exists on mainboard
                             pMoves->regularMoveSequence(pMissingPieceActualFieldOnMainBoard,
                                                         pExaminedField);
                         else pMoves->restoreMoveSequence(pMissingPiece);
@@ -146,12 +157,12 @@ void ChessResets::resetPiecePositions()
                             pMoves->regularMoveSequence(pExaminedField, pFieldToPutAsidePiece);
                         else if (pExaminedField == pStartFieldOfPieceOnPutAsideField)
                             pMoves->removeMoveSequence(pExaminedField);
-                        //else iterate through all fields one more time (pieces ps will change)
+                        //else: iterate through all fields one more time (pieces pos will change)
                     }
                 }
             }
 
-            if (_pChess->isPieceSetOnBoardsIdentical(*tempBoard, pBoardMain))
+            if (this->isPieceSetOnBoardsIdentical(*tempBoard, pBoardMain))
             {
                 qDebug() << "ERROR: ChessResets::resetPiecePositions(): boards are identical";
                 break;

@@ -37,7 +37,7 @@ private:
     TCPMsgs* _pTCPMsgs;
     ArduinoUsb* _pUsb;
 
-    COMMUNICATION_TYPES _PlayerSource;
+    COMMUNICATION_TYPE _PlayerSource;
 
     ChessTimers* _pTimers;
     ChessMovements* _pMovements;
@@ -56,7 +56,7 @@ private:
 public:
     Chess(Clients* pClients, Dobot* pDobot, Chessboard* pBoardMain,
           Chessboard* pBoardRemoved, ArduinoUsb* pUsb, Websockets* pWebsockets,
-          TCPMsgs* pTCPMsgs, COMMUNICATION_TYPES PlayerSource);
+          TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 
     void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
@@ -68,7 +68,6 @@ public:
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece);
     Field* searchForPieceActualFieldOnMainBoard(Piece* pPiece);
-    bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);
     void removeClient(Client* pClient);
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE vertMove = VM_NONE);
@@ -88,8 +87,9 @@ public:
     ChessResets* getResetsPointer() { return _pResets; }
 
 public slots:
-    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
     void checkMsgFromWebsockets(QString QStrMsg, Client* pClient);
+    void checkMsgFromChenard(QString tcpMsgType, QString tcpRespond);
+    void checkMsgFromUsb(QString QStrMsg);
     QString getTableData();
 
 signals:

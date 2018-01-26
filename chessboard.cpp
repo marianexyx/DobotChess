@@ -143,30 +143,6 @@ void Chessboard::calculateRetreatPoints()
     _retreatLeft.z = _retreatRight.z = _MaxBoard.z;
 }
 
-/*void Chessboard::showBoardInDebug()
-{
-    for (int i=0; i<=7; ++i)
-    {
-        qDebug() << "Board's row" << i+1 << "pieces =" << _QStrBoard[i][0] << _QStrBoard[i][1] <<
-                    _QStrBoard[i][2] << _QStrBoard[i][3] << _QStrBoard[i][4] << _QStrBoard[i][5] <<
-                    _QStrBoard[i][6] << _QStrBoard[i][7];
-    }
-}*/
-
-QString Chessboard::arrayBoardAsQStr(QString QStrBoard[8][8])
-{
-    QString board = "";
-    for (int i=0; i<=7; ++i)
-    {
-        for (int j=0; j<=7; ++j)
-        {
-            board += QStrBoard[i][j] + " ";
-        }
-        board += "\n";
-    }
-    return board;
-}
-
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField)
 {
     if (pField->isFieldOccupied(true)) return;

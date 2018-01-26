@@ -153,12 +153,11 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
                         " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
             return false;
         }
-        //todo: upewnic sie ze ten warunek jest ok
-        if (!QStrMoveFromTo.length() != 4 && !ChessStatus::isMovePromotion(QStrMoveFromTo))
+
+        if (QStrMoveFromTo.length() == 5)
         {
-            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): last char isn't "
-                        " promotion char:" << QStrMoveFromTo.right(1);
-            return false;
+            if (!ChessStatus::isMovePromotion(QStrMoveFromTo), true)
+                return false;
         }
     }
     else

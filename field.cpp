@@ -116,3 +116,11 @@ bool Field::isFieldOccupied(bool bErrorLog = false)
     }
     else return false;
 }
+
+Piece* Field::getPieceOnField(bool bErrorLog = false) const
+{
+    if (bErrorLog && _pPieceOnField == nullptr)
+        qDebug() << "ERROR: Field::getPieceOnField(): piece == nullptr";
+
+    return _pPieceOnField;
+}

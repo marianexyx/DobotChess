@@ -23,7 +23,6 @@ public:
 
     void sendDataToUsb(QString QsMsg);
     void searchDevices();
-    void manageMsgFromUsb(QString QStrMsg);
 
 private:
     QByteArray QByteA_data; //tablica niezorganizowanych danych przypływających z usb
@@ -37,17 +36,10 @@ private slots:
     //void portIndexChanged(int index); //zmiana/wybór portu
     void readUsbData(); //zczytywanie danych lecących asynchronicznie z usb
 
-    //TODO: te sygnały to rympał w ogarnianiu kodu. działają na klasy pod którymi nie są, co...
-    //...powoduje chaos w ogarnianiu co skąd i kiedy leci
-    //todo: sygnały wiedzą że klasa ma związek z szachami. usb powinno tylko przepychać dane...
-    //...w 2 strony
 signals:
     void addTextToLogPTE(QString, LOG);
     void updatePortsComboBox(int);
-    void sigRestoreGameToInitialState(); //future: nazwa gryzie się z funkcja robiącą...
-    //...w sumie coś innego
-    void AIEnemySend(QString);
-    void TcpQueueMsg(int, QString); //todo: usb nie powinno mieć dostępu bokiem do tcp
+    void msgFromUsbToChess(QString);
 };
 
 #endif // ARDUINOUSB_H

@@ -2,7 +2,6 @@
 #define FIELD_H
 
 #pragma once
-
 #include "piece.h"
 #include "vars/basic_vars.h"
 
@@ -39,7 +38,7 @@ public:
     short getNr() const { return _sNr; }
     PosOnBoard getPos() const { return Field::Pos(_sNr); }
     QString getNrAsQStr() const { return Field::nrAsQStr(_sNr); }
-    Piece* getPieceOnField() const { return _pPieceOnField; }
+    Piece* getPieceOnField(bool bErrorLog = false) const;
     short getStartPieceNrOnField() const { return _sStartPieceNrOnField; }
 };
 

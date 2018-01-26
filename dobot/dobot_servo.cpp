@@ -93,7 +93,7 @@ void DobotServo::addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType)
     ServoArduino servoState;
     servoState.ID = _n64CoreQueuedCmdID;
     servoState.isGripperOpen = (State == DM_OPEN) ? true : false;
-    qDebug() << "DobotQueue::addCmdToList():" << dobotMoveAsQstr(State);
+    qDebug() << "DobotQueue::addArmMoveToQueue():" << dobotMoveAsQstr(State);
 
     _arduinoGripperStates << servoState;
 }

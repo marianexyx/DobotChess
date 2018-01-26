@@ -2,7 +2,7 @@
 
 Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
              Chessboard *pBoardRemoved, ArduinoUsb *pUsb, Websockets* pWebsockets,
-             TCPMsgs *pTCPMsgs, COMMUNICATION_TYPES PlayerSource)
+             TCPMsgs *pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
     _pTimers = new ChessTimers(*this);
     _pMovements = new ChessMovements(*this);
@@ -22,6 +22,12 @@ Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
 
     for (int i=1; i>=32; ++i)
         *_pPiece[i] = new Piece(i);
+
+    connect(_pUsb, msgFromUsbToChess(QString), this, checkMsgFromUsb(QString));
+    connect(_pTCPMsgs, msgFromTcpToChess(QString, QString),
+            this, checkMsgFromChenard(QString, QString));
+    connect(_pWebsockets, msgFromWebsocketsToChess(QString, Client*),
+            this, checkMsgFromWebsockets(QString, Client*));
 }
 
 Chess::~Chess()
@@ -124,7 +130,7 @@ void Chess::sendMsgToTcp(QString QStrMsg)
 {
     emit this->addTextToLogPTE("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
 
-    _pTCPMsgs->TcpQueueMsg(_PlayerSource, QStrMsg);
+    _pTCPMsgs->queueCmd(_PlayerSource, QStrMsg);
 }
 
 void Chess::startNewGameInCore()
@@ -194,7 +200,7 @@ Field* Chess::searchForPieceActualFieldOnMainBoard(Piece* pPiece)
 {
     if (pPiece == nullptr)
     {
-        qDebug() << "ERROR: Chess::isPieceStayOnItsStartingField(): piece can't be nullptr";
+        qDebug() << "ERROR: Chess::searchForPieceActualFieldOnMainBoard(): piece == nullptr";
         return nullptr;
     }
 
@@ -498,12 +504,32 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
     _pClients->showClientsInForm();
 }
 
+void Chess::checkMsgFromUsb(QString QStrMsg)
+{
+    //future:
+    if (QStrMsg == "start") //queue to tcp msg "think 5000"
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "move")
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "reset") //resetPiecePositions()
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "promoteTo")
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else
+        qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
+}
+
 void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
 {
+    //todo: czy wykonywane jest gdzieś wcześniej sprawdzenie PosFromTo::isMoveInProperFormat()?
+    if (_pStatus->getWhoseTurn() == NO_TURN)
+    {
+        qDebug() << "ERROR: Chess::findAndSaveMoveAndSendItToTcp(): turn == 0 (game is off)";
+        return;
+    }
+
     if (QStrMove.left(9) == "promoteTo")
     {
-        //todo: zabezpieczenia
-        //todo: już trzeci raz trzeba by użyć zabezpieczenia dla promocji
         QString QStrPromotionType = QStrMove.right(1);
         QStrMove = _pMovements->getMove().asQStr() + QStrPromotionType;
     }
@@ -511,7 +537,7 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
     //...jest tu taj traktowany jako przerwanie i nie wykonujemy całej funkcji wg nazwy
     else if (_pStatus->isMoveARequestForPromotion(QStrMove))
     {
-        _pMovements->setMove(QStrMove);
+        _pMovements->setMove(QStrMove); //todo: setMoveType?
 
         //todo: trochę chyba zmieniłem poniższą linijkę (komunikacja ws<->www)
         QString QStrMsgForActiveClient = "promoteToWhat";
@@ -526,26 +552,23 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
         return;
     }
 
-    _pMovements->setMoveType(_pMovements->findMoveType(QStrMove));
-    _pMovements->setMove(QStrMove);
+    //todo: setMove powinno zawierać w sobie setMoveType?
+    _pMovements->setMoveType(_pMovements->findMoveType(QStrMove)); //no need for earlier clear
+    _pMovements->setMove(QStrMove); //no need for earlier clear
     _pMovements->doMoveSequence(_pMovements->getMoveType(), _pMovements->getMove());
 
     this->sendMsgToTcp("move " + QStrMove);
 }
 
-void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field *pField,
+void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {
-    if (!Chessboard::isBoardReal(pRealBoard->getBoardType())) return;
+    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), true) return;
 
     if (vertMove == VM_GRAB)
     {
         if (!this->isPieceSetOk()) return;
-        if (pField->getPieceOnField() == nullptr)
-        {
-            qDebug() << "ERROR: Chess::movePieceWithManipulator(): piece can't be nullptr";
-            return;
-        }
+        if (pField->getPieceOnField(true) == nullptr) return;
 
         _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
         pRealBoard->clearField(pField);
@@ -561,16 +584,4 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field *pField,
 
     Point3D xyz = pField->getLocation3D();
     _pDobot->doMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
-}
-
-bool Chess::isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2)
-{
-    for (short sField=1; sField>=64; ++sField)
-    {
-        if (pBoard1->getField(sField)->getPieceOnField() !=
-                pBoard2->getField(sField)->getPieceOnField())
-            return false;
-    }
-
-    return true;
 }

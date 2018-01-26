@@ -12,15 +12,12 @@ private:
     Chessboard* _pBoardMain;
 
     FEN_GAME_STATE _FENGameState;
-    QString _QStrBoard[8][8]; //todo:?? nazwać to jakiś tempem, albo używać obiektów
     WHOSE_TURN _WhoseTurn;
     QString _QStrCastlings;
     QString _QStrEnpassant; //f.e.: "e5"
     QStringList _legalMoves;
     QStringList _historyMoves;
 
-    //todo: dodatkowo zawsze zwalniac potem pamiec- freeboard
-    QString** FENToBoard(QString FENBoard);
     WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
 
 public:
@@ -33,11 +30,12 @@ public:
     bool isMoveRemoving();
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
-    static bool isMovePromotion(QString QStrMoveToTest);
+    static bool isMovePromotion(QString QStrMoveToTest, bool bErrorLog = false);
     void saveStatusData(QString status);
     void resetStatusData();
 
-    //todo: settery jako friend dla chess?
+    //todo: settery jako friend dla chess? sprawdzić czy większośc metod dostepowych nie jest...
+    //...używanych tylko w tej klasie
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
     void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
     void setLegalMoves(QString msg);

@@ -25,7 +25,7 @@ public:
     void thinkOk(QString QStrMsg); //future: i co dalej to robi?
     void checkAI();
 
-    void setAI(bool bAI) { _bAI = bAI; } //future: wszystkie nazwy "AI" zamienić na "Igor"
+    void setAI(bool bAI) { _bAI = bAI; } //future: najgorsza nazwa
     void setAIAsPlayer2(bool bIsAIAsP2) { _bIsIgorsAiSimulatedAsPlayer2 = bIsAIAsP2; }
 
     bool getAIAsPlayer2() { return _bIsIgorsAiSimulatedAsPlayer2; } //future: is...

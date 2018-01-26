@@ -423,9 +423,6 @@
               <widget class="QPlainTextEdit" name="queuedOnDobot"/>
              </item>
             </layout>
-            <zorder>plainTextEdit_2</zorder>
-            <zorder>plainTextEdit_2</zorder>
-            <zorder>queuedOnDobot</zorder>
            </widget>
           </item>
          </layout>
@@ -1149,16 +1146,6 @@
            <widget class="QLineEdit" name="emulatePlayerMsgLineEdit">
             <property name="enabled">
              <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="serviceCheckBox">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>servMsg</string>
             </property>
            </widget>
           </item>

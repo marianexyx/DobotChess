@@ -40,7 +40,6 @@ public:
     Chessboard(BOARD boardType); //todo: friend dla chess
     ~Chessboard();
 
-    void emitBoardToForm(QString QStrBoard) { emit this->showBoardInForm(QStrBoard); }
     bool isPointInLocationLimits(Point3D point);
     bool isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
@@ -51,9 +50,6 @@ public:
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
     void clearField(Field* pField);
 
-    //void showBoardInDebug(); //todo
-    //todo: double pointers + freeboard:
-    static QString arrayBoardAsQStr(QString QStrBoard[8][8]);
     static bool isBoardReal(BOARD boardType, bool bErrorLog = false);
 
 signals:
