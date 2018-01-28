@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     chess/chess_resets.cpp \
     xml_reader.cpp \
     dobot/dobot_queue.cpp \
-    dobot/dobot_servo.cpp
+    dobot/dobot_servo.cpp \
+    chess/chess_conditions.cpp
 
 HEADERS  +=  \
     websockets.h \
@@ -69,12 +70,13 @@ HEADERS  +=  \
     chess/chess_bot.h \
     chess/chess_status.h \
     vars/game_status.h \
-    vars/fen_game_state.h \
     client.h \
     chess/chess_resets.h \
     xml_reader.h \
     dobot/dobot_queue.h \
-    dobot/dobot_servo.h
+    dobot/dobot_servo.h \
+    chess/chess_conditions.h \
+    vars/request_types.h
 
 FORMS    += mainwindow.ui
 

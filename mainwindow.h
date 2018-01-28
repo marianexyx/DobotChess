@@ -51,7 +51,6 @@ private slots:
     void onChangedMode();
     void onJOGCtrlBtnPressed(int index);
     void onJOGCtrlBtnReleased();
-    void onPTPsendBtnClicked();
 
     //sloty do używania GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG msgType);
@@ -97,6 +96,12 @@ private slots:
     void on_sendTcpLineEdit_textChanged(const QString &textChanged);
     void on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged);
     void on_homeBtn_clicked();
+    void on_usbCmdLine_textChanged(const QString &arg1);
+    void on_middleAboveBtn_clicked();
+    void on_sendBtn_clicked();
+    void on_xPTPEdit_textChanged(const QString &arg1);
+    void on_yPTPEdit_textChanged(const QString &arg1);
+    void on_zPTPEdit_textChanged(const QString &arg1);
 };
 
 #endif // MAINWINDOW_H

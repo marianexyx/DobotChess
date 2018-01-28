@@ -6,7 +6,8 @@
 
 enum BOARD { B_MAIN,
              B_CHENARD,
-             B_TEMP,
+             B_TEMP, //todo: temp to i tak 1 z tych 3 innych. można po prostu nazwy...
+             //...obiektu innej używać
              B_REMOVED };
 
 inline QString boardTypeAsQstr(BOARD board)

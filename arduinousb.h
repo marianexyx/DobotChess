@@ -19,7 +19,7 @@ public:
     QList <QSerialPortInfo> availablePort;
     const QSerialPortInfo* usbInfo;
     QSerialPort* usbPort;
-    QString QsFullSerialMsg;
+    QString QStrFullSerialMsg;
 
     void sendDataToUsb(QString QsMsg);
     void searchDevices();

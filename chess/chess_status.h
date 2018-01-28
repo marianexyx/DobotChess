@@ -11,10 +11,10 @@ private:
     Chess* _pChess;
     Chessboard* _pBoardMain;
 
-    FEN_GAME_STATE _FENGameState;
+    END_TYPE _FENGameState;
     WHOSE_TURN _WhoseTurn;
     QString _QStrCastlings;
-    QString _QStrEnpassant; //f.e.: "e5"
+    QString _QStrEnpassant;
     QStringList _legalMoves;
     QStringList _historyMoves;
 
@@ -45,8 +45,7 @@ public:
     void setHistoryMoves(QStringList moves) { _historyMoves = moves;
                                               emit _pChess->showHistoryMoves(_historyMoves); }
 
-    FEN_GAME_STATE getFENGameState() const { return _FENGameState; }
-    END_TYPE getFENGameStateAsEndType() const;
+    END_TYPE getFENGameState() const { return _FENGameState; }
     WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
     QStringList getLegalMoves() const { return _legalMoves; }
     QStringList getHisotyMoves() const { return _historyMoves; }

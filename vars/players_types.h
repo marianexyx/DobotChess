@@ -14,6 +14,7 @@ enum PLAYER_TYPE
 inline QString playerTypeAsQStr(PLAYER_TYPE PT)
 {
     QString QStrType;
+
     switch(PT)
     {
     case PT_NONE: QStrType = ""; break;
@@ -23,15 +24,18 @@ inline QString playerTypeAsQStr(PLAYER_TYPE PT)
         qDebug() << "ERROR: playerTypeAsQStr(): unknwown parameter:" << QString::number(PT);
         break;
     }
+
     return QStrType;
 }
 
 inline PLAYER_TYPE playerTypeFromQStr(QString QStrPlayer)
 {
     PLAYER_TYPE playerType = PT_NONE;
+
     if (QStrPlayer == "White") playerType = PT_WHITE;
     else if (QStrPlayer == "Black") playerType = PT_BLACK;
     else qDebug() << "ERROR: playerTypeFromQStr(): unknwown parameter:" << QStrPlayer;
+
     return playerType;
 }
 

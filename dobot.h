@@ -49,9 +49,9 @@ public:
     void doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump);
     bool isPointTotallyDiffrent(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
-    void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint); //todo: addMove...
+    void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint);
     void armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
-    void writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType);
+    void writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType); //todo: logPTE
     bool bIsMoveInAxisRange(Point3D point);
 
     void setItemInGripper(short sGrippersItemID);

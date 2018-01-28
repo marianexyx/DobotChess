@@ -9,6 +9,7 @@ Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
     _pBot = new ChessBot(*this);
     _pStatus = new ChessStatus(*this);
     _pResets = new ChessResets(*this) ;
+    _pConditions = new ChessConditions(*this);
 
     _pClients = pClients;
     _pDobot = pDobot;
@@ -37,6 +38,7 @@ Chess::~Chess()
     delete _pBot;
     delete _pStatus;
     delete _pResets;
+    delete _pConditions;
 }
 
 void Chess::sendDataToClient(QString QStrMsg, Client* pClient = nullptr)
@@ -90,7 +92,7 @@ void Chess::continueGameplay()
     {
         _pTimers->switchPlayersTimers();
         this->sendDataToAllClients("moveOk " + _pMovements->getMove().asQStr() + " " +
-                                          turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
+                                   turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -358,17 +360,16 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     {
         _pStatus->saveStatusData(tcpRespond);
 
-        //TODO: naprawdę nie da się FGSów zrobić jako ETów?
-        if (_pStatus->getFENGameState() == FGS_IN_PROGRESS)
+        if (_pStatus->getFENGameState() == ET_NONE)
         {
             this->sendMsgToTcp("history pgn");
             this->continueGameplay(); //future: zrobić to kiedyś tak by dopiero w odpowiedzi...
             //...na legal core wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął...
             //...blokadę przed kojenym ruchem)
         }
-        else if (_pStatus->getFENGameState() == FGS_WHITE_WON ||
-                 _pStatus->getFENGameState() == FGS_BLACK_WON ||
-                 _pStatus->getFENGameState() == FGS_DRAW)
+        else if (_pStatus->getFENGameState() == ET_WHIE_WON ||
+                 _pStatus->getFENGameState() == ET_BLACK_WON ||
+                 _pStatus->getFENGameState() == ET_DRAW)
         {
             _pResets->restartGame(_pStatus->getFENGameStateAsEndType());
         }
@@ -390,7 +391,8 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
     else if (tcpMsgType == "think 5000" && _PlayerSource == ARDUINO &&
              (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
         _pBot->thinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
-    else qDebug() << "ERROR: Chess:checkMsgFromChenard(): received unknown tcpMsgType:"
+    else
+        qDebug() << "ERROR: Chess:checkMsgFromChenard(): received unknown tcpMsgType:"
                   << tcpMsgType;
 }
 
@@ -537,7 +539,7 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
     //...jest tu taj traktowany jako przerwanie i nie wykonujemy całej funkcji wg nazwy
     else if (_pStatus->isMoveARequestForPromotion(QStrMove))
     {
-        _pMovements->setMove(QStrMove); //todo: setMoveType?
+        _pMovements->setMove(QStrMove);
 
         //todo: trochę chyba zmieniłem poniższą linijkę (komunikacja ws<->www)
         QString QStrMsgForActiveClient = "promoteToWhat";
@@ -552,17 +554,14 @@ void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
         return;
     }
 
-    //todo: setMove powinno zawierać w sobie setMoveType?
-    _pMovements->setMoveType(_pMovements->findMoveType(QStrMove)); //no need for earlier clear
     _pMovements->setMove(QStrMove); //no need for earlier clear
-    _pMovements->doMoveSequence(_pMovements->getMoveType(), _pMovements->getMove());
-
+    _pMovements->doMoveSequence();
     this->sendMsgToTcp("move " + QStrMove);
 }
 
 void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
                                               VERTICAL_MOVE vertMove = VM_NONE)
-{
+{    
     if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), true) return;
 
     if (vertMove == VM_GRAB)
@@ -570,15 +569,24 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
         if (!this->isPieceSetOk()) return;
         if (pField->getPieceOnField(true) == nullptr) return;
 
+        emit this->addTextToLogPTE("Queue: grab piece " + pField->getPieceOnField()->getNr() +
+                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
+                                   " from field " + pField->getNrAsQStr(), LOG_CORE);
         _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
         pRealBoard->clearField(pField);
+
         if (!this->isPieceSetOk()) return;
     }
     else if (vertMove == VM_PUT)
     {
         if (!this->isPieceSetOk()) return;
+
+        emit this->addTextToLogPTE("Queue: put piece " + _pPiece[_pDobot->getItemInGripper()] +
+                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
+                                   " on field " + pField->getNrAsQStr(), LOG_CORE);
         pRealBoard->setPieceOnField(_pPiece[_pDobot->getItemInGripper()], pField);
         _pDobot->clearGripper();
+
         if (!this->isPieceSetOk()) return;
     }
 

@@ -93,6 +93,24 @@ static PIECE_TYPE Piece::Type(short sPieceNr)
     return PieceType;
 }
 
+static QString Piece::name(short sPieceNr)
+{
+    QString QStrName = static_cast<char>(Piece::Type(sPieceNr));
+    if (_PieceColor == PT_WHITE) QStrName.toUpper();
+
+    switch(sPieceNr)
+    {
+    case 1: case 2: case 3: case 25: case 26: case 27:
+        QStrName += "1"; break;
+    case 6: case 7: case 8: case 30: case 31: case 32:
+        QStrName += "2"; break;
+    default:
+        QStrName += QString::number(sPieceNr - static_cast<int(_PieceColor)*8);
+    }
+
+    return QStrName;
+}
+
 static short Piece::nr(PosOnBoard PieceLines)
 {
     short sPieceNr = static_cast<short>(PieceLines.Letter) +

@@ -16,6 +16,9 @@ INPUT(
 ./release\chess_status.o
 ./release\client.o
 ./release\chess_resets.o
+./release\xml_reader.o
+./release\dobot_queue.o
+./release\dobot_servo.o
 ./release\moc_websockets.o
 ./release\moc_tcpmsgs.o
 ./release\moc_dobot.o

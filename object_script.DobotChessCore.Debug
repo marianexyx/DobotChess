@@ -16,6 +16,9 @@ INPUT(
 ./debug\chess_status.o
 ./debug\client.o
 ./debug\chess_resets.o
+./debug\xml_reader.o
+./debug\dobot_queue.o
+./debug\dobot_servo.o
 ./debug\moc_websockets.o
 ./debug\moc_tcpmsgs.o
 ./debug\moc_dobot.o

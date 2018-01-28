@@ -19,8 +19,6 @@ public:
     Field(short sFieldID);
     ~Field();
 
-    static double dSquareWidht = 21.f; //todo: xml (albo w sumie obliczać można)
-
     static bool isInRange(short sFieldNr);
     static PosOnBoard Pos(short sFieldNr);
     static short nr(PosOnBoard FieldLines);

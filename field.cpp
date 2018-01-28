@@ -9,10 +9,6 @@ Field::Field(short sFieldNr)
     _pPieceOnField = nullptr;
 
     _sStartPieceNrOnField = Field::startPieceNrOnField(sFieldNr);
-
-    _Location3D.x = -1;
-    _Location3D.y = -1;
-    _Location3D.z = -1;
 }
 
 

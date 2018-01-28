@@ -18,10 +18,16 @@ Chessboard::Chessboard(BOARD boardType)
     _remBlackFurtherInner(267.2, 0, -19.4); //y is unused
 
     if (boardType == B_MAIN)
+    {
         this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
+        _dSquareWidth = ((_A8.x - _A1.x)/7 + (_A8.y - _A1.y)/7)/2;
+    }
     else if (boardType == B_REMOVED)
+    {
         this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
               _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
+        _dSquareWidth = qFabs(_remWhiteCloserOuter.y - _remWhiteFurtherInner.y);
+    }
 
     if (this->isBoardReal(_BoardType))
     {
@@ -53,14 +59,20 @@ void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
 
             Point3D p3D;
             p3D.x = A1.x +
-                    digit*(((A8.x-A1.x)/7.f)+((letter/14.f)*(((A1.x-H1.x)/7.f)-((A8.x-H8.x)/7.f))))-
-                    letter*(((A1.x-H1.x)/7.f)-((digit/14.f)*(((H8.x-H1.x)/7.f)-((A8.x-A1.x)/7.f))));
+                    digit*(((A8.x-A1.x)/7.f)+
+                           ((letter/14.f)*(((A1.x-H1.x)/7.f)-((A8.x-H8.x)/7.f))))-
+                    letter*(((A1.x-H1.x)/7.f)-
+                            ((digit/14.f)*(((H8.x-H1.x)/7.f)-((A8.x-A1.x)/7.f))));
             p3D.y = A1.y +
-                    digit*(((A8.y-A1.y)/7.f)+((letter/14.f)*(((A1.y-H1.y)/7.f)-((A8.y-H8.y)/7.f))))-
-                    letter*(((A1.y-H1.y)/7.f)-((digit/14.f)*(((H8.y-H1.y)/7.f)-((A8.y-A1.y)/7.f))));
+                    digit*(((A8.y-A1.y)/7.f)+
+                           ((letter/14.f)*(((A1.y-H1.y)/7.f)-((A8.y-H8.y)/7.f))))-
+                    letter*(((A1.y-H1.y)/7.f)-
+                            ((digit/14.f)*(((H8.y-H1.y)/7.f)-((A8.y-A1.y)/7.f))));
             p3D.z = A1.z +
-                    digit*(((A8.z-A1.z)/7.f)+((letter/14.f)*(((A1.z-H1.z)/7.f)-((A8.z-H8.z)/7.f))))-
-                    letter*(((A1.z-H1.z)/7.f)-((digit/14.f)*(((H8.z-H1.z)/7.f)-((A8.z-A1.z)/7.f))));
+                    digit*(((A8.z-A1.z)/7.f)+
+                           ((letter/14.f)*(((A1.z-H1.z)/7.f)-((A8.z-H8.z)/7.f))))-
+                    letter*(((A1.z-H1.z)/7.f)-
+                            ((digit/14.f)*(((H8.z-H1.z)/7.f)-((A8.z-A1.z)/7.f))));
 
             _pField[Piece::nr(pos)]->setField3DLocation(p3D);
         }
@@ -80,7 +92,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 
             Point3D p3D;
             p3D.x = whiteCloserOuter.x + row*((whiteFutherInner.x - whiteCloserOuter.x)/7.f);
-            p3D.y = whiteCloserOuter.y - column * Field::dSquareWidht;
+            p3D.y = whiteCloserOuter.y - column * _dSquareWidth;
             p3D.z = whiteCloserOuter.z + row*((whiteFutherInner.z - whiteCloserOuter.z)/7.f);
 
             _pField[Piece::nr(pos)]->setField3DLocation(p3D);
@@ -97,7 +109,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 
             Point3D p3D;
             p3D.x = blackCloserOuter.x + row*((blackFutherInner.x - blackCloserOuter.x)/7.f);
-            p3D.y = blackCloserOuter.y + ((column-2)*(-Field::dSquareWidht));
+            p3D.y = blackCloserOuter.y + ((column-2)*(-_dSquareWidth));
             p3D.z = blackCloserOuter.z + row*((blackFutherInner.z - blackCloserOuter.z)/7.f);
 
             _pField[Piece::nr(pos)]->setField3DLocation(p3D);

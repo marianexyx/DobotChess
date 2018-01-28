@@ -14,8 +14,6 @@ enum DOBOT_MOVE_TYPE { DM_NONE,
                        DM_DOWN
                      };
 
-enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
-
 inline QString dobotMoveAsQstr(DOBOT_MOVE_TYPE DM)
 {
     QString QStrMove;
@@ -33,6 +31,22 @@ inline QString dobotMoveAsQstr(DOBOT_MOVE_TYPE DM)
     }
 
     return QStrMove;
+}
+
+enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
+
+inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
+{
+    QStrin QStrMove;
+    switch(VM)
+    {
+    case VM_NONE: QStrMove = "none" ; break;
+    case VM_GRAB: QStrMove = "grab" ; break;
+    case VM_PUT: QStrMove = "put" ; break;
+    default:
+        qDebug() << "ERROR: verticalMoveAsQStr(): wrong arg =" << VM;
+        break;
+    }
 }
 
 #endif // DOBOT_MOVES_H

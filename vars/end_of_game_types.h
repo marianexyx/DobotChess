@@ -35,6 +35,17 @@ inline QString endTypeAsQstr(END_TYPE ET)
     return QStrEndType;
 }
 
-
+inline END_TYPE FENGameState(QString QStrFENGameState)
+{
+    if (QStrFENGameState == "*") return ET_NONE;
+    else if (QStrFENGameState == "1-0") return ET_WHIE_WON;
+    else if (QStrFENGameState == "0-1") return ET_BLACK_WON;
+    else if (QStrFENGameState == "1/2-1/2") return ET_DRAW;
+    else
+    {
+        qDebug() << "ERROR: FENGameState(): unknown val:" << QStrFENGameState;
+        return ET_NONE;
+    }
+}
 
 #endif // END_OF_GAME_TYPES_H

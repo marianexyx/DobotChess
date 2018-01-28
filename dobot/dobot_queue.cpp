@@ -7,6 +7,8 @@ DobotQueue::DobotQueue(Dobot *pDobot)
 
     _n64CoreQueuedCmdID = 1; //set 1st ID
     _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max();
+    _n64RealTimeDobotActualID = 0;
+    _n64RetreatID = 0;
 }
 
 void DobotQueue::parseNextMoveToArmIfPossible()
@@ -107,8 +109,9 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
-    //todo: usuwać z tablicy wiadomości na dobota wiadomości te które już poszły (może minus 1)
-    _n64CoreQueuedCmdID += 1; //aktualne id ruchu = +1 większe od ostatniego
+    //todo: usuwać z tablicy wiadomości na dobota wiadomości o 1 niższym niż aktualny ID dobota
+    //todo: wyświetlać komunikaty dobota w czasie rzeczywistym
+    _n64CoreQueuedCmdID += 1;
 
     DobotMove cmdToQueue;
     cmdToQueue.ID = _n64CoreQueuedCmdID;
@@ -120,7 +123,6 @@ void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 
 void DobotQueue::saveIDFromConnectedDobot()
 {
-    //sprawdź aktualny id i zapisz w zmiennej
    int result = GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID);
    if (result == DobotCommunicate_NoError)
    {

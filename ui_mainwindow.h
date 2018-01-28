@@ -183,7 +183,6 @@ public:
     QGridLayout *gridLayout_6;
     QPushButton *sendSimulatedMsgBtn;
     QLineEdit *emulatePlayerMsgLineEdit;
-    QCheckBox *serviceCheckBox;
     QPushButton *sendTcpBtn;
     QLineEdit *sendTcpLineEdit;
     QCheckBox *directTcpMsgCheckBox;
@@ -525,7 +524,6 @@ public:
 
         gridLayout_24->addWidget(queuedOnDobot, 0, 0, 1, 1);
 
-        queuedOnDobot->raise();
 
         gridLayout_19->addWidget(groupBox_14, 1, 2, 3, 1);
 
@@ -1018,12 +1016,6 @@ public:
 
         gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 2);
 
-        serviceCheckBox = new QCheckBox(groupBox_6);
-        serviceCheckBox->setObjectName(QStringLiteral("serviceCheckBox"));
-        serviceCheckBox->setEnabled(false);
-
-        gridLayout_6->addWidget(serviceCheckBox, 1, 0, 1, 1);
-
         sendTcpBtn = new QPushButton(groupBox_6);
         sendTcpBtn->setObjectName(QStringLiteral("sendTcpBtn"));
         sendTcpBtn->setEnabled(false);
@@ -1260,7 +1252,6 @@ public:
         sendBtn->setText(QApplication::translate("MainWindow", "Send", 0));
         groupBox_6->setTitle(QApplication::translate("MainWindow", "Simulate player msg ", 0));
         sendSimulatedMsgBtn->setText(QApplication::translate("MainWindow", "Send", 0));
-        serviceCheckBox->setText(QApplication::translate("MainWindow", "servMsg", 0));
         sendTcpBtn->setText(QApplication::translate("MainWindow", "SendTCP", 0));
 #ifndef QT_NO_TOOLTIP
         directTcpMsgCheckBox->setToolTip(QString());

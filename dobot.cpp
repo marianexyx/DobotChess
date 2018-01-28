@@ -13,7 +13,7 @@ Dobot::Dobot(ArduinoUsb *pArduinoUsb)
     
     _bConnectedToDobot = false;
 
-    _lastGivenPoint(200,0,25);
+    _lastGivenPoint(200,0,25); //todo: pierwszy punkt jako middle above
 
     _Home.x = 140; //todo: home ciągnąć z xml
     _Home.y = 0;
@@ -214,7 +214,6 @@ void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, dou
 {
     if (this->isPointTotallyDiffrent(dest3D)) return;
 
-    //todo: przesunąć wyświetlanie wszystkich komunikatów do czasu rzeczywistego
     if (VertMove == VM_GRAB)
         this->addArmMoveToQueue(DM_OPEN);
 

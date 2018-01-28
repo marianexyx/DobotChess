@@ -24,7 +24,7 @@ class Websockets: public QObject
     Q_OBJECT
 
 private:
-    QWebSocketServer *_pWebSocketServer;
+    QWebSocketServer* _pWebSocketServer;
     Clients* _pClients;
 
 private Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow

@@ -69,7 +69,7 @@ void ChessStatus::saveStatusData(QString status)
 
     if (QStrFENRecord.size() == 7)
     {
-         _FENGameState = FENGameState(QStrFENRecord.at(0));
+        _FENGameState = FENGameState(QStrFENRecord.at(0));
         qDebug() << "ChessStatus::saveStatusData(): FEN game state =" << QStrFENRecord.at(0);
         emit _pChess->setBoardDataLabel(QStrFENRecord.at(0), BDL_GAME_STATUS);
 
@@ -139,21 +139,6 @@ void ChessStatus::setHistoryMoves(QString msg)
     }
 
     this->setHistoryMoves(historyMoves);
-}
-
-END_TYPE ChessStatus::getFENGameStateAsEndType() const
-{
-    switch(_FENGameState)
-    {
-    case FGS_IN_PROGRESS: return ET_NONE; break;
-    case FGS_WHITE_WON: return ET_WHIE_WON; break;
-    case FGS_BLACK_WON: return ET_BLACK_WON; break;
-    case FGS_DRAW: return ET_DRAW; break;
-    default:
-        qDebug() << "ERROR: ChessStatus::getFENGameStateAsEndType():"
-                         "unknown _FENGameState val =" << _FENGameState;
-        return ET_NONE;
-    }
 }
 
 WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)

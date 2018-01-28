@@ -59,19 +59,19 @@ void ArduinoUsb::readUsbData()
 
     qDebug() << "QByteA_data = usbPort->readAll():" << QByteA_data;
     QString QsQByteA(QByteA_data); //stwórz stringa z listy stringów z usb (musi być z dekalracją)
-    QsFullSerialMsg += QsQByteA; //sklejaj to w pozafunkcyjnym stringu, póki nie trafimy na '$'
+    QStrFullSerialMsg += QsQByteA; //sklejaj to w pozafunkcyjnym stringu, póki nie trafimy na '$'
 
-    if(QsFullSerialMsg.at(0) == '@' && //jeżeli pierwszy znak wiadomosci to @...
-            QsFullSerialMsg.at(QsFullSerialMsg.size()-1) == '$') //...a ostatni to $...
+    if(QStrFullSerialMsg.at(0) == '@' && //jeżeli pierwszy znak wiadomosci to @...
+            QStrFullSerialMsg.at(QStrFullSerialMsg.size()-1) == '$') //...a ostatni to $...
     {
-        QsFullSerialMsg.remove('$'); //...to jest to cała wiadomość...
-        QsFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
+        QStrFullSerialMsg.remove('$'); //...to jest to cała wiadomość...
+        QStrFullSerialMsg.remove('@'); //... i pousuwaj te znaki.
 
-        emit this->addTextToLogPTE(QsFullSerialMsg + "\n", LOG_USB_RECEIVED);
-        emit this->msgFromUsbToChess(QsFullSerialMsg);
+        emit this->addTextToLogPTE(QStrFullSerialMsg + "\n", LOG_USB_RECEIVED);
+        emit this->msgFromUsbToChess(QStrFullSerialMsg);
 
         QByteA_data.clear();
-        QsFullSerialMsg.clear();
+        QStrFullSerialMsg.clear();
     }
 }
 

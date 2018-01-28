@@ -28,6 +28,7 @@ private:
     Point3D _remWhiteCloserOuter, _remWhiteFurtherInner;
     Point3D _remBlackCloserOuter, _remBlackFurtherInner;
     Point3D _MinBoard, _MaxBoard, _middleAbove, _retreatLeft, _retreatRight;
+    double _dSquareWidth;
 
     void calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8, Point3D H1, Point3D H8);
     void calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOuter,

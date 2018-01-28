@@ -29,8 +29,6 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain, Chessboa
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),
             _pDobot, SLOT(onConnectDobot())); //connect dobot
-    connect(ui->sendBtn, SIGNAL(clicked(bool)),
-            this, SLOT(onPTPsendBtnClicked())); //send PTP data
     this->setDobot_UI_PTE_Validators();
 
     //classes signals to ui
@@ -90,7 +88,6 @@ void MainWindow::setDobot_UI_PTE_Validators()
     ui->xPTPEdit->setValidator(validator);
     ui->yPTPEdit->setValidator(validator);
     ui->zPTPEdit->setValidator(validator);
-    ui->rPTPEdit->setValidator(validator);
 }
 
 void MainWindow::setJointLabelText(QString QSJointLabelText, short sJoint)
@@ -115,7 +112,7 @@ void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
     if (nSpaceLeft == 0) nSpaceLeft = 1; //to tylko dla tymczasowego zblokowania wyskakującego...
     //...warninga o unused parameter, póki nie wprowadzę tej funkcji
     //ui->DobotQueuedCmdLeftSpaceLabel->
-    //setText(QString::number(nSpace)); //TODO: dobot.cc nie zrobił tego jeszcze- chyba już jest
+    //setText(QString::number(nSpace)); //future: dobot.cc nie zrobił tego jeszcze- chyba już jest
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
@@ -143,7 +140,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->xPTPEdit->setEnabled(false);
         ui->yPTPEdit->setEnabled(false);
         ui->zPTPEdit->setEnabled(false);
-        ui->rPTPEdit->setEnabled(false);
         ui->servoGripperEdit->setEnabled(false);
         ui->calibrateBtn->setEnabled(false);
         ui->upBtn->setEnabled(false);
@@ -162,6 +158,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->homeBtn->setEnabled(false);
         ui->directTcpMsgCheckBox->setEnabled(false);
         ui->moveRestrictionsCheckBox->setEnabled(false);
+        ui->middleAboveBtn->setEnabled(false);
     }
     else
     {
@@ -181,7 +178,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->xPTPEdit->setEnabled(true);
         ui->yPTPEdit->setEnabled(true);
         ui->zPTPEdit->setEnabled(true);
-        ui->rPTPEdit->setEnabled(true);
         ui->servoGripperEdit->setEnabled(true);
         ui->calibrateBtn->setEnabled(true);
         ui->upBtn->setEnabled(true);
@@ -197,6 +193,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->homeBtn->setEnabled(true);
         ui->directTcpMsgCheckBox->setEnabled(true);
         ui->moveRestrictionsCheckBox->setEnabled(true);
+        ui->middleAboveBtn->setEnabled(true);
     }
 }
 
@@ -208,9 +205,11 @@ void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName,
     ui->DeviceInfoLabel->setText(QSdeviceVersion);
 }
 
-void MainWindow::onPTPsendBtnClicked()
+void MainWindow::on_sendBtn_clicked()
 {
     qDebug() << "sendBtn clicked";
+
+    _pChess->getMovementsPointer()->clearMove();
 
     bool bConversionXOk, bConversionYOk, bConversionZOk;
 
@@ -335,12 +334,6 @@ void MainWindow::onJOGCtrlBtnReleased() {
     SetJOGCmd(&jogCmd, false, NULL);
 }
 
-void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged)
-{
-    if (textChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
-    else ui->sendSimulatedMsgBtn->setEnabled(false);
-}
-
 void MainWindow::on_sendSimulatedMsgBtn_clicked()
 {
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
@@ -362,9 +355,9 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_calibrateBtn_clicked()
 {
-    if (ui->xLabel->text().toInt() == _pDobot->getHomePos().x &&
-            ui->yLabel->text().toInt() == _pDobot->getHomePos().y &&
-            ui->zLabel->text().toInt() == _pDobot->getHomePos().z)
+    if (ui->xLabel->text().toInt() == (int)_pDobot->getHomePos().x &&
+            ui->yLabel->text().toInt() == (int)_pDobot->getHomePos().y &&
+            ui->zLabel->text().toInt() == (int)_pDobot->getHomePos().z)
     {
         _pDobot->addArmMoveToQueue(DM_CALIBRATE);
     }
@@ -379,12 +372,18 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_UP);
+    if (_pChess->getMovementsPointer()->isMoveSet())
+        _pDobot->addArmMoveToQueue(DM_UP);
+    else
+        qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_UP);
+    if (_pChess->getMovementsPointer()->isMoveSet())
+        _pDobot->addArmMoveToQueue(DM_DOWN);
+    else
+        qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
@@ -473,20 +472,33 @@ void MainWindow::on_closeGripperBtn_clicked()
     _pDobot->addArmMoveToQueue(DM_CLOSE);
 }
 
+void MainWindow::on_middleAboveBtn_clicked()
+{
+    Point3D mid; //todo: ciągnąc z xml
+    _pDobot->addArmMoveToQueue(mid);
+}
+
 //todo: ogarnąć punkty przejściowe
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawić pierwej jako stałe z xmla
     //todo: bezsensowny zawijaniec przez klasy:
-    this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-    //todo: te liczby nazwać tym gdzie i czym są
-    Point3D rightBottomLowerMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                _pDobot->getHomePos().z);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomLowerMainBoardSafeCorner);
-    Point3D rightBottomHigherMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
+    if (ui->xLabel->text().toInt() == (int)_pDobot->getHomePos().x &&
+            ui->yLabel->text().toInt() == (int)_pDobot->getHomePos().y &&
+            ui->zLabel->text().toInt() == (int)_pDobot->getHomePos().z)
+    {
+        this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
+        //todo: te liczby nazwać tym gdzie i czym są
+        Point3D rightBottomLowerMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
+                                                    _pDobot->getHomePos().z);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomLowerMainBoardSafeCorner);
+        Point3D rightBottomHigherMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
+                                                     _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
+    }
+    else
+        qDebug() << "ERROR: MainWindow::on_startGmPosBtn_clicked(): Dobot not in home positions";
 }
 
 //todo: ogarnąć punkty przejściowe
@@ -513,12 +525,6 @@ void MainWindow::on_SimulateFromUsbBtn_clicked()
     }
 }
 
-void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged)
-{
-    if (textChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
-    else ui->SimulateFromUsbBtn->setEnabled(false);
-}
-
 void MainWindow::on_sendTcpBtn_clicked()
 {
     if (!ui->sendTcpLineEdit->text().isEmpty())
@@ -529,13 +535,6 @@ void MainWindow::on_sendTcpBtn_clicked()
             _pTCPmsg->queueCmd(_pChess->getBotPointer()->getAI() ? ARDUINO : WEBSITE, ui->sendTcpLineEdit->text());
         ui->sendTcpLineEdit->clear();
     }
-}
-
-///todo: tutej rup daley
-void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
-{
-    if (textChanged != NULL) ui->sendTcpBtn->setEnabled(true);
-    else ui->sendTcpBtn->setEnabled(false);
 }
 
 void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
@@ -712,4 +711,49 @@ void MainWindow::showHistoryMoves(QStringList historyMoves)
     }
 
     ui->historyPTE->setPlainText(history);
+}
+
+void MainWindow::on_usbCmdLine_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->sendUsbBtn->setEnabled(true);
+    else ui->sendUsbBtn->setEnabled(false);
+}
+
+void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
+    else ui->sendSimulatedMsgBtn->setEnabled(false);
+}
+
+void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
+    else ui->SimulateFromUsbBtn->setEnabled(false);
+}
+
+void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL) ui->sendTcpBtn->setEnabled(true);
+    else ui->sendTcpBtn->setEnabled(false);
+}
+
+void MainWindow::on_xPTPEdit_textChanged(const QString &textChanged)
+{
+    if (textChanged != NULL || ui->yPTPEdit->text() != NULL || ui->zPTPEdit->text() != NULL)
+        ui->sendBtn->setEnabled(true);
+    else ui->sendBtn->setEnabled(false);
+}
+
+void MainWindow::on_yPTPEdit_textChanged(const QString &textChanged)
+{
+    if (ui->xPTPEdit->text() != NULL || textChanged != NULL || ui->zPTPEdit->text() != NULL)
+        ui->sendBtn->setEnabled(true);
+    else ui->sendBtn->setEnabled(false);
+}
+
+void MainWindow::on_zPTPEdit_textChanged(const QString &textChanged)
+{
+    if (ui->xPTPEdit->text() != NULL || ui->yPTPEdit->text() != NULL  || textChanged != NULL)
+        ui->sendBtn->setEnabled(true);
+    else ui->sendBtn->setEnabled(false);
 }

@@ -9,12 +9,12 @@
 #include "tcpmsgs.h"
 #include "websockets.h"
 #include "arduinousb.h"
-#include "vars/fen_game_state.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_status.h"
 #include "chess/chess_bot.h"
 #include "chess/chess_resets.h"
+#include "chess/chess_conditions.h"
 
 /*todo2: na pierwszy rzut oka i po kolei powinno być widać to tu się dzieje:
 ruch e2e4 wpada do obiektu szachow:
@@ -43,7 +43,8 @@ private:
     ChessMovements* _pMovements;
     ChessBot* _pBot;
     ChessStatus* _pStatus;
-    ChessResets _pResets;
+    ChessResets* _pResets;
+    ChessConditions* _pConditions;
 
     Piece* _pPiece[32];
 
@@ -85,6 +86,7 @@ public:
     ChessBot* getBotPointer() { return _pBot; }
     ChessStatus* getStatusPointer() { return _pStatus; }
     ChessResets* getResetsPointer() { return _pResets; }
+    ChessConditions* getConditionsPointer() { return _pConditions; }
 
 public slots:
     void checkMsgFromWebsockets(QString QStrMsg, Client* pClient);
