@@ -9,6 +9,7 @@
 #include "tcpmsgs.h"
 #include "websockets.h"
 #include "arduinousb.h"
+#include "vars/game_status.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_status.h"
@@ -48,6 +49,9 @@ private:
 
     Piece* _pPiece[32];
 
+    GAME_STATUS _ChessGameStatus;
+    clientRequest _request;
+
     void coreIsReadyForNewGame();
     void playerWantToStartNewGame(PLAYER_TYPE playerType);
     void startNewGameInChenard(bool bService = false);
@@ -72,6 +76,7 @@ public:
     void removeClient(Client* pClient);
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE vertMove = VM_NONE);
+    GAME_STATUS getGameStatus() const { return _ChessGameStatus; }
 
     PLAYER_TYPE getActivePlayerType();
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }

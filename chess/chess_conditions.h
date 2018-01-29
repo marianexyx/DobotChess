@@ -20,21 +20,16 @@ class ChessConditions
 private:
     Chess* _pChess;
 
-    clientRequest _request;
-
-    bool isRequestParameterInProperFormat();
+    bool isRequestParameterInProperFormat(clientRequest request);
+    bool isRequestAppropriateToGameStatus(REQUEST_TYPE Type);
+    bool isSenderAppropriate(Client* pSender, REQUEST_TYPE Type);
+    bool isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request);
 
 public:
     ChessConditions(Chess* pChess);
-    ~ChessConditions();
 
-    //todo: private- które?
-    bool isMsgFromClientCanBeAccepted(QString QStrMsg);
-    bool isRequestAppropriateToGameStatus(QString QStrMsg, bool bErrorLog = false);
-    bool isSenderAppropriate(QString QStrMsg, bool bErrorLog = false);
-    bool isThereAnySpecialConditionBeenMet(QString QStrMsg, bool bErrorLog = false);
-
-    QString extractParameter(QString QStrRequest);
+    bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender);
+    QString extractParameter(REQUEST_TYPE Type, QString QStrRequest);
 
     clientRequest getClientRequest() const { return _request; }
 };

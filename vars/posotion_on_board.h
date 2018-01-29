@@ -135,8 +135,8 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
         if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)
             return false;
 
-        if (QString::number(QStrMoveFromTo.mid(2,1)) < 1 ||
-                QString::number(QStrMoveFromTo.mid(2,1)) > 8)
+        if (QString::number(QStrMoveFromTo.mid(2,1)) < D_1 ||
+                QString::number(QStrMoveFromTo.mid(2,1)) > D_8)
         {
             qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceFromDigit is out"
                         " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.mid(2,1));
@@ -146,19 +146,17 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
         if (pieceLetterPos(QStrMoveFromTo.mid(3,1)) == L_X)
             return false;
 
-        if (QString::number(QStrMoveFromTo.mid(4,1)) < 1 ||
-                QString::number(QStrMoveFromTo.mid(4,1)) > 8)
+        if (QString::number(QStrMoveFromTo.mid(4,1)) < D_1 ||
+                QString::number(QStrMoveFromTo.mid(4,1)) > D_8)
         {
             qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceToDigit is out"
                         " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
             return false;
         }
 
-        if (QStrMoveFromTo.length() == 5)
-        {
-            if (!ChessStatus::isMovePromotion(QStrMoveFromTo), true)
-                return false;
-        }
+        if (QStrMoveFromTo.length() == 5 &&
+                !ChessStatus->isSignProperPromotionType(QStrMoveFromTo.right(1), SHOW_ERRORS))
+            return false;
     }
     else
     {

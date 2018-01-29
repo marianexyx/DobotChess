@@ -369,6 +369,12 @@ QString Clients::getClientName(Client client)
     return "";
 }
 
+bool Clients::isClientLoggedIn(Client client)
+{
+    if (!this->getClientName(client).isEmpty()) return true;
+    else return false;
+}
+
 Client Clients::getNextQueuedClient()
 {
     int64_t minQueue = std::numeric_limits<int64_t>::max();
@@ -475,13 +481,18 @@ PLAYER_TYPE Clients::getClientType(Client client)
     return PT_NONE;
 }
 
-bool Clients::isPlayerChairEmpty(PLAYER_TYPE type)
+bool Clients::isPlayerChairEmpty(PLAYER_TYPE type, bool bErrorLog = false)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.type == type)
             return false;
     }
+
+    if (bErrorLog)
+        qDebug() << "ERROR: Clients::isPlayerChairEmpty():" << playerTypeAsQStr(type)
+                 << "player chair is empty";
+
     return true;
 }
 
@@ -583,13 +594,17 @@ bool Clients::isClientInQueue(Client client)
     return false;
 }
 
-bool Clients::isClientNameExists(QString name)
+bool Clients::isClientNameExists(QString name, bool bErrorLog = false)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.name == name)
             return true;
     }
+
+    if (bErrorLog)
+        qDebug() << "ERROR: Clients::isClientNameExists(): name:" << name << "already exists";
+
     return false;
 }
 
@@ -617,13 +632,18 @@ int Clients::getAmountOfQueuedClients()
     else return 0;
 }
 
-bool Clients::isClientAPlayer(Client client)
+bool Clients::isClientAPlayer(Client client, bool bErrorLog = false)
 {
     if (this->getClientType(client) == PT_WHITE ||
             this->getClientType(client) == PT_BLACK )
         return true;
-    else return false;
+    else
+    {
+        if (bErrorLog)
+            qDebug() << "ERROR: Clients::isClientAPlayer(): client isnt a player";
 
+        return false;
+    }
 }
 
 bool Clients::isClientIDExists(int64_t ID)

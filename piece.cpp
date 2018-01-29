@@ -105,7 +105,7 @@ static QString Piece::name(short sPieceNr)
     case 6: case 7: case 8: case 30: case 31: case 32:
         QStrName += "2"; break;
     default:
-        QStrName += QString::number(sPieceNr - static_cast<int(_PieceColor)*8);
+        QStrName += QString::number(sPieceNr - static_cast<int>(_PieceColor)*8);
     }
 
     return QStrName;

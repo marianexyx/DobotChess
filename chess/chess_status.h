@@ -30,7 +30,8 @@ public:
     bool isMoveRemoving();
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
-    static bool isMovePromotion(QString QStrMoveToTest, bool bErrorLog = false);
+    static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
+    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     void saveStatusData(QString status);
     void resetStatusData();
 

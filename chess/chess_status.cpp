@@ -16,19 +16,29 @@ bool ChessStatus::isMoveRemoving()
     else return false;
 }
 
-static bool ChessStatus::isMovePromotion(QString QStrMoveToTest, bool bErrorLog = false)
+static bool ChessStatus::isSignProperPromotionType(QString QStrSign, bool bErrorLog = false)
 {
-    if ((QStrMoveToTest.right(1) == "q" || QStrMoveToTest.right(1) == "Q" ||
-         QStrMoveToTest.right(1) == "r" || QStrMoveToTest.right(1) == "R" ||
-         QStrMoveToTest.right(1) == "b" || QStrMoveToTest.right(1) == "B" ||
-         QStrMoveToTest.right(1) == "k" || QStrMoveToTest.right(1) == "K")
-            && QStrMoveToTest.length() == 5 )
+    if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "k" ||
+            QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "K")
         return true;
     else
     {
         if (bErrorLog)
-            qDebug() << "ERROR:: ChessStatus::isMovePromotion(): it's not. Move ="
-                     << QStrMoveToTest;
+            qDebug() << "ERROR:: ChessStatus::isSignProperPromotionType(): it's not. "
+                        "Sign =" << QStrSign;
+        return false;
+    }
+}
+
+static bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog = false)
+{
+    if (this->isSignProperPromotionType(QStrMove.right(1), SHOW_ERRORS)
+            && QStrMove.length() == 5)
+        return true;
+    else
+    {
+        if (bErrorLog)
+            qDebug() << "ERROR:: ChessStatus::isMovePromotion(): it's not. Move =" << QStrMove;
         return false;
     }
 }
@@ -55,9 +65,9 @@ bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
     PosFromTo MoveFrom = _pChess->getMovementsPointer()->getMove().from;
     PIECE_TYPE PieceType = _pBoardMain->getField(MoveFrom)->getPieceOnField()->getType();
-    if ((PieceType == P_PAWN && ((Piece::Color(PieceType) == PT_WHITE && _WhoseTurn == WHITE_TURN)
-            || (Piece::Color(PieceType) == PT_BLACK && _WhoseTurn == BLACK_TURN))) &&
-            QStrMoveToTest.right(2) == _QStrEnpassant)
+    if (QStrMoveToTest.right(2) == _QStrEnpassant && (PieceType == P_PAWN &&
+         ((Piece::Color(PieceType) == PT_WHITE && _WhoseTurn == WHITE_TURN)
+            || (Piece::Color(PieceType) == PT_BLACK && _WhoseTurn == BLACK_TURN))))
         return true;
     else return false;
 }
@@ -90,9 +100,9 @@ void ChessStatus::saveStatusData(QString status)
         qDebug() << "ChessStatus::saveStatusData(): QStrEnpassant =" << _QStrEnpassant;
         emit _pChess->setBoardDataLabel(_QStrEnpassant, BDL_ENPASSANT);
 
-        QString QStrHalfmoveClock = QStrFENRecord.at(5);
-        QString QStrFullmoveNumber = QStrFENRecord.at(6);
-        emit _pChess->setBoardDataLabel(QStrHalfmoveClock + "/" + QStrFullmoveNumber , BDL_MOVES);
+        QString QStrHalfMoveClock = QStrFENRecord.at(5);
+        QString QStrFullMoveNr = QStrFENRecord.at(6);
+        emit _pChess->setBoardDataLabel(QStrHalfMoveClock + "/" + QStrFullMoveNr, BDL_MOVES);
     }
     else
         qDebug() << "ERROR: ChessStatus::saveStatusData(): wrong QStrFENRecord size ="

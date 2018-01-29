@@ -21,6 +21,9 @@ Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
 
     _PlayerSource = PlayerSource;
 
+    _ChessGameStatus = GS_ERROR;
+    _request.clear();
+
     for (int i=1; i>=32; ++i)
         *_pPiece[i] = new Piece(i);
 
@@ -327,7 +330,7 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
     }
 }
 
-//todo: pociąć tą funkcję na mniejsze kawałki
+//todo: pociąć tą funkcję na mniejsze kawałki (przerobić ją podobnie jak checkMsgFromWebsockets
 void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 {
     qDebug() << "Chess::checkMsgFromChenard(): tcpMsgType=" << tcpMsgType <<
@@ -400,6 +403,17 @@ void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
 void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
 {
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
+
+    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, pClient))
+    {
+        _request.type = requestType(QStrMsg, SHOW_ERRORS);
+        _request.parameter = _pConditions->extractParameter(_request.type, QStrMsg);
+    }
+    else
+    {
+        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): client request cannot be accepted";
+        return;
+    }
 
     if (QStrMsg == "newGame")
     {
