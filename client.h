@@ -20,13 +20,13 @@ struct Client //todo: class friend to Clients
     bool isStartClickedByPlayer;
     int64_t queue;
 
-    bool operator ==(const struct Client& st)
+    bool operator ==(const struct Client& cl)
     {
-        return socket == st.socket &&
-                name == st.name &&
-                type == st.type &&
-                isStartClickedByPlayer == st.isStartClickedByPlayer &&
-                queue == st.queue;
+        return socket == cl.socket &&
+                name == cl.name &&
+                type == cl.type &&
+                isStartClickedByPlayer == cl.isStartClickedByPlayer &&
+                queue == cl.queue;
     }
 };
 
@@ -35,9 +35,9 @@ class Clients
 private:
     QList<Client> _clients;
 public:
-    Clients() {}
+    Clients(): _clients() {}
 
-    void newClient(QWebSocket *clientSocket);
+    void newClient(QWebSocket* pClientSocket);
     //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w działaniu
     void setClientName(Client client, QString name);
     void setPlayerType(Client client, PLAYER_TYPE type);
@@ -52,7 +52,7 @@ public:
 
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(Client client);
-    Client* getClient(QWebSocket *clientSocket);
+    Client* getClient(QWebSocket* pClientSocket);
     Client* getClient(int64_t clientID);
     Client* getPlayer(PLAYER_TYPE type); //todo: typy z dużych? poczytać
     QWebSocket* getClientSocket(QString playerName);

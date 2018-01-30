@@ -25,13 +25,13 @@ class Websockets: public QObject
 
 private:
     QWebSocketServer* _pWebSocketServer;
-    Clients* _pClients;
+    Clients* _pClientsList;
 
 private Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
     void socketDisconnected();
 
 public:
-    Websockets(Clients* pClients, quint16 port, QObject* parent = Q_NULLPTR);
+    Websockets(Clients* pClientsList, quint16 port, QObject* parent = Q_NULLPTR);
     ~Websockets();
 
 public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow

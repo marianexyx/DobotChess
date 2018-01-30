@@ -2,9 +2,9 @@
 
 //TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian tylko kalibracyjnych
 
-Dobot::Dobot(ArduinoUsb *pArduinoUsb)
+Dobot::Dobot(ArduinoUsb *pUsb)
 {
-    _pArduinoUsb = pArduinoUsb;
+    _pUsb = pUsb;
 
     _pQueue = new DobotQueue(*this);
     _pServo = new DobotServo(*this);

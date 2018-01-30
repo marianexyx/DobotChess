@@ -10,11 +10,11 @@ TCPMsgs::TCPMsgs()
 void TCPMsgs::queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd)
 {
     qDebug() << "TCPMsgs::queueCmd(): cmd =" << QStrCmd << ", sender ="
-             << communicationTypeAsQStr(nSender);
+             << communicationTypeAsQStr(Sender);
 
     TcpMsgMetadata QStrReceivedData;
     QStrReceivedData.ullTcpID = ++_n64CmdID;
-    QStrReceivedData.nSender = nSender;
+    QStrReceivedData.nSender = Sender;
     QStrReceivedData.QStrMsgForTcp = QStrCmd;
     TCPMsgsList << QStrReceivedData;
     if (!TCPMsgsList.isEmpty() && !_bWaitingForReadyRead)

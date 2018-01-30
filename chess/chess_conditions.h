@@ -5,14 +5,17 @@
 #include "chess.h"
 #include "vars/request_types.h"
 
+//future: wszystkie errory zapisywać w plikach z logami, z oznaczeniami kto, co, kiedy...
+//...wysyłał i w jakich okolicznościach
+
 struct clientRequest
 {
     REQUEST_TYPE type;
-    QString parameter;
+    QString param;
 
-    clientRequest() { request = RT_NONE; parameter.clear(); }
-    clientRequest(REQUEST_TYPE req, QString par) { request = req; parameter = par; }
-    void clear() { request = RT_NONE; parameter.clear(); }
+    clientRequest() { request = RT_NONE; param.clear(); }
+    clientRequest(REQUEST_TYPE req, QString par) { request = req; param = par; }
+    void clear() { request = RT_NONE; param.clear(); }
 };
 
 class ChessConditions

@@ -7,19 +7,19 @@ ChessConditions::ChessConditions(Chess* pChess)
 
 bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender)
 {
-    clientRequest request;
+    clientRequest r;
 
     if (requestType(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;
-    request.type = requestType(QStrMsg, SHOW_ERRORS);
-    request.parameter = this->extractParameter(request.type, QStrMsg);
+    r.type = requestType(QStrMsg, SHOW_ERRORS);
 
-    if (!this->isRequestParameterInProperFormat(request)) return false;
-    if (!this->isRequestAppropriateToGameStatus(request.type)) return false;
-    if (!this->isSenderAppropriate(pSender, request.type)) return false;
-    if (!this->isThereAnySpecialConditionBeenMet(pSender, request)) return false;
+    if (r.type == RT_MOVE || r.type == RT_SIT_ON || r.type == RT_IM || r.type == RT_PROMOTE_TO)
+        r.param = this->extractParameter(r.type, QStrMsg);
 
-    //todo: przejechać się po wszystkich tych warunkach z innego kodu i zobaczyć czy...
-    //...czegoś nie pominąłem. zrobić to podczas jego usuwania
+    if (!this->isRequestParameterInProperFormat(r)) return false;
+    if (!this->isRequestAppropriateToGameStatus(r.type)) return false;
+    if (!this->isSenderAppropriate(pSender, r.type)) return false;
+    if (!this->isThereAnySpecialConditionBeenMet(pSender, r)) return false;
+
     return true;
 }
 
@@ -30,31 +30,23 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
     switch(request.type)
     {
     case RT_MOVE:
-    {
-        if (pMovements->findMoveType(request.parameter) == ST_NONE ||
-                pMovements->findMoveType(request.parameter) == ST_PROMOTE_TO_WHAT)
+        if (pMovements->findMoveType(request.param) == ST_NONE ||
+                pMovements->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
             return false;
         else return true;
-    }
     case RT_SIT_ON:
-    {
-        if (playerTypeFromQStr(request.parameter) != PT_WHITE &&
-                playerTypeFromQStr(request.parameter) != PT_BLACK)
+        if (playerTypeFromQStr(request.param) != PT_WHITE &&
+                playerTypeFromQStr(request.param) != PT_BLACK)
             return false;
         else return true;
-    }
     case RT_IM:
-    {
-        if (request.parameter.isEmpty())
+        if (request.param.isEmpty())
             return false;
         else return true;
-    }
     case RT_PROMOTE_TO:
-    {
-        if (ChessStatus::isSignProperPromotionType(request.parameter))
+        if (ChessStatus::isSignProperPromotionType(request.param))
             return true;
         else return false;
-    }
     default:
         qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): unknown "
                     "_request.type:" << requestTypeAsQStr(request.type);
@@ -82,20 +74,16 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type)
     switch(Type)
     {
     case RT_NONE:
-    {
         qDebug() << "ERROR: ChessConditions::isRequestAppropriateToGameStatus(): Type = RT_NONE";
         return false;
-    }
     case RT_NEW_GAME: return Status == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS ? true : false;
     case RT_MOVE: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
     case RT_GIVE_UP: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
     case RT_SIT_ON: return Status == GS_TURN_NONE_WAITING_FOR_PLAYERS ? true : false;
-    case RT_STAND_UP: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
+    case RT_STAND_UP: return whoseTurnFromGameStatus(Status) == NO_TURN ? true : false;
     case RT_PROMOTE_TO:
-    {
         if (Status == GS_TURN_WHITE_PROMOTE || Status == GS_TURN_BLACK_PROMOTE) return true;
         else return false;
-    }
     case RT_QUEUE_ME: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
     default: return true;
     }
@@ -103,95 +91,77 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type)
 
 bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
-    Clients* pClients = _pChess->getClientsPointer();
+    Clients* pClientsList = _pChess->getClientsPointer();
 
-    if (!pClients->isClientInList(pSender)) return false;
+    if (!pClientsList->isClientInList(pSender)) return false;
 
-    bool bLogged = pClients->isClientLoggedIn(pSender);
-    bool bSittingOnChair = pClients->isClientAPlayer(pSender);
-    bool bInQueue = pClients->isClientInQueue(pSender);
+    bool bLogged = pClientsList->isClientLoggedIn(pSender);
+    bool bSittingOnChair = pClientsList->isClientAPlayer(pSender);
+    bool bInQueue = pClientsList->isClientInQueue(pSender);
 
     switch(Type)
     {
     case RT_NONE:
-    {
         qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = RT_NONE";
         return false;
-    }
     case RT_NEW_GAME:
     case RT_MOVE:
     case RT_GIVE_UP:
     case RT_STAND_UP:
     case RT_PROMOTE_TO:
-    {
         if (bSittingOnChair && !bInQueue) return true;
         else return false;
-    }
     case RT_SIT_ON:
-    case RT_IM:
     case RT_QUEUE_ME:
-    {
         if (bLogged && !bSittingOnChair && !bInQueue) return true;
         else return false;
-    }
     case RT_LEAVE_QUEUE:
-    {
         if (bLogged && !bSittingOnChair && bInQueue) return true;
         else return false;
-    }
     default: return true; //case getTableDataAsJSON
     }
 }
 
 bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request)
 {
-    Clients* pClients = _pChess->getClientsPointer();
+    Clients* pClientsList = _pChess->getClientsPointer();
     ChessStatus* pStatus = _pChess->getStatusPointer();
 
     switch(request.type)
     {
     case RT_NONE:
-    {
         qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = RT_NONE";
         return false;
-    }
     case RT_MOVE:
     case RT_PROMOTE_TO:
-    {
-        if ((pClients->getClientType(pSender) == PT_WHITE
+        if ((pClientsList->getClientType(pSender) == PT_WHITE
              && pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (pClients->getClientType(pSender) == PT_BLACK
+                (pClientsList->getClientType(pSender) == PT_BLACK
                  && pStatus->getWhoseTurn() == BLACK_TURN))
             return true;
         else return false;
-    }
     case RT_SIT_ON:
-    {
-        PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.parameter);
-        if (pClients->isPlayerChairEmpty(PlayerChair, SHOW_ERRORS) &&
-                !pClients->isClientAPlayer(pSender, SHOW_ERRORS))
+        PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
+        if (pClientsList->isPlayerChairEmpty(PlayerChair, SHOW_ERRORS) &&
+                !pClientsList->isClientAPlayer(pSender, SHOW_ERRORS))
             return true;
         else return false;
-    }
-    case RT_IM: //todo: double login obłusigwać poza ChessConditions
-    {
-        if (pSender->name.isEmpty() && !pClients->isClientNameExists(pSender->name, SHOW_ERRORS))
+    case RT_IM: //name == empty || name = actual
+        if (pSender->name.isEmpty() || pClientsList->getClientName(pSender) == request.param)
             return true;
         else return false;
-    }
     case RT_QUEUE_ME:
-    {
-        if (pClients->isGameTableOccupied())
+        if (pClientsList->isGameTableOccupied())
             return true;
         else return false;
-    }
     case RT_LEAVE_QUEUE:
-    {
-        if (pClients->isClientInQueue(pSender))
+        if (pClientsList->isClientInQueue(pSender))
             return true;
         else return false;
-    }
+    case RT_CLIENT_LEFT:
+        if (pClientsList->isClientInList(pSender))
+            return true;
+        else return false;
     default: return true;
     }
 }
-

@@ -10,6 +10,7 @@ class ChessStatus
 private:
     Chess* _pChess;
     Chessboard* _pBoardMain;
+    Clients* _pClientsList;
 
     END_TYPE _FENGameState;
     WHOSE_TURN _WhoseTurn;
@@ -53,6 +54,7 @@ public:
     QString getHisotyMovesAsQStr() const { return _historyMoves.join(" "); }
     QString getCastlings() const { return _QStrCastlings; }
     QString getEnpassant() const { return _QStrEnpassant; }
+    PLAYER_TYPE getActivePlayerType();
 
     void clearLegalMoves() { _legalMoves.clear();
                              emit _pChess->showLegalMoves(_legalMoves);}

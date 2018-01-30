@@ -1,9 +1,11 @@
 #include "websockets.h"
 
-Websockets::Websockets(Clients* pClients, quint16 port, QObject* parent): //todo: pClients??
+Websockets::Websockets(Clients* pClientsList, quint16 port, QObject* parent):
     QObject(parent),
-    _pClients()
+    _pClientsList()
 {
+    _pClientsList = pClientsList;
+
     _pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
                                               QWebSocketServer::NonSecureMode, this);
     if (_pWebSocketServer->listen(QHostAddress::Any, port))
@@ -20,7 +22,7 @@ Websockets::~Websockets()
     _pWebSocketServer->close();
 
     //future: póki mam jednen obiekt/ramię to nie jest mi to potrzebne
-    //qDeleteAll(_pClients.begin(), _pClients.end());
+    //qDeleteAll(_pClientsList.begin(), _pClientsList.end());
 }
 
 void Websockets::onNewConnection()
@@ -32,11 +34,11 @@ void Websockets::onNewConnection()
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
     this->newClient(pSocket);
     emit this->addTextToLogPTE("New connection \n", LOG_WEBSOCKET);
-    _pClients->showClientsInForm();
+    _pClientsList->showClientsInForm();
 }
 
-//Q_FOREACH (QWebSocket *pNextClient, _pClients) ma być depreciated
-//na korzyść: "for (QWebSocket *pClient : qAsConst(_pClients))"
+//Q_FOREACH (QWebSocket *pNextClient, _pClientsList) ma być depreciated
+//na korzyść: "for (QWebSocket *pClient : qAsConst(_pClientsList))"
 //póki nie zmieniam wersji to może tak zostać
 
 //TODO: obsuga komend serwisowych przez websockety
@@ -48,7 +50,7 @@ void Websockets::receivedMsg(QString QStrMsg)
     else return;
 
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-    emit this->msgFromWebsocketsToChess(QStrMsg, _pClients->getClient(pSocket));
+    emit this->msgFromWebsocketsToChess(QStrMsg, _pClientsList->getClient(pSocket));
 }
 
 void Websockets::sendMsgToClient(QString QStrMsg, Client* pClient)
@@ -72,12 +74,12 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
     emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
-    Q_FOREACH (Client client, _pClients->getClientsList())
+    Q_FOREACH (Client client, _pClientsList->getClientsList())
         client.socket->sendTextMessage(QStrMsg);
 }
 
 void Websockets::socketDisconnected()
 {
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-    emit this->msgFromWebsocketsToChess("clientLeft", _pClients->getClient(pSocket));
+    emit this->msgFromWebsocketsToChess("clientLeft", _pClientsList->getClient(pSocket));
 }

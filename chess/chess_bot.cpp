@@ -1,9 +1,9 @@
 #include "chess_bot.h"
 
-ChessBot::ChessBot(Chess *pChess, ArduinoUsb *pArduinoUsb)
+ChessBot::ChessBot(Chess *pChess, ArduinoUsb *pUsb)
 {
     _pChess = pChess;
-    _pArduinoUsb = pArduinoUsb;
+    _pUsb = pUsb;
 
     _bAI = false;
     _bUndo = false;

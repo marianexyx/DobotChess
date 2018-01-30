@@ -28,8 +28,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
-                        Chessboard* pBoardRemoved, TCPMsgs* pTCPmsg, ArduinoUsb* pArduinoUsb,
-                        Dobot* pDobot, Chess* pChess, Client* pClient, QWidget* parent = 0);
+                        Chessboard* pBoardRemoved,  Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
+                        ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Client* pClient,
+                        QWidget* parent = 0);
 
     virtual ~MainWindow();
 
@@ -40,8 +41,9 @@ private:
     Websockets* _pWebSockets;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
+    Chessboard* _pBoardChenard;
     TCPMsgs* _pTCPmsg;
-    ArduinoUsb* _pArduinoUsb;
+    ArduinoUsb* _pUsb;
     Client* _pClient;
     Chess* _pChess;
 
@@ -55,8 +57,8 @@ private slots:
     //sloty do używania GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG msgType);
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType);
-    void showBoard(QString QStrBoard);
-    void clearFormBoard();
+    void showBoardInUI(QString QStrBoard, BOARD BoardType);
+    void clearBoardInUI();
     void showLegalMoves(QStringList legalMoves);
     void showHistoryMoves(QStringList historyMoves);
 
@@ -80,7 +82,7 @@ private slots:
     void on_resetDobotIndexBtn_clicked();
     void on_AIBtn_clicked();
     void on_AIEnemySendBtn_clicked();
-    void showClientsList(QList<Clients> list);
+    void showClientsList(QList<Client> list);
 
     //arduino usb slots
     void updatePortsComboBox(int nUsbPorst);

@@ -76,7 +76,8 @@ HEADERS  +=  \
     dobot/dobot_queue.h \
     dobot/dobot_servo.h \
     chess/chess_conditions.h \
-    vars/request_types.h
+    vars/request_types.h \
+    vars/chenard_io_msgs.h
 
 FORMS    += mainwindow.ui
 

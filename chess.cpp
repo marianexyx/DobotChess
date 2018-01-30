@@ -1,8 +1,8 @@
 #include "chess.h"
 
-Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
-             Chessboard *pBoardRemoved, ArduinoUsb *pUsb, Websockets* pWebsockets,
-             TCPMsgs *pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
+Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
+             Chessboard *pBoardRemoved, Chessboard *pBoardChenard, ArduinoUsb *pUsb,
+             Websockets* pWebsockets, TCPMsgs *pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
     _pTimers = new ChessTimers(*this);
     _pMovements = new ChessMovements(*this);
@@ -11,10 +11,11 @@ Chess::Chess(Clients *pClients, Dobot *pDobot, Chessboard *pBoardMain,
     _pResets = new ChessResets(*this) ;
     _pConditions = new ChessConditions(*this);
 
-    _pClients = pClients;
+    _pClientsList = pClientsList;
     _pDobot = pDobot;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
+    _pBoardChenard = pBoardChenard;
     _pWebsockets = pWebsockets;
     _pTCPMsgs = pTCPMsgs;
     _pUsb = pUsb;
@@ -42,6 +43,271 @@ Chess::~Chess()
     delete _pStatus;
     delete _pResets;
     delete _pConditions;
+}
+
+void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
+{
+    emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
+
+    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, pClient))
+    {
+        _request.type = requestType(QStrMsg, SHOW_ERRORS);
+        _request.param = _pConditions->extractParameter(_request.type, QStrMsg);
+    }
+    else
+    {
+        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): client request can't be accepted";
+        return;
+    }
+
+    switch(_request.type)
+    {
+    case RT_NEW_GAME:
+        if (pClient == _pClientsList->getPlayer(PT_WHITE))
+            this->playerWantToStartNewGame(PT_WHITE);
+        else if (pClient == _pClientsList->getPlayer(PT_BLACK))
+            this->playerWantToStartNewGame(PT_BLACK);
+        break;
+    case RT_PROMOTE_TO:
+        request.param = _pMovements->getMove().asQStr() + request.param; //w/o break
+    case RT_MOVE:
+        this->manageMoveRequest(_request.param);
+        break;
+    case RT_GET_TABLE_DATA:
+        this->sendDataToClient(this->getTableData(), pClient);
+        break;
+    case RT_GIVE_UP:
+        _pResets->restartGame(ET_GIVE_UP, pClient);
+        break;
+    case RT_SIT_ON:
+        _pClientsList->setPlayerType(pClient, playerTypeFromQStr(_request.param));
+        if (_pClientsList->isGameTableOccupied())
+            _pTimers->startQueueTimer();
+        this->sendDataToAllClients(this->getTableData());
+        break;
+    case RT_STAND_UP:
+        _pClientsList->clearPlayerType(_pClientsList->getClientType(pClient));
+        this->sendDataToAllClients(this->getTableData());
+        break;
+    case RT_IM:
+        this->newClientName(pClient, _request);
+        break;
+    case RT_QUEUE_ME:
+        _pClientsList->addClientToQueue(pClient);
+        this->sendDataToAllClients(this->getTableData());
+        break;
+    case RT_LEAVE_QUEUE:
+        _pClientsList->removeClientFromQueue(pClient);
+        this->sendDataToAllClients(this->getTableData());
+        break;
+    case RT_CLIENT_LEFT:
+        this->removeClient(pClient);
+        break;
+    default:
+        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received _request.type:"
+                          << _request.type;
+    }
+
+    _pClientsList->showClientsInForm();
+}
+
+void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
+{
+    qDebug() << "Chess::checkMsgFromChenard(): QStrTcpMsgType=" << QStrTcpMsgType
+             << ", QStrTcpRespond:" << QStrTcpRespond;
+
+    if(_PlayerSource == ARDUINO)
+        this->checkAI();
+
+    CHENARD_MSG_TYPE ProcessedChenardMsgType = ChenardMsgType(QStrTcpMsgType);
+    if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpMsgType, SHOW_ERRORS)) return;
+
+    switch(ProcessedChenardMsgType)
+    {
+    case CMT_NEW:
+        this->startNewGameInCore();
+        break;
+    case CMT_STATUS:
+        _pStatus->saveStatusData(QStrTcpRespond);
+
+        if (_pStatus->getFENGameState() == ET_NONE)
+        {
+            this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_HISTORY));
+            this->continueGameplay(); //future: zrobić to kiedyś tak by dopiero w...
+            //...odpowiedzi na legal core wysyłał na stronę potwiedzenie wykonania...
+            //...ruchu (tj. zdjął blokadę przed kojenym ruchem)
+        }
+        else //ET_WHIE_WON, ET_BLACK_WON, ET_DRAW
+            _pResets->restartGame(_pStatus->getFENGameStateAsEndType());
+        break;
+    case CMT_LEGAL:
+        _pStatus->setLegalMoves(QStrTcpRespond);
+        break;
+    case CMT_HISTORY:
+        _pStatus->historyOk(QStrTcpRespond);
+        this->sendDataToAllClients("history " + _pStatus->getHisotyMovesAsQStr());
+        this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
+        break;
+    case CMT_MOVE:
+        this->continueGameplay();
+        break;
+    case CMT_THINK:
+        if (_PlayerSource == ARDUINO)
+            _pBot->undoOk();
+        else qDebug() << "ERROR: Chess::checkMsgFromChenard(): ProcessedChenardMsgType = "
+                         "CMT_THINK, but _PlayerSource != ARDUINO";
+        break;
+    case CMT_UNDO:
+        if (_PlayerSource == ARDUINO)
+            _pBot->thinkOk(QStrTcpRespond); //f.e.: QStrTcpRespond = "OK d1h5 Qh5#"
+        else qDebug() << "ERROR: Chess::checkMsgFromChenard(): ProcessedChenardMsgType = "
+                         "CMT_UNDO, but _PlayerSource != ARDUINO";
+        break;
+    default:
+        qDebug() << "ERROR: Chess:checkMsgFromChenard(): unknown ProcessedChenardMsgType:"
+                  << ProcessedChenardMsgType;
+    }
+}
+
+void Chess::checkMsgFromUsb(QString QStrMsg)
+{ //future:
+    if (QStrMsg == "start") //queue to tcp msg "think 5000"
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "move")
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "reset") //resetPiecePositions()
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "promoteTo")
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else
+        qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
+}
+
+void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
+{
+    if (playerType == PT_WHITE)
+    {
+        qDebug() << "Chess::playerWantToStartNewGame(): white";
+        _pClientsList->setClientState(PT_WHITE, true);
+    }
+    else if (playerType == PT_BLACK)
+    {
+        _pClientsList->setClientState(PT_BLACK, true);
+        qDebug() << "Chess::playerWantToStartNewGame(): black";
+    }
+    else if (_PlayerSource == ARDUINO)
+        qDebug() << "Chess::playerWantToStartNewGame()";
+    else
+        qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame "
+                     "val:" << playerTypeAsQStr(playerType);
+
+    if (_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers()
+            || _PlayerSource == ARDUINO || bService)
+    {
+        qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
+                    "Try to start a game";
+        _pTimers->stopQueueTimer();
+        this->startNewGameInChenard();
+        _pClientsList->setClientState(PT_WHITE, false);
+        _pClientsList->setClientState(PT_BLACK, false);
+    }
+}
+
+void Chess::startNewGameInChenard(bool bService = false)
+{
+    if (_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers()
+            || _PlayerSource == ARDUINO || bService)
+    {
+        this->sendMsgToTcp("new");
+    }
+    else
+        qDebug() << "ERROR: Chess::startNewGameInChenard(): game couldn't start";
+}
+
+void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
+{
+    qDebug() << "Chess::tellPlayerThatHeGaveBadMove():" << QStrMsg;
+    QString QStrMsgForActivePlayer = "badMove " + QStrMsg + " "
+            + turnTypeAsQstr(_pStatus->getWhoseTurn());
+    Client* pPlayer = _pClientsList->getPlayer(_pStatus->getActivePlayerType());
+
+    this->sendDataToClient(QStrMsgForActivePlayer, pPlayer);
+}
+
+void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
+                                              VERTICAL_MOVE vertMove = VM_NONE)
+{
+    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), true) return;
+
+    if (vertMove == VM_GRAB)
+    {
+        if (!this->isPieceSetOk()) return;
+        if (pField->getPieceOnField(true) == nullptr) return;
+
+        emit this->addTextToLogPTE("Queue: grab piece " + pField->getPieceOnField()->getNr() +
+                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
+                                   " from field " + pField->getNrAsQStr(), LOG_CORE);
+        _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
+        pRealBoard->clearField(pField);
+
+        if (!this->isPieceSetOk()) return;
+    }
+    else if (vertMove == VM_PUT)
+    {
+        if (!this->isPieceSetOk()) return;
+
+        emit this->addTextToLogPTE("Queue: put piece " + _pPiece[_pDobot->getItemInGripper()] +
+                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
+                                   " on field " + pField->getNrAsQStr(), LOG_CORE);
+        pRealBoard->setPieceOnField(_pPiece[_pDobot->getItemInGripper()], pField);
+        _pDobot->clearGripper();
+
+        if (!this->isPieceSetOk()) return;
+    }
+
+    Point3D xyz = pField->getLocation3D();
+    _pDobot->doMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
+}
+
+void Chess::sendMsgToTcp(QString QStrMsg)
+{
+    emit this->addTextToLogPTE("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
+
+    _pTCPMsgs->queueCmd(_PlayerSource, QStrMsg);
+}
+
+void Chess::newClientName(Client* pClient, clientRequest request)
+{
+    if (!_pClientsList->isClientNameExists(request.param))
+    {
+        _pClientsList->setClientName(pClient, request.param);
+        this->sendDataToClient(this->getTableData(), pClient);
+    }
+    else //double login
+    {
+        _pClientsList->getClientSocket(request.param)->sendTextMessage("logout:doubleLogin");
+        if (_pClientsList->isClientAPlayer(pClient))
+            _pResets->restartGame(ET_SOCKET_LOST, pClient);
+        _pClientsList->setClientName(pClient, request.param);
+    }
+}
+
+void Chess::removeClient(Client* pClient)
+{
+    if (_pClientsList->isClientAPlayer(pClient))
+    {
+        emit this->addTextToLogPTE(playerTypeAsQStr(pClient->type)
+                                   + " player disconnected\n", LOG_CORE);
+        _pResets->restartGame(ET_SOCKET_LOST, pClient);
+    }
+    else //future: strange behavior with those info- seen more often then we should
+        emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
+
+    _pClientsList->removeClient(pClient);
+
+    emit this->setBoardDataLabel(std::to_string(_pClientsList->getClientsList().size()).c_str(),
+                            BDL_SOCKETS_ONLINE);
+    emit _pClientsList->showClientsList(_pClientsList->getClientsList());
 }
 
 void Chess::sendDataToClient(QString QStrMsg, Client* pClient = nullptr)
@@ -89,6 +355,61 @@ void Chess::sendDataToAllClients(QString QStrMsg)
                  << communicationTypeAsQStr(_PlayerSource);
 }
 
+void Chess::coreIsReadyForNewGame()
+{
+    qDebug() << "Chess::coreIsReadyForNewGame()";
+
+    if (_PlayerSource == WEBSITE)
+    {
+        if (_pClientsList->isGameTableOccupied())
+            _pTimers->startQueueTimer();
+
+        this->sendDataToAllClients("resetComplited");
+    }
+    else if (_PlayerSource == ARDUINO)
+    {
+        //future: nie startować automatycznie nowej gry? lepiej wymagać od gracza potwierdzenia
+        this->startNewGameInChenard();
+    }
+    else
+        qDebug() << "ERROR: Chess::coreIsReadyForNewGame(): unknown _PlayerSource val ="
+                  << communicationTypeAsQStr(_PlayerSource);
+}
+
+void Chess::startNewGameInCore()
+{
+    emit this->addTextToLogPTE("new game\n", LOG_CORE);
+
+    //pierwszy legal i status wyglądają zawsze tak samo:
+    _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
+    _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 "
+                            "d2d4 e2e3 e2e4 f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
+
+    _pTimers->resetGameTimers();
+    _pTimers->startGameTimer();
+    _pClientsList->resetPlayersStartConfirmInfo();
+
+    this->sendDataToAllClients("newOk");
+}
+
+void Chess::manageMoveRequest(clientRequest request)
+{
+    if (_pStatus->isMoveARequestForPromotion(request.param))
+    {
+        _pMovements->setMove(request.param);
+        this->sendDataToClient("promoteToWhat", _pClientsList->getPlayer(
+                                   _pStatus->getActivePlayerType()));
+    }
+    else if (!_pStatus->isMoveLegal(request.param))
+        this->tellPlayerThatHeGaveBadMove(request.param);
+    else
+    {
+        _pMovements->setMove(request.param); //no need for earlier clear
+        _pMovements->doMoveSequence();
+        this->sendMsgToTcp("move " + request.param);
+    }
+}
+
 void Chess::continueGameplay()
 {
     if (_PlayerSource == WEBSITE)
@@ -118,49 +439,6 @@ void Chess::continueGameplay()
                  << communicationTypeAsQStr(_PlayerSource);
 
     this->sendMsgToTcp("status");
-}
-
-void Chess::startNewGameInChenard(bool bService = false)
-{
-    if (_pClients->isGameTableOccupied && _pClients->isStartClickedByBothPlayers()
-            || _PlayerSource == ARDUINO || bService)
-    {
-        this->sendMsgToTcp("new");
-    }
-    else
-        qDebug() << "ERROR: Chess::startNewGameInChenard(): game couldn't start";
-}
-
-void Chess::sendMsgToTcp(QString QStrMsg)
-{
-    emit this->addTextToLogPTE("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
-
-    _pTCPMsgs->queueCmd(_PlayerSource, QStrMsg);
-}
-
-void Chess::startNewGameInCore()
-{
-    emit this->addTextToLogPTE("new game\n", LOG_CORE);
-
-    //pierwszy legal i status wyglądają zawsze tak samo:
-    _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
-    _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 "
-                            "d2d4 e2e3 e2e4 f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
-
-    _pTimers->resetGameTimers();
-    _pTimers->startGameTimer();
-    _pClients->resetPlayersStartConfirmInfo();
-
-    this->sendDataToAllClients("newOk");
-}
-
-void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
-{
-    qDebug() << "Chess::tellPlayerThatHeGaveBadMove():" << QStrMsg;
-    QString QStrMsgForActivePlayer = "badMove " + QStrMsg + " "
-            + turnTypeAsQstr(_pStatus->getWhoseTurn());
-    Client* pPlayer = _pClients->getPlayer(this->getActivePlayerType());
-    this->sendDataToClient(QStrMsgForActivePlayer, QStrMsg);
 }
 
 bool Chess::isPieceSetOk()
@@ -219,53 +497,23 @@ Field* Chess::searchForPieceActualFieldOnMainBoard(Piece* pPiece)
     return nullptr;
 }
 
-void Chess::removeClient(Client* pClient)
-{
-    if (_pClients->isClientAPlayer(pClient))
-        _pResets->restartGame(ET_SOCKET_LOST, pClient);
-    else //future: strange behavior with those info- seen more often then we should
-        emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
-
-    _pClients->removeClient(pClient);
-
-    emit this->setBoardDataLabel(std::to_string(_pClients->getClientsList().size()).c_str(),
-                            BDL_SOCKETS_ONLINE);
-    emit _pClients->showClientsList(_pClients->getClientsList());
-}
-
-PLAYER_TYPE Chess::getActivePlayerType()
-{
-    if (_pStatus->getWhoseTurn() == WHITE_TURN &&
-            _pClients->getPlayerSocket(PT_WHITE) != nullptr)
-        return PT_WHITE;
-    else if (_pStatus->getWhoseTurn() == BLACK_TURN &&
-             _pClients->getPlayerSocket(PT_BLACK) != nullptr)
-        return PT_BLACK;
-    else
-    {
-        qDebug() << "ERROR: Chess::getActivePlayerType(): wrong turn:" <<
-                    turnTypeAsQstr(_pStatus->getWhoseTurn());
-        return PT_NONE;
-    }
-}
-
 QString Chess::getTableData()
 {
     //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt",
     //"wtime":345581,"btime":300000,"queue":"empty"}
-    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClients->getPlayerName(PT_WHITE) +
-            "\",\"bplr\":\"" + _pClients->getPlayerName(PT_BLACK) +
+    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +
+            "\",\"bplr\":\"" + _pClientsList->getPlayerName(PT_BLACK) +
             "\",\"turn\":\"" + _pStatus->getStrWhoseTurn() +
             "\",\"wtime\":" + QString::number(_pTimers->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pTimers->getBlackTimeLeft()) +
-            ",\"queue\":\"" + _pClients->getQueuedClientsList();
+            ",\"queue\":\"" + _pClientsList->getQueuedClientsList();
 
     if (_pTimers->isStartTimerRunning())
     {
         QString QStrWhiteClickedStart =
-                _pClients->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
+                _pClientsList->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
         QString QStrBlackClickedStart =
-                _pClients->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
+                _pClientsList->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
         QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
                 QString::number(_pTimers->getStartTimeLeft());
     }
@@ -277,333 +525,4 @@ QString Chess::getTableData()
 
     qDebug() << "Chess::getTableData(): QStrTableData =" << QStrTableData;
     return QStrTableData;
-}
-
-void Chess::coreIsReadyForNewGame()
-{
-    qDebug() << "Chess::coreIsReadyForNewGame()";
-
-    if (_PlayerSource == WEBSITE)
-    {
-        if (_pClients->isGameTableOccupied())
-            _pTimers->startQueueTimer();
-
-        this->sendDataToAllClients("resetComplited");
-    }
-    else if (_PlayerSource == ARDUINO)
-    {
-        //future: nie startować automatycznie nowej gry? lepiej wymagać od gracza potwierdzenia
-        this->startNewGameInChenard();
-    }
-    else
-        qDebug() << "ERROR: Chess::coreIsReadyForNewGame(): unknown _PlayerSource val ="
-                  << communicationTypeAsQStr(_PlayerSource);
-}
-
-void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
-{
-    if (playerType == PT_WHITE)
-    {
-        qDebug() << "Chess::playerWantToStartNewGame(): white";
-        _pClients->setClientState(PT_WHITE, true);
-    }
-    else if (playerType == PT_BLACK)
-    {
-        _pClients->setClientState(PT_BLACK, true);
-        qDebug() << "Chess::playerWantToStartNewGame(): black";
-    }
-    else if (_PlayerSource == ARDUINO)
-        qDebug() << "Chess::playerWantToStartNewGame()";
-    else
-        qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame "
-                     "val:" << playerTypeAsQStr(playerType);
-
-    if (_pClients->isGameTableOccupied && _pClients->isStartClickedByBothPlayers()
-            || _PlayerSource == ARDUINO || bService)
-    {
-        qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
-                    "Try to start a game";
-        _pTimers->stopQueueTimer();
-        this->startNewGameInChenard();
-        _pClients->setClientState(PT_WHITE, false);
-        _pClients->setClientState(PT_BLACK, false);
-    }
-}
-
-//todo: pociąć tą funkcję na mniejsze kawałki (przerobić ją podobnie jak checkMsgFromWebsockets
-void Chess::checkMsgFromChenard(QString tcpMsgType, QString tcpRespond)
-{
-    qDebug() << "Chess::checkMsgFromChenard(): tcpMsgType=" << tcpMsgType <<
-                ", tcpRespond:" << tcpRespond;
-
-    if(_PlayerSource == ARDUINO)
-        this->checkAI();
-
-    //future: zdarza się, że z jakiegoś powodu tcp utnie końcówkę '\n', dlatego są...
-    //...czasami 2 warunki typu 'ok'
-    if (tcpMsgType == "new")
-    {
-        if (tcpRespond == "OK\n" || tcpRespond == "OK")            
-            this->startNewGameInCore();
-        else
-            qDebug() << "ERROR: Chess::checkMsgFromChenard(): unknown tcpRespond="
-                     << tcpRespond << "for tcpMsgType =" << tcpMsgType;
-    }
-    else if (tcpMsgType.left(4) == "move")
-    {
-        if (tcpRespond == "OK 1\n" || tcpRespond == "OK 1")
-            this->continueGameplay();
-        else if (tcpRespond == "BAD_MOVE")
-            this->tellPlayerThatHeGaveBadMove(tcpRespond);
-        else
-            qDebug() << "ERROR: Chess::checkMsgFromChenard(): unknown tcpRespond="
-                     << tcpRespond << "for tcpMsgType =" << tcpMsgType;
-    }
-    else if (tcpMsgType == "status")
-    {
-        _pStatus->saveStatusData(tcpRespond);
-
-        if (_pStatus->getFENGameState() == ET_NONE)
-        {
-            this->sendMsgToTcp("history pgn");
-            this->continueGameplay(); //future: zrobić to kiedyś tak by dopiero w odpowiedzi...
-            //...na legal core wysyłał na stronę potwiedzenie wykonania ruchu (tj. zdjął...
-            //...blokadę przed kojenym ruchem)
-        }
-        else if (_pStatus->getFENGameState() == ET_WHIE_WON ||
-                 _pStatus->getFENGameState() == ET_BLACK_WON ||
-                 _pStatus->getFENGameState() == ET_DRAW)
-        {
-            _pResets->restartGame(_pStatus->getFENGameStateAsEndType());
-        }
-        else
-            qDebug() << "ERROR: Chess::checkMsgFromChenard(): unknown tcpRespond="
-                     << _pStatus->getFENGameState() << "for tcpMsgType =" << tcpMsgType;
-    }
-    else if (tcpMsgType.left(7) == "history" && tcpRespond.left(3) == "OK ")
-    {
-        _pStatus->historyOk(tcpRespond);
-        this->sendDataToAllClients("history " + _pStatus->getHisotyMovesAsQStr());
-        this->sendMsgToTcp("legal");
-    }
-    else if (tcpMsgType == "legal" && tcpRespond.left(3) == "OK ")
-        _pStatus->setLegalMoves(tcpRespond);
-    else if (tcpMsgType == "undo 1" && _PlayerSource == ARDUINO &&
-             (tcpRespond == "OK\n" || tcpRespond == "OK"))
-        _pBot->undoOk();
-    else if (tcpMsgType == "think 5000" && _PlayerSource == ARDUINO &&
-             (tcpRespond.left(3) == "OK " && tcpRespond.left(4) != "OK 1"))
-        _pBot->thinkOk(tcpRespond); //"f.e.: OK d1h5 Qh5#"
-    else
-        qDebug() << "ERROR: Chess:checkMsgFromChenard(): received unknown tcpMsgType:"
-                  << tcpMsgType;
-}
-
-//todo: funkcja ma 120 linii kodu...
-void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
-{
-    emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
-
-    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, pClient))
-    {
-        _request.type = requestType(QStrMsg, SHOW_ERRORS);
-        _request.parameter = _pConditions->extractParameter(_request.type, QStrMsg);
-    }
-    else
-    {
-        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): client request cannot be accepted";
-        return;
-    }
-
-    if (QStrMsg == "newGame")
-    {
-        PLAYER_TYPE PlayerType = PT_NONE;
-        if (pClient == _pClients->getPlayer(PT_WHITE))
-            PlayerType = PT_WHITE;
-        else if (pClient == _pClients->getPlayer(PT_BLACK))
-            PlayerType = PT_BLACK;
-
-        this->playerWantToStartNewGame(PlayerType);
-    }
-    else if (QStrMsg.left(4) == "move") this->findAndSaveMoveAndSendItToTcp(QStrMsg.mid(5));
-    else if (QStrMsg.left(9) == "promoteTo") this->findAndSaveMoveAndSendItToTcp(QStrMsg);
-    else if (QStrMsg == "getTableData") this->sendDataToClient(this->getTableData(), pClient);
-    else if (QStrMsg == "giveUp")
-    {
-        if (_pClients->isClientAPlayer(pClient))
-            _pResets->restartGame(ET_GIVE_UP, pClient);
-        else
-            qDebug() << "ERROR: Chess::receivedMsg(): non-player tried to logout (hacker?)";
-    }
-    else if (QStrMsg.left(5) == "sitOn")
-    {
-        if (_pClients->getClientName(pClient) == "-1")
-        {
-            qDebug() << "ERROR: Chess::receivedMsg(): sitOn: client not loggedIn";
-            return;
-        }
-
-        PLAYER_TYPE PlayerChair = playerTypeFromQStr(QStrMsg.mid(5));
-
-        _pStatus->setWhoseTurn(NO_TURN);
-        if (!_pClients->isPlayerChairEmpty(PlayerChair))
-        {
-            qDebug() << "ERROR: Chess::receivedMsg(): client wanted to "
-                        "sit on occupied chair. client name:"
-                     << _pClients->getClientName(pClient) << ", player name:" <<
-                        _pClients->getPlayerName(PlayerChair);
-            return;
-        }
-        else
-            _pClients->setPlayerType(pClient, PlayerChair);
-
-        if (this->isGameTableOccupied())
-            _pTimers->startQueueTimer();
-
-        this->sendDataToAllClients(this->getTableData());
-    }
-    else if (QStrMsg == "standUp")
-    {
-        if (_pClients->isClientAPlayer(pClient))
-        {
-            if (_pStatus->getWhoseTurn() == NO_TURN)
-            {
-                _pClients->clearPlayerType(_pClients->getClientType(pClient));
-                this->sendDataToAllClients(this->getTableData());
-            }
-            else
-            {
-                qDebug() << "ERROR: Chess::receivedMsg(): player wanted to "
-                            "leave chair during game. client name:"
-                          << _pClients->getClientName(pClient);
-                return;
-            }
-        }
-        else
-        {
-            qDebug() << "ERROR: Chess::receivedMsg(): non-player client"
-                        " wanted to leave chair. client name:"
-                     << _pClients->getClientName(pClient);
-            return;
-        }
-    }
-    else if (QStrMsg.left(3) == "im ")
-    {
-        QString QStrName = QStrMsg.mid(3);
-        if (!_pClients->isClientNameExists(QStrName))
-        {
-            _pClients->setClientName(pClient, QStrName);
-            this->sendDataToClient(this->getTableData(), pClient);
-        }
-        else //double login
-        {
-            _pClients->getClientSocket(QStrName)->sendTextMessage("logout:doubleLogin");
-            if (_pClients->isClientAPlayer(pClient))
-                _pResets->restartGame(ET_SOCKET_LOST, pClient);
-            _pClients->setClientName(pClient, QStrName);
-        }
-    }
-    else if (QStrMsg == "queueMe")
-    {
-        _pClients->addClientToQueue(pClient);
-        this->sendDataToAllClients(this->getTableData());
-    }
-    else if (QStrMsg == "leaveQueue")
-    {
-        this->removeClientFromQueue(pClient);
-        this->sendDataToAllClients(this->getTableData());
-    }
-    else if (QStrMsg == "clientLeft") this->removeClient(pClient);
-    else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received unknown msg:"
-                  << QStrMsg;
-
-    _pClients->showClientsInForm();
-}
-
-void Chess::checkMsgFromUsb(QString QStrMsg)
-{
-    //future:
-    if (QStrMsg == "start") //queue to tcp msg "think 5000"
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else if (QStrMsg ==  "move")
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else if (QStrMsg ==  "reset") //resetPiecePositions()
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else if (QStrMsg ==  "promoteTo")
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else
-        qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
-}
-
-void Chess::findAndSaveMoveAndSendItToTcp(QString QStrMove)
-{
-    //todo: czy wykonywane jest gdzieś wcześniej sprawdzenie PosFromTo::isMoveInProperFormat()?
-    if (_pStatus->getWhoseTurn() == NO_TURN)
-    {
-        qDebug() << "ERROR: Chess::findAndSaveMoveAndSendItToTcp(): turn == 0 (game is off)";
-        return;
-    }
-
-    if (QStrMove.left(9) == "promoteTo")
-    {
-        QString QStrPromotionType = QStrMove.right(1);
-        QStrMove = _pMovements->getMove().asQStr() + QStrPromotionType;
-    }
-    //todo: troche nieadekwatne jest to że normalny przypadek złego ruchu czy promocji...
-    //...jest tu taj traktowany jako przerwanie i nie wykonujemy całej funkcji wg nazwy
-    else if (_pStatus->isMoveARequestForPromotion(QStrMove))
-    {
-        _pMovements->setMove(QStrMove);
-
-        //todo: trochę chyba zmieniłem poniższą linijkę (komunikacja ws<->www)
-        QString QStrMsgForActiveClient = "promoteToWhat";
-        Client* pClient = _pClients->getPlayer(this->getActivePlayerType());
-        this->sendDataToClient(QStrMsgForActiveClient, pClient);
-
-        return;
-    }
-    else if (!_pStatus->isMoveLegal(QStrMove))
-    {
-        this->tellPlayerThatHeGaveBadMove;
-        return;
-    }
-
-    _pMovements->setMove(QStrMove); //no need for earlier clear
-    _pMovements->doMoveSequence();
-    this->sendMsgToTcp("move " + QStrMove);
-}
-
-void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
-                                              VERTICAL_MOVE vertMove = VM_NONE)
-{    
-    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), true) return;
-
-    if (vertMove == VM_GRAB)
-    {
-        if (!this->isPieceSetOk()) return;
-        if (pField->getPieceOnField(true) == nullptr) return;
-
-        emit this->addTextToLogPTE("Queue: grab piece " + pField->getPieceOnField()->getNr() +
-                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
-                                   " from field " + pField->getNrAsQStr(), LOG_CORE);
-        _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
-        pRealBoard->clearField(pField);
-
-        if (!this->isPieceSetOk()) return;
-    }
-    else if (vertMove == VM_PUT)
-    {
-        if (!this->isPieceSetOk()) return;
-
-        emit this->addTextToLogPTE("Queue: put piece " + _pPiece[_pDobot->getItemInGripper()] +
-                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
-                                   " on field " + pField->getNrAsQStr(), LOG_CORE);
-        pRealBoard->setPieceOnField(_pPiece[_pDobot->getItemInGripper()], pField);
-        _pDobot->clearGripper();
-
-        if (!this->isPieceSetOk()) return;
-    }
-
-    Point3D xyz = pField->getLocation3D();
-    _pDobot->doMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
 }

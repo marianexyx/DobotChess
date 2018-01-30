@@ -3,22 +3,23 @@
 
 QT_USE_NAMESPACE
 
-MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain, Chessboard* pBoardRemoved,
-                       TCPMsgs* pTCPmsg, ArduinoUsb* pArduinoUsb, Dobot* pDobot,
-                       Chess* pChess, Client* pClient, QWidget* parent):
+MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
+                       Chessboard* pBoardRemoved, Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
+                       ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Client* pClient,
+                       QWidget* parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     this->setWindowTitle("Chess");
 
-    //todo: ustandaryzować jakoś te nazwy pointerów pomiędzy wszystkimi plikami
     _pDobot = pDobot;
     _pWebSockets = pWebSockets;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
+    _pBoardChenard = pBoardChenard;
     _pTCPmsg = pTCPmsg;
-    _pArduinoUsb = pArduinoUsb;
+    _pUsb = pUsb;
     _pClient = pClient;
     _pChess = pChess;
 
@@ -36,7 +37,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain, Chessboa
     connect(_pTCPmsg, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
     connect(_pWebSockets, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
     connect(_pChess, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pArduinoUsb, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
+    connect(_pUsb, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
     connect(_pClient, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
     connect(_pChess, setBoardDataLabel(QString, BOARD_DATA_LABEL),
              this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
@@ -46,8 +47,13 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain, Chessboa
              this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
     connect(_pClient, setBoardDataLabel(QString, BOARD_DATA_LABEL),
              this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
-    connect(_pBoardMain, clearFormBoard(), this, clearFormBoard()); //no need connect for removed
-    connect(_pBoardMain, showBoardInForm(QString), this, showBoard(QString)); //todo: chenard
+    connect(_pBoardMain, clearBoardInUI(), this, clearBoardInUI()); //no need connect for removed
+    connect(_pBoardMain, showBoardInUI(QString, BOARD),
+            this, showBoardInUI(QString, BOARD));
+    connect(_pBoardRemoved, showBoardInUI(QString, BOARD),
+            this, showBoardInUI(QString, BOARD));
+    connect(_pBoardChenard, showBoardInUI(QString, BOARD),
+            this, showBoardInUI(QString, BOARD));
     connect(_pChess, showLegalMoves(QStringList), this, showLegalMoves(QStringList));
     connect(_pChess, showHistoryMoves(QStringList), this, showHistoryMoves(QStringList));
     connect(_pWebSockets, showClientsList(QList<Clients>), this, showClientsList(QList<Clients>));
@@ -63,7 +69,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain, Chessboa
             this, SLOT(showDobotErrorMsgBox()));
     connect(_pDobot, SIGNAL(queueLabels(int, int, int, int, int)),
             this, SLOT(setQueueLabels(int, int, int, int, int)));
-    connect(_pArduinoUsb, SIGNAL(updatePortsComboBox(int)),
+    connect(_pUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
     connect(_pDobot->getServoPointer(), showArduinoGripperStateList(QList<ServoArduino>),
             this, showArduinoGripperStateList(QList<ServoArduino>));
@@ -109,10 +115,10 @@ void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
 void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
                                 int nCoreIdLeft, int CoreNextId)
 {
-    if (nSpaceLeft == 0) nSpaceLeft = 1; //to tylko dla tymczasowego zblokowania wyskakującego...
-    //...warninga o unused parameter, póki nie wprowadzę tej funkcji
+    if (nSpaceLeft == 0) nSpaceLeft = 1; //to tylko dla tymczasowego zblokowania...
+    //...wyskakującego warninga o unused parameter, póki nie wprowadzę tej funkcji
     //ui->DobotQueuedCmdLeftSpaceLabel->
-    //setText(QString::number(nSpace)); //future: dobot.cc nie zrobił tego jeszcze- chyba już jest
+    //setText(QString::number(nSpace)); //future: spróbować samemu albo czekać na update
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
@@ -339,15 +345,14 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
     {
         QString QStrServiceMove = ui->emulatePlayerMsgLineEdit->text();
-        if (QStrServiceMove.left(5) == "move ")
-            QStrServiceMove = QStrServiceMove.mid(5);
+        if (QStrServiceMove.left(5) != "move ")
+            QStrServiceMove = "move " + QStrServiceMove;
 
         qDebug() << "MainWindow::on_sendSimulatedMsgBtn_clicked(): "
                     "QStrServiceMove =" << QStrServiceMove;
 
-        if (!PosFromTo::isMoveInProperFormat(QStrServiceMove)) return;
-
-        _pChess->findAndSaveMoveAndSendItToTcp(QStrServiceMove);
+        qDebug() << "WARNING: unfinished MainWindow::on_sendSimulatedMsgBtn_clicked() method";
+        //_pChess->checkMsgFromWebsockets(QStrServiceMove, ); //future
     }
 
     ui->emulatePlayerMsgLineEdit->clear();
@@ -420,8 +425,8 @@ void MainWindow::on_AIEnemySendBtn_clicked()
 {
     _pChess->getBotPointer()->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
 
-    if (PosFromTo::isMoveInProperFormat(ui->AIEnemyLineEdit->text()))
-        _pChess->findAndSaveMoveAndSendItToTcp(ui->AIEnemyLineEdit->text());
+    qDebug() << "WARNING: unfinished MainWindow::on_sendSimulatedMsgBtn_clicked() method";
+    //_pChess->checkMsgFromWebsockets(QStrServiceMove, ); //future
 }
 
 void MainWindow::updatePortsComboBox(int nUsbPorst)
@@ -434,12 +439,12 @@ void MainWindow::updatePortsComboBox(int nUsbPorst)
     ui->portsComboBox->clear();
     ui->portsComboBox->addItem("NULL");
     for(int i=0; i<nUsbPorst; i++)
-        ui->portsComboBox->addItem(_pArduinoUsb->availablePort.at(i).portName());
+        ui->portsComboBox->addItem(_pUsb->availablePort.at(i).portName());
 }
 
 void MainWindow::on_portsComboBox_currentIndexChanged(int index)
 {
-    _pArduinoUsb->portIndexChanged(index);
+    _pUsb->portIndexChanged(index);
 }
 
 void MainWindow::on_reloadPortsBtn_clicked()
@@ -447,16 +452,16 @@ void MainWindow::on_reloadPortsBtn_clicked()
     ui->usbCmdLine->setEnabled(true);
     ui->portsComboBox->setEnabled(true);
     ui->SimulateFromUsbLineEdit->setEnabled(true);
-    _pArduinoUsb->searchDevices();
+    _pUsb->searchDevices();
 }
 
 void MainWindow::on_sendUsbBtn_clicked()
 {
-    if(_pArduinoUsb->usbInfo == NULL)
+    if(_pUsb->usbInfo == NULL)
         this->writeInConsole("None port selected\n", LOG_USB);
     else
     {
-        _pArduinoUsb->sendDataToUsb(ui->usbCmdLine->text());
+        _pUsb->sendDataToUsb(ui->usbCmdLine->text());
         ui->usbCmdLine->clear();
     }
 }
@@ -520,7 +525,7 @@ void MainWindow::on_SimulateFromUsbBtn_clicked()
 {
     if (!ui->SimulateFromUsbLineEdit->text().isEmpty())
     {
-        _pArduinoUsb->msgFromUsbToChess(ui->SimulateFromUsbLineEdit->text());
+        _pUsb->msgFromUsbToChess(ui->SimulateFromUsbLineEdit->text());
         ui->SimulateFromUsbLineEdit->clear();
     }
 }
@@ -532,7 +537,8 @@ void MainWindow::on_sendTcpBtn_clicked()
         if (ui->directTcpMsgCheckBox->isChecked())
             _pTCPmsg->queueCmd(TEST, ui->sendTcpLineEdit->text());
         else
-            _pTCPmsg->queueCmd(_pChess->getBotPointer()->getAI() ? ARDUINO : WEBSITE, ui->sendTcpLineEdit->text());
+            _pTCPmsg->queueCmd(_pChess->getBotPointer()->getAI() ? ARDUINO : WEBSITE,
+                               ui->sendTcpLineEdit->text());
         ui->sendTcpLineEdit->clear();
     }
 }
@@ -568,10 +574,10 @@ void MainWindow::showArduinoGripperStateList(QList<ServoArduino> list)
     ui->servoQueuePTE->setPlainText(QStrQueuedList);
 }
 
-void MainWindow::showClientsList(QList<Clients> list)
+void MainWindow::showClientsList(QList<Client> list)
 {
     QString QStrClientsList;
-    Clients item;
+    Client item;
 
     for(int i=0; i<list.count(); ++i)
     {
@@ -619,20 +625,16 @@ void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType
     }
 }
 
-void MainWindow::clearFormBoard()
+void MainWindow::clearBoardInUI()
 {
     ui->boardPTE->clear();
 }
 
-//todo: przerobić tak by działało tutaj
-void MainWindow::showBoard(QString QStrBoard)
+void MainWindow::showBoardInUI(QString QStrBoard, BOARD BoardType)
 {
-    /*
-QString **ChessStatus::FENToBoard(QString FENBoard)
-{
-    QString** QStrBoardArray = create2DArray();
+    QString QStrBoardArray[8][8];
 
-    QStringList QStrFENBoardRows = FENBoard.split(QRegExp("/"));
+    QStringList QStrFENBoardRows = QStrBoard.split(QRegExp("/"));
     std::reverse(QStrFENBoardRows.begin(), QStrFENBoardRows.end());
     if (QStrFENBoardRows.size() == 8)
     {
@@ -651,8 +653,9 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
                 if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
                 {
                     QStrBoardArray[nColumn][nRow] = QStrFENSign;
-                    if (nColumn > D_8) qDebug() << "ERROR: ChessStatus::FENToBoard(): nColumn"
-                                                   " > 8 =" << nColumn;
+                    if (nColumn > D_8)
+                        qDebug() << "ERROR: MainWindow::showBoardInUI(): nColumn > 8 ="
+                                 << nColumn;
                     ++nColumn;
                 }
                 else //digits
@@ -660,8 +663,9 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
                     for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
                     {
                         QStrBoardArray[nColumn][nRow] = ".";
-                        if (nColumn > D_8) qDebug() << "ERROR: ChessStatus::FENToBoard(): nColumn"
-                                                       " > 8 =" << nColumn;
+                        if (nColumn > D_8)
+                            qDebug() << "ERROR: MainWindow::showBoardInUI: nColumn > 8 ="
+                                     << nColumn;
                         ++nColumn;
                     }
                 }
@@ -670,18 +674,24 @@ QString **ChessStatus::FENToBoard(QString FENBoard)
     }
     else
     {
-        qDebug() << "ERROR: ChessStatus::FENToBoard(): boardRows.size() != 8. Size = " <<
-                    QStrFENBoardRows.size();
+        qDebug() << "ERROR: MainWindow::showBoardInUI(): boardRows.size() != 8. Size = "
+                 << QStrFENBoardRows.size();
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
 
-    return QStrBoardArray;
-}
-    */
-
-    ui->boardPTE->clear();
-    ui->boardPTE->setPlainText(QStrBoard);
+    switch(BoardType)
+    {
+    case B_MAIN:
+        ui->boardPTE->clear();
+        ui->boardPTE->setPlainText(QStrBoard);
+        break;
+    case B_REMOVED:
+        break;
+    case B_CHENARD:
+        break;
+    default: qDebug() << "ERROR: MainWindow::showBoardInUI(): unknown BoardType:" << BoardType;
+    }
 }
 
 void MainWindow::showLegalMoves(QStringList legalMoves)

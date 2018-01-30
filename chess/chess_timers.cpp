@@ -62,13 +62,13 @@ void ChessTimers::updateTimeLabels()
 void ChessTimers::timeOutStartQueue()
 {
     this->stopQueueTimer();
-    pClients->resetPlayersStartConfirmInfo();
+    pClientsList->resetPlayersStartConfirmInfo();
 
-    Clients* pClients = _pChess->getClientsPointer();
-    if (!pClients->isStartClickedByPlayer(PT_WHITE))
-        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    Clients* pClientsList = _pChess->getClientsPointer();
+    if (!pClientsList->isStartClickedByPlayer(PT_WHITE))
+        pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
-        pClients->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
     if (this->isGameTableOccupied())
         this->startQueueTimer();

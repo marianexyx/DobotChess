@@ -26,7 +26,7 @@ class Dobot: public QObject
     Q_OBJECT
 
 private:
-    ArduinoUsb *_pArduinoUsb;
+    ArduinoUsb *_pUsb;
 
     DobotServo* _pServo;
     DobotQueue* _pQueue;
@@ -39,7 +39,7 @@ private:
     Point3D _lastGivenPoint, _realTimePoint;
 
 public:
-    Dobot(ArduinoUsb* pArduinoUsb);
+    Dobot(ArduinoUsb* pUsb);
     ~Dobot();
 
     void saveActualDobotPosition();
@@ -64,7 +64,7 @@ public:
     //todo: poniższe: friends
     DobotServo* getServoPointer() const { return _pServo; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
-    ArduinoUsb* getArduinoPointer() const { return _pArduinoUsb; }
+    ArduinoUsb* getArduinoPointer() const { return _pUsb; }
 
 public slots:
     void onConnectDobot();

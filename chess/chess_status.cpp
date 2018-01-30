@@ -4,6 +4,7 @@ ChessStatus::ChessStatus(Chess *pChess)
 {
     _pChess = pChess;
     _pBoardMain = _pChess->getBoardMainPointer();
+    _pClientsList = _pChess->getClientsPointer();
 
     _WhoseTurn = NO_TURN;
 }
@@ -85,7 +86,7 @@ void ChessStatus::saveStatusData(QString status)
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "ChessStatus::saveStatusData(): QStrFENBoard =" << QStrFENBoard;
-        emit _pBoardMain->showBoardInForm(QStrFENBoard);
+        emit _pBoardMain->showBoardInUI(QStrFENBoard, _pBoardMain->getBoardType());
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
@@ -115,7 +116,7 @@ void ChessStatus::resetStatusData()
     this->setWhoseTurn(NO_TURN);
     this->clearLegalMoves();
     this->clearHistoryMoves();
-    emit _pBoardMain->clearFormBoard();
+    emit _pBoardMain->clearBoardInUI();
 }
 
 void ChessStatus::setLegalMoves(QString msg)
@@ -172,5 +173,21 @@ QString ChessStatus::getStrWhoseTurn()
         QString err = "ERROR: ChessStatus::getStrWhoseTurn(): wrong turn type: "
                 + QString::number(_WhoseTurn);
         return err;
+    }
+}
+
+PLAYER_TYPE ChessStatus::getActivePlayerType()
+{
+    if (_WhoseTurn == WHITE_TURN &&
+            _pClientsList->getPlayerSocket(PT_WHITE) != nullptr)
+        return PT_WHITE;
+    else if (_WhoseTurn == BLACK_TURN &&
+             _pClientsList->getPlayerSocket(PT_BLACK) != nullptr)
+        return PT_BLACK;
+    else
+    {
+        qDebug() << "ERROR: ChessStatus::getActivePlayerType(): wrong turn:"
+                 << turnTypeAsQstr(_WhoseTurn);
+        return PT_NONE;
     }
 }

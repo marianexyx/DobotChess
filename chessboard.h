@@ -54,9 +54,9 @@ public:
     static bool isBoardReal(BOARD boardType, bool bErrorLog = false);
 
 signals:
-    void showBoardInForm(QString);
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
-    void clearFormBoard();
+    void clearBoardInUI();
+    void showBoardInUI(QString, BOARD);
 };
 
 #endif // CHESSBOARD_H
