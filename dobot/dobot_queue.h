@@ -22,14 +22,18 @@ private:
     uint _unQueuedCmdLeftSpace;
     QList<DobotMove> _queuedCmdIDList;
     DobotMove _lowestIDMoveInList;
-    int64_t _n64RetreatID; //todo: czy to potrzebne? gdyby na każde nowe zapytanie sprawdzać w ...
-    //...pętli czy maxymalny ID == aktualny ID, i robić retreat zawsze kiedy są one ==, po czym ...
-    //... wyłączać pętlę, póki nie pojawi się nic nowego w addCmd
+    int64_t _n64RetreatID;
+    int64_t _n64LastDobotIDShownInUI;
 
 public:
     DobotQueue(Dobot* pDobot);
 
     void parseNextMoveToArmIfPossible();
+    bool isNextPhysicalMoveToQueueOnArmAvailable();
+    DobotMove getNextPhysicalMoveToQueueOnArm();
+    void showLastExecutedArmMoveInUI();
+    void removeOldQueuedMovesFromCore();
+    DobotMove getQueuedMoveInCore(int64_t ID);
     //void retreat();
     void queuePhysicalMoveOnArm(DobotMove move);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);

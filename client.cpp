@@ -1,6 +1,6 @@
 #include "client.h"
 
-//todo: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
+//future: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
 void Clients::newClient(QWebSocket* pClientSocket)
 {
     Client newClient;
@@ -232,12 +232,13 @@ void Clients::removeClient(Client client)
     {
         if (cl == client)
         {
-            cl.socket->deleteLater();
+            cl.socket->deleteLater(); //todo: jest sens to usuwać skoro to nie jest wskaźnik?...
+            //...a może to musi być wskaźnik by dało się to wogle usunąć?
 
             if(!_clients.removeOne(cl))
                 qDebug() << "ERROR: Clients::removeClient(): client not found";;
 
-            return;
+            //return;
 
             //info: erlier working code in chess class:
             /*for(int i = 0; i < _pClientsList->getClientsList().count(); ++i)

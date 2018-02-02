@@ -1,8 +1,11 @@
 #include "dobot.h"
 
-//TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian tylko kalibracyjnych
+//TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian...
+//...tylko kalibracyjnych
 
-Dobot::Dobot(ArduinoUsb *pUsb)
+Dobot::Dobot(ArduinoUsb *pUsb):
+    _ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
+    _ARM_MAX_ACCELERATION(300)
 {
     _pUsb = pUsb;
 
@@ -158,6 +161,7 @@ void Dobot::initDobot()
                       QString::number(minorVersion) + "." +
                       QString::number(revision));
     
+    //todo: ustawić servo tutej
     //set the end effector parameters
     EndEffectorParams endEffectorParams;
     memset(&endEffectorParams, 0, sizeof(endEffectorParams));
@@ -168,38 +172,37 @@ void Dobot::initDobot()
     JOGJointParams jogJointParams;
     for (int i = 0; i < 4; i++)
     {
-        jogJointParams.velocity[i] = 100;
-        jogJointParams.acceleration[i] = 100;
+        jogJointParams.velocity[i] = _ARM_MAX_VELOCITY;
+        jogJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
     }
     SetJOGJointParams(&jogJointParams, false, NULL);
     
     JOGCoordinateParams jogCoordinateParams;
     for (int i = 0; i < 4; i++)
     {
-        jogCoordinateParams.velocity[i] = 100;
-        jogCoordinateParams.acceleration[i] = 100;
+        jogCoordinateParams.velocity[i] = _ARM_MAX_VELOCITY;
+        jogCoordinateParams.acceleration[i] = _ARM_MAX_ACCELERATION;
     }
     SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
     
-    //todo: predkosci
     JOGCommonParams jogCommonParams;
-    jogCommonParams.velocityRatio = 100;
-    jogCommonParams.accelerationRatio = 100;
+    jogCommonParams.velocityRatio = _ARM_MAX_VELOCITY;
+    jogCommonParams.accelerationRatio = _ARM_MAX_ACCELERATION;
     SetJOGCommonParams(&jogCommonParams, false, NULL);
     
     PTPJointParams ptpJointParams;
     for (int i = 0; i < 4; i++)
     {
-        ptpJointParams.velocity[i] = 200;
-        ptpJointParams.acceleration[i] = 200;
+        ptpJointParams.velocity[i] = _ARM_MAX_VELOCITY;
+        ptpJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
     }
     SetPTPJointParams(&ptpJointParams, false, NULL);
     
     PTPCoordinateParams ptpCoordinateParams;
-    ptpCoordinateParams.xyzVelocity = 200;
-    ptpCoordinateParams.xyzAcceleration = 200;
-    ptpCoordinateParams.rVelocity = 200;
-    ptpCoordinateParams.rAcceleration = 200;
+    ptpCoordinateParams.xyzVelocity = _ARM_MAX_VELOCITY;
+    ptpCoordinateParams.xyzAcceleration = _ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.rVelocity = _ARM_MAX_VELOCITY;
+    ptpCoordinateParams.rAcceleration = _ARM_MAX_ACCELERATION;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
     
     PTPJumpParams ptpJumpParams;
@@ -210,7 +213,7 @@ void Dobot::initDobot()
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
-void Dobot::doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump)
+void Dobot::queueMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump)
 {
     if (this->isPointTotallyDiffrent(dest3D)) return;
 
@@ -279,22 +282,4 @@ void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
     dest3D.z = dHeight;
 
     this->addArmMoveToQueue(ArmDestination, dest3D);
-}
-
-void Dobot::writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType)
-{
-    QString QStrMsg;
-
-    switch(MoveType)
-    {
-    case DM_TO_POINT: QStrMsg = ""; break;
-    case DM_OPEN: QStrMsg = "gripper opened\n"; break;
-    case DM_CLOSE: QStrMsg = "gripper closed\n"; break;
-    case DM_UP: QStrMsg = "arm up\n"; break;
-    case DM_DOWN: QStrMsg = "arm down\n"; break;
-    default: QStrMsg = "ERROR: Dobot::writeMoveTypeInConsole(): wrong movement state: "
-                + dobotMoveAsQstr(MoveType) + "\n"; break;
-    }
-
-    emit this->addTextToLogPTE(QStrMsg, LOG_DOBOT);
 }

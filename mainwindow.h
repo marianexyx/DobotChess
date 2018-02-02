@@ -59,8 +59,8 @@ private slots:
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType);
     void showBoardInUI(QString QStrBoard, BOARD BoardType);
     void clearBoardInUI();
-    void showLegalMoves(QStringList legalMoves);
-    void showHistoryMoves(QStringList historyMoves);
+    void showLegalMovesInUI(QStringList legalMoves);
+    void showHistoryMovesInUI(QStringList historyMoves);
 
     //dobot slots
     void setDobot_UI_PTE_Validators();

@@ -31,6 +31,8 @@ private:
     DobotServo* _pServo;
     DobotQueue* _pQueue;
 
+    const int _ARM_MAX_VELOCITY, _ARM_MAX_ACCELERATION;
+
     short _sItemIDInGripper;
 
     bool _bConnectedToDobot;
@@ -46,12 +48,11 @@ public:
     void initDobot();
     void onPTPsendBtnClicked();
 
-    void doMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump);
+    void queueMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump);
     bool isPointTotallyDiffrent(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint);
     void armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
-    void writeMoveTypeInConsole(DOBOT_MOVE_TYPE MoveType); //todo: logPTE
     bool bIsMoveInAxisRange(Point3D point);
 
     void setItemInGripper(short sGrippersItemID);

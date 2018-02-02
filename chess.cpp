@@ -237,12 +237,12 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
 void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
                                               VERTICAL_MOVE vertMove = VM_NONE)
 {
-    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), true) return;
+    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), SHOW_ERRORS) return;
 
     if (vertMove == VM_GRAB)
     {
         if (!this->isPieceSetOk()) return;
-        if (pField->getPieceOnField(true) == nullptr) return;
+        if (pField->getPieceOnField(SHOW_ERRORS) == nullptr) return;
 
         emit this->addTextToLogPTE("Queue: grab piece " + pField->getPieceOnField()->getNr() +
                                    " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
@@ -266,7 +266,7 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
     }
 
     Point3D xyz = pField->getLocation3D();
-    _pDobot->doMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
+    _pDobot->queueMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
 }
 
 void Chess::sendMsgToTcp(QString QStrMsg)

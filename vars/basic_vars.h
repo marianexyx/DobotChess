@@ -5,7 +5,7 @@
 
 #include <QString>
 
-const bool SHOW_ERRORS = true; //todo: poupychać do wszystkich erro logów
+const bool SHOW_ERRORS = true;
 
 enum COMMUNICATION_TYPE { WEBSITE = 1, ARDUINO, TEST };
 

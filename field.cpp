@@ -101,14 +101,15 @@ void Field::clearField()
                  << Field::nrAsQStr(_sNr) << ", piece nr on it =" << _pPieceOnField->getNr();
     _pPieceOnField = nullptr;
 }
+
 bool Field::isFieldOccupied(bool bErrorLog = false)
 {
     if (_pPieceOnField != nullptr)
     {
         return true;
         if (bErrorLog)
-            qDebug() << "ERROR: Field::isFieldOccupied: field is already occupied by"
-                        " another piece, field =" << _sNr << ", piece =" << _pPieceOnField->getNr();
+            qDebug() << "ERROR: Field::isFieldOccupied: field is already occupied by another"
+                        " piece, field =" << _sNr << ", piece =" << _pPieceOnField->getNr();
     }
     else return false;
 }

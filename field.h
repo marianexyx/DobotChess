@@ -5,8 +5,6 @@
 #include "piece.h"
 #include "vars/basic_vars.h"
 
-//todo: udałoby się dziedziczyć chessboard po field'zie. settery mogłyby by być wtedy...
-//... protected, a gettery public (sprawdzić)
 class Field
 {
 private:

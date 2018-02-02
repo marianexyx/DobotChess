@@ -120,8 +120,7 @@ void ChessResets::resetPiecePositions()
 {
     if (!this->isPieceSetOnStartFields())
     {
-        //todo: pokombinować nad pozbyciem się tempBoard + czy ten obiekt się zbuduje?
-        Chessboard tempBoard;
+        Chessboard tempBoard(B_CHENARD); //chenard type needs no xyz values
         Chessboard* pBoardMain = _pChess->getBoardMainPointer();
         ChessMovements* pMoves = _pChess->getMovementsPointer();
 

@@ -32,7 +32,7 @@ public:
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
-    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
+    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false); //todo: unused?
     void saveStatusData(QString status);
     void resetStatusData();
 
@@ -42,10 +42,10 @@ public:
     void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
     void setLegalMoves(QString msg);
     void setLegalMoves(QStringList moves) { _legalMoves = moves;
-                                            emit _pChess->showLegalMoves(_legalMoves); }
+                                            emit _pChess->showLegalMovesInUI(_legalMoves); }
     void setHistoryMoves(QString msg);
     void setHistoryMoves(QStringList moves) { _historyMoves = moves;
-                                              emit _pChess->showHistoryMoves(_historyMoves); }
+                                              emit _pChess->showHistoryMovesInUI(_historyMoves); }
 
     END_TYPE getFENGameState() const { return _FENGameState; }
     WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
@@ -57,9 +57,9 @@ public:
     PLAYER_TYPE getActivePlayerType();
 
     void clearLegalMoves() { _legalMoves.clear();
-                             emit _pChess->showLegalMoves(_legalMoves);}
+                             emit _pChess->showLegalMovesInUI(_legalMoves);}
     void clearHistoryMoves() { _historyMoves.clear();
-                               emit _pChess->showHistoryMoves(_historyMoves); }
+                               emit _pChess->showHistoryMovesInUI(_historyMoves); }
 };
 
 #endif // CHESS_STATUS_H

@@ -9,16 +9,35 @@ DobotQueue::DobotQueue(Dobot *pDobot)
     _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max();
     _n64RealTimeDobotActualID = 0;
     _n64RetreatID = 0;
+    _n64LastDobotIDShownInUI = 0;
 }
 
 void DobotQueue::parseNextMoveToArmIfPossible()
 {
-    //if (this->isDobotCmdsLeftSpaceEmpty()) return;
+    //if (this->isDobotCmdsLeftSpaceEmpty()) return; //future
 
     GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID);
 
     if (!_pServo->isServoListEmpty())
         _pServo->moveServoManually();
+
+    this->showLastExecutedArmMoveInUI();
+
+    if (this->isNextPhysicalMoveToQueueOnArmCanBeSend)
+    {
+        this->queuePhysicalMoveOnArm(getNextPhysicalMoveToQueueOnArm);
+        this->removeOldQueuedMovesFromCore();
+    }
+
+    //if (!this->isRetreatLastExecutedArmMoveType)
+    //  this->retreat(); //todo: zrobić to po udanych ruchach dobota
+}
+
+bool DobotQueue::isNextPhysicalMoveToQueueOnArmCanBeSend()
+{
+    emit this->queueLabels(_unQueuedCmdLeftSpace, _n64RealTimeDobotActualID,
+                           _n64CoreQueuedCmdID, _queuedCmdIDList.size(),
+                           _lowestIDMoveInList.ID);
 
     if (!_queuedCmdIDList.isEmpty())
     {
@@ -27,30 +46,82 @@ void DobotQueue::parseNextMoveToArmIfPossible()
         if(QueuedCmdIDIter.hasNext())
         {
             _lowestIDMoveInList = QueuedCmdIDIter.next();
-            if(firstMoveInList.ID - _n64RealTimeDobotActualID < 15)
-                this->queuePhysicalMoveOnArm(_queuedCmdIDList.takeFirst());
+            if(_lowestIDMoveInList.ID - _n64RealTimeDobotActualID < 15)
+                return true;
 
-            emit showActualDobot_queuedCmdIDList(_queuedCmdIDList);
+            emit showActualDobotQueuedCmdIDList(_queuedCmdIDList);
         }
     }
 
-    emit this->queueLabels(_unQueuedCmdLeftSpace, _n64RealTimeDobotActualID,
-                           _n64CoreQueuedCmdID, _queuedCmdIDList.size(),
-                           _lowestIDMoveInList.ID);
-
-    //this->retreat(); //todo: zrobić to po udanych ruchach dobota
+    return false;
 }
+
+DobotMove DobotQueue::getNextPhysicalMoveToQueueOnArm()
+{
+    if (!_queuedCmdIDList.isEmpty()) //2nd security checks is mandatory
+    {
+        QListIterator<DobotMove> QueuedCmdIDIter(_queuedCmdIDList);
+        QueuedCmdIDIter.toFront(); //oldest move in list
+        if(QueuedCmdIDIter.hasNext())
+        {
+            _lowestIDMoveInList = QueuedCmdIDIter.next();
+            if(_lowestIDMoveInList.ID - _n64RealTimeDobotActualID < 15)
+                return _queuedCmdIDList.First();
+        }
+    }
+
+    DobotMove errorMove;
+    qDebug() << "ERROR: DobotQueue::getNextPhysicalMoveToQueueOnArm(): reached artificially "
+                "created anty-error return (shouldn't be possible)";
+    return errorMove;
+}
+
+void DobotQueue::showLastExecutedArmMoveInUI()
+{
+    if (_n64RealTimeDobotActualID > _n64LastDobotIDShownInUI)
+    {
+        DobotMove Move = this->getQueuedMoveInCore(_n64RealTimeDobotActualID);
+        emit _pDobot->addTextToLogPTE("Executed move(ID,type): " + Move.ID + ","
+                                      + dobotMoveAsQstr(Move.type), LOG_DOBOT);
+        _n64LastDobotIDShownInUI = _n64RealTimeDobotActualID;
+    }
+}
+
+void DobotQueue::removeOldQueuedMovesFromCore()
+{
+    if (!_queuedCmdIDList.removeOne(this->getQueuedMoveInCore(_n64RealTimeDobotActualID - 1)))
+        qDebug() << "ERROR: DobotQueue::removeOldQueuedMovesFromCore(): move in list not found";
+}
+
+DobotMove DobotQueue::getQueuedMoveInCore(int64_t ID)
+{
+    Q_FOREACH(DobotMove Move, _queuedCmdIDList)
+    {
+        if (Move.ID == ID)
+            return Move;
+    }
+
+    DobotMove errorMove;
+    qDebug() << "ERROR: DobotQueue::getQueuedMoveInCore(): move with ID:"
+             << ID << "doesn't exists";
+    return errorMove;
+}
+
+/*bool DobotQueue::isRetreatLastExecutedArmMoveType()
+{
+    if (this->getQueuedMoveInCore(_n64CoreQueuedCmdID).type == )
+        //future: jednak wprowadzam pojęcie "retreat" do klasy dobota
+}*/
 
 //todo: if retreat is set from xml
 /*void DobotQueue::retreat() //todo
 {
-    if (_n64RetreatID <= _n64RealTimeDobotActualID)
+    if (_n64CoreQueuedCmdID <= _n64RealTimeDobotActualID)
     {
         qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): retreat";
         PtpCmdActualVal retreatId;
         retreatId = (_pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
         addArmMoveToQueue(DM_TO_POINT, retreatId.x, retreatId.y, retreatId.z);
-        _n64RetreatID = std::numeric_limits<int64_t>::max();
     }
 }*/
 
@@ -109,8 +180,6 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
-    //todo: usuwać z tablicy wiadomości na dobota wiadomości o 1 niższym niż aktualny ID dobota
-    //todo: wyświetlać komunikaty dobota w czasie rzeczywistym
     _n64CoreQueuedCmdID += 1;
 
     DobotMove cmdToQueue;

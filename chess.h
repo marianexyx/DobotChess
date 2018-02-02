@@ -98,8 +98,8 @@ public slots:
 signals:
     void addTextToLogPTE(QString, LOG);
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
-    void showLegalMoves(QStringList); //todo: inUI
-    void showHistoryMoves(QStringList); //todo: inUI
+    void showLegalMovesInUI(QStringList);
+    void showHistoryMovesInUI(QStringList);
 };
 
 #endif // CHESS_H

@@ -61,7 +61,7 @@ void ChessMovements::regularMoveSequence(Field* pFrom, Field* pTo)
 void ChessMovements::removeMoveSequence(Field* pFieldWithPieceToRemove)
 {    
     //find and safe piece on board, before grabbing (i.e. till it stands on board)
-    Piece* pPieceToRemove = pFieldWithPieceToRemove->getPieceOnField(true);
+    Piece* pPieceToRemove = pFieldWithPieceToRemove->getPieceOnField(SHOW_ERRORS);
     if (pPieceToRemove == nullptr) return;
 
     _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
@@ -111,7 +111,7 @@ void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
     }
 
     Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
-    Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField(true);
+    Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField(SHOW_ERRORS);
 
     _pChess->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
 

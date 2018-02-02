@@ -54,8 +54,8 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
             this, showBoardInUI(QString, BOARD));
     connect(_pBoardChenard, showBoardInUI(QString, BOARD),
             this, showBoardInUI(QString, BOARD));
-    connect(_pChess, showLegalMoves(QStringList), this, showLegalMoves(QStringList));
-    connect(_pChess, showHistoryMoves(QStringList), this, showHistoryMoves(QStringList));
+    connect(_pChess, showLegalMovesInUI(QStringList), this, showLegalMovesInUI(QStringList));
+    connect(_pChess, showHistoryMovesInUI(QStringList), this, showHistoryMovesInUI(QStringList));
     connect(_pWebSockets, showClientsList(QList<Clients>), this, showClientsList(QList<Clients>));
     connect(_pDobot, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
@@ -77,7 +77,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
     this->initControl(); //init dobot JOG control
 
     //todo: narobić tych tooltipów
-    ui->directTcpMsgCheckBox->setToolTip("//todo");
+    ui->directTcpMsgCheckBox->setToolTip("//todo:");
     ui->emulatePlayerMsgLineEdit->setToolTip("send msg to Websockets::receivedMsg");
 }
 
@@ -483,7 +483,7 @@ void MainWindow::on_middleAboveBtn_clicked()
     _pDobot->addArmMoveToQueue(mid);
 }
 
-//todo: ogarnąć punkty przejściowe
+//todo: ogarnąć punkty przejściowe (xml'e najpierw)
 void MainWindow::on_startGmPosBtn_clicked()
 { //todo: te punkty wstawić pierwej jako stałe z xmla
     //todo: bezsensowny zawijaniec przez klasy:
@@ -694,7 +694,7 @@ void MainWindow::showBoardInUI(QString QStrBoard, BOARD BoardType)
     }
 }
 
-void MainWindow::showLegalMoves(QStringList legalMoves)
+void MainWindow::showLegalMovesInUI(QStringList legalMoves)
 {
     QString legal = "";
     if (!legalMoves.isEmpty()) legal = legalMoves.join(" ");
@@ -702,7 +702,7 @@ void MainWindow::showLegalMoves(QStringList legalMoves)
     ui->legalPTE->setPlainText(legal);
 }
 
-void MainWindow::showHistoryMoves(QStringList historyMoves)
+void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
 {
     QString history = "";
     ui->historyPTE->clear();

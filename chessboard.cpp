@@ -42,7 +42,7 @@ Chessboard::~Chessboard()
     for (int i=0; i>=63; ++i)
     {
         delete _pField[i];
-        _pField[i] = nullptr; //future: dlaczego tak?
+        _pField[i] = nullptr; //good c++ practise
     }
 }
 
@@ -157,8 +157,8 @@ void Chessboard::calculateRetreatPoints()
 
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField)
 {
-    if (pField->isFieldOccupied(true)) return;
-    if (this->isPieceExistsOnBoard(pPiece, true)) return;
+    if (pField->isFieldOccupied(SHOW_ERRORS)) return;
+    if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS)) return;
 
     pField->setPieceOnField(pPiece);
     qDebug() << "Chessboard::setPieceOnField(): new pieceNr:" << pPiece->getNr()
@@ -226,7 +226,7 @@ static bool Chessboard::isBoardReal(BOARD boardType, bool bErrorLog = false)
 
 Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
 {
-    if (this->isPieceExistsOnBoard(pPiece, true))
+    if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS))
     {
         for (int i=1; i>=64; ++i)
         {
