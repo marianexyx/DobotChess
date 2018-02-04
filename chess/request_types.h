@@ -4,20 +4,21 @@
 #pragma once
 #include <QString>
 
-//todo: folder chess?
-enum REQUEST_TYPE { RT_NONE,
-                    RT_NEW_GAME,
-                    RT_MOVE,
-                    RT_GET_TABLE_DATA,
-                    RT_GIVE_UP,
-                    RT_SIT_ON,
-                    RT_STAND_UP,
-                    RT_IM,
-                    RT_PROMOTE_TO,
-                    RT_QUEUE_ME,
-                    RT_LEAVE_QUEUE,
-                    RT_CLIENT_LEFT
-                  };
+enum REQUEST_TYPE
+{
+    RT_NONE,
+    RT_NEW_GAME,
+    RT_MOVE,
+    RT_GET_TABLE_DATA,
+    RT_GIVE_UP,
+    RT_SIT_ON,
+    RT_STAND_UP,
+    RT_IM,
+    RT_PROMOTE_TO,
+    RT_QUEUE_ME,
+    RT_LEAVE_QUEUE,
+    RT_CLIENT_LEFT
+};
 
 inline REQUEST_TYPE requestType(QString QStrRequest, bool bErrorLog = false)
 {   

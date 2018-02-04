@@ -32,7 +32,7 @@ inline QString gameStatusAsQStr(GAME_STATUS GS)
     case GS_TURN_BLACK_PROMOTE: return "noTurn_black_promote";
     case GS_ERROR:
     default:
-        qDebug() << "ERROR: QString gameStatusAsQStr(): wrong param:" << GS;
+        qDebug() << "ERROR: gameStatusAsQStr(): wrong param:" << GS;
         return "";
     }
 }
@@ -51,7 +51,7 @@ inline WHOSE_TURN whoseTurnFromGameStatus(GAME_STATUS GS)
     case GS_TURN_BLACK: return BLACK_TURN;
     case GS_TURN_BLACK_PROMOTE: return BLACK_TURN;
     default:
-        qDebug() << "ERROR: WHOSE_TURN whoseTurnFromGameStatus(): unknwon GAME_STATUS:" << GS;
+        qDebug() << "ERROR: whoseTurnFromGameStatus(): unknwon GAME_STATUS:" << GS;
         return NO_TURN;
     }
 }

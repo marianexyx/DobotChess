@@ -12,9 +12,7 @@
 #include "typeinfo"
 #include "client.h"
 #include "vars/log.h"
-#include "vars/board_data_labels.h"
 #include "vars/players_types.h"
-#include "vars/end_of_game_types.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
 QT_FORWARD_DECLARE_CLASS(QWebSocket)

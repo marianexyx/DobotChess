@@ -61,7 +61,6 @@ HEADERS  +=  \
     vars/board_types.h \
     vars/turn_types.h \
     sql.h \
-    vars/piece_type.h \
     piece.h \
     vars/posotion_on_board.h \
     field.h \
@@ -77,7 +76,14 @@ HEADERS  +=  \
     dobot/dobot_servo.h \
     chess/chess_conditions.h \
     vars/request_types.h \
-    vars/chenard_io_msgs.h
+    vars/chenard_io_msgs.h \
+    dobot/dobot_moves.h \
+    chess/request_types.h \
+    chess/chenard_io_msgs.h \
+    chess/game_status.h \
+    chess/turn_types.h \
+    chess/sequence_types.h \
+    chess/end_of_game_types.h
 
 FORMS    += mainwindow.ui
 

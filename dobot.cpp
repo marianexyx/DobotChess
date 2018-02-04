@@ -32,7 +32,7 @@ Dobot::~Dobot()
 
 void Dobot::onPeriodicTaskTimer()
 {
-    PeriodicTask(); //check dobot actual data
+    PeriodicTask(); //start arm task loop. non-return funcion
     QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
     periodicTaskTimer->start(); //auto restart timer
 }
@@ -47,10 +47,30 @@ void Dobot::onGetPoseTimer()
     getPoseTimer->start(); //auto restart timer
 }
 
+static bool Dobot::isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false)
+{
+    if (nResult == DobotCommunicate_NoError)
+        return true;
+    else
+    {
+        if (bErrorLog)
+        {
+            if (nResult == DobotCommunicate_BufferFull)
+                qDebug() << "ERROR: Dobot::isArmReceivedCorrectCmd(): dobot buffer is full";
+            else if (nResult == DobotCommunicate_Timeout)
+                qDebug() << "ERROR: Dobot::isArmReceivedCorrectCmd(): cmd timeout";
+            else
+                qDebug() << "ERROR: Dobot::isArmReceivedCorrectCmd(): unknown error:" << nResult;
+        }
+
+        return false;
+    }
+}
+
 void Dobot::saveActualDobotPosition()
 {
     Pose pose;
-    GetPose(&pose); //from dobot
+    GetPose(&pose); //pose from arm
 
     _realTimePoint.x = pose.x;
     _realTimePoint.y = pose.y;
@@ -98,7 +118,7 @@ void Dobot::clearGripper()
     _sItemIDInGripper = 0;
 }
 
-Point3D Dobot::getHomePos()
+Point3D Dobot::getHomePos() //todo:
 {
     Point3D home(_Home);
     return home;
@@ -238,6 +258,8 @@ void Dobot::queueMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, 
 
 bool Dobot::isPointTotallyDiffrent(Point3D point)
 {
+    if (point !=)
+
     if (point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y
             && point.z != _lastGivenPoint.z)
     {

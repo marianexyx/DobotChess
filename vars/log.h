@@ -19,25 +19,21 @@ enum LOG
 
 inline QString logAsQstr(LOG log)
 {
-    QString QStrLog;
     switch(log)
     {
-    case LOG_NOTHING: QStrLog = "nothing" ; break;
-    case LOG_CORE: QStrLog = "core" ; break;
-    case LOG_DOBOT: QStrLog = "dobot" ; break;
-    case LOG_TCP: QStrLog = "tcp" ; break;
-    case LOG_WEBSOCKET: QStrLog = "websocket" ; break;
-    case LOG_MAINWINDOW: QStrLog = "mainwindow" ; break;
-    case LOG_USB: QStrLog = "usb" ; break;
-    case LOG_USB_SENT: QStrLog = "usbSent" ; break;
-    case LOG_USB_RECEIVED: QStrLog = "usbReceived" ; break;
+    case LOG_NOTHING: return "nothing";
+    case LOG_CORE: return "core";
+    case LOG_DOBOT: return "dobot";
+    case LOG_TCP: return "tcp";
+    case LOG_WEBSOCKET: return "websocket";
+    case LOG_MAINWINDOW: return "mainwindow";
+    case LOG_USB: return "usb";
+    case LOG_USB_SENT: return "usbSent";
+    case LOG_USB_RECEIVED: return "usbReceived";
     default:
-        QStrLog = "ERROR: wrong logAsQstr arg = " + log;
-        qDebug() << QStrLog;
-        break;
+        qDebug() << "ERROR: logAsQstr(): wrong arg = " << log;
+        return "";
     }
-
-    return QStrLog;
 }
 
 #endif /* LOG_H */

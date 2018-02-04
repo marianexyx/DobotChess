@@ -76,7 +76,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
 
     this->initControl(); //init dobot JOG control
 
-    //todo: narobić tych tooltipów
+    //future: narobić tych tooltipów
     ui->directTcpMsgCheckBox->setToolTip("//todo:");
     ui->emulatePlayerMsgLineEdit->setToolTip("send msg to Websockets::receivedMsg");
 }
@@ -125,7 +125,7 @@ void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
     ui->CoreNextIdLabel->setText(QString::number(CoreNextId));
 }
 
-//todo: wszystkie przyciski się włączą, nawet jeżeli otrzymamy od dobota info że się nie udało
+//future: wszystkie przyciski się włączą, nawet jeżeli otrzymamy od dobota info że się nie udało
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
 {
     if (bDobotButtonsStates)
@@ -393,12 +393,8 @@ void MainWindow::on_downBtn_clicked()
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
 {
-    int result = SetQueuedCmdClear(); //wyczyść/wyzeruj zapytania w dobocie
-    //todo: jak już zrobiłem to w tym miejscu, to rpobić to wszędzie
-    if (result == DobotCommunicate_NoError)
+    if (Dobot::isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
         this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
-    else
-        qDebug() << "ERROR: MainWindow::on_resetDobotIndexBtn_clicked(): reset failed";
 }
 
 void MainWindow::on_AIBtn_clicked()

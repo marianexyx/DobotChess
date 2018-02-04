@@ -32,7 +32,7 @@ public:
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
-    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false); //todo: unused?
+    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     void saveStatusData(QString status);
     void resetStatusData();
 

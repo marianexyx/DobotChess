@@ -17,22 +17,18 @@ enum END_TYPE
 
 inline QString endTypeAsQstr(END_TYPE ET)
 {
-    QString QStrEndType;
     switch(ET)
     {
-    case ET_WHIE_WON: QStrEndType = "whiteWon"; break;
-    case ET_BLACK_WON: QStrEndType = "blackWon"; break;
-    case ET_DRAW: QStrEndType = "draw"; break;
-    case ET_GIVE_UP: QStrEndType = "giveUp"; break;
-    case ET_SOCKET_LOST: QStrEndType = "socketLost" ; break;
-    case ET_TIMEOUT_GAME: QStrEndType = "timeoutGame"; break;
+    case ET_WHIE_WON: return "whiteWon";
+    case ET_BLACK_WON: return "blackWon";
+    case ET_DRAW: return "draw";
+    case ET_GIVE_UP: return "giveUp";
+    case ET_SOCKET_LOST: return "socketLost";
+    case ET_TIMEOUT_GAME: return "timeoutGame";
     default:
-        QStrEndType = "ERROR: wrong endTypeAsQstr arg = " + ET;
-        qDebug() << QStrEndType;
-        break;
+        qDebug() << "ERROR: endTypeAsQstr(): wrong arg = " << ET;
+        return "";
     }
-
-    return QStrEndType;
 }
 
 inline END_TYPE FENGameState(QString QStrFENGameState)

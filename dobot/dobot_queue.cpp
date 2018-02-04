@@ -16,7 +16,8 @@ void DobotQueue::parseNextMoveToArmIfPossible()
 {
     //if (this->isDobotCmdsLeftSpaceEmpty()) return; //future
 
-    GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID);
+    Dobot::isArmReceivedCorrectCmd(GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID),
+                                   SHOW_ERRORS);
 
     if (!_pServo->isServoListEmpty())
         _pServo->moveServoManually();
@@ -25,7 +26,7 @@ void DobotQueue::parseNextMoveToArmIfPossible()
 
     if (this->isNextPhysicalMoveToQueueOnArmCanBeSend)
     {
-        this->queuePhysicalMoveOnArm(getNextPhysicalMoveToQueueOnArm);
+        this->queuePhysicalMoveOnArm(this->getNextPhysicalMoveToQueueOnArm);
         this->removeOldQueuedMovesFromCore();
     }
 
@@ -148,7 +149,7 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
-        SetPTPCmd(&moveAsPtpCmd, true, &move.ID);
+        Dobot::isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
         break;
     case DM_OPEN:
         _pServo->openGripper(move.ID);
@@ -162,10 +163,7 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
 
         HOMECmd HOME;
         HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
-        int result = SetHOMECmd(&HOME, true, &move.ID);
-        if (result != DobotCommunicate_NoError)
-            qDebug() << "ERROR: DobotQueue::queuePhysicalMoveOnArm(): "
-                        "SetHOMECmd result != DobotCommunicate_NoError";
+        Dobot::isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
     }
         break;
     case DM_UP:
@@ -173,8 +171,7 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
         _pServo->addServoMoveToGripperStatesList(Move);
         break;
     default:
-        qDebug() << "ERROR: Dobot::queuePhysicalMoveOnArm(): wrong move type:"
-                 << move.type;
+        qDebug() << "ERROR: Dobot::queuePhysicalMoveOnArm(): wrong move type:" << move.type;
     }
 }
 
@@ -192,18 +189,14 @@ void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 
 void DobotQueue::saveIDFromConnectedDobot()
 {
-   int result = GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID);
-   if (result == DobotCommunicate_NoError)
+   if (Dobot::isArmReceivedCorrectCmd(GetQueuedCmdCurrentID(&_n64RealTimeDobotActualID),
+                                      SHOW_ERRORS))
    {
        emit this->queueLabels(_unQueuedCmdLeftSpace, _n64RealTimeDobotActualID,
                               _n64CoreQueuedCmdID, _queuedCmdIDList.size(),
                               _lowestIDMoveInList.index);
    }
-   else
-   {
-       qDebug() << "ERROR: DobotQueue::onConnectDobot(): saveIDFromConnectedDobot"
-                   " gone wrong";
-   }
+
 
     _n64CoreQueuedCmdID = _n64RealTimeDobotActualID;
 }

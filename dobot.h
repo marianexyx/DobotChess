@@ -16,8 +16,7 @@
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
-#include "vars/dobot_moves.h"
-#include "vars/board_data_labels.h"
+#include "dobot/dobot_moves.h"
 #include "dobot/dobot_queue.h"
 #include "dobot/dobot_servo.h"
 
@@ -43,6 +42,8 @@ private:
 public:
     Dobot(ArduinoUsb* pUsb);
     ~Dobot();
+
+    static bool isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false);
 
     void saveActualDobotPosition();
     void initDobot();

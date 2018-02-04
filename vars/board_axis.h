@@ -32,44 +32,40 @@ enum DIGIT
 
 inline LETTER pieceLetterPos(QString QStrLetter)
 {
-    LETTER letter = L_X;
-
-    if (QStrLetter == "a" || QStrLetter == "A") {letter = L_A; }
-    else if (QStrLetter == "b" || QStrLetter == "B") {letter = L_B;}
-    else if (QStrLetter == "c" || QStrLetter == "C") {letter = L_C;}
-    else if (QStrLetter == "d" || QStrLetter == "D") {letter = L_D;}
-    else if (QStrLetter == "e" || QStrLetter == "E") {letter = L_E;}
-    else if (QStrLetter == "f" || QStrLetter == "F") {letter = L_F;}
-    else if (QStrLetter == "g" || QStrLetter == "G") {letter = L_G;}
-    else if (QStrLetter == "h" || QStrLetter == "H") {letter = L_H;}
-    else qDebug() << "ERROR: pieceLetterPos(QString QStrLetter): "
+    if (QStrLetter == "a" || QStrLetter == "A") return L_A;
+    else if (QStrLetter == "b" || QStrLetter == "B") return L_B;
+    else if (QStrLetter == "c" || QStrLetter == "C") return L_C;
+    else if (QStrLetter == "d" || QStrLetter == "D") return L_D;
+    else if (QStrLetter == "e" || QStrLetter == "E") return L_E;
+    else if (QStrLetter == "f" || QStrLetter == "F") return L_F;
+    else if (QStrLetter == "g" || QStrLetter == "G") return L_G;
+    else if (QStrLetter == "h" || QStrLetter == "H") return L_H;
+    else
+    {
+        qDebug() << "ERROR: pieceLetterPos(QString QStrLetter): "
                      "Unknown QStrLetter value =" << QStrLetter;
-
-    return letter;
+        return L_X;
+    }
 }
 
 inline QString pieceLetterPosAsQStr(LETTER letter)
 {
-    QString QStrLetter;
-
     switch(letter)
     {
-    case L_X: QStrLetter = "-1"; break;
-    case L_A: QStrLetter = "a"; break;
-    case L_B: QStrLetter = "b"; break;
-    case L_C: QStrLetter = "c"; break;
-    case L_D: QStrLetter = "d"; break;
-    case L_E: QStrLetter = "e"; break;
-    case L_F: QStrLetter = "f"; break;
-    case L_G: QStrLetter = "g"; break;
-    case L_H: QStrLetter = "h"; break;
+    case L_X: return "-1";
+    case L_A: return "a";
+    case L_B: return "b";
+    case L_C: return "c";
+    case L_D: return "d";
+    case L_E: return "e";
+    case L_F: return "f";
+    case L_G: return "g";
+    case L_H: return "h";
     default:
         qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): "
                     "Unknown letter value =" << letter;
-        break;
+        return "";
     }
-
-    return QStrLetter;
 }
 
 #endif // BOARD_AXIS_H

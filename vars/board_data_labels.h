@@ -22,28 +22,24 @@ enum BOARD_DATA_LABEL
 
 inline QString boardDataLabelsAsQstr(BOARD_DATA_LABEL BDL)
 {
-    QString QStrBoardLbl;
     switch(BDL)
     {
-    case BDL_SOCKETS_ONLINE: QStrBoardLbl = "socketsOnline" ; break;
-    case BDL_WHITE_NAME: QStrBoardLbl = "whiteName" ; break;
-    case BDL_BLACK_NAME: QStrBoardLbl = "blackName" ; break;
-    case BDL_TURN: QStrBoardLbl = "turn" ; break;
-    case BDL_GAME_STATUS: QStrBoardLbl = "gameStatus" ; break;
-    case BDL_MOVES: QStrBoardLbl = "moves" ; break;
-    case BDL_CASTLINGS: QStrBoardLbl = "castlings" ; break;
-    case BDL_ENPASSANT: QStrBoardLbl = "enapssant" ; break;
-    case BDL_WHITE_TIME: QStrBoardLbl = "whiteTime" ; break;
-    case BDL_BLACK_TIME: QStrBoardLbl = "blackTime" ; break;
-    case BDL_QUEUE_PLAYERS: QStrBoardLbl = "queuePlayers" ; break;
-    case BDL_QUEUE_TIME: QStrBoardLbl = "queueTime" ; break;
+    case BDL_SOCKETS_ONLINE: return "socketsOnline";
+    case BDL_WHITE_NAME: return "whiteName";
+    case BDL_BLACK_NAME: return "blackName";
+    case BDL_TURN: return "turn";
+    case BDL_GAME_STATUS: return "gameStatus";
+    case BDL_MOVES: return "moves";
+    case BDL_CASTLINGS: return "castlings";
+    case BDL_ENPASSANT: return "enapssant";
+    case BDL_WHITE_TIME: return "whiteTime";
+    case BDL_BLACK_TIME: return "blackTime";
+    case BDL_QUEUE_PLAYERS: return "queuePlayers";
+    case BDL_QUEUE_TIME: return "queueTime";
     default:
-        QStrBoardLbl = "ERROR: wrong boardDataLabelsAsQstr arg = " + BDL;
-        qDebug() << QStrBoardLbl;
+        qDebug() << "ERROR: boardDataLabelsAsQstr(): wrong arg =" << BDL;
         break;
     }
-
-    return QStrBoardLbl;
 }
 
 #endif // BOARD_DATA_LABELS_H

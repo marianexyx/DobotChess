@@ -6,15 +6,17 @@
 
 //https://github.com/cosinekitty/chenard/wiki/ChenServer#complete-command-reference
 
-enum CHENARD_MSG_TYPE { CMT_ERROR,
-                        CMT_NEW,
-                        CMT_STATUS,
-                        CMT_LEGAL,
-                        CMT_HISTORY,
-                        CMT_MOVE,
-                        CMT_THINK,
-                        CMT_UNDO
-                      };
+enum CHENARD_MSG_TYPE
+{
+    CMT_ERROR,
+    CMT_NEW,
+    CMT_STATUS,
+    CMT_LEGAL,
+    CMT_HISTORY,
+    CMT_MOVE,
+    CMT_THINK,
+    CMT_UNDO
+};
 
 inline CHENARD_MSG_TYPE ChenardMsgType(QString QStrMsgType)
 {

@@ -41,7 +41,7 @@ void DobotServo::changeGripperAngle(float fDutyCycle) //info: powinno działać
     if (fDutyCycle != 0)
         _gripperServo.dutyCycle = fDutyCycle;
     qDebug() << "_gripperServo.dutyCycle = " << fDutyCycle;
-    SetIOPWM(&_gripperServo, false, NULL); //unqueued
+    Dobot::isArmReceivedCorrectCmd(SetIOPWM(&_gripperServo, false, NULL), SHOW_ERRORS); //unqueued
 }
 
 void DobotServo::moveServoManually()
@@ -63,22 +63,16 @@ void DobotServo::moveServoManually()
 void DobotServo::openGripper(int64_t ID)
 {
     _gripperServo.dutyCycle = _fGripOpened;
-    int openGripResult = SetIOPWM(&_gripperServo, true, &ID);
-    if (openGripResult != DobotCommunicate_NoError)
-        qDebug() << "ERROR: DobotQueue::queuePhysicalMoveOnArm(): "
-                    "SetIOPWM gone wrong";
+    Dobot::isArmReceivedCorrectCmd(SetIOPWM(&_gripperServo, true, &ID), SHOW_ERRORS);
 }
 
 void DobotServo::closeGripper(int64_t ID)
 {
     _gripperServo.dutyCycle = _fGripClosed;
-    int closeGripResult = SetIOPWM(&_gripperServo, true, &ID);
-    if (closeGripResult != DobotCommunicate_NoError)
-        qDebug() << "ERROR: DobotQueue::queuePhysicalMoveOnArm(): "
-                    "SetIOPWM gone wrong";
+    Dobot::isArmReceivedCorrectCmd(SetIOPWM(&_gripperServo, true, &ID), SHOW_ERRORS);
 
-    //todo: 2 id w 1 ruchu
-    SetWAITCmd(&_gripperMoveDelay, true, &move.ID); //wait for the servo to be closed
+    //wait for the servo to be closed //todo: 2 id w 1 ruchu
+    Dobot::isArmReceivedCorrectCmd(SetWAITCmd(&_gripperMoveDelay, true, &move.ID), SHOW_ERRORS);
 }
 
 void DobotServo::addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType)

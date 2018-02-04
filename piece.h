@@ -5,10 +5,18 @@
 
 #include "QDebug"
 #include "QString"
-#include "vars/piece_type.h"
 #include "vars/players_types.h"
 #include "vars/posotion_on_board.h"
-#include "vars/board_types.h"
+
+enum PIECE_TYPE
+{
+    P_PAWN = 112, //p
+    P_ROOK = 114, //r
+    P_KNIGHT = 110, //n
+    P_BISHOP = 98, //b
+    P_KING = 107, //k
+    P_QUEEN = 113 //q
+};
 
 class Piece
 {
