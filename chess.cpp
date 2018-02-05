@@ -183,14 +183,14 @@ void Chess::checkMsgFromUsb(QString QStrMsg)
         qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
 }
 
-void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
+void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false)
 {
-    if (playerType == PT_WHITE)
+    if (PlayerType == PT_WHITE)
     {
         qDebug() << "Chess::playerWantToStartNewGame(): white";
         _pClientsList->setClientState(PT_WHITE, true);
     }
-    else if (playerType == PT_BLACK)
+    else if (PlayerType == PT_BLACK)
     {
         _pClientsList->setClientState(PT_BLACK, true);
         qDebug() << "Chess::playerWantToStartNewGame(): black";
@@ -199,7 +199,7 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE playerType)
         qDebug() << "Chess::playerWantToStartNewGame()";
     else
         qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame "
-                     "val:" << playerTypeAsQStr(playerType);
+                     "val:" << playerTypeAsQStr(PlayerType);
 
     if (_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers()
             || _PlayerSource == ARDUINO || bService)
@@ -235,11 +235,11 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
 }
 
 void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
-                                              VERTICAL_MOVE vertMove = VM_NONE)
+                                              VERTICAL_MOVE VertMove = VM_NONE)
 {
     if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), SHOW_ERRORS) return;
 
-    if (vertMove == VM_GRAB)
+    if (VertMove == VM_GRAB)
     {
         if (!this->isPieceSetOk()) return;
         if (pField->getPieceOnField(SHOW_ERRORS) == nullptr) return;
@@ -252,7 +252,7 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
 
         if (!this->isPieceSetOk()) return;
     }
-    else if (vertMove == VM_PUT)
+    else if (VertMove == VM_PUT)
     {
         if (!this->isPieceSetOk()) return;
 
@@ -266,7 +266,7 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
     }
 
     Point3D xyz = pField->getLocation3D();
-    _pDobot->queueMoveSequence(xyz, vertMove, Piece::dMaxPieceHeight);
+    _pDobot->queueMoveSequence(xyz, VertMove, Piece::dMaxPieceHeight);
 }
 
 void Chess::sendMsgToTcp(QString QStrMsg)

@@ -51,12 +51,12 @@ private:
 
 private slots:
     void onChangedMode();
-    void onJOGCtrlBtnPressed(int index);
+    void onJOGCtrlBtnPressed(int nID);
     void onJOGCtrlBtnReleased();
 
     //sloty do używania GUI MainWindow
-    void writeInConsole(QString QStrMsg, LOG msgType);
-    void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType);
+    void writeInConsole(QString QStrMsg, LOG MsgType);
+    void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showBoardInUI(QString QStrBoard, BOARD BoardType);
     void clearBoardInUI();
     void showLegalMovesInUI(QStringList legalMoves);
@@ -64,14 +64,16 @@ private slots:
 
     //dobot slots
     void setDobot_UI_PTE_Validators();
-    void setJointLabelText(QString QSJointLabelText, short sJoint);
-    void setAxisLabelText(QString QSAxisLabelText, char chAxis);
+    void setJointLabelText(QString QStrJointLabelText, short sJoint);
+    void setAxisLabelText(QString QStrAxisLabelText, char chAxis);
     void setDobotButtonsStates(bool bDobotButtonsStates);
-    void setDeviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
+    void setDeviceLabels(QString QStrDeviceSN, QString QStrDeviceName,
+                         QString QStrDeviceVersion);
     void showDobotErrorMsgBox();
-    void on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged);
+    void on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged);
     void on_sendSimulatedMsgBtn_clicked();
-    void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
+    void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft,
+                        int CoreNextId);
     void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
     void showArduinoGripperStateList(QList<ServoArduino> list);
 
@@ -86,7 +88,7 @@ private slots:
 
     //arduino usb slots
     void updatePortsComboBox(int nUsbPorst);
-    void on_portsComboBox_currentIndexChanged(int index);
+    void on_portsComboBox_currentIndexChanged(int nID);
     void on_reloadPortsBtn_clicked();
     void on_sendUsbBtn_clicked();
     void on_openGripperBtn_clicked();
@@ -95,15 +97,15 @@ private slots:
     void on_startDtPosBtn_clicked();
     void on_SimulateFromUsbBtn_clicked();
     void on_sendTcpBtn_clicked();
-    void on_sendTcpLineEdit_textChanged(const QString &textChanged);
-    void on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged);
+    void on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged);
+    void on_SimulateFromUsbLineEdit_textChanged(const QString& QStrTextChanged);
     void on_homeBtn_clicked();
-    void on_usbCmdLine_textChanged(const QString &arg1);
+    void on_usbCmdLine_textChanged(const QString& QStrTextChanged);
     void on_middleAboveBtn_clicked();
     void on_sendBtn_clicked();
-    void on_xPTPEdit_textChanged(const QString &arg1);
-    void on_yPTPEdit_textChanged(const QString &arg1);
-    void on_zPTPEdit_textChanged(const QString &arg1);
+    void on_xPTPEdit_textChanged(const QString& QStrTextChanged);
+    void on_yPTPEdit_textChanged(const QString& QStrTextChanged);
+    void on_zPTPEdit_textChanged(const QString& QStrTextChanged);
 };
 
 #endif // MAINWINDOW_H

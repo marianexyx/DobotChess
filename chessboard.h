@@ -45,7 +45,7 @@ public:
     bool isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
     BOARD getBoardType() const { return _BoardType; }
-    Point3D getBoardPoint3D(BOARD_POINTS bp) const;
+    Point3D getBoardPoint3D(BOARD_POINTS BP) const;
     Field* getField(short sFieldNr) const { return _pField[sFieldNr]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece);

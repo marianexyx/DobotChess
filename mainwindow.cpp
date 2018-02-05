@@ -96,20 +96,20 @@ void MainWindow::setDobot_UI_PTE_Validators()
     ui->zPTPEdit->setValidator(validator);
 }
 
-void MainWindow::setJointLabelText(QString QSJointLabelText, short sJoint)
+void MainWindow::setJointLabelText(QString QStrJointLabelText, short sJoint)
 {
-    if (sJoint == 1)  ui->joint1Label->setText(QSJointLabelText);
-    else if (sJoint == 2)  ui->joint2Label->setText(QSJointLabelText);
-    else if (sJoint == 3)  ui->joint3Label->setText(QSJointLabelText);
-    else if (sJoint == 4)  ui->joint4Label->setText(QSJointLabelText);
+    if (sJoint == 1)  ui->joint1Label->setText(QStrJointLabelText);
+    else if (sJoint == 2)  ui->joint2Label->setText(QStrJointLabelText);
+    else if (sJoint == 3)  ui->joint3Label->setText(QStrJointLabelText);
+    else if (sJoint == 4)  ui->joint4Label->setText(QStrJointLabelText);
 }
 
-void MainWindow::setAxisLabelText(QString QSAxisLabelText, char chAxis)
+void MainWindow::setAxisLabelText(QString QStrAxisLabelText, char chAxis)
 {
-    if (chAxis == 'x') ui->xLabel->setText(QSAxisLabelText);
-    else if (chAxis == 'y') ui->yLabel->setText(QSAxisLabelText);
-    else if (chAxis == 'z') ui->zLabel->setText(QSAxisLabelText);
-    else if (chAxis == 'r') ui->rLabel->setText(QSAxisLabelText);
+    if (chAxis == 'x') ui->xLabel->setText(QStrAxisLabelText);
+    else if (chAxis == 'y') ui->yLabel->setText(QStrAxisLabelText);
+    else if (chAxis == 'z') ui->zLabel->setText(QStrAxisLabelText);
+    else if (chAxis == 'r') ui->rLabel->setText(QStrAxisLabelText);
 }
 
 void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
@@ -203,12 +203,12 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
     }
 }
 
-void MainWindow::setDeviceLabels(QString QSdeviceSN, QString QSdeviceName,
-                                 QString QSdeviceVersion)
+void MainWindow::setDeviceLabels(QString QStrDeviceSN, QString QStrDeviceName,
+                                 QString QStrDeviceVersion)
 {
-    ui->deviceSNLabel->setText(QSdeviceSN);
-    ui->DeviceNameLabel->setText(QSdeviceName);
-    ui->DeviceInfoLabel->setText(QSdeviceVersion);
+    ui->deviceSNLabel->setText(QStrDeviceSN);
+    ui->DeviceNameLabel->setText(QStrDeviceName);
+    ui->DeviceInfoLabel->setText(QStrDeviceVersion);
 }
 
 void MainWindow::on_sendBtn_clicked()
@@ -243,9 +243,9 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-void MainWindow::writeInConsole(QString QStrMsg, LOG msgType = LOG_NOTHING)
+void MainWindow::writeInConsole(QString QStrMsg, LOG MsgType = LOG_NOTHING)
 {
-    QString QsLogType = "<" + logAsQstr(msgType) + ">: ";
+    QString QsLogType = "<" + logAsQstr(MsgType) + ">: ";
     if(QStrMsg.isEmpty()) return;
     if(QStrMsg == "/clear")
     {
@@ -326,10 +326,10 @@ void MainWindow::onChangedMode()
     }
 }
 
-void MainWindow::onJOGCtrlBtnPressed(int index) {
+void MainWindow::onJOGCtrlBtnPressed(int nID) {
     JOGCmd jogCmd;
     jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
-    jogCmd.cmd = index + 1;
+    jogCmd.cmd = nID + 1;
     SetJOGCmd(&jogCmd, false, NULL);
 }
 
@@ -438,9 +438,9 @@ void MainWindow::updatePortsComboBox(int nUsbPorst)
         ui->portsComboBox->addItem(_pUsb->availablePort.at(i).portName());
 }
 
-void MainWindow::on_portsComboBox_currentIndexChanged(int index)
+void MainWindow::on_portsComboBox_currentIndexChanged(int nID)
 {
-    _pUsb->portIndexChanged(index);
+    _pUsb->portIndexChanged(nID);
 }
 
 void MainWindow::on_reloadPortsBtn_clicked()
@@ -600,9 +600,9 @@ void MainWindow::showClientsList(QList<Client> list)
     ui->clientsPTE->setPlainText(QStrClientsList);
 }
 
-void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType)
+void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)
 {
-    switch(labelType)
+    switch(LabelType)
     {
     case BDL_SOCKETS_ONLINE: ui->socketsLbl->setText(QStrLabel); break;
     case BDL_WHITE_NAME: ui->whiteNameLbl->setText(QStrLabel); break;
@@ -617,7 +617,7 @@ void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL labelType
     case BDL_QUEUE_PLAYERS: ui->queuedPlayersLbl->setText(QStrLabel); break;
     case BDL_QUEUE_TIME: ui->queueTimeLbl->setText(QStrLabel); break;
     default: qDebug() << "ERROR: MainWindow::setBoardDataLabel(): unknown labelType"
-                      << labelType;
+                      << LabelType;
     }
 }
 
@@ -719,47 +719,47 @@ void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
     ui->historyPTE->setPlainText(history);
 }
 
-void MainWindow::on_usbCmdLine_textChanged(const QString &textChanged)
+void MainWindow::on_usbCmdLine_textChanged(const QString& QStrTextChanged)
 {
-    if (textChanged != NULL) ui->sendUsbBtn->setEnabled(true);
+    if (QStrTextChanged != NULL) ui->sendUsbBtn->setEnabled(true);
     else ui->sendUsbBtn->setEnabled(false);
 }
 
-void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString &textChanged)
+void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged)
 {
-    if (textChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
+    if (QStrTextChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
     else ui->sendSimulatedMsgBtn->setEnabled(false);
 }
 
-void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString &textChanged)
+void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString& QStrTextChanged)
 {
-    if (textChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
+    if (QStrTextChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
     else ui->SimulateFromUsbBtn->setEnabled(false);
 }
 
-void MainWindow::on_sendTcpLineEdit_textChanged(const QString &textChanged)
+void MainWindow::on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged)
 {
-    if (textChanged != NULL) ui->sendTcpBtn->setEnabled(true);
+    if (QStrTextChanged != NULL) ui->sendTcpBtn->setEnabled(true);
     else ui->sendTcpBtn->setEnabled(false);
 }
 
-void MainWindow::on_xPTPEdit_textChanged(const QString &textChanged)
+void MainWindow::on_xPTPEdit_textChanged(const QString& QStrTextChanged)
 {
-    if (textChanged != NULL || ui->yPTPEdit->text() != NULL || ui->zPTPEdit->text() != NULL)
+    if (QStrTextChanged != NULL || ui->yPTPEdit->text() != NULL || ui->zPTPEdit->text() != NULL)
         ui->sendBtn->setEnabled(true);
     else ui->sendBtn->setEnabled(false);
 }
 
-void MainWindow::on_yPTPEdit_textChanged(const QString &textChanged)
+void MainWindow::on_yPTPEdit_textChanged(const QString& QStrTextChanged)
 {
-    if (ui->xPTPEdit->text() != NULL || textChanged != NULL || ui->zPTPEdit->text() != NULL)
+    if (ui->xPTPEdit->text() != NULL || QStrTextChanged != NULL || ui->zPTPEdit->text() != NULL)
         ui->sendBtn->setEnabled(true);
     else ui->sendBtn->setEnabled(false);
 }
 
-void MainWindow::on_zPTPEdit_textChanged(const QString &textChanged)
+void MainWindow::on_zPTPEdit_textChanged(const QString& QStrTextChanged)
 {
-    if (ui->xPTPEdit->text() != NULL || ui->yPTPEdit->text() != NULL  || textChanged != NULL)
+    if (ui->xPTPEdit->text() != NULL || ui->yPTPEdit->text() != NULL  || QStrTextChanged != NULL)
         ui->sendBtn->setEnabled(true);
     else ui->sendBtn->setEnabled(false);
 }

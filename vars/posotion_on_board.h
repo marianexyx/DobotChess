@@ -32,7 +32,7 @@ struct PosFromTo
 
     PosFromTo();
     PosFromTo(PosOnBoard PosFrom, PosOnBoard PosTo) { from = PosFrom, to = PosTo;}
-    PosFromTo(LETTER fromL, DIGIT fromD, LETTER toL, DIGIT toD);
+    PosFromTo(LETTER FromL, DIGIT FromD, LETTER ToL, DIGIT ToD);
     PosFromTo(QString QStrMoveFromTo);
 
     static bool isMoveInProperFormat(QString QStrMoveFromTo);
@@ -58,8 +58,8 @@ PosOnBoard::PosOnBoard(int nL, int nD)
     {
         Letter = L_X;
         Digit = D_X;
-        qDebug() << "ERROR: PosOnBoard(int nL, int nD): parameters out of range: nL =" << nL
-                 << ", nD =" << nD;
+        qDebug() << "ERROR: PosOnBoard(int nL, int nD): parameters out of range: nL ="
+                 << nL << ", nD =" << nD;
     }
 }
 
@@ -68,8 +68,8 @@ PosOnBoard::PosOnBoard(QString QStrL, DIGIT D)
     Letter = pieceLetterPos(QStrL);
     Digit = D;
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PosOnBoard(QString QStrL, DIGIT D): parameter is X: "
-                    "Letter =" << Letter << ", Digit =" << Digit;
+        qDebug() << "WARNING: PosOnBoard(QString QStrL, DIGIT D): parameter is X: Letter ="
+                 << Letter << ", Digit =" << Digit;
 }
 
 PosOnBoard::PosOnBoard(QString QStrL, int nD)
@@ -77,8 +77,8 @@ PosOnBoard::PosOnBoard(QString QStrL, int nD)
     Letter = pieceLetterPos(QStrL);
     Digit = static_cast<DIGIT>(nD);
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PosOnBoard(QString QStrL, int nD): parameter is X: "
-                    "Letter =" << Letter << ", Digit =" << Digit;
+        qDebug() << "WARNING: PosOnBoard(QString QStrL, int nD): parameter is X: Letter ="
+                 << Letter << ", Digit =" << Digit;
 }
 PosOnBoard::PosOnBoard(QString QStrBoardPos)
 {
@@ -94,8 +94,8 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
         Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt());
     }
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PosOnBoard(QString QStrBoardPos): parameter is X: "
-                    "Letter =" << Letter << ", Digit =" << Digit;
+        qDebug() << "WARNING: PosOnBoard(QString QStrBoardPos): parameter is X: Letter ="
+                 << Letter << ", Digit =" << Digit;
 }
 
 
@@ -110,12 +110,12 @@ PosFromTo::PosFromTo()
     to.Digit = D_X;
 }
 
-PosFromTo::PosFromTo(LETTER fromL, DIGIT fromD, LETTER toL, DIGIT toD)
+PosFromTo::PosFromTo(LETTER FromL, DIGIT FromD, LETTER ToL, DIGIT ToD)
 {
-    from.Letter = fromL;
-    from.Digit = fromD;
-    to.Letter = toL;
-    to.Digit = toD;
+    from.Letter = FromL;
+    from.Digit = FromD;
+    to.Letter = ToL;
+    to.Digit = ToD;
 }
 
 PosFromTo::PosFromTo(QString QStrMoveFromTo)

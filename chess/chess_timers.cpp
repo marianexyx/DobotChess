@@ -26,21 +26,21 @@ ChessTimers::ChessTimers(Chess *pChess):
     _nRemainingBlackTime = _lTimersStartTime;
 }
 
-void ChessTimers::playerTimeOut(PLAYER_TYPE player)
+void ChessTimers::playerTimeOut(PLAYER_TYPE Player)
 {
     QString QStrMsg;
-    switch(player)
+    switch(Player)
     {
     case PT_WHITE: QStrMsg = "timeOutWhite"; break;
     case PT_BLACK: QStrMsg = "timeOutBlack"; break;
     default:
         qDebug() << "ERROR: ChessTimers::playerTimeOut(): unknown PLAYER_TYPE:"
-                 << playerTypeAsQStr(player);
+                 << playerTypeAsQStr(Player);
         return;
     }
 
     _pChess->getResetsPointer()->restartGame(ET_TIMEOUT_GAME,
-                                             _pChess->getClientsPointer()->getPlayer(player));
+                                             _pChess->getClientsPointer()->getPlayer(Player));
 }
 
 void ChessTimers::updateTimeLabels()

@@ -75,10 +75,10 @@ public slots:
 
 signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);
-    void JointLabelText(QString QSLabelText, short sJoint);
-    void AxisLabelText(QString QSAxisLabelText, char chAxis);
+    void JointLabelText(QString QStrLabelText, short sJoint);
+    void AxisLabelText(QString QStrAxisLabelText, char chAxis);
     void RefreshDobotButtonsStates(bool bDobotButtonsStates);
-    void deviceLabels(QString QSdeviceSN, QString QSdeviceName, QString QSdeviceVersion);
+    void deviceLabels(QString QStrDeviceSN, QString QStrDeviceName, QString QStrDeviceVersion);
     void DobotErrorMsgBox();
     void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
 };

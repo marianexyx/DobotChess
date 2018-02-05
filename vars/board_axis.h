@@ -48,9 +48,9 @@ inline LETTER pieceLetterPos(QString QStrLetter)
     }
 }
 
-inline QString pieceLetterPosAsQStr(LETTER letter)
+inline QString pieceLetterPosAsQStr(LETTER Letter)
 {
-    switch(letter)
+    switch(Letter)
     {
     case L_X: return "-1";
     case L_A: return "a";
@@ -63,7 +63,7 @@ inline QString pieceLetterPosAsQStr(LETTER letter)
     case L_H: return "h";
     default:
         qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): "
-                    "Unknown letter value =" << letter;
+                    "Unknown letter value =" << Letter;
         return "";
     }
 }

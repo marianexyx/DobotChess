@@ -6,6 +6,7 @@
 
 class ChessStatus
 {
+    friend class Chess;
 
 private:
     Chess* _pChess;
@@ -21,7 +22,7 @@ private:
 
     WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
 
-public:
+//public:
     ChessStatus(Chess* pChess);
     ~ChessStatus() {}
 
@@ -33,17 +34,17 @@ public:
     bool isMoveEnpassant(QString QStrMoveToTest);
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
     static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
-    void saveStatusData(QString status);
+    void saveStatusData(QString QStrStatus);
     void resetStatusData();
 
     //todo: settery jako friend dla chess? sprawdzić czy większośc metod dostepowych nie jest...
     //...używanych tylko w tej klasie
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
     void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
-    void setLegalMoves(QString msg);
+    void setLegalMoves(QString QStrMsg);
     void setLegalMoves(QStringList moves) { _legalMoves = moves;
                                             emit _pChess->showLegalMovesInUI(_legalMoves); }
-    void setHistoryMoves(QString msg);
+    void setHistoryMoves(QString QStrMsg);
     void setHistoryMoves(QStringList moves) { _historyMoves = moves;
                                               emit _pChess->showHistoryMovesInUI(_historyMoves); }
 

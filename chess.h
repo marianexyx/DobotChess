@@ -49,11 +49,11 @@ private:
     clientRequest _request;
 
     //communication methods
-    void playerWantToStartNewGame(PLAYER_TYPE playerType);
+    void playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);
     void startNewGameInChenard(bool bService = false);
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
-                                  VERTICAL_MOVE vertMove = VM_NONE);
+                                  VERTICAL_MOVE VertMove = VM_NONE);
     void sendMsgToTcp(QString QStrMsg);
     void newClientName(Client* pClient, clientRequest request);
     void removeClient(Client* pClient);

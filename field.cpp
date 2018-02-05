@@ -46,18 +46,18 @@ static PosOnBoard Field::Pos(short sFieldNr)
     return FieldLines;
 }
 
-static short Field::nr(PosOnBoard FieldLines)
+static short Field::nr(PosOnBoard fieldLines)
 {
-    short sFieldNr = static_cast<short>(FieldLines.Letter) +
-            static_cast<short>(FieldLines.Digit - 1) * 8;
+    short sFieldNr = static_cast<short>(fieldLines.Letter) +
+            static_cast<short>(fieldLines.Digit - 1) * 8;
 
     if (Field::isInRange(sFieldNr)) return sFieldNr;
     else return -1;
 }
 
-static short nr(LETTER let, DIGIT dig)
+static short nr(LETTER L, DIGIT D)
 {
-    PosOnBoard FieldLines(let, dig);
+    PosOnBoard FieldLines(L, D);
     return Field::nr(FieldLines);
 }
 
@@ -78,9 +78,9 @@ static short Field::startPieceNrOnField(short sFieldNr)
     else return 0;
 }
 
-static short startPieceNrOnField(PosOnBoard FieldLines)
+static short startPieceNrOnField(PosOnBoard fieldLines)
 {
-    short sFieldID = Field::nr(FieldLines);
+    short sFieldID = Field::nr(fieldLines);
     return Field::startPieceNrOnField(sFieldID);
 }
 

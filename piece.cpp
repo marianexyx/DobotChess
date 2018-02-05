@@ -21,18 +21,18 @@ static bool Piece::isInRange(short sPieceNr)
     else return true;
 }
 
-static PLAYER_TYPE Piece::Color(char cFENSign)
+static PLAYER_TYPE Piece::Color(char chFENSign)
 {
     PLAYER_TYPE PlayerType;
 
-    switch(cFENSign)
+    switch(chFENSign)
     {
     case 'p': case 'r': case 'n': case 'b': case 'k': case 'q':
         PlayerType = PT_BLACK; break;
     case 'P': case 'R': case 'N': case 'B': case 'K': case 'Q':
         PlayerType = PT_WHITE; break;
     default:
-        qDebug() << "ERROR: Piece::player unknown FENSign val =" << cFENSign;
+        qDebug() << "ERROR: Piece::player unknown FENSign val =" << chFENSign;
         PlayerType = PT_NONE;
         break;
     }
@@ -48,13 +48,13 @@ static PLAYER_TYPE Piece::Color(short sPieceNr)
     else return PT_BLACK;
 }
 
-static PIECE_TYPE Piece::Type(char cFENSign)
+static PIECE_TYPE Piece::Type(char chFENSign)
 {
-    if (Piece::Color(cFENSign) == PT_NONE) return PT_NONE;
+    if (Piece::Color(chFENSign) == PT_NONE) return PT_NONE;
 
     PIECE_TYPE Type;
 
-    switch(cFENSign)
+    switch(chFENSign)
     {
     case 'p': case 'P': Type = P_PAWN; break;
     case 'r': case 'R': Type = P_ROOK; break;
@@ -111,10 +111,10 @@ static QString Piece::name(short sPieceNr)
     return QStrName;
 }
 
-static short Piece::nr(PosOnBoard PieceLines)
+static short Piece::nr(PosOnBoard pieceLines)
 {
-    short sPieceNr = static_cast<short>(PieceLines.Letter) +
-            static_cast<short>(PieceLines.Digit - 1) * 8;
+    short sPieceNr = static_cast<short>(pieceLines.Letter) +
+            static_cast<short>(pieceLines.Digit - 1) * 8;
 
     if (Piece::isInRange(sPieceNr)) return sPieceNr;
     else return -1;
@@ -130,7 +130,7 @@ static short Piece::startFieldNr(short sPieceNr)
     else return sPieceNr + 32;
 }
 
-static PosOnBoard Piece::StartFieldPos(short sPieceNr)
+static PosOnBoard Piece::startFieldPos(short sPieceNr)
 {
     PosOnBoard PieceLines;
     if (!Piece::isInRange(sPieceNr)) return PieceLines;
@@ -148,7 +148,7 @@ static PosOnBoard Piece::StartFieldPos(short sPieceNr)
 
     if (PieceLines.Letter < 1 || PieceLines.Letter > 8 ||
             PieceLines.Digit < 1 || PieceLines.Digit > 8)
-        qDebug() << "ERROR: Field::StartFieldPos(): PieceLines out of range: letter ="
+        qDebug() << "ERROR: Field::startFieldPos(): PieceLines out of range: letter ="
                  << PieceLines.Letter << ", Digit =" << PieceLines.Digit;
 
     return PieceLines;

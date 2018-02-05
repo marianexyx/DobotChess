@@ -20,34 +20,34 @@ void ArduinoUsb::searchDevices()
 
 //Slot jest aktywowany po zmianie wartości przez użytkownika w combo box’ie. Ustawia on wskaźnik
 //na nowy obiekt (lub nic) i wyświetla odpowiednią informację w pasku statusu
-void ArduinoUsb::portIndexChanged(int nPortIndex) //zmiana/wybór portu
+void ArduinoUsb::portIndexChanged(int nIndex) //zmiana/wybór portu
 { //połączenie z portem jest ustawianie automatycznie jak tylko zostanie on wybrany
     if(usbPort->isOpen()) usbPort->close();
-    QString QsPortName = "NULL";
-    if (nPortIndex > 0)
+    QString QStrPortName = "NULL";
+    if (nIndex > 0)
     {
-        usbInfo = &availablePort.at(nPortIndex-1);
-        QsPortName = usbInfo->portName();
+        usbInfo = &availablePort.at(nIndex-1);
+        QStrPortName = usbInfo->portName();
 
         //funkcja setPort() dziedziczy wszystkie atrybuty portu typu BaudRate, DataBits, Parity itd.
-        usbPort->setPort(availablePort.at(nPortIndex-1)); //połącz z wybranym portem
+        usbPort->setPort(availablePort.at(nIndex-1)); //połącz z wybranym portem
         if(!usbPort->open(QIODevice::ReadWrite)) //jezeli port nie jest otwarty
             qDebug() << "ERROR: ArduinoUsb::portIndexChanged(): Unable to open port";
     }
     else usbInfo = NULL; //wskaźnik czyszczony, by nie wyświetlało wcześniejszych informacji
 
-    if (QsPortName != "NULL") //nie pokazuj próby podłączania do pustego portu
-        emit this->addTextToLogPTE("Connected to port: " + QsPortName + "\n", LOG_USB);
+    if (QStrPortName != "NULL") //nie pokazuj próby podłączania do pustego portu
+        emit this->addTextToLogPTE("Connected to port: " + QStrPortName + "\n", LOG_USB);
 }
 
-void ArduinoUsb::sendDataToUsb(QString QsMsg) //wyslij wiadomość na serial port
+void ArduinoUsb::sendDataToUsb(QString QStrMsg) //wyslij wiadomość na serial port
 {
     if(usbPort->isOpen())
     {
-        emit this->addTextToLogPTE(QsMsg + "\n", LOG_USB_SENT);
-        QsMsg += "$"; //wiadomości przez arduino odczytywane są póki nie natrafimy na znak '$'
+        emit this->addTextToLogPTE(QStrMsg + "\n", LOG_USB_SENT);
+        QStrMsg += "$"; //wiadomości przez arduino odczytywane są póki nie natrafimy na znak '$'
 
-        usbPort->write(QsMsg.toStdString().c_str());
+        usbPort->write(QStrMsg.toStdString().c_str());
         usbPort->waitForBytesWritten(-1); //czekaj aż przyjdą wszystkie dane
     }
     else emit this->addTextToLogPTE("ERROR: USB port is closed\n", LOG_USB);

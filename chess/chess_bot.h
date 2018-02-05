@@ -6,7 +6,7 @@
 
 class ChessBot
 {
-    Q_OBJECT
+    friend class Chess;
 
 private:
     Chess* _pChess;
@@ -17,7 +17,7 @@ private:
     bool _bIsIgorsAiSimulatedAsPlayer2;
     QString _QStrAIPiecieFromTo; //zapamiętany kolejny ruch bota czekający na wywołanie
 
-public:
+//public:
     ChessBot(Chess* pChess);
     ~ChessBot() {}
 

@@ -13,7 +13,7 @@ void TCPMsgs::queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd)
              << communicationTypeAsQStr(Sender);
 
     TcpMsgMetadata QStrReceivedData;
-    QStrReceivedData.ullTcpID = ++_n64CmdID;
+    QStrReceivedData.n64TcpID = ++_n64CmdID;
     QStrReceivedData.nSender = Sender;
     QStrReceivedData.QStrMsgForTcp = QStrCmd;
     TCPMsgsList << QStrReceivedData;
@@ -148,7 +148,7 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
             return;
         }
 
-        qDebug() << "ID =" << QStrData.ullTcpID << ", sender =" << QStrData.nSender
+        qDebug() << "ID =" << QStrData.n64TcpID << ", sender =" << QStrData.nSender
                  << ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp ="
                  << QStrMsgFromTcp;
 

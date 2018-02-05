@@ -10,15 +10,15 @@
 const bool SHOW_ERRORS = true;
 
 enum COMMUNICATION_TYPE { WEBSITE = 1, ARDUINO, TEST };
-inline QString communicationTypeAsQStr(COMMUNICATION_TYPE type)
+inline QString communicationTypeAsQStr(COMMUNICATION_TYPE Type)
 {
-    switch(type)
+    switch(Type)
     {
     case WEBSITE: return "website";
     case ARDUINO: return "arduino";
     case TEST: return "test";
     default:
-        qDebug() << "ERROR: communicationTypeAsQStr(): unknown parametr =" << type;
+        qDebug() << "ERROR: communicationTypeAsQStr(): unknown parametr =" << Type;
         return "";
     }
 }

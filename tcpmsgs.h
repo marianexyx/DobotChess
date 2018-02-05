@@ -8,7 +8,7 @@
 
 struct TcpMsgMetadata
 {
-    int64_t ullTcpID;
+    int64_t n64TcpID;
     int nSender;
     QString QStrMsgForTcp;
 };

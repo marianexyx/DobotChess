@@ -94,17 +94,17 @@ void DobotQueue::removeOldQueuedMovesFromCore()
         qDebug() << "ERROR: DobotQueue::removeOldQueuedMovesFromCore(): move in list not found";
 }
 
-DobotMove DobotQueue::getQueuedMoveInCore(int64_t ID)
+DobotMove DobotQueue::getQueuedMoveInCore(int64_t n64ID)
 {
     Q_FOREACH(DobotMove Move, _queuedCmdIDList)
     {
-        if (Move.ID == ID)
+        if (Move.ID == n64ID)
             return Move;
     }
 
     DobotMove errorMove;
     qDebug() << "ERROR: DobotQueue::getQueuedMoveInCore(): move with ID:"
-             << ID << "doesn't exists";
+             << n64ID << "doesn't exists";
     return errorMove;
 }
 

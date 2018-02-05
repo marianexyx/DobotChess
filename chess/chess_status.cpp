@@ -73,9 +73,9 @@ bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
     else return false;
 }
 
-void ChessStatus::saveStatusData(QString status)
+void ChessStatus::saveStatusData(QString QStrStatus)
 {
-    QStringList QStrFENRecord = status.split(QRegExp("\\s+"));
+    QStringList QStrFENRecord = QStrStatus.split(QRegExp("\\s+"));
     if (!QStrFENRecord.isEmpty()) QStrFENRecord.removeLast();
 
     if (QStrFENRecord.size() == 7)
@@ -119,9 +119,9 @@ void ChessStatus::resetStatusData()
     emit _pBoardMain->clearBoardInUI();
 }
 
-void ChessStatus::setLegalMoves(QString msg)
+void ChessStatus::setLegalMoves(QString QStrMsg)
 {
-    QStringList legalMoves = msg.split(QRegExp("\\s"));
+    QStringList legalMoves = QStrMsg.split(QRegExp("\\s"));
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove "ok"
     if (!legalMoves.isEmpty()) legalMoves.removeFirst(); //remove np. "20"
 
@@ -135,9 +135,9 @@ void ChessStatus::setLegalMoves(QString msg)
     this->setLegalMoves(legalMoves);
 }
 
-void ChessStatus::setHistoryMoves(QString msg)
+void ChessStatus::setHistoryMoves(QString QStrMsg)
 {
-    QStringList historyMoves = msg.split(QRegExp("\\s"));
+    QStringList historyMoves = QStrMsg.split(QRegExp("\\s"));
     if (!historyMoves.isEmpty()) historyMoves.removeFirst(); //remove "ok"
     if (!historyMoves.isEmpty()) historyMoves.removeFirst(); //remove f.e. "20"
 

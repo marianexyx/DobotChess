@@ -6,6 +6,8 @@
 
 class ChessMovements
 {
+    friend class Chess;
+
 private:
     Chess* _pChess;
     Chessboard* _pBoardMain;
@@ -16,7 +18,7 @@ private:
 
     void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }
 
-public:
+//public:
     ChessMovements(Chess* pChess);
     ~ChessMovements();
 

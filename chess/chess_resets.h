@@ -6,6 +6,8 @@
 
 class ChessResets
 {
+    friend class Chess;
+
 private:
     Chess* _pChess;
     Clients* _pClientsList;
@@ -17,7 +19,7 @@ private:
     void changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear);
     bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);
 
-public:
+//public:
     ChessResets(Chess* pChess);
 
     void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);

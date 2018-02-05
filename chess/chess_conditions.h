@@ -3,7 +3,7 @@
 
 #pragma once
 #include "chess.h"
-#include "vars/request_types.h"
+#include "chess/request_types.h"
 
 //future: wszystkie errory zapisywać w plikach z logami, z oznaczeniami kto, co, kiedy...
 //...wysyłał i w jakich okolicznościach
@@ -20,6 +20,8 @@ struct clientRequest
 
 class ChessConditions
 {
+    friend class Chess;
+
 private:
     Chess* _pChess;
 
@@ -28,7 +30,7 @@ private:
     bool isSenderAppropriate(Client* pSender, REQUEST_TYPE Type);
     bool isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request);
 
-public:
+//public:
     ChessConditions(Chess* pChess);
 
     bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender);

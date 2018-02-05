@@ -8,15 +8,15 @@ enum BOARD { B_MAIN,
              B_CHENARD,
              B_REMOVED };
 
-inline QString boardTypeAsQstr(BOARD board)
+inline QString boardTypeAsQstr(BOARD Board)
 {
-    switch(board)
+    switch(Board)
     {
     case B_MAIN: return "mainBoard";
     case B_CHENARD: return "chenardBoard";
     case B_REMOVED: return "removedBoard";
     default:
-        qDebug() << "ERROR: boardTypeAsQstr(): wrong arg = " << board;
+        qDebug() << "ERROR: boardTypeAsQstr(): wrong arg = " << Board;
         return "";
     }
 }

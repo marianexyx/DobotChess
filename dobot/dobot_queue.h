@@ -33,7 +33,7 @@ public:
     DobotMove getNextPhysicalMoveToQueueOnArm();
     void showLastExecutedArmMoveInUI();
     void removeOldQueuedMovesFromCore();
-    DobotMove getQueuedMoveInCore(int64_t ID);
+    DobotMove getQueuedMoveInCore(int64_t n64ID);
     //void retreat();
     void queuePhysicalMoveOnArm(DobotMove move);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);

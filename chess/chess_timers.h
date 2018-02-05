@@ -7,6 +7,8 @@
 
 class ChessTimers
 {
+    friend class Chess;
+
 private:
     Chess* _pChess;
 
@@ -22,11 +24,11 @@ private:
     void stopBoardTimers();
 
 private slots:
-    void playerTimeOut(PLAYER_TYPE player);
+    void playerTimeOut(PLAYER_TYPE Player);
     void updateTimeLabels();
     void timeOutStartQueue();
 
-public:
+//public:
     ChessTimers(Chess* pChess);
 
     void startGameTimer();

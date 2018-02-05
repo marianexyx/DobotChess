@@ -237,16 +237,16 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
     else return nullptr;
 }
 
-Point3D Chessboard::getBoardPoint3D(BOARD_POINTS bp) const
+Point3D Chessboard::getBoardPoint3D(BOARD_POINTS BP) const
 {
-    switch(bp)
+    switch(BP)
     {
     case BP_MIN: return _MinBoard; break;
     case BP_MAX: return _MaxBoard; break;
     case BP_MIDDLE: return _middleAbove; break;
     case BP_RETREAT_LEFT: return _retreatLeft; break;
     case BP_RETREAT_RIGHT: return _retreatRight; break;
-    default: qDebug() << "ERROR: Chessboard::getBoardPoint3D(): unknown bp:" << bp;
+    default: qDebug() << "ERROR: Chessboard::getBoardPoint3D(): unknown bp:" << BP;
         return _middleAbove;
     }
 }

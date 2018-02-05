@@ -21,7 +21,7 @@ public:
     QSerialPort* usbPort;
     QString QStrFullSerialMsg;
 
-    void sendDataToUsb(QString QsMsg);
+    void sendDataToUsb(QString QStrMsg);
     void searchDevices();
 
 private:
@@ -30,7 +30,7 @@ private:
     void receive(); //odbieranie wiadomości z usb
 
 public slots:
-   void portIndexChanged(int index); //zmiana/wybór portu
+   void portIndexChanged(int nIndex); //zmiana/wybór portu
 
 private slots:
     //void portIndexChanged(int index); //zmiana/wybór portu

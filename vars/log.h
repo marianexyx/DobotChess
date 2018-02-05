@@ -17,9 +17,9 @@ enum LOG
     LOG_USB_RECEIVED
 };
 
-inline QString logAsQstr(LOG log)
+inline QString logAsQstr(LOG Log)
 {
-    switch(log)
+    switch(Log)
     {
     case LOG_NOTHING: return "nothing";
     case LOG_CORE: return "core";
@@ -31,7 +31,7 @@ inline QString logAsQstr(LOG log)
     case LOG_USB_SENT: return "usbSent";
     case LOG_USB_RECEIVED: return "usbReceived";
     default:
-        qDebug() << "ERROR: logAsQstr(): wrong arg = " << log;
+        qDebug() << "ERROR: logAsQstr(): wrong arg = " << Log;
         return "";
     }
 }
