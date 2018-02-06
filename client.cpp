@@ -116,62 +116,62 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
     else qDebug() << "WARNING: Clients::clearPlayerType(): already clear";
 }
 
-void Clients::setClientState(Client client, bool state)
+void Clients::setClientStartConfirmation(Client client, bool bState)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl == client)
         {
-            if(state && cl.isStartClickedByPlayer == state)
-                qDebug() << "WARNING: Clients::setClientState(Client client, "
+            if(bState && cl.isStartClickedByPlayer == bState)
+                qDebug() << "WARNING: Clients::setClientStartConfirmation(Client client, "
                             "bool state): client has already clicked start";
 
             Client changedClient = cl;
-            changedClient.isStartClickedByPlayer = state;
+            changedClient.isStartClickedByPlayer = bState;
 
             int nClientPos = _clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setClientState(): new state =" <<
-                            _clients.at(nClientPos).isStartClickedByPlayer;
+                qDebug() << "Clients::setClientStartConfirmation(): new state ="
+                         << _clients.at(nClientPos).isStartClickedByPlayer;
             }
-            else qDebug() << "ERROR: Clients::setClientState(): iteration error. iter val ="
-                          << nClientPos;
+            else qDebug() << "ERROR: Clients::setClientStartConfirmation(): iteration "
+                             "error. iter val =" << nClientPos;
 
             return;
         }
     }
-    qDebug() << "ERROR: Clients::setClientState(): client not found";
+    qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
 }
 
-void Clients::setClientState(PLAYER_TYPE Type, bool state)
+void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.type == Type)
         {
-            if(state && cl.isStartClickedByPlayer == state)
-                qDebug() << "WARNING: Clients::setClientState(PLAYER_TYPE type, "
+            if(bState && cl.isStartClickedByPlayer == bState)
+                qDebug() << "WARNING: Clients::setClientStartConfirmation(PLAYER_TYPE type, "
                             "bool state): client has already clicked start";
 
             Client changedClient = cl;
-            changedClient.isStartClickedByPlayer = state;
+            changedClient.isStartClickedByPlayer = bState;
 
             int nClientPos = _clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setClientState(): new state =" <<
-                            _clients.at(nClientPos).isStartClickedByPlayer;
+                qDebug() << "Clients::setClientStartConfirmation(): new state ="
+                         << _clients.at(nClientPos).isStartClickedByPlayer;
             }
-            else qDebug() << "ERROR: Clients::setClientState(): iteration error. iter val ="
-                          << nClientPos;
+            else qDebug() << "ERROR: Clients::setClientStartConfirmation(): iteration "
+                             "error. iter val =" << nClientPos;
 
             return;
         }
     }
-    qDebug() << "ERROR: Clients::setClientState(): client not found";
+    qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
 }
 
 void Clients::addClientToQueue(Client client)
@@ -280,9 +280,9 @@ void Clients::resetPlayersStartConfirmInfo()
 {
     qDebug() << "Clients::resetPlayersStartConfirmInfo()";
     if (this->isStartClickedByPlayer(PT_WHITE))
-           this->setClientState(PT_WHITE, false);
+           this->setClientStartConfirmation(PT_WHITE, false);
     if (this->isStartClickedByPlayer(PT_BLACK))
-        this->setClientState(PT_BLACK, false);
+        this->setClientStartConfirmation(PT_BLACK, false);
 }
 
 void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
@@ -298,7 +298,7 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
 
         this->removeClientFromQueue(nextQueuedClient);
         this->setPlayerType(nextQueuedClient, Chair);
-        this->setClientState(nextQueuedClient, false);
+        this->setClientStartConfirmation(nextQueuedClient, false);
 
         emit this->setBoardDataLabel(this->getPlayerName(Chair),
                                       Chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);

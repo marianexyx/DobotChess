@@ -22,7 +22,7 @@ Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
 
     _PlayerSource = PlayerSource;
 
-    _ChessGameStatus = GS_ERROR;
+    _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
     _request.clear();
 
     for (int i=1; i>=32; ++i)
@@ -69,7 +69,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
             this->playerWantToStartNewGame(PT_BLACK);
         break;
     case RT_PROMOTE_TO:
-        request.param = _pMovements->getMove().asQStr() + request.param; //w/o break
+        request.param = _pMovements->getMove().asQStr() + request.param; // w/o break
     case RT_MOVE:
         this->manageMoveRequest(_request.param);
         break;
@@ -87,6 +87,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
         break;
     case RT_STAND_UP:
         _pClientsList->clearPlayerType(_pClientsList->getClientType(pClient));
+        _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_IM:
@@ -145,6 +146,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         break;
     case CMT_HISTORY:
         _pStatus->historyOk(QStrTcpRespond);
+        //todo: typy odpowiedzi na WWW też jako enumy zrobić z parametrami
         this->sendDataToAllClients("history " + _pStatus->getHisotyMovesAsQStr());
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
@@ -188,18 +190,18 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = fal
     if (PlayerType == PT_WHITE)
     {
         qDebug() << "Chess::playerWantToStartNewGame(): white";
-        _pClientsList->setClientState(PT_WHITE, true);
+        _pClientsList->setClientStartConfirmation(PT_WHITE, true);
     }
     else if (PlayerType == PT_BLACK)
     {
-        _pClientsList->setClientState(PT_BLACK, true);
+        _pClientsList->setClientStartConfirmation(PT_BLACK, true);
         qDebug() << "Chess::playerWantToStartNewGame(): black";
     }
     else if (_PlayerSource == ARDUINO)
         qDebug() << "Chess::playerWantToStartNewGame()";
     else
-        qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame "
-                     "val:" << playerTypeAsQStr(PlayerType);
+        qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame"
+                    " val:" << playerTypeAsQStr(PlayerType);
 
     if (_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers()
             || _PlayerSource == ARDUINO || bService)
@@ -207,21 +209,10 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = fal
         qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
                     "Try to start a game";
         _pTimers->stopQueueTimer();
-        this->startNewGameInChenard();
-        _pClientsList->setClientState(PT_WHITE, false);
-        _pClientsList->setClientState(PT_BLACK, false);
-    }
-}
-
-void Chess::startNewGameInChenard(bool bService = false)
-{
-    if (_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers()
-            || _PlayerSource == ARDUINO || bService)
-    {
         this->sendMsgToTcp("new");
+        _pClientsList->setClientStartConfirmation(PT_WHITE, false);
+        _pClientsList->setClientStartConfirmation(PT_BLACK, false);
     }
-    else
-        qDebug() << "ERROR: Chess::startNewGameInChenard(): game couldn't start";
 }
 
 void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
@@ -355,7 +346,7 @@ void Chess::sendDataToAllClients(QString QStrMsg)
                  << communicationTypeAsQStr(_PlayerSource);
 }
 
-void Chess::coreIsReadyForNewGame()
+void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
 {
     qDebug() << "Chess::coreIsReadyForNewGame()";
 
@@ -363,13 +354,15 @@ void Chess::coreIsReadyForNewGame()
     {
         if (_pClientsList->isGameTableOccupied())
             _pTimers->startQueueTimer();
+        else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
-        this->sendDataToAllClients("resetComplited");
+        this->sendDataToAllClients("resetComplited"); //don't add tableData- only chess data...
+        //...has changed during reset
     }
     else if (_PlayerSource == ARDUINO)
     {
         //future: nie startować automatycznie nowej gry? lepiej wymagać od gracza potwierdzenia
-        this->startNewGameInChenard();
+        this->sendMsgToTcp("new");
     }
     else
         qDebug() << "ERROR: Chess::coreIsReadyForNewGame(): unknown _PlayerSource val ="
@@ -379,6 +372,8 @@ void Chess::coreIsReadyForNewGame()
 void Chess::startNewGameInCore()
 {
     emit this->addTextToLogPTE("new game\n", LOG_CORE);
+
+    _ChessGameStatus = GS_TURN_WHITE_FIRST_TURN;
 
     //pierwszy legal i status wyglądają zawsze tak samo:
     _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
@@ -397,6 +392,8 @@ void Chess::manageMoveRequest(clientRequest request)
     if (_pStatus->isMoveARequestForPromotion(request.param))
     {
         _pMovements->setMove(request.param);
+        _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
+                                                                    GS_TURN_BLACK_PROMOTE;
         this->sendDataToClient("promoteToWhat", _pClientsList->getPlayer(
                                    _pStatus->getActivePlayerType()));
     }
@@ -415,6 +412,8 @@ void Chess::continueGameplay()
     if (_PlayerSource == WEBSITE)
     {
         _pTimers->switchPlayersTimers();
+        _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
+                                                                    GS_TURN_BLACK;
         this->sendDataToAllClients("moveOk " + _pMovements->getMove().asQStr() + " " +
                                    turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
     }

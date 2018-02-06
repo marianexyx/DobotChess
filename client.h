@@ -42,8 +42,8 @@ public:
     void setClientName(Client client, QString QStrName);
     void setPlayerType(Client client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
-    void setClientState(Client client, bool state);
-    void setClientState(PLAYER_TYPE Type, bool state);
+    void setClientStartConfirmation(Client client, bool bState);
+    void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
     void addClientToQueue(Client client);
     void removeClient(Client client);
     void removeClientFromQueue(Client client);

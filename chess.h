@@ -45,12 +45,11 @@ private:
 
     Piece* _pPiece[32];
 
-    GAME_STATUS _ChessGameStatus;
+    GAME_STATUS _ChessGameStatus; //todo: wyświetlać w pętli w tytule okna stan gry
     clientRequest _request;
 
     //communication methods
     void playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);
-    void startNewGameInChenard(bool bService = false);
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE VertMove = VM_NONE);
@@ -75,6 +74,8 @@ public:
           Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 
+    void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }
+
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
 
     //todo: friends to rest of ingredients
@@ -90,6 +91,7 @@ public:
     ChessConditions* getConditionsPointer() { return _pConditions; }
 
     GAME_STATUS getGameStatus() const { return _ChessGameStatus; }
+    clientRequest getLastRequest() const { return _request; }
 
 public slots:
     void checkMsgFromWebsockets(QString QStrMsg, Client* pClient);

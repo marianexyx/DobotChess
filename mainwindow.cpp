@@ -11,7 +11,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("Chess");
+    this->setWindowTitle(gameStatusAsQStr(GS_TURN_NONE_WAITING_FOR_PLAYERS));
 
     _pDobot = pDobot;
     _pWebSockets = pWebSockets;
@@ -30,7 +30,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),
             _pDobot, SLOT(onConnectDobot())); //connect dobot
-    this->setDobot_UI_PTE_Validators();
+    this->setDobotPTEValidatorsInUI();
 
     //classes signals to ui
     connect(_pDobot, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
@@ -86,7 +86,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setDobot_UI_PTE_Validators()
+void MainWindow::setDobotPTEValidatorsInUI()
 {
     QRegExp regExp("0|[-+]?[1-9][0-9]{0,2}[.][0-9]{1,3}");
     QValidator *validator = new QRegExpValidator(regExp);

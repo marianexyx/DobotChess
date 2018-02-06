@@ -63,7 +63,7 @@ private slots:
     void showHistoryMovesInUI(QStringList historyMoves);
 
     //dobot slots
-    void setDobot_UI_PTE_Validators();
+    void setDobotPTEValidatorsInUI();
     void setJointLabelText(QString QStrJointLabelText, short sJoint);
     void setAxisLabelText(QString QStrAxisLabelText, char chAxis);
     void setDobotButtonsStates(bool bDobotButtonsStates);

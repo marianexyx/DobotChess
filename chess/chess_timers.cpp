@@ -1,10 +1,12 @@
 #include "chess_timers.h"
 
 ChessTimers::ChessTimers(Chess *pChess):
-    _lTimersStartTime(1000*60*30), //1000ms (1s) * 60s * 30min
-    _lTimersStartQueue(1000*60*2)
+    _lTimersStartTime(1000*60*30), //30min
+    _lTimersStartQueue(1000*60*2) //2min
 {
     _pChess = pChess;
+    _pResets = _pChess->getResetsPointer();
+    _pClientsList = _pChess->getClientsPointer();
 
     _whiteTimer = new QTimer();
     _blackTimer = new QTimer();
@@ -28,19 +30,7 @@ ChessTimers::ChessTimers(Chess *pChess):
 
 void ChessTimers::playerTimeOut(PLAYER_TYPE Player)
 {
-    QString QStrMsg;
-    switch(Player)
-    {
-    case PT_WHITE: QStrMsg = "timeOutWhite"; break;
-    case PT_BLACK: QStrMsg = "timeOutBlack"; break;
-    default:
-        qDebug() << "ERROR: ChessTimers::playerTimeOut(): unknown PLAYER_TYPE:"
-                 << playerTypeAsQStr(Player);
-        return;
-    }
-
-    _pChess->getResetsPointer()->restartGame(ET_TIMEOUT_GAME,
-                                             _pChess->getClientsPointer()->getPlayer(Player));
+    _pResets->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
 }
 
 void ChessTimers::updateTimeLabels()
@@ -60,18 +50,18 @@ void ChessTimers::updateTimeLabels()
 }
 
 void ChessTimers::timeOutStartQueue()
-{
+{    
     this->stopQueueTimer();
-    pClientsList->resetPlayersStartConfirmInfo();
+    _pClientsList->resetPlayersStartConfirmInfo();
 
-    Clients* pClientsList = _pChess->getClientsPointer();
-    if (!pClientsList->isStartClickedByPlayer(PT_WHITE))
-        pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!this->isStartClickedByPlayer(PT_BLACK))
-        pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
     if (this->isGameTableOccupied())
         this->startQueueTimer();
+    else _pChess->setGameStatus(GS_TURN_NONE_WAITING_FOR_PLAYERS);
 
     _pChess->sendDataToAllClients(_pChess->getTableData());
 }
@@ -141,6 +131,8 @@ void ChessTimers::switchPlayersTimers()
 
 void ChessTimers::startQueueTimer()
 {
+    _pChess->setGameStatus(GS_TURN_NONE_WAITING_FOR_START_CONFIRMS);
+
     qDebug() << "Chessboard::startQueueTimer()";
     _startQueueTimer->stop();
     _startQueueTimer->setInterval(_lTimersStartQueue);

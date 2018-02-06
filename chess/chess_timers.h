@@ -11,11 +11,13 @@ class ChessTimers
 
 private:
     Chess* _pChess;
+    ChessResets* _pResets;
+    Clients* _pClientsList;
 
-    QTimer *_whiteTimer;
-    QTimer *_blackTimer;
-    QTimer *_updateLabelTimer;
-    QTimer *_startQueueTimer;
+    QTimer* _whiteTimer;
+    QTimer* _blackTimer;
+    QTimer* _updateLabelTimer;
+    QTimer* _startQueueTimer;
     int _nRemainingWhiteTime;
     int _nRemainingBlackTime;
     const long _lTimersStartTime;
