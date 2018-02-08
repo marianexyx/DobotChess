@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #pragma once
-
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QDebug>
@@ -29,7 +28,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
                         Chessboard* pBoardRemoved,  Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
-                        ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Client* pClient,
+                        ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Clients* pClientsList,
                         QWidget* parent = 0);
 
     virtual ~MainWindow();
@@ -42,9 +41,9 @@ private:
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
     Chessboard* _pBoardChenard;
-    TCPMsgs* _pTCPmsg;
+    TCPMsgs* _pTCPMsg;
     ArduinoUsb* _pUsb;
-    Client* _pClient;
+    Clients* _pClientsList;
     Chess* _pChess;
 
     void initControl();
@@ -55,7 +54,7 @@ private slots:
     void onJOGCtrlBtnReleased();
 
     //sloty do używania GUI MainWindow
-    void writeInConsole(QString QStrMsg, LOG MsgType);
+    void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showBoardInUI(QString QStrBoard, BOARD BoardType);
     void clearBoardInUI();

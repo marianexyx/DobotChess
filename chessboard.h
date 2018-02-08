@@ -13,14 +13,13 @@
 #include "vars/board_data_labels.h"
 #include "vars/board_types.h"
 
-//info: bez makra QOBCJECT. ta szachownica ma by w 100% zalezna
-//info: szachownica nie powinna być tworzona z bierkami- to...
-//...gra o tym decyduje gdzie i jakie są
 enum BOARD_POINTS { BP_MIN, BP_MAX, BP_MIDDLE, BP_RETREAT_LEFT, BP_RETREAT_RIGHT };
 
 //future: ta klasa może mieć swój podfolder razem z klasami piece, field i enumami
-class Chessboard
+class Chessboard: public QObject
 {
+    Q_OBJECT
+
 private:
     BOARD _BoardType;
     Field* _pField[64];

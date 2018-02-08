@@ -123,40 +123,38 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return;
 
     from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
-    from.Digit = QString::number(QStrMoveFromTo.mid(2,1));
+    from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
     to.Letter = pieceLetterPos(QStrMoveFromTo.mid(3,1));
-    to.Digit = QString::number(QStrMoveFromTo.right(1));
+    to.Digit = static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
 }
 
-static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
+/*static*/ bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
 {
-    if  (QStrMoveFromTo.length() == 4 || QStrMoveFromTo.length() == 5)
+    if  (QStrMoveFromTo.length() == 4)
     {
         if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)
             return false;
 
-        if (QString::number(QStrMoveFromTo.mid(2,1)) < D_1 ||
-                QString::number(QStrMoveFromTo.mid(2,1)) > D_8)
+        if (static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt()) < D_1 ||
+                static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt()) > D_8)
         {
-            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceFromDigit is out"
-                        " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.mid(2,1));
+            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat():"
+                        " pieceFromDigit is out of range <1, 8>. it ="
+                     << static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
             return false;
         }
 
         if (pieceLetterPos(QStrMoveFromTo.mid(3,1)) == L_X)
             return false;
 
-        if (QString::number(QStrMoveFromTo.mid(4,1)) < D_1 ||
-                QString::number(QStrMoveFromTo.mid(4,1)) > D_8)
+        if (static_cast<DIGIT>(QStrMoveFromTo.mid(4,1).toInt()) < D_1 ||
+                static_cast<DIGIT>(QStrMoveFromTo.mid(4,1).toInt()) > D_8)
         {
-            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): pieceToDigit is out"
-                        " of range <1, 8>. it ==" << QString::number(QStrMoveFromTo.right(1));
+            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat():"
+                        " pieceToDigit is out of range <1, 8>. it ="
+                     << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
             return false;
         }
-
-        if (QStrMoveFromTo.length() == 5 &&
-                !ChessStatus->isSignProperPromotionType(QStrMoveFromTo.right(1), SHOW_ERRORS))
-            return false;
     }
     else
     {
@@ -168,15 +166,16 @@ static bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
     return true;
 }
 
-static PosFromTo PosFromTo::fromQStr(QString QStrMoveFromTo)
+/*static*/ PosFromTo PosFromTo::fromQStr(QString QStrMoveFromTo)
 {
-    if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return;
-
     PosFromTo move;
+
+    if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return move;
+
     move.from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
-    move.from.Digit = QString::number(QStrMoveFromTo.mid(2,1));
+    move.from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
     move.to.Letter = pieceLetterPos(QStrMoveFromTo.mid(3,1));
-    move.to.Digit = QString::number(QStrMoveFromTo.right(1));
+    move.to.Digit = static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
 
     return move;
 }

@@ -5,7 +5,7 @@ QT_USE_NAMESPACE
 
 MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
                        Chessboard* pBoardRemoved, Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
-                       ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Client* pClient,
+                       ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Clients* pClientsList,
                        QWidget* parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -18,13 +18,11 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
     _pBoardChenard = pBoardChenard;
-    _pTCPmsg = pTCPmsg;
+    _pTCPMsg = pTCPMsg;
     _pUsb = pUsb;
-    _pClient = pClient;
+    _pClientsList = pClientsList;
     _pChess = pChess;
 
-    //todo: niektórych znaczników SIGNALS i SLOTS nie da się usunąć. sprawdzić po...
-    //...kompilacji czy się uda
     //ui signals to classes
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onChangedMode())); //endtype change
@@ -33,36 +31,46 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
     this->setDobotPTEValidatorsInUI();
 
     //classes signals to ui
-    connect(_pDobot, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pTCPmsg, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pWebSockets, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pChess, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pUsb, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pClient, addTextToLogPTE(QString, LOG), this, writeInConsole(QString, LOG));
-    connect(_pChess, setBoardDataLabel(QString, BOARD_DATA_LABEL),
-             this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
-    connect(_pBoardMain, setBoardDataLabel(QString, BOARD_DATA_LABEL),
-             this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
-    connect(_pBoardRemoved, setBoardDataLabel(QString, BOARD_DATA_LABEL),
-             this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
-    connect(_pClient, setBoardDataLabel(QString, BOARD_DATA_LABEL),
-             this, setBoardDataLabel(QString, BOARD_DATA_LABEL));
-    connect(_pBoardMain, clearBoardInUI(), this, clearBoardInUI()); //no need connect for removed
-    connect(_pBoardMain, showBoardInUI(QString, BOARD),
-            this, showBoardInUI(QString, BOARD));
-    connect(_pBoardRemoved, showBoardInUI(QString, BOARD),
-            this, showBoardInUI(QString, BOARD));
-    connect(_pBoardChenard, showBoardInUI(QString, BOARD),
-            this, showBoardInUI(QString, BOARD));
-    connect(_pChess, showLegalMovesInUI(QStringList), this, showLegalMovesInUI(QStringList));
-    connect(_pChess, showHistoryMovesInUI(QStringList), this, showHistoryMovesInUI(QStringList));
-    connect(_pWebSockets, showClientsList(QList<Clients>), this, showClientsList(QList<Clients>));
+    connect(_pDobot, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pTCPMsg, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pWebSockets, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pChess, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pUsb, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pClientsList, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pChess, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+             this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+    connect(_pBoardMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+             this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+    connect(_pBoardRemoved, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+             this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+    connect(_pClientsList, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+             this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed
+            this, SLOT(clearBoardInUI()));
+    connect(_pBoardMain, SIGNAL(showBoardInUI(QString, BOARD)),
+            this, SLOT(showBoardInUI(QString, BOARD)));
+    connect(_pBoardRemoved, SIGNAL(showBoardInUI(QString, BOARD)),
+            this, SLOT(showBoardInUI(QString, BOARD)));
+    connect(_pBoardChenard, SIGNAL(showBoardInUI(QString, BOARD)),
+            this, SLOT(showBoardInUI(QString, BOARD)));
+    connect(_pChess, SIGNAL(showLegalMovesInUI(QStringList)),
+            this, SLOT(showLegalMovesInUI(QStringList)));
+    connect(_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
+            this, SLOT(showHistoryMovesInUI(QStringList)));
+    connect(_pWebSockets, SIGNAL(showClientsList(QList<Clients>)),
+            this, SLOT(showClientsList(QList<Clients>)));
     connect(_pDobot, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobot, SIGNAL(AxisLabelText(QString, char)),
             this, SLOT(setAxisLabelText(QString, char)));
-    connect(_pDobot, deviceLabels(QString, QString, QString),
-            this, setDeviceLabels(QString, QString, QString));
+    connect(_pDobot, SIGNAL(deviceLabels(QString, QString, QString)),
+            this, SLOT(setDeviceLabels(QString, QString, QString)));
     connect(_pDobot, SIGNAL(RefreshDobotButtonsStates(bool)),
             this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobot, SIGNAL(DobotErrorMsgBox()),
@@ -71,8 +79,8 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
             this, SLOT(setQueueLabels(int, int, int, int, int)));
     connect(_pUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
-    connect(_pDobot->getServoPointer(), showArduinoGripperStateList(QList<ServoArduino>),
-            this, showArduinoGripperStateList(QList<ServoArduino>));
+    connect(_pDobot, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
+            this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
 
     this->initControl(); //init dobot JOG control
 
@@ -234,7 +242,7 @@ void MainWindow::on_sendBtn_clicked()
     bool bConversionServoOk;
     float fServoDutyCycle = ui->servoGripperEdit->text().toFloat(&bConversionServoOk);
     if (bConversionServoOk)
-        _pDobot->changeGripperAngle(fServoDutyCycle);
+        _pDobot->getServoPointer()->changeGripperAngle(fServoDutyCycle);
 }
 
 void MainWindow::showDobotErrorMsgBox()
@@ -243,41 +251,40 @@ void MainWindow::showDobotErrorMsgBox()
     return;
 }
 
-void MainWindow::writeInConsole(QString QStrMsg, LOG MsgType = LOG_NOTHING)
+void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
 {
-    QString QsLogType = "<" + logAsQstr(MsgType) + ">: ";
     if(QStrMsg.isEmpty()) return;
     if(QStrMsg == "/clear")
     {
-        ui->debug_log->clear();
+        ui->logPTE->clear();
         return;
     }
-    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " + QsLogType + QStrMsg;
-    ui->debug_log->setPlainText(ui->debug_log->toPlainText() + QStrMsg);
+    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " + logAsQstr(TypeOfMsg) + QStrMsg;
+    ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
     qDebug() << QStrMsg;
 
     //auto scroll
-    QScrollBar *scroll_debug_log = ui->debug_log->verticalScrollBar();
-    scroll_debug_log->setValue(scroll_debug_log->maximum());
+    QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
+    scroll_logPTE->setValue(scroll_logPTE->maximum());
 
     //prevent big string data
     int nMaximum = 10 * 1000;
-    while (ui.textEdit->toPlainText().length() > nMaximum)
-        ui.textEdit->textCursor().deletePreviousChar();
+    while (ui->logPTE->toPlainText().length() > nMaximum)
+        ui->logPTE->textCursor().deletePreviousChar();
 
     //future: wszystkie debugi i logi zapisywać do plików txt
 }
 
 void MainWindow::initControl() {
     QSignalMapper* signalMapper  = new QSignalMapper(this);
-    connect(ui->baseAngleAddBtn, pressed(), signalMapper, map());
-    connect(ui->baseAngleSubBtn, pressed(), signalMapper, map());
-    connect(ui->longArmAddBtn, pressed(), signalMapper, map());
-    connect(ui->longArmSubBtn, pressed(), signalMapper, map());
-    connect(ui->shortArmAddBtn, pressed(), signalMapper, map());
-    connect(ui->shortArmSubBtn, pressed(), signalMapper, map());
-    connect(ui->rHeadAddBtn, pressed(), signalMapper, map());
-    connect(ui->rHeadSubBtn, pressed(), signalMapper, map());
+    connect(ui->baseAngleAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->baseAngleSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->longArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->longArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->shortArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->shortArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->rHeadAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->rHeadSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
 
     signalMapper->setMapping(ui->baseAngleAddBtn, 0);
     signalMapper->setMapping(ui->baseAngleSubBtn, 1);
@@ -290,14 +297,14 @@ void MainWindow::initControl() {
 
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(onJOGCtrlBtnPressed(int)));
 
-    connect(ui->baseAngleAddBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->baseAngleSubBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->longArmAddBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->longArmSubBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->shortArmAddBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->shortArmSubBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->rHeadAddBtn, released(), this, onJOGCtrlBtnReleased());
-    connect(ui->rHeadSubBtn, released(), this, onJOGCtrlBtnReleased());
+    connect(ui->baseAngleAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->baseAngleSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->longArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->longArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->shortArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->shortArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->rHeadAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->rHeadSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
 }
 
 void MainWindow::onChangedMode()
@@ -427,8 +434,8 @@ void MainWindow::on_AIEnemySendBtn_clicked()
 
 void MainWindow::updatePortsComboBox(int nUsbPorst)
 {
-    QString QStrUsbPortsAmount = QString::number(nUsbPorst)
-            + (QStrUsbPortsAmount == 1 ? " port is ready to use\n" : " ports are ready to use\n");
+    QString QStrUsbPortsAmount = QString::number(nUsbPorst) + ((nUsbPorst == 1) ?
+                " port is ready to use\n" : " ports are ready to use\n");
     this->writeInConsole(QStrUsbPortsAmount, LOG_USB);
 
     //refresh ports list
@@ -476,7 +483,7 @@ void MainWindow::on_closeGripperBtn_clicked()
 void MainWindow::on_middleAboveBtn_clicked()
 {
     Point3D mid; //todo: ciągnąc z xml
-    _pDobot->addArmMoveToQueue(mid);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, mid);
 }
 
 //todo: ogarnąć punkty przejściowe (xml'e najpierw)
@@ -531,9 +538,9 @@ void MainWindow::on_sendTcpBtn_clicked()
     if (!ui->sendTcpLineEdit->text().isEmpty())
     {
         if (ui->directTcpMsgCheckBox->isChecked())
-            _pTCPmsg->queueCmd(TEST, ui->sendTcpLineEdit->text());
+            _pTCPMsg->queueCmd(TEST, ui->sendTcpLineEdit->text());
         else
-            _pTCPmsg->queueCmd(_pChess->getBotPointer()->getAI() ? ARDUINO : WEBSITE,
+            _pTCPMsg->queueCmd(_pChess->getBotPointer()->getAI() ? ARDUINO : WEBSITE,
                                ui->sendTcpLineEdit->text());
         ui->sendTcpLineEdit->clear();
     }
@@ -547,9 +554,9 @@ void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
     for(int i=0; i<list.count(); ++i)
     {
        item = list.at(i);
-       QStrQueuedList += QString::number(item.index) + ". " +  dobotMoveAsQstr(item.type) +
-               " " + sequenceTypeAsQstr(item.sequence) + QString::number(item.x) + " " +
-               QString::number(item.y) + " " + QString::number(item.z) + "\n";
+       QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
+               + " " + QString::number(item.xyz.x) + " " + QString::number(item.xyz.y)
+               + " " + QString::number(item.xyz.z) + "\n";
     }
     ui->queuedPTE->clear();
     ui->queuedPTE->setPlainText(QStrQueuedList);
@@ -564,10 +571,11 @@ void MainWindow::showArduinoGripperStateList(QList<ServoArduino> list)
     {
        item = list.at(i);
        QString QStrState = item.isGripperOpen ? "open" : "close";
-       QStrQueuedList += QString::number(item.index) + ". " + QStrState + "\n";
+       QStrQueuedList += QString::number(item.ID) + ". " + QStrState + "\n";
     }
-    ui->servoQueuePTE->clear();
-    ui->servoQueuePTE->setPlainText(QStrQueuedList);
+    /*ui->servoQueuePTE->clear();
+    ui->servoQueuePTE->setPlainText(QStrQueuedList);*/
+    qDebug() << "WARNING: MainWindow::showArduinoGripperStateList(): servoQueuePTE is removed";
 }
 
 void MainWindow::showClientsList(QList<Client> list)

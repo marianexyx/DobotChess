@@ -19,11 +19,11 @@ INPUT(
 ./release\xml_reader.o
 ./release\dobot_queue.o
 ./release\dobot_servo.o
+./release\chess_conditions.o
 ./release\moc_websockets.o
 ./release\moc_tcpmsgs.o
 ./release\moc_dobot.o
 ./release\moc_arduinousb.o
 ./release\moc_chess.o
 ./release\moc_mainwindow.o
-./release\moc_chess_bot.o
 );

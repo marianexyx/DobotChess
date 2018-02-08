@@ -4,6 +4,8 @@
 #pragma once
 #include "dobot.h"
 
+class Dobot;
+
 struct ServoArduino
 {
     int64_t ID;
@@ -32,9 +34,6 @@ public:
     void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType);
 
     bool isServoListEmpty() const { return _arduinoGripperStates.isEmpty() ? true : false; }
-
-signals:
-    void showArduinoGripperStateList(QList<ServoArduino>);
 };
 
 #endif // DOBOT_SERVO_H

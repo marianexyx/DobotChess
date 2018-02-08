@@ -17,7 +17,7 @@ bool ChessStatus::isMoveRemoving()
     else return false;
 }
 
-static bool ChessStatus::isSignProperPromotionType(QString QStrSign, bool bErrorLog = false)
+/*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign, bool bErrorLog = false)
 {
     if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "k" ||
             QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "K")
@@ -31,7 +31,7 @@ static bool ChessStatus::isSignProperPromotionType(QString QStrSign, bool bError
     }
 }
 
-static bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog = false)
+/*static*/ bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog = false)
 {
     if (this->isSignProperPromotionType(QStrMove.right(1), SHOW_ERRORS)
             && QStrMove.length() == 5)
@@ -40,6 +40,18 @@ static bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog = fals
     {
         if (bErrorLog)
             qDebug() << "ERROR:: ChessStatus::isMovePromotion(): it's not. Move =" << QStrMove;
+        return false;
+    }
+}
+
+/*static*/ bool ChessStatus::isMoveInProperFormat(QString QStrMove, bool bErrorLog = false)
+{
+    if (PosFromTo::isMoveInProperFormat(QStrMove) || ChessStatus::isMovePromotion(QStrMove))
+        return true;
+    else
+    {
+        if (bErrorLog)
+            qDebug() << "ERROR: ChessStatus::isMoveInProperFormat(): it's not. it =" << QStrMove;
         return false;
     }
 }
@@ -135,6 +147,12 @@ void ChessStatus::setLegalMoves(QString QStrMsg)
     this->setLegalMoves(legalMoves);
 }
 
+void ChessStatus::setLegalMoves(QStringList moves)
+{
+    _legalMoves = moves;
+    _pChess->showMovesInUI(ML_LEGAL, _legalMoves);
+}
+
 void ChessStatus::setHistoryMoves(QString QStrMsg)
 {
     QStringList historyMoves = QStrMsg.split(QRegExp("\\s"));
@@ -150,6 +168,12 @@ void ChessStatus::setHistoryMoves(QString QStrMsg)
     }
 
     this->setHistoryMoves(historyMoves);
+}
+
+void ChessStatus::setHistoryMoves(QStringList moves)
+{
+    _historyMoves = moves;
+    _pChess->showMovesInUI(ML_HISTORY, _legalMoves);
 }
 
 WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
@@ -190,4 +214,16 @@ PLAYER_TYPE ChessStatus::getActivePlayerType()
                  << turnTypeAsQstr(_WhoseTurn);
         return PT_NONE;
     }
+}
+
+void ChessStatus::clearLegalMoves()
+{
+    _legalMoves.clear();
+    _pChess->showMovesInUI(ML_LEGAL, _legalMoves);
+}
+
+void ChessStatus::clearHistoryMoves()
+{
+    _historyMoves.clear();
+    _pChess->showMovesInUI(ML_HISTORY, _legalMoves);
 }

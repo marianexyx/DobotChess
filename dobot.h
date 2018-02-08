@@ -17,8 +17,8 @@
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "dobot/dobot_moves.h"
-#include "dobot/dobot_queue.h"
 #include "dobot/dobot_servo.h"
+#include "dobot/dobot_queue.h"
 
 class Dobot: public QObject
 {
@@ -37,7 +37,8 @@ private:
     bool _bConnectedToDobot;
 
     HOMEParams _Home;
-    Point3D _lastGivenPoint, _realTimePoint;
+    Point3D _realTimePoint;
+    Point3D _lastGivenPoint;
 
 public:
     Dobot(ArduinoUsb* pUsb);
@@ -49,10 +50,11 @@ public:
     void initDobot();
     void onPTPsendBtnClicked();
 
-    void queueMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump);
+    void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove = VM_NONE);
     bool isPointTotallyDiffrent(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
-    void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint);
+    void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
+    void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
     bool bIsMoveInAxisRange(Point3D point);
 
@@ -68,6 +70,9 @@ public:
     DobotQueue* getQueuePointer() const { return _pQueue; }
     ArduinoUsb* getArduinoPointer() const { return _pUsb; }
 
+    void showArduinoGripperStateListInUI(QList<ServoArduino> list)
+    { emit this->showArduinoGripperStateList(list); }
+
 public slots:
     void onConnectDobot();
     void onPeriodicTaskTimer();
@@ -81,6 +86,7 @@ signals: //GUI mainWindow
     void deviceLabels(QString QStrDeviceSN, QString QStrDeviceName, QString QStrDeviceVersion);
     void DobotErrorMsgBox();
     void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
+    void showArduinoGripperStateList(QList<ServoArduino>);
 };
 
 #endif // DOBOT_H

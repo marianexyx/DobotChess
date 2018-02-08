@@ -57,7 +57,7 @@ void DobotServo::moveServoManually()
         _arduinoGripperStates.removeFirst();
     }
 
-    emit showArduinoGripperStateList(_arduinoGripperStates);
+    _pDobot->showArduinoGripperStateListInUI(_arduinoGripperStates);
 }
 
 void DobotServo::openGripper(int64_t ID)

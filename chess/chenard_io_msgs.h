@@ -72,13 +72,13 @@ bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bool bErr
         bReturn = (QStrAns.left(4) == "OK 1") ? true : false; //"OK 1" and "OK 1\n"
         break;
     default:
-        qDebug() << "ERROR: chenardMsgTypeAsQStr(): wrong arg =" << CMT;
+        qDebug() << "ERROR: chenardMsgTypeAsQStr(): wrong arg =" << Command;
         return "";
     }
 
     if (bReturn && bErrorLog)
         qDebug() << "ERROR: isChenardAnswerCorrect(): wrong answer:" << QStrAns
-                    << "for" << requestTypeAsQStr(CMT_NEW) << "command";
+                    << "for" << chenardMsgTypeAsQStr(CMT_NEW) << "command";
 
     return bReturn;
 }

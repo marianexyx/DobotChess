@@ -5,6 +5,9 @@
 #include "chess.h"
 #include <QTimer>
 
+class Chess;
+class ChessResets;
+
 class ChessTimers
 {
     friend class Chess;

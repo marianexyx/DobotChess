@@ -4,12 +4,12 @@ Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
              Chessboard *pBoardRemoved, Chessboard *pBoardChenard, ArduinoUsb *pUsb,
              Websockets* pWebsockets, TCPMsgs *pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
-    _pTimers = new ChessTimers(*this);
-    _pMovements = new ChessMovements(*this);
-    _pBot = new ChessBot(*this);
-    _pStatus = new ChessStatus(*this);
-    _pResets = new ChessResets(*this) ;
-    _pConditions = new ChessConditions(*this);
+    _pTimers = new ChessTimers(this);
+    _pMovements = new ChessMovements(this);
+    _pBot = new ChessBot(this);
+    _pStatus = new ChessStatus(this);
+    _pResets = new ChessResets(this) ;
+    _pConditions = new ChessConditions(this);
 
     _pClientsList = pClientsList;
     _pDobot = pDobot;
@@ -26,13 +26,14 @@ Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
     _request.clear();
 
     for (int i=1; i>=32; ++i)
-        *_pPiece[i] = new Piece(i);
+        _pPiece[i] = new Piece(i);
 
-    connect(_pUsb, msgFromUsbToChess(QString), this, checkMsgFromUsb(QString));
-    connect(_pTCPMsgs, msgFromTcpToChess(QString, QString),
-            this, checkMsgFromChenard(QString, QString));
-    connect(_pWebsockets, msgFromWebsocketsToChess(QString, Client*),
-            this, checkMsgFromWebsockets(QString, Client*));
+    connect(_pUsb, SIGNAL(msgFromUsbToChess(QString)),
+            this, SLOT(checkMsgFromUsb(QString)));
+    connect(_pTCPMsgs, SIGNAL(msgFromTcpToChess(QString, QString)),
+            this, SLOT(checkMsgFromChenard(QString, QString)));
+    connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, Client*)),
+            this, SLOT(checkMsgFromWebsockets(QString, Client*)));
 }
 
 Chess::~Chess()
@@ -69,9 +70,9 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
             this->playerWantToStartNewGame(PT_BLACK);
         break;
     case RT_PROMOTE_TO:
-        request.param = _pMovements->getMove().asQStr() + request.param; // w/o break
+        _request.param = _pMovements->getMove().asQStr() + _request.param; // w/o break
     case RT_MOVE:
-        this->manageMoveRequest(_request.param);
+        this->manageMoveRequest(_request);
         break;
     case RT_GET_TABLE_DATA:
         this->sendDataToClient(this->getTableData(), pClient);
@@ -118,7 +119,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
              << ", QStrTcpRespond:" << QStrTcpRespond;
 
     if(_PlayerSource == ARDUINO)
-        this->checkAI();
+        _pBot->checkAI();
 
     CHENARD_MSG_TYPE ProcessedChenardMsgType = ChenardMsgType(QStrTcpMsgType);
     if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpMsgType, SHOW_ERRORS)) return;
@@ -139,13 +140,13 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
             //...ruchu (tj. zdjął blokadę przed kojenym ruchem)
         }
         else //ET_WHIE_WON, ET_BLACK_WON, ET_DRAW
-            _pResets->restartGame(_pStatus->getFENGameStateAsEndType());
+            _pResets->restartGame(_pStatus->getFENGameState());
         break;
     case CMT_LEGAL:
         _pStatus->setLegalMoves(QStrTcpRespond);
         break;
     case CMT_HISTORY:
-        _pStatus->historyOk(QStrTcpRespond);
+        _pStatus->setHistoryMoves(QStrTcpRespond);
         //todo: typy odpowiedzi na WWW też jako enumy zrobić z parametrami
         this->sendDataToAllClients("history " + _pStatus->getHisotyMovesAsQStr());
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
@@ -185,7 +186,7 @@ void Chess::checkMsgFromUsb(QString QStrMsg)
         qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
 }
 
-void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false)
+void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = false*/)
 {
     if (PlayerType == PT_WHITE)
     {
@@ -203,7 +204,7 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = fal
         qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame"
                     " val:" << playerTypeAsQStr(PlayerType);
 
-    if (_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers()
+    if ((_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers())
             || _PlayerSource == ARDUINO || bService)
     {
         qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
@@ -257,7 +258,7 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
     }
 
     Point3D xyz = pField->getLocation3D();
-    _pDobot->queueMoveSequence(xyz, VertMove, Piece::dMaxPieceHeight);
+    _pDobot->queueMoveSequence(xyz, Piece::dMaxPieceHeight, VertMove);
 }
 
 void Chess::sendMsgToTcp(QString QStrMsg)
@@ -344,6 +345,16 @@ void Chess::sendDataToAllClients(QString QStrMsg)
     else
         qDebug() << "ERROR: Chess::sendDataToAllClients(): unknown _PlayerSource val ="
                  << communicationTypeAsQStr(_PlayerSource);
+}
+
+void Chess::showMovesInUI(MOVES_LISTS ML, QStringList moves)
+{
+    switch(ML)
+    {
+    case ML_HISTORY: emit this->showHistoryMovesInUI(moves); break;
+    case ML_LEGAL: emit this->showLegalMovesInUI(moves); break;
+    default: qDebug() << "ERROR: Chess::showMovesInUI(): unknown ML =" << ML;
+    }
 }
 
 void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?

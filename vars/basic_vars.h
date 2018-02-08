@@ -1,7 +1,7 @@
 #ifndef BASIC_VARS_H
 #define BASIC_VARS_H
 
-#pramga once
+#pragma once
 #include <QString>
 
 //future: w zasadzie folder vars/ mógłby nie istnieć, jeżeli każda większa klasa miała by...
@@ -29,10 +29,11 @@ struct Point3D
     double y;
     double z;
 
+    void operator =(const struct Point3D& p) { x = p.x; y = p.y; z = p.z; }
     bool operator ==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
 
-    Point3D() { x = 0.0; y = 0.0, z = 0.0; }
-    Point3D(double dX, double dY, double dZ) { x = dX; y = dY; z = dZ; }
+    Point3D(): x(0.0), y(0.0), z(0.0) {}
+    Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}
 };
 
 enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
@@ -45,7 +46,7 @@ inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
     case VM_PUT: return "put"; break;
     default:
         qDebug() << "ERROR: verticalMoveAsQStr(): wrong arg =" << VM;
-        return VM_NONE;
+        return "none";
     }
 }
 

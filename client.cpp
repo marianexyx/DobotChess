@@ -49,13 +49,13 @@ void Clients::setClientName(Client client, QString QStrName)
     qDebug() << "ERROR: Clients::setClientName(): client not found";
 }
 
-void Clients::setPlayerType(Client client, PLAYER_TYPE Type)
+void Clients::setPlayerType(Client* client, PLAYER_TYPE Type)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
         {
-            if (Type != PT_NONE && client.queue > 0)
+            if (Type != PT_NONE && client->queue > 0)
             {
                 qDebug() << "ERROR: Clients::setPlayerType(): client in queue can not"
                             " sit on chair";
@@ -174,11 +174,11 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
     qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
 }
 
-void Clients::addClientToQueue(Client client)
+void Clients::addClientToQueue(Client* client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
         {
             if (cl.queue > 0)
             {
@@ -201,9 +201,9 @@ void Clients::addClientToQueue(Client client)
         if (cl.queue > maxQueue)
             maxQueue = cl.queue;
     }
-    Q_FOREACH (Client client, _clients)
+    Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
         {
             Client changedClient = cl;
             changedClient.queue = (maxQueue == 0) ? 1 : maxQueue + 1;
@@ -253,11 +253,11 @@ void Clients::removeClient(Client client)
     }
 }
 
-void Clients::removeClientFromQueue(Client client)
+void Clients::removeClientFromQueue(Client* client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
         {
             Client changedClient = cl;
             changedClient.queue = -1;
@@ -473,11 +473,11 @@ QString Clients::getQueuedClientsList()
     qDebug() << "Clients::testQueuedClients(): QStrQueuedClients =" << QStrQueuedClients;
 }*/
 
-PLAYER_TYPE Clients::getClientType(Client client)
+PLAYER_TYPE Clients::getClientType(Client* client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
             return cl.type;
     }
     qDebug() << "ERROR: Clients::getClientType(): socket not found";
@@ -517,7 +517,7 @@ int64_t Clients::getClientPosInQueue(Client client)
     return -1;
 }
 
-QWebSocket *Clients::getPlayerSocket(PLAYER_TYPE Type)
+QWebSocket* Clients::getPlayerSocket(PLAYER_TYPE Type)
 {
     if (Type != PT_NONE)
     {

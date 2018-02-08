@@ -410,7 +410,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_18">
        <item row="0" column="0">
-        <widget class="QPlainTextEdit" name="debug_log">
+        <widget class="QPlainTextEdit" name="logPTE">
          <property name="readOnly">
           <bool>true</bool>
          </property>

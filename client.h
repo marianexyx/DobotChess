@@ -30,8 +30,10 @@ struct Client //todo: class friend to Clients
     }
 };
 
-class Clients
+class Clients: public QObject
 {
+    Q_OBJECT
+
 private:
     QList<Client> _clients;
 public:
@@ -40,13 +42,13 @@ public:
     void newClient(QWebSocket* pClientSocket);
     //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w działaniu
     void setClientName(Client client, QString QStrName);
-    void setPlayerType(Client client, PLAYER_TYPE Type);
+    void setPlayerType(Client* client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
     void setClientStartConfirmation(Client client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
-    void addClientToQueue(Client client);
+    void addClientToQueue(Client* client);
     void removeClient(Client client);
-    void removeClientFromQueue(Client client);
+    void removeClientFromQueue(Client* client);
     void resetPlayersStartConfirmInfo();
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
@@ -59,7 +61,7 @@ public:
     QString getClientName(Client client);
     Client getNextQueuedClient();
     QString getQueuedClientsList();
-    PLAYER_TYPE getClientType(Client client);
+    PLAYER_TYPE getClientType(Client* client);
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
     bool isGameTableOccupied();
     int64_t getClientPosInQueue(Client client);

@@ -32,7 +32,7 @@ public:
 
     bool operator ==(const class Piece& p) { return _sPieceID == p.getNr(); }
 
-    static double dMaxPieceHeight = 50.f;
+    static double dMaxPieceHeight;
 
     static bool isInRange(short sPieceNr);
     static PLAYER_TYPE Color(char chFENSign);

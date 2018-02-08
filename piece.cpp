@@ -1,6 +1,6 @@
 #include "piece.h"
 
-Piece::Piece(short sPieceID)
+Piece::Piece(short sPieceID): dMaxPieceHeight(50.f)
 {
     if (Piece::isInRange(sPieceID))
         _PieceType = Piece::Type(sPieceID);

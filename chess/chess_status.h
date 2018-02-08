@@ -3,6 +3,14 @@
 
 #pragma once
 #include "chess.h"
+#include "chess/end_of_game_types.h"
+#include "chess/turn_types.h"
+
+class Chess;
+class Chessboard;
+class Clients;
+
+enum MOVES_LISTS { ML_HISTORY, ML_LEGAL };
 
 class ChessStatus
 {
@@ -32,8 +40,6 @@ private:
     bool isMoveRemoving();
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
-    static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
-    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     void saveStatusData(QString QStrStatus);
     void resetStatusData();
 
@@ -42,11 +48,9 @@ private:
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
     void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
     void setLegalMoves(QString QStrMsg);
-    void setLegalMoves(QStringList moves) { _legalMoves = moves;
-                                            emit _pChess->showLegalMovesInUI(_legalMoves); }
+    void setLegalMoves(QStringList moves);
     void setHistoryMoves(QString QStrMsg);
-    void setHistoryMoves(QStringList moves) { _historyMoves = moves;
-                                              emit _pChess->showHistoryMovesInUI(_historyMoves); }
+    void setHistoryMoves(QStringList moves);
 
     END_TYPE getFENGameState() const { return _FENGameState; }
     WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
@@ -57,10 +61,13 @@ private:
     QString getEnpassant() const { return _QStrEnpassant; }
     PLAYER_TYPE getActivePlayerType();
 
-    void clearLegalMoves() { _legalMoves.clear();
-                             emit _pChess->showLegalMovesInUI(_legalMoves);}
-    void clearHistoryMoves() { _historyMoves.clear();
-                               emit _pChess->showHistoryMovesInUI(_historyMoves); }
+    void clearLegalMoves();
+    void clearHistoryMoves();
+
+public:
+    static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
+    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
+    static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
 };
 
 #endif // CHESS_STATUS_H

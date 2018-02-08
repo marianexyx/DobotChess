@@ -18,7 +18,7 @@ private:
 
     void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }
 
-//public:
+public:
     ChessMovements(Chess* pChess);
     ~ChessMovements();
 

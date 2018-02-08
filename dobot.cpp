@@ -233,7 +233,7 @@ void Dobot::initDobot()
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
-void Dobot::queueMoveSequence(Point3D dest3D, VERTICAL_MOVE VertMove = VM_NONE, double dJump)
+void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove = VM_NONE)
 {
     if (this->isPointTotallyDiffrent(dest3D)) return;
 
@@ -284,10 +284,15 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
     else return true;
 }
 
-void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point = _lastGivenPoint)
+void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
+{
+    Point3D point = _lastGivenPoint;
+    _pQueue->addArmMoveToQueue(Type, point);
+}
+
+void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
     _lastGivenPoint = point;
-
     _pQueue->addArmMoveToQueue(Type, point);
 }
 

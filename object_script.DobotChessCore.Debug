@@ -19,11 +19,11 @@ INPUT(
 ./debug\xml_reader.o
 ./debug\dobot_queue.o
 ./debug\dobot_servo.o
+./debug\chess_conditions.o
 ./debug\moc_websockets.o
 ./debug\moc_tcpmsgs.o
 ./debug\moc_dobot.o
 ./debug\moc_arduinousb.o
 ./debug\moc_chess.o
 ./debug\moc_mainwindow.o
-./debug\moc_chess_bot.o
 );

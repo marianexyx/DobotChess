@@ -20,6 +20,16 @@ enum REQUEST_TYPE
     RT_CLIENT_LEFT
 };
 
+struct clientRequest
+{
+    REQUEST_TYPE type;
+    QString param;
+
+    clientRequest(): type(RT_NONE), param("") {}
+    clientRequest(REQUEST_TYPE R, QString p): type(R), param(p) {}
+    void clear() { type = RT_NONE; param.clear(); }
+};
+
 inline REQUEST_TYPE requestType(QString QStrRequest, bool bErrorLog = false)
 {   
     if (QStrRequest == "newGame") return RT_NEW_GAME;

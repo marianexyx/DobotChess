@@ -13,12 +13,18 @@
 #include "chess/chenard_io_msgs.h"
 #include "chess/sequence_types.h"
 #include "chess/end_of_game_types.h"
+#include "chess/chess_status.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_movements.h"
-#include "chess/chess_status.h"
 #include "chess/chess_bot.h"
 #include "chess/chess_resets.h"
 #include "chess/chess_conditions.h"
+
+class ChessTimers;
+class ChessMovements;
+class ChessStatus;
+class ChessBot;
+class ChessConditions;
 
 class Chess: public QObject
 {
@@ -58,6 +64,7 @@ private:
     void removeClient(Client* pClient);
     void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
     void sendDataToAllClients(QString QStrMsg);
+    void showMovesInUI(MOVES_LISTS ML, QStringList moves);
 
     //gameplay methods
     void coreIsReadyForNewGame();

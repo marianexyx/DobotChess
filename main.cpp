@@ -9,9 +9,9 @@ int main(int argc, char *argv[])
     //...przekazywane dalej
     Clients ClientsList;
     ArduinoUsb USB001;
-    Chessboard BoardMain001;
-    Chessboard BoardRemoved001;
-    Chessboard BoardChenard001;
+    Chessboard BoardMain001(B_MAIN);
+    Chessboard BoardRemoved001(B_REMOVED);
+    Chessboard BoardChenard001(B_CHENARD);
     Dobot DobotArm001(&USB001);
     Websockets Websockety(&ClientsList, 1234);
     //TODO: odpalać server websocket po konstruktorze mainwindow
