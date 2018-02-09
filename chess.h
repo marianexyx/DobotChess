@@ -5,7 +5,9 @@
 #include <QScrollBar>
 #include <QRegularExpression>
 #include "dobot.h"
-#include "chessboard.h"
+#include "vars/board_axis.h"
+#include "vars/board_data_labels.h"
+#include "vars/board_types.h"
 #include "tcpmsgs.h"
 #include "websockets.h"
 #include "arduinousb.h"
@@ -13,22 +15,20 @@
 #include "chess/chenard_io_msgs.h"
 #include "chess/sequence_types.h"
 #include "chess/end_of_game_types.h"
-#include "chess/chess_status.h"
+#include "chessboard.h"
 #include "chess/chess_timers.h"
-#include "chess/chess_movements.h"
 #include "chess/chess_bot.h"
 #include "chess/chess_resets.h"
 #include "chess/chess_conditions.h"
-
-class ChessTimers;
-class ChessMovements;
-class ChessStatus;
-class ChessBot;
-class ChessConditions;
+#include "chess/chess_movements.h"
+#include "chess/chess_status.h"
 
 class Chess: public QObject
 {
     Q_OBJECT
+
+    friend class ChessTimers; //todo: ok?? more??
+    friend class ChessMovements;
 
 private:
     Clients* _pClientsList;

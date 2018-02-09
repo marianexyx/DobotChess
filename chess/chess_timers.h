@@ -6,14 +6,18 @@
 #include <QTimer>
 
 class Chess;
+class ChessStatus;
 class ChessResets;
 
-class ChessTimers
+class ChessTimers: public QObject
 {
+    Q_OBJECT
+
     friend class Chess;
 
 private:
     Chess* _pChess;
+    ChessStatus* _pStatus;
     ChessResets* _pResets;
     Clients* _pClientsList;
 
@@ -33,7 +37,7 @@ private slots:
     void updateTimeLabels();
     void timeOutStartQueue();
 
-//public:
+public:
     ChessTimers(Chess* pChess);
 
     void startGameTimer();

@@ -9,14 +9,15 @@ Dobot::Dobot(ArduinoUsb *pUsb):
 {
     _pUsb = pUsb;
 
-    _pQueue = new DobotQueue(*this);
-    _pServo = new DobotServo(*this);
+    _pQueue = new DobotQueue(this);
+    _pServo = new DobotServo(this);
 
     _sItemIDInGripper = 0;
     
     _bConnectedToDobot = false;
 
-    _lastGivenPoint(200,0,25); //todo: pierwszy punkt jako middle above
+    Point3D fakeMid(200,0,25);
+    _lastGivenPoint = fakeMid; //todo: pierwszy punkt jako middle above
 
     _Home.x = 140; //todo: home ciągnąć z xml
     _Home.y = 0;
@@ -47,7 +48,7 @@ void Dobot::onGetPoseTimer()
     getPoseTimer->start(); //auto restart timer
 }
 
-static bool Dobot::isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false)
+/*static*/ bool Dobot::isArmReceivedCorrectCmd(int nResult, bool bErrorLog /*= false*/)
 {
     if (nResult == DobotCommunicate_NoError)
         return true;
@@ -89,6 +90,7 @@ void Dobot::saveActualDobotPosition()
 
 bool Dobot::bIsMoveInAxisRange(Point3D point)
 {
+    if (point.x > 300) qDebug() << "todo: ogarnac blokady";
     //todo: zrobic jeszcze prewencyjnie wewnetrzny kod blokad
     //...max ciągnąć z xml
     //...i pouswstawiać to tam gdzie trzeba
@@ -120,7 +122,7 @@ void Dobot::clearGripper()
 
 Point3D Dobot::getHomePos() //todo:
 {
-    Point3D home(_Home);
+    Point3D home(_Home.x, _Home.y, _Home.z);
     return home;
 }
 
@@ -137,7 +139,7 @@ void Dobot::onConnectDobot()
         //create dobot periodic timer
         QTimer *periodicTaskTimer = new QTimer(this);
         periodicTaskTimer->setObjectName("periodicTaskTimer");
-        connect(periodicTaskTimer, timeout(), this, onPeriodicTaskTimer());
+        connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
         periodicTaskTimer->setSingleShot(true);
         periodicTaskTimer->start(5);
         //future: ciągle dostaję błąd: "QObject::startTimer: Timers can only...
@@ -146,7 +148,7 @@ void Dobot::onConnectDobot()
         //create dobot pose timer
         QTimer *getPoseTimer = new QTimer(this);
         getPoseTimer->setObjectName("getPoseTimer");
-        connect(getPoseTimer, timeout(), this, onGetPoseTimer());
+        connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
         getPoseTimer->setSingleShot(true);
         getPoseTimer->start(200);
 
@@ -233,7 +235,7 @@ void Dobot::initDobot()
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
-void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove = VM_NONE)
+void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove /*= VM_NONE*/)
 {
     if (this->isPointTotallyDiffrent(dest3D)) return;
 
@@ -246,20 +248,18 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
     if (VertMove == VM_NONE) return;
 
     if (!this->isPointDiffrentOnlyInZAxis(dest3D)) return;
-    this->armUpDown(DM_DOWN, dest3D - dJump);
+    this->armUpDown(DM_DOWN, dest3D.z - dJump);
 
     if (VertMove == VM_PUT)
         this->addArmMoveToQueue(DM_OPEN);
     else if (VertMove == VM_GRAB)
         this->addArmMoveToQueue(DM_CLOSE);
 
-    this->armUpDown(DM_UP, dest3D);
+    this->armUpDown(DM_UP, dest3D.z);
 }
 
 bool Dobot::isPointTotallyDiffrent(Point3D point)
 {
-    if (point !=)
-
     if (point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y
             && point.z != _lastGivenPoint.z)
     {

@@ -37,7 +37,7 @@ private:
     void calculateRetreatPoints();
 
 public:
-    Chessboard(BOARD boardType); //todo: friend dla chess
+    Chessboard(BOARD BoardType); //todo: friend dla chess
     ~Chessboard();
 
     bool isPointInLocationLimits(Point3D point);
@@ -50,12 +50,13 @@ public:
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
     void clearField(Field* pField);
 
-    static bool isBoardReal(BOARD boardType, bool bErrorLog = false);
+    static bool isBoardReal(BOARD BoardType, bool bErrorLog = false);
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
-    void clearBoardInUI();
     void showBoardInUI(QString, BOARD);
+    void clearBoardInUI();
 };
 
 #endif // CHESSBOARD_H
+

@@ -20,6 +20,8 @@ Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
     _pTCPMsgs = pTCPMsgs;
     _pUsb = pUsb;
 
+    _pBoardMain->isBoardReal(B_MAIN); //todo: to sa testy
+
     _PlayerSource = PlayerSource;
 
     _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
@@ -110,7 +112,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
                           << _request.type;
     }
 
-    _pClientsList->showClientsInForm();
+    _pClientsList->showClientsInUI();
 }
 
 void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
@@ -148,7 +150,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
     case CMT_HISTORY:
         _pStatus->setHistoryMoves(QStrTcpRespond);
         //todo: typy odpowiedzi na WWW też jako enumy zrobić z parametrami
-        this->sendDataToAllClients("history " + _pStatus->getHisotyMovesAsQStr());
+        this->sendDataToAllClients("history " + _pStatus->getHistoryMovesAsQStr());
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
     case CMT_MOVE:
@@ -204,7 +206,7 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = 
         qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame"
                     " val:" << playerTypeAsQStr(PlayerType);
 
-    if ((_pClientsList->isGameTableOccupied && _pClientsList->isStartClickedByBothPlayers())
+    if ((_pClientsList->isGameTableOccupied() && _pClientsList->isStartClickedByBothPlayers())
             || _PlayerSource == ARDUINO || bService)
     {
         qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
@@ -227,7 +229,7 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
 }
 
 void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
-                                              VERTICAL_MOVE VertMove = VM_NONE)
+                                              VERTICAL_MOVE VertMove)
 {
     if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), SHOW_ERRORS) return;
 
@@ -236,7 +238,8 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
         if (!this->isPieceSetOk()) return;
         if (pField->getPieceOnField(SHOW_ERRORS) == nullptr) return;
 
-        emit this->addTextToLogPTE("Queue: grab piece " + pField->getPieceOnField()->getNr() +
+        emit this->addTextToLogPTE("Queue: grab piece " +
+                                   QString::number(pField->getPieceOnField()->getNr()) +
                                    " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
                                    " from field " + pField->getNrAsQStr(), LOG_CORE);
         _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
@@ -248,7 +251,8 @@ void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
     {
         if (!this->isPieceSetOk()) return;
 
-        emit this->addTextToLogPTE("Queue: put piece " + _pPiece[_pDobot->getItemInGripper()] +
+        emit this->addTextToLogPTE("Queue: put piece " +
+                                   _pPiece[_pDobot->getItemInGripper()]->getName() +
                                    " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
                                    " on field " + pField->getNrAsQStr(), LOG_CORE);
         pRealBoard->setPieceOnField(_pPiece[_pDobot->getItemInGripper()], pField);
@@ -302,7 +306,7 @@ void Chess::removeClient(Client* pClient)
     emit _pClientsList->showClientsList(_pClientsList->getClientsList());
 }
 
-void Chess::sendDataToClient(QString QStrMsg, Client* pClient = nullptr)
+void Chess::sendDataToClient(QString QStrMsg, Client* pClient /* = nullptr*/)
 {
     emit this->addTextToLogPTE("Sending msg to " + communicationTypeAsQStr(_PlayerSource)
                                 + ": " + QStrMsg, LOG_CORE);
@@ -432,7 +436,7 @@ void Chess::continueGameplay()
     {
         //future: to kto wysłał ruch (gracz/bot) powinno być kontrolowane przed, a nie po akcji
         //future: zrobić kiedyś diagram działań z arduino i przemyśleć ułozenie kodu
-        if (!_pBot->getAI) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
+        if (!_pBot->getAI()) //jeżeli po wykonaniu ruchu gracza gra jest dalej w toku
         {
             if (_pBot->getAIAsPlayer2()) //future: powinno być zawsze true dla arduino
                 this->sendDataToClient("EnterSimulatedIgorsMove");
@@ -513,7 +517,7 @@ QString Chess::getTableData()
     //"wtime":345581,"btime":300000,"queue":"empty"}
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +
             "\",\"bplr\":\"" + _pClientsList->getPlayerName(PT_BLACK) +
-            "\",\"turn\":\"" + _pStatus->getStrWhoseTurn() +
+            "\",\"turn\":\"" +  turnTypeAsQstr(_pStatus->getWhoseTurn()) +
             "\",\"wtime\":" + QString::number(_pTimers->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pTimers->getBlackTimeLeft()) +
             ",\"queue\":\"" + _pClientsList->getQueuedClientsList();

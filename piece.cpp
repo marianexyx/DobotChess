@@ -1,6 +1,6 @@
 #include "piece.h"
 
-Piece::Piece(short sPieceID): dMaxPieceHeight(50.f)
+Piece::Piece(short sPieceID)
 {
     if (Piece::isInRange(sPieceID))
         _PieceType = Piece::Type(sPieceID);
@@ -11,7 +11,7 @@ Piece::Piece(short sPieceID): dMaxPieceHeight(50.f)
     _sStartFieldID = Piece::startFieldNr(sPieceID);
 }
 
-static bool Piece::isInRange(short sPieceNr)
+/*static*/ bool Piece::isInRange(short sPieceNr)
 {
     if (sPieceNr < 1 || sPieceNr > 32)
     {
@@ -21,7 +21,7 @@ static bool Piece::isInRange(short sPieceNr)
     else return true;
 }
 
-static PLAYER_TYPE Piece::Color(char chFENSign)
+/*static*/ PLAYER_TYPE Piece::Color(char chFENSign)
 {
     PLAYER_TYPE PlayerType;
 
@@ -40,17 +40,17 @@ static PLAYER_TYPE Piece::Color(char chFENSign)
     return PlayerType;
 }
 
-static PLAYER_TYPE Piece::Color(short sPieceNr)
+/*static*/ PLAYER_TYPE Piece::Color(short sPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return -1;
+    if (!Piece::isInRange(sPieceNr)) return PT_NONE;
 
     if (sPieceNr <= 16) return PT_WHITE;
     else return PT_BLACK;
 }
 
-static PIECE_TYPE Piece::Type(char chFENSign)
+/*static*/ PIECE_TYPE Piece::Type(char chFENSign)
 {
-    if (Piece::Color(chFENSign) == PT_NONE) return PT_NONE;
+    if (Piece::Color(chFENSign) == PT_NONE) return P_ERROR;
 
     PIECE_TYPE Type;
 
@@ -68,9 +68,9 @@ static PIECE_TYPE Piece::Type(char chFENSign)
     return Type;
 }
 
-static PIECE_TYPE Piece::Type(short sPieceNr)
+/*static*/ PIECE_TYPE Piece::Type(short sPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return -1;
+    if (!Piece::isInRange(sPieceNr)) return P_ERROR;
 
     PIECE_TYPE PieceType;
 
@@ -93,10 +93,12 @@ static PIECE_TYPE Piece::Type(short sPieceNr)
     return PieceType;
 }
 
-static QString Piece::name(short sPieceNr)
+/*static*/ QString Piece::name(short sPieceNr)
 {
-    QString QStrName = static_cast<char>(Piece::Type(sPieceNr));
-    if (_PieceColor == PT_WHITE) QStrName.toUpper();
+    QString QStrName = QChar::fromLatin1(Piece::Type(sPieceNr));
+    PLAYER_TYPE PieceColor = Piece::Color(sPieceNr);
+
+    if (PieceColor == PT_WHITE) QStrName.toUpper();
 
     switch(sPieceNr)
     {
@@ -105,13 +107,13 @@ static QString Piece::name(short sPieceNr)
     case 6: case 7: case 8: case 30: case 31: case 32:
         QStrName += "2"; break;
     default:
-        QStrName += QString::number(sPieceNr - static_cast<int>(_PieceColor)*8);
+        QStrName += QString::number(sPieceNr - static_cast<int>(PieceColor)*8);
     }
 
     return QStrName;
 }
 
-static short Piece::nr(PosOnBoard pieceLines)
+/*static*/ short Piece::nr(PosOnBoard pieceLines)
 {
     short sPieceNr = static_cast<short>(pieceLines.Letter) +
             static_cast<short>(pieceLines.Digit - 1) * 8;
@@ -120,9 +122,9 @@ static short Piece::nr(PosOnBoard pieceLines)
     else return -1;
 }
 
-static PosOnBoard Pos(short sPieceNr);
+/*static*/ PosOnBoard Pos(short sPieceNr);
 
-static short Piece::startFieldNr(short sPieceNr)
+/*static*/ short Piece::startFieldNr(short sPieceNr)
 {
     if (!Piece::isInRange(sPieceNr)) return -1;
 
@@ -130,26 +132,24 @@ static short Piece::startFieldNr(short sPieceNr)
     else return sPieceNr + 32;
 }
 
-static PosOnBoard Piece::startFieldPos(short sPieceNr)
+/*static*/ PosOnBoard Piece::startFieldPos(short sPieceNr)
 {
     PosOnBoard PieceLines;
     if (!Piece::isInRange(sPieceNr)) return PieceLines;
 
-    if (sPiecedNr % 8 != 0)
+    if (sPieceNr % 8 != 0)
     {
-        PieceLines.Digit = (sPiecedNr / 8) + 1;
-        PieceLines.Letter  = sPiecedNr - (PieceLines.Digit * 8);
+        PieceLines.Digit = static_cast<DIGIT>((sPieceNr / 8) + 1);
+        PieceLines.Letter  = static_cast<LETTER>(sPieceNr - (PieceLines.Digit * 8));
     }
     else
     {
-        PieceLines.Digit = (sPiecedNr / 8);
-        PieceLines.Letter = 8;
+        PieceLines.Digit = static_cast<DIGIT>((sPieceNr / 8));
+        PieceLines.Letter = static_cast<LETTER>(8);
     }
 
-    if (PieceLines.Letter < 1 || PieceLines.Letter > 8 ||
-            PieceLines.Digit < 1 || PieceLines.Digit > 8)
-        qDebug() << "ERROR: Field::startFieldPos(): PieceLines out of range: letter ="
-                 << PieceLines.Letter << ", Digit =" << PieceLines.Digit;
+    if (!Piece::isInRange(Piece::nr(PieceLines)))
+        qDebug() << "ERROR: Piece::startFieldPos(): piece isn't in range after conversation";
 
     return PieceLines;
 }

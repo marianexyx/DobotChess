@@ -4,6 +4,8 @@
 #pragma once
 #include "chess.h"
 
+class Chess;
+
 class ChessBot
 {
     friend class Chess;

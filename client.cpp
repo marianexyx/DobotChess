@@ -14,7 +14,7 @@ void Clients::newClient(QWebSocket* pClientSocket)
     _clients << newClient;
 }
 
-void Clients::setClientName(Client client, QString QStrName)
+void Clients::setClientName(Client* client, QString QStrName)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -27,7 +27,7 @@ void Clients::setClientName(Client client, QString QStrName)
 
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
         {
             Client changedClient = cl;
             changedClient.name = name;
@@ -226,11 +226,11 @@ void Clients::addClientToQueue(Client* client)
     emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
-void Clients::removeClient(Client client)
+void Clients::removeClient(Client* client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl == &client)
         {
             cl.socket->deleteLater(); //todo: jest sens to usuwać skoro to nie jest wskaźnik?...
             //...a może to musi być wskaźnik by dało się to wogle usunąć?
@@ -635,7 +635,7 @@ int Clients::getAmountOfQueuedClients()
     else return 0;
 }
 
-bool Clients::isClientAPlayer(Client client, bool bErrorLog = false)
+bool Clients::isClientAPlayer(Client* client, bool bErrorLog = false)
 {
     if (this->getClientType(client) == PT_WHITE ||
             this->getClientType(client) == PT_BLACK )
@@ -700,7 +700,7 @@ int64_t Clients::getNextAvailableClientID()
     }
 }
 
-void Clients::showClientsInForm()
+void Clients::showClientsInUI()
 {
     emit this->showClientsList(_clients);
     emit this->setBoardDataLabel(std::to_string(_clients.size()).c_str(), BDL_SOCKETS_ONLINE);

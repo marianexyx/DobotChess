@@ -2,15 +2,12 @@
 #define CHESS_STATUS_H
 
 #pragma once
-#include "chess.h"
 #include "chess/end_of_game_types.h"
 #include "chess/turn_types.h"
 
-class Chess;
-class Chessboard;
-class Clients;
-
 enum MOVES_LISTS { ML_HISTORY, ML_LEGAL };
+
+class Chess;
 
 class ChessStatus
 {
@@ -34,12 +31,6 @@ private:
     ChessStatus(Chess* pChess);
     ~ChessStatus() {}
 
-    bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
-    bool isMoveARequestForPromotion(QString QStrMove){
-        return _legalMoves.contains(QStrMove + "q")? true : false; }
-    bool isMoveRemoving();
-    bool isMoveCastling(QString QStrMoveToTest);
-    bool isMoveEnpassant(QString QStrMoveToTest);
     void saveStatusData(QString QStrStatus);
     void resetStatusData();
 
@@ -52,15 +43,6 @@ private:
     void setHistoryMoves(QString QStrMsg);
     void setHistoryMoves(QStringList moves);
 
-    END_TYPE getFENGameState() const { return _FENGameState; }
-    WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
-    QStringList getLegalMoves() const { return _legalMoves; }
-    QStringList getHisotyMoves() const { return _historyMoves; }
-    QString getHisotyMovesAsQStr() const { return _historyMoves.join(" "); }
-    QString getCastlings() const { return _QStrCastlings; }
-    QString getEnpassant() const { return _QStrEnpassant; }
-    PLAYER_TYPE getActivePlayerType();
-
     void clearLegalMoves();
     void clearHistoryMoves();
 
@@ -68,6 +50,22 @@ public:
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
     static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
+
+    bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
+    bool isMoveARequestForPromotion(QString QStrMove){
+        return _legalMoves.contains(QStrMove + "q")? true : false; }
+    bool isMoveRemoving();
+    bool isMoveCastling(QString QStrMoveToTest);
+    bool isMoveEnpassant(QString QStrMoveToTest);
+
+    END_TYPE getFENGameState() const { return _FENGameState; }
+    WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
+    QStringList getLegalMoves() const { return _legalMoves; }
+    QStringList getHistoryMoves() const { return _historyMoves; }
+    QString getHistoryMovesAsQStr() const { return _historyMoves.join(" "); }
+    QString getCastlings() const { return _QStrCastlings; }
+    QString getEnpassant() const { return _QStrEnpassant; }
+    PLAYER_TYPE getActivePlayerType();
 };
 
 #endif // CHESS_STATUS_H

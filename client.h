@@ -40,14 +40,15 @@ public:
     Clients(): _clients() {}
 
     void newClient(QWebSocket* pClientSocket);
-    //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w działaniu
-    void setClientName(Client client, QString QStrName);
+    //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w...
+    //...działaniu i pozamieniać wtedy nazwy na pClient
+    void setClientName(Client* client, QString QStrName);
     void setPlayerType(Client* client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
     void setClientStartConfirmation(Client client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
     void addClientToQueue(Client* client);
-    void removeClient(Client client);
+    void removeClient(Client* client);
     void removeClientFromQueue(Client* client);
     void resetPlayersStartConfirmInfo();
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
@@ -73,7 +74,7 @@ public:
     bool isClientInQueue(Client client);
     bool isClientNameExists(QString QStrName, bool bErrorLog = false);
     int getAmountOfQueuedClients();
-    bool isClientAPlayer(Client client, bool bErrorLog = false);
+    bool isClientAPlayer(Client* client, bool bErrorLog = false);
     bool isClientIDExists(int64_t n64ID);
     int64_t getClientID(Client client);
     int64_t getNextAvailableClientID();
@@ -81,7 +82,7 @@ public:
     //void testQueuedClients(); //test jednostkowy
 
 public slots:
-    void showClientsInForm();
+    void showClientsInUI();
 
 signals:
     void addTextToLogPTE(QString, LOG);

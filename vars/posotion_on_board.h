@@ -2,7 +2,6 @@
 #define POSOTION_ON_BOARD_H
 
 #pragma once
-#include "chess/chess_status.h"
 #include "QString"
 #include "vars/board_axis.h"
 
@@ -138,7 +137,7 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
         if (static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt()) < D_1 ||
                 static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt()) > D_8)
         {
-            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat():"
+            qDebug() << "ERROR: PosFromTo::isMoveInProperFormat():"
                         " pieceFromDigit is out of range <1, 8>. it ="
                      << static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
             return false;
@@ -150,7 +149,7 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
         if (static_cast<DIGIT>(QStrMoveFromTo.mid(4,1).toInt()) < D_1 ||
                 static_cast<DIGIT>(QStrMoveFromTo.mid(4,1).toInt()) > D_8)
         {
-            qDebug() << "ERROR: ChessMovements::isMoveInProperFormat():"
+            qDebug() << "ERROR: PosFromTo::isMoveInProperFormat():"
                         " pieceToDigit is out of range <1, 8>. it ="
                      << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
             return false;
@@ -158,7 +157,7 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     }
     else
     {
-        qDebug() << "ERROR: ChessMovements::isMoveInProperFormat(): wrong length:"
+        qDebug() << "ERROR: PosFromTo::isMoveInProperFormat(): wrong length:"
                  << QStrMoveFromTo.length();
         return false;
     }

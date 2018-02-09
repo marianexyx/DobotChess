@@ -19,7 +19,7 @@ public:
 
     static bool isInRange(short sFieldNr);
     static PosOnBoard Pos(short sFieldNr);
-    static short nr(PosOnBoard FieldLines);
+    static short nr(PosOnBoard fieldLines);
     static short nr(LETTER L, DIGIT D);
     static QString nrAsQStr(short sFieldNr);
     static short startPieceNrOnField(short sFieldNr);

@@ -32,9 +32,9 @@ void Websockets::onNewConnection()
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
-    this->newClient(pSocket);
+    _pClientsList->newClient(pSocket);
     emit this->addTextToLogPTE("New connection \n", LOG_WEBSOCKET);
-    _pClientsList->showClientsInForm();
+    _pClientsList->showClientsInUI();
 }
 
 //Q_FOREACH (QWebSocket *pNextClient, _pClientsList) ma być depreciated

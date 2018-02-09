@@ -5,6 +5,7 @@ ChessTimers::ChessTimers(Chess *pChess):
     _lTimersStartQueue(1000*60*2) //2min
 {
     _pChess = pChess;
+    _pStatus = _pChess->getStatusPointer();
     _pResets = _pChess->getResetsPointer();
     _pClientsList = _pChess->getClientsPointer();
 
@@ -20,10 +21,10 @@ ChessTimers::ChessTimers(Chess *pChess):
     _blackTimer->setSingleShot(true);
     _updateLabelTimer->setSingleShot(false);
     _startQueueTimer->setSingleShot(true);
-    connect(_whiteTimer, timeout(), this, playerTimeOut(PT_WHITE));
-    connect(_blackTimer, timeout(), this, playerTimeOut(PT_BLACK));
-    connect(_updateLabelTimer, timeout(), this, updateTimeLabels());
-    connect(_startQueueTimer, timeout(), this, timeOutStartQueue());
+    connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_WHITE)));
+    connect(_blackTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_BLACK)));
+    connect(_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
+    connect(_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
     _nRemainingWhiteTime = _lTimersStartTime;
     _nRemainingBlackTime = _lTimersStartTime;
 }
@@ -56,10 +57,10 @@ void ChessTimers::timeOutStartQueue()
 
     if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
         _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-    if (!this->isStartClickedByPlayer(PT_BLACK))
+    if (!_pClientsList->isStartClickedByPlayer(PT_BLACK))
         _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
-    if (this->isGameTableOccupied())
+    if (_pClientsList->isGameTableOccupied())
         this->startQueueTimer();
     else _pChess->setGameStatus(GS_TURN_NONE_WAITING_FOR_PLAYERS);
 
@@ -108,7 +109,7 @@ QString ChessTimers::milisecToClockTime(long lMilis)
 
 void ChessTimers::switchPlayersTimers()
 {
-    if (getWhoseTurn() == WHITE_TURN)
+    if (_pStatus->getWhoseTurn() == WHITE_TURN)
     {
         _nRemainingBlackTime = _blackTimer->remainingTime();
         _blackTimer->stop();
@@ -116,7 +117,7 @@ void ChessTimers::switchPlayersTimers()
         _whiteTimer->setInterval(_nRemainingWhiteTime);
         _whiteTimer->start();
     }
-    else if (getWhoseTurn() == BLACK_TURN)
+    else if (_pStatus->getWhoseTurn() == BLACK_TURN)
     {
         _nRemainingWhiteTime = _whiteTimer->remainingTime();
         _whiteTimer->stop();
@@ -126,7 +127,7 @@ void ChessTimers::switchPlayersTimers()
     }
     else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
                      "white or black.  it's' ="
-                  << turnTypeAsQstr(_pChess->getStatusPointer()->getWhoseTurn());
+                  << turnTypeAsQstr(_pStatus->getWhoseTurn());
 }
 
 void ChessTimers::startQueueTimer()

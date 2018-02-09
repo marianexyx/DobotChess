@@ -12,7 +12,7 @@ Field::Field(short sFieldNr)
 }
 
 
-static bool Field::isInRange(short sFieldNr)
+/*static*/ bool Field::isInRange(short sFieldNr)
 {
     if (sFieldNr < 1 || sFieldNr > 64)
     {
@@ -22,31 +22,29 @@ static bool Field::isInRange(short sFieldNr)
     else return true;
 }
 
-static PosOnBoard Field::Pos(short sFieldNr)
+/*static*/ PosOnBoard Field::Pos(short sFieldNr)
 {
     PosOnBoard FieldLines;
     if (!Field::isInRange(sFieldNr)) return FieldLines;
 
     if (sFieldNr % 8 != 0)
     {
-        FieldLines.Digit = (sFieldNr / 8) + 1;
-        FieldLines.Letter  = sFieldNr - (FieldLines.Digit * 8);
+        FieldLines.Digit = static_cast<DIGIT>((sFieldNr / 8) + 1);
+        FieldLines.Letter  = static_cast<LETTER>(sFieldNr - (FieldLines.Digit * 8));
     }
     else
     {
-        FieldLines.Digit = (sFieldNr / 8);
-        FieldLines.Letter = 8;
+        FieldLines.Digit = static_cast<DIGIT>((sFieldNr / 8));
+        FieldLines.Letter = static_cast<LETTER>(8);
     }
 
-    if (FieldLines.Letter < 1 || FieldLines.Letter > 8 ||
-            FieldLines.Digit < 1 || FieldLines.Digit > 8)
-        qDebug() << "ERROR: Field::Pos(): FieldLines out of range: letter ="
-                 << FieldLines.Letter << ", Digit =" << FieldLines.Digit;
+    if (!Field::isInRange(Field::nr(FieldLines)))
+        qDebug() << "ERROR: Field::Pos(): field isn't in range after conversation";
 
     return FieldLines;
 }
 
-static short Field::nr(PosOnBoard fieldLines)
+/*static*/ short Field::nr(PosOnBoard fieldLines)
 {
     short sFieldNr = static_cast<short>(fieldLines.Letter) +
             static_cast<short>(fieldLines.Digit - 1) * 8;
@@ -55,13 +53,13 @@ static short Field::nr(PosOnBoard fieldLines)
     else return -1;
 }
 
-static short nr(LETTER L, DIGIT D)
+/*static*/ short Field::nr(LETTER L, DIGIT D)
 {
     PosOnBoard FieldLines(L, D);
     return Field::nr(FieldLines);
 }
 
-static QString Field::nrAsQStr(short sFieldNr)
+/*static*/ QString Field::nrAsQStr(short sFieldNr)
 {
     PosOnBoard PosOnBoard = Field::Pos(sFieldNr);
     QString PosAsQstr = pieceLetterPosAsQStr(PosOnBoard.Letter) +
@@ -69,7 +67,7 @@ static QString Field::nrAsQStr(short sFieldNr)
     return PosAsQstr;
 }
 
-static short Field::startPieceNrOnField(short sFieldNr)
+/*static*/ short Field::startPieceNrOnField(short sFieldNr)
 {
     if (!Field::isInRange(sFieldNr)) return -1;
 
@@ -78,7 +76,7 @@ static short Field::startPieceNrOnField(short sFieldNr)
     else return 0;
 }
 
-static short startPieceNrOnField(PosOnBoard fieldLines)
+/*static*/ short Field::startPieceNrOnField(PosOnBoard fieldLines)
 {
     short sFieldID = Field::nr(fieldLines);
     return Field::startPieceNrOnField(sFieldID);
@@ -102,7 +100,7 @@ void Field::clearField()
     _pPieceOnField = nullptr;
 }
 
-bool Field::isFieldOccupied(bool bErrorLog = false)
+bool Field::isFieldOccupied(bool bErrorLog /*= false*/)
 {
     if (_pPieceOnField != nullptr)
     {
@@ -114,7 +112,7 @@ bool Field::isFieldOccupied(bool bErrorLog = false)
     else return false;
 }
 
-Piece* Field::getPieceOnField(bool bErrorLog = false) const
+Piece* Field::getPieceOnField(bool bErrorLog /*= false*/) const
 {
     if (bErrorLog && _pPieceOnField == nullptr)
         qDebug() << "ERROR: Field::getPieceOnField(): piece == nullptr";

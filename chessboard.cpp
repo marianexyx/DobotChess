@@ -1,28 +1,26 @@
 #include "chessboard.h"
 
-Chessboard::Chessboard(BOARD boardType)
+Chessboard::Chessboard(BOARD BoardType):
+    _A1(157.4, 76.3, -22.9),
+    _A8(306.6, 75.0, -19.1),
+    _H1(157.4, -81.9, -23.1),
+    _H8(305.6, -79.2, -19.3),
+    _remWhiteCloserOuter(108.9, 176.0, -21.8),
+    _remWhiteFurtherInner(259.0, 169.3, -19.5), //y is unused
+    _remBlackCloserOuter(115.5, -148.4, -23.2),
+    _remBlackFurtherInner(267.2, 0, -19.4) //y is unused
 {
-    _BoardType = boardType;
+    _BoardType = BoardType;
 
     for (int i=0; i>=63; ++i)
-        *_pField[i] = new Field(i);
+        _pField[i] = new Field(i);
 
-    _A1(157.4, 76.3, -22.9);
-    _A8(306.6, 75.0, -19.1);
-    _H1(157.4, -81.9, -23.1);
-    _H8(305.6, -79.2, -19.3);
-
-    _remWhiteCloserOuter(108.9, 176.0, -21.8);
-    _remWhiteFurtherInner(259.0, 169.3, -19.5); //y is unused
-    _remBlackCloserOuter(115.5, -148.4, -23.2);
-    _remBlackFurtherInner(267.2, 0, -19.4); //y is unused
-
-    if (boardType == B_MAIN)
+    if (BoardType == B_MAIN)
     {
         this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
         _dSquareWidth = ((_A8.x - _A1.x)/7 + (_A8.y - _A1.y)/7)/2;
     }
-    else if (boardType == B_REMOVED)
+    else if (BoardType == B_REMOVED)
     {
         this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
               _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
@@ -186,7 +184,7 @@ bool Chessboard::isPointInLocationLimits(Point3D point)
     }
 }
 
-bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false)
+bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
 {
     if (pPiece != nullptr)
     {
@@ -210,15 +208,15 @@ bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false)
     return false;
 }
 
-static bool Chessboard::isBoardReal(BOARD boardType, bool bErrorLog = false)
+/*static*/ bool Chessboard::isBoardReal(BOARD BoardType, bool bErrorLog /*= false*/)
 {
-    if (boardType == B_MAIN || boardType == B_REMOVED)
+    if (BoardType == B_MAIN || BoardType == B_REMOVED)
         return true;
     else
     {
         if (bErrorLog)
             qDebug() << "ERROR: Chessboard::isBoardReal(): it's not. board ="
-                     << boardTypeAsQstr(pRealBoard->getBoardType());
+                     << boardTypeAsQstr(BoardType);
 
         return false;
     }
@@ -234,7 +232,8 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
                 return _pField[i];
         }
     }
-    else return nullptr;
+
+    return nullptr;
 }
 
 Point3D Chessboard::getBoardPoint3D(BOARD_POINTS BP) const

@@ -6,7 +6,7 @@ ArduinoUsb::ArduinoUsb()
     usbInfo = NULL; //wartośc wskażnika obecnie wybranego portu ustgawiamy na pustą wartość
     this->searchDevices(); //wyszukujemy obecnie podłączone urządzenia usb
 
-    connect(usbPort, readyRead(), this, readUsbData());
+    connect(usbPort, SIGNAL(readyRead()), this, SLOT(readUsbData()));
 }
 
 //aktualizowanie listy z urządzeniami

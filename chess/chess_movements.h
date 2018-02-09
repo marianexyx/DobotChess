@@ -2,12 +2,11 @@
 #define CHESS_MOVEMENTS_H
 
 #pragma once
+#include "vars/posotion_on_board.h"
 #include "chess.h"
 
 class ChessMovements
 {
-    friend class Chess;
-
 private:
     Chess* _pChess;
     Chessboard* _pBoardMain;

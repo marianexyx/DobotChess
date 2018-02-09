@@ -33,9 +33,9 @@ void TCPMsgs::doTcpConnect()
     socket = new QTcpSocket(this);
 
     //każde nowe zapytanie jest nowym połączeniem
-    connect(socket, connected(),this, connected());
-    connect(socket, disconnected(),this, disconnected());
-    connect(socket, bytesWritten(qint64),this, bytesWritten(qint64)); //to mi raczej zbędne
+    connect(socket, SIGNAL(connected()),this, SLOT(connected()));
+    connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
+    connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64))); //to mi raczej zbędne
     connect(socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),

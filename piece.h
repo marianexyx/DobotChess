@@ -10,12 +10,13 @@
 
 enum PIECE_TYPE
 {
-    P_PAWN = 112, //p
-    P_ROOK = 114, //r
-    P_KNIGHT = 110, //n
-    P_BISHOP = 98, //b
-    P_KING = 107, //k
-    P_QUEEN = 113 //q
+    P_ERROR = 'e',
+    P_PAWN = 'p',
+    P_ROOK = 'r',
+    P_KNIGHT = 'n',
+    P_BISHOP = 'b',
+    P_KING = 'k',
+    P_QUEEN = 'q'
 };
 
 class Piece
@@ -32,7 +33,7 @@ public:
 
     bool operator ==(const class Piece& p) { return _sPieceID == p.getNr(); }
 
-    static double dMaxPieceHeight;
+    static constexpr double dMaxPieceHeight = 50.f;
 
     static bool isInRange(short sPieceNr);
     static PLAYER_TYPE Color(char chFENSign);
