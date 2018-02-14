@@ -5,12 +5,18 @@
 #include "vars/posotion_on_board.h"
 #include "chess.h"
 
+class Chess;
+class ChessStatus;
+
 class ChessMovements
 {
+    friend class Chess;
+
 private:
     Chess* _pChess;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
+    ChessStatus* _pStatus;
 
     SEQUENCE_TYPE _MoveType;
     PosFromTo _PosMove;

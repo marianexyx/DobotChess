@@ -11,6 +11,8 @@
 #include "vars/board_data_labels.h"
 #include "typeinfo"
 
+const QString QUEUE_EMPTY = "queueEmpty";
+
 struct Client //todo: class friend to Clients
 {
     int64_t ID;
@@ -45,7 +47,7 @@ public:
     void setClientName(Client* client, QString QStrName);
     void setPlayerType(Client* client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
-    void setClientStartConfirmation(Client client, bool bState);
+    void setClientStartConfirmation(Client* client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
     void addClientToQueue(Client* client);
     void removeClient(Client* client);
@@ -54,13 +56,13 @@ public:
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
     QList<Client> getClientsList() const { return _clients; }
-    bool isClientInList(Client client);
+    bool isClientInList(Client* pClient);
     Client* getClient(QWebSocket* pClientSocket);
     Client* getClient(int64_t n64ClientID);
     Client* getPlayer(PLAYER_TYPE Type);
     QWebSocket* getClientSocket(QString QStrPlayerName);
     QString getClientName(Client client);
-    Client getNextQueuedClient();
+    Client* getNextQueuedClient();
     QString getQueuedClientsList();
     PLAYER_TYPE getClientType(Client* client);
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);

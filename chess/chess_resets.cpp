@@ -4,8 +4,9 @@ ChessResets::ChessResets(Chess* pChess)
 {
     _pChess = pChess;
     _pClientsList = _pChess->getClientsPointer();
-    _pTimers->getTimersPointer();
-    _pStatus->getStatusPointer();
+    _pTimers = _pChess->getTimersPointer();
+    _pStatus = _pChess->getStatusPointer();
+    _pMovements = _pChess->getMovementsPointer();
 }
 
 void ChessResets::restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr)
@@ -107,7 +108,7 @@ void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToC
         //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
         //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
         //...o ruchach będą wyciągane z "history"
-        QString QStrMove = _pChess->getMovementsPointer()->getMove().asQStr();
+        QString QStrMove = _pMovements->getMove().asQStr();
         _pChess->sendDataToAllClients("moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon)
                                       + " " + _pChess->getTableData());
         break;
@@ -136,7 +137,6 @@ void ChessResets::resetPiecePositions()
     {
         Chessboard tempBoard(B_CHENARD); //chenard board type needs no xyz values in constructor
         Chessboard* pBoardMain = _pChess->getBoardMainPointer();
-        ChessMovements* pMoves = _pChess->getMovementsPointer();
 
         do
         {
@@ -156,9 +156,9 @@ void ChessResets::resetPiecePositions()
                         Field* pMissingPieceActualFieldOnMainBoard =
                                 _pChess->searchForPieceActualFieldOnMainBoad(pMissingPiece);
                         if (pMissingPieceActualFieldOnMainBoard != nullptr) //if exists on mainB
-                            pMoves->regularMoveSequence(pMissingPieceActualFieldOnMainBoard,
+                            _pMovements->regularMoveSequence(pMissingPieceActualFieldOnMainBoard,
                                                         pExaminedField);
-                        else pMoves->restoreMoveSequence(pMissingPiece);
+                        else _pMovements->restoreMoveSequence(pMissingPiece);
                     }
                     else //checking field is occupied
                     {
@@ -169,9 +169,10 @@ void ChessResets::resetPiecePositions()
                                 pBoardMain->getField(pPieceOnPutAsideField->getStartFieldNr());
 
                         if (pPieceOnPutAsideField == nullptr)
-                            pMoves->regularMoveSequence(pExaminedField, pFieldToPutAsidePiece);
+                            _pMovements->regularMoveSequence(pExaminedField,
+                                                             pFieldToPutAsidePiece);
                         else if (pExaminedField == pStartFieldOfPieceOnPutAsideField)
-                            pMoves->removeMoveSequence(pExaminedField);
+                            _pMovements->removeMoveSequence(pExaminedField);
                         //else: iterate through all fields one more time (pieces pos will change)
                     }
                 }

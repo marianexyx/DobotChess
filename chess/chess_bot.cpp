@@ -1,9 +1,10 @@
 #include "chess_bot.h"
 
-ChessBot::ChessBot(Chess *pChess, ArduinoUsb *pUsb)
+ChessBot::ChessBot(Chess *pChess)
 {
     _pChess = pChess;
-    _pUsb = pUsb;
+    //_pResets = _pChess->getResetsPointer();
+    //_pUsb = _pChess->getUsbPointer();
 
     _bAI = false;
     _bUndo = false;
@@ -38,5 +39,5 @@ void ChessBot::enemyStart()
 {
     this->checkAI();
     //furture: a jak będzie z nowym resetem dla bota? olać póki nie potrzebuję
-    _pChess->getResetsPointer()->resetPiecePositions();
+    //_pResets->resetPiecePositions();
 }

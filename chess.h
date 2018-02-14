@@ -10,25 +10,30 @@
 #include "vars/board_types.h"
 #include "tcpmsgs.h"
 #include "websockets.h"
-#include "arduinousb.h"
 #include "chess/game_status.h"
 #include "chess/chenard_io_msgs.h"
 #include "chess/sequence_types.h"
 #include "chess/end_of_game_types.h"
 #include "chessboard.h"
-#include "chess/chess_timers.h"
 #include "chess/chess_bot.h"
+#include "chess/chess_movements.h"
+#include "chess/chess_timers.h"
 #include "chess/chess_resets.h"
 #include "chess/chess_conditions.h"
-#include "chess/chess_movements.h"
 #include "chess/chess_status.h"
+
+class ChessBot;
 
 class Chess: public QObject
 {
     Q_OBJECT
 
-    friend class ChessTimers; //todo: ok?? more??
+    friend class ChessBot;
+    friend class ChessTimers;
     friend class ChessMovements;
+    friend class ChessStatus;
+    friend class ChessResets;
+    friend class ChessConditions;
 
 private:
     Clients* _pClientsList;
@@ -42,12 +47,12 @@ private:
 
     COMMUNICATION_TYPE _PlayerSource;
 
-    ChessTimers* _pTimers;
-    ChessMovements* _pMovements;
     ChessBot* _pBot;
+    ChessTimers* _pTimers;
     ChessStatus* _pStatus;
     ChessResets* _pResets;
     ChessConditions* _pConditions;
+    ChessMovements* _pMovements;
 
     Piece* _pPiece[32];
 
@@ -64,7 +69,6 @@ private:
     void removeClient(Client* pClient);
     void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
     void sendDataToAllClients(QString QStrMsg);
-    void showMovesInUI(MOVES_LISTS ML, QStringList moves);
 
     //gameplay methods
     void coreIsReadyForNewGame();
@@ -77,18 +81,20 @@ private:
 
 public:
     Chess(Clients* pClientsList, Dobot* pDobot, Chessboard* pBoardMain,
-          Chessboard* pBoardRemoved, Chessboard* pBoardChenard, ArduinoUsb* pUsb,
-          Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
+          Chessboard* pBoardRemoved, Chessboard* pBoardChenard, Websockets* pWebsockets,
+          TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 
     void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }
 
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
 
-    //todo: friends to rest of ingredients
+    //todo: friends to rest of ingredients. jeżeli cała klasa to friend, to nie potrzebuje...
+    //...poniższych funkcji
     Clients* getClientsPointer() { return _pClientsList; }
     Chessboard* getBoardMainPointer() { return _pBoardMain; }
     Chessboard* getBoardRemovedPointer() { return _pBoardRemoved; }
+    ArduinoUsb* getUsbPointer() { return _pUsb; }
 
     ChessTimers* getTimersPointer() { return _pTimers; }
     ChessMovements* getMovementsPointer() { return _pMovements; }

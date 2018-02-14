@@ -1,8 +1,8 @@
 #include "chess.h"
 
-Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
-             Chessboard *pBoardRemoved, Chessboard *pBoardChenard, ArduinoUsb *pUsb,
-             Websockets* pWebsockets, TCPMsgs *pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
+Chess::Chess(Clients* pClientsList, Dobot* pDobot, Chessboard* pBoardMain,
+             Chessboard* pBoardRemoved, Chessboard* pBoardChenard, Websockets* pWebsockets,
+             TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
     _pTimers = new ChessTimers(this);
     _pMovements = new ChessMovements(this);
@@ -18,7 +18,7 @@ Chess::Chess(Clients *pClientsList, Dobot *pDobot, Chessboard *pBoardMain,
     _pBoardChenard = pBoardChenard;
     _pWebsockets = pWebsockets;
     _pTCPMsgs = pTCPMsgs;
-    _pUsb = pUsb;
+    _pUsb = _pDobot->getArduinoPointer();
 
     _pBoardMain->isBoardReal(B_MAIN); //todo: to sa testy
 
@@ -349,16 +349,6 @@ void Chess::sendDataToAllClients(QString QStrMsg)
     else
         qDebug() << "ERROR: Chess::sendDataToAllClients(): unknown _PlayerSource val ="
                  << communicationTypeAsQStr(_PlayerSource);
-}
-
-void Chess::showMovesInUI(MOVES_LISTS ML, QStringList moves)
-{
-    switch(ML)
-    {
-    case ML_HISTORY: emit this->showHistoryMovesInUI(moves); break;
-    case ML_LEGAL: emit this->showLegalMovesInUI(moves); break;
-    default: qDebug() << "ERROR: Chess::showMovesInUI(): unknown ML =" << ML;
-    }
 }
 
 void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?

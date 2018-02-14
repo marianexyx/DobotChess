@@ -3,6 +3,9 @@
 ChessConditions::ChessConditions(Chess* pChess)
 {
     _pChess = pChess;
+    _pClientsList = _pChess->getClientsPointer();
+    _pMovements = _pChess->getMovementsPointer();
+    _pStatus = _pChess->getStatusPointer();
 }
 
 bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender)
@@ -25,13 +28,11 @@ bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSen
 
 bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
 {
-    ChessMovements* pMovements = _pChess->getMovementsPointer();
-
     switch(request.type)
     {
     case RT_MOVE:
-        if (pMovements->findMoveType(request.param) == ST_NONE ||
-                pMovements->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
+        if (_pMovements->findMoveType(request.param) == ST_NONE ||
+                _pMovements->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
             return false;
         else return true;
     case RT_SIT_ON:
@@ -91,13 +92,11 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type)
 
 bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
-    Clients* pClientsList = _pChess->getClientsPointer();
+    if (!_pClientsList->isClientInList(pSender)) return false;
 
-    if (!pClientsList->isClientInList(pSender)) return false;
-
-    bool bLogged = pClientsList->isClientLoggedIn(pSender);
-    bool bSittingOnChair = pClientsList->isClientAPlayer(pSender);
-    bool bInQueue = pClientsList->isClientInQueue(pSender);
+    bool bLogged = _pClientsList->isClientLoggedIn(pSender);
+    bool bSittingOnChair = _pClientsList->isClientAPlayer(pSender);
+    bool bInQueue = _pClientsList->isClientInQueue(pSender);
 
     switch(Type)
     {
@@ -124,9 +123,6 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 
 bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request)
 {
-    Clients* pClientsList = _pChess->getClientsPointer();
-    ChessStatus* pStatus = _pChess->getStatusPointer();
-
     switch(request.type)
     {
     case RT_NONE:
@@ -134,32 +130,32 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         return false;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((pClientsList->getClientType(pSender) == PT_WHITE
-             && pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (pClientsList->getClientType(pSender) == PT_BLACK
-                 && pStatus->getWhoseTurn() == BLACK_TURN))
+        if ((_pClientsList->getClientType(pSender) == PT_WHITE
+             && _pStatus->getWhoseTurn() == WHITE_TURN) ||
+                (_pClientsList->getClientType(pSender) == PT_BLACK
+                 && _pStatus->getWhoseTurn() == BLACK_TURN))
             return true;
         else return false;
     case RT_SIT_ON:
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
-        if (pClientsList->isPlayerChairEmpty(PlayerChair, SHOW_ERRORS) &&
-                !pClientsList->isClientAPlayer(pSender, SHOW_ERRORS))
+        if (_pClientsList->isPlayerChairEmpty(PlayerChair, SHOW_ERRORS) &&
+                !_pClientsList->isClientAPlayer(pSender, SHOW_ERRORS))
             return true;
         else return false;
     case RT_IM: //name == empty || name = actual
-        if (pSender->name.isEmpty() || pClientsList->getClientName(pSender) == request.param)
+        if (pSender->name.isEmpty() || _pClientsList->getClientName(pSender) == request.param)
             return true;
         else return false;
     case RT_QUEUE_ME:
-        if (pClientsList->isGameTableOccupied())
+        if (_pClientsList->isGameTableOccupied())
             return true;
         else return false;
     case RT_LEAVE_QUEUE:
-        if (pClientsList->isClientInQueue(pSender))
+        if (_pClientsList->isClientInQueue(pSender))
             return true;
         else return false;
     case RT_CLIENT_LEFT:
-        if (pClientsList->isClientInList(pSender))
+        if (_pClientsList->isClientInList(pSender))
             return true;
         else return false;
     default: return true;

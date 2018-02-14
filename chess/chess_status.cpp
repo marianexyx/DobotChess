@@ -5,19 +5,21 @@ ChessStatus::ChessStatus(Chess *pChess)
     _pChess = pChess;
     _pBoardMain = _pChess->getBoardMainPointer();
     _pClientsList = _pChess->getClientsPointer();
+    _pMovements = _pChess->getMovementsPointer();
 
     _WhoseTurn = NO_TURN;
 }
 
 bool ChessStatus::isMoveRemoving()
 {
-    PosFromTo MoveTo = _pChess->getMovementsPointer()->getMove().to;
+    PosOnBoard MoveTo = _pMovements->getMove().to;
     if (_pBoardMain->getField(MoveTo)->getPieceOnField() != nullptr)
         return true;
     else return false;
 }
 
-/*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign, bool bErrorLog = false)
+/*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign,
+                                                      bool bErrorLog /*= false*/)
 {
     if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "k" ||
             QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "K")
@@ -31,9 +33,9 @@ bool ChessStatus::isMoveRemoving()
     }
 }
 
-/*static*/ bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog = false)
+/*static*/ bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog /*= false*/)
 {
-    if (this->isSignProperPromotionType(QStrMove.right(1), SHOW_ERRORS)
+    if (ChessStatus::isSignProperPromotionType(QStrMove.right(1), SHOW_ERRORS)
             && QStrMove.length() == 5)
         return true;
     else
@@ -44,7 +46,7 @@ bool ChessStatus::isMoveRemoving()
     }
 }
 
-/*static*/ bool ChessStatus::isMoveInProperFormat(QString QStrMove, bool bErrorLog = false)
+/*static*/ bool ChessStatus::isMoveInProperFormat(QString QStrMove, bool bErrorLog /*= false*/)
 {
     if (PosFromTo::isMoveInProperFormat(QStrMove) || ChessStatus::isMovePromotion(QStrMove))
         return true;
@@ -64,25 +66,28 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
     Piece* WhiteKing = _pChess->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
     Piece* BlackKing = _pChess->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
 
-    if (_pChess->isPieceStayOnItsStartingField(WhiteKing) &&
+    if ((_pChess->isPieceStayOnItsStartingField(WhiteKing) &&
          ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q")) ||
-            (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K"))) ||
-            _pChess->isPieceStayOnItsStartingField(BlackKing) &&
+            (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K"))))
+            ||
+            (_pChess->isPieceStayOnItsStartingField(BlackKing) &&
             (QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q")) ||
-            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k")))
+            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k"))))
         return true;
     else return false;
 }
 
 bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
-    PosFromTo MoveFrom = _pChess->getMovementsPointer()->getMove().from;
-    PIECE_TYPE PieceType = _pBoardMain->getField(MoveFrom)->getPieceOnField()->getType();
-    if (QStrMoveToTest.right(2) == _QStrEnpassant && (PieceType == P_PAWN &&
-         ((Piece::Color(PieceType) == PT_WHITE && _WhoseTurn == WHITE_TURN)
-            || (Piece::Color(PieceType) == PT_BLACK && _WhoseTurn == BLACK_TURN))))
+    PosOnBoard MoveFrom = _pMovements->getMove().from;
+    Piece* piece = _pBoardMain->getField(MoveFrom)->getPieceOnField();
+
+    if (QStrMoveToTest.right(2) == _QStrEnpassant && (piece->getType() == P_PAWN &&
+         ((Piece::Color(piece->getNr()) == PT_WHITE && _WhoseTurn == WHITE_TURN)
+            || (Piece::Color(piece->getNr()) == PT_BLACK && _WhoseTurn == BLACK_TURN))))
         return true;
-    else return false;
+    else
+        return false;
 }
 
 void ChessStatus::saveStatusData(QString QStrStatus)
@@ -103,7 +108,7 @@ void ChessStatus::saveStatusData(QString QStrStatus)
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
         _WhoseTurn = this->whoseTurn(QStrWhoseTurn);
-        emit _pChess->setBoardDataLabel(this->getStrWhoseTurn(), BDL_TURN);
+        emit _pChess->setBoardDataLabel(turnTypeAsQstr(_WhoseTurn), BDL_TURN);
 
         _QStrCastlings = QStrFENRecord.at(3);
         qDebug() << "ChessStatus::saveStatusData(): QStrCastlings =" << _QStrCastlings;
@@ -124,7 +129,7 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
 void ChessStatus::resetStatusData()
 {
-    _pChess->getMovementsPointer()->clearMove();
+    _pMovements->clearMove();
     this->setWhoseTurn(NO_TURN);
     this->clearLegalMoves();
     this->clearHistoryMoves();
@@ -150,7 +155,7 @@ void ChessStatus::setLegalMoves(QString QStrMsg)
 void ChessStatus::setLegalMoves(QStringList moves)
 {
     _legalMoves = moves;
-    _pChess->showMovesInUI(ML_LEGAL, _legalMoves);
+    emit _pChess->showLegalMovesInUI(_legalMoves);
 }
 
 void ChessStatus::setHistoryMoves(QString QStrMsg)
@@ -173,7 +178,7 @@ void ChessStatus::setHistoryMoves(QString QStrMsg)
 void ChessStatus::setHistoryMoves(QStringList moves)
 {
     _historyMoves = moves;
-    _pChess->showMovesInUI(ML_HISTORY, _legalMoves);
+    emit _pChess->showHistoryMovesInUI(_legalMoves);
 }
 
 WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
@@ -184,19 +189,6 @@ WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
     {
         return NO_TURN;
         qDebug () << "ERROR: ChessStatus::whoseTurn(); unknown parameter:" << QStrWhoseTurn;
-    }
-}
-
-QString ChessStatus::getStrWhoseTurn()
-{
-    if (_WhoseTurn == WHITE_TURN) return "wt";
-    else if (_WhoseTurn == BLACK_TURN) return "bt";
-    else if (_WhoseTurn == NO_TURN) return "nt";
-    else
-    {
-        QString err = "ERROR: ChessStatus::getStrWhoseTurn(): wrong turn type: "
-                + QString::number(_WhoseTurn);
-        return err;
     }
 }
 
@@ -219,11 +211,11 @@ PLAYER_TYPE ChessStatus::getActivePlayerType()
 void ChessStatus::clearLegalMoves()
 {
     _legalMoves.clear();
-    _pChess->showMovesInUI(ML_LEGAL, _legalMoves);
+    emit _pChess->showLegalMovesInUI(_legalMoves);
 }
 
 void ChessStatus::clearHistoryMoves()
 {
     _historyMoves.clear();
-    _pChess->showMovesInUI(ML_HISTORY, _legalMoves);
+    emit _pChess->showHistoryMovesInUI(_legalMoves);
 }

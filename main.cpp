@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     //TODO: odpalać server websocket po konstruktorze mainwindow
     TCPMsgs TCPMsgs001;
     Chess Chess001(&ClientsList, &DobotArm001, &BoardMain001, &BoardRemoved001, &BoardChenard001,
-                   &USB001, &Websockety, &TCPMsgs001, WEBSITE);
+                   &Websockety, &TCPMsgs001, WEBSITE);
     MainWindow mainwindow(&Websockety, &BoardMain001, &BoardRemoved001, &BoardChenard001,
                           &TCPMsgs001, &USB001, &DobotArm001, &Chess001, &ClientsList);
     mainwindow.show();

@@ -4,8 +4,10 @@
 #pragma once
 #include "chess.h"
 
+class Clients;
 class ChessStatus;
 class ChessTimers;
+class ChessMovements;
 
 class ChessResets
 {
@@ -16,6 +18,7 @@ private:
     Clients* _pClientsList;
     ChessTimers* _pTimers;
     ChessStatus* _pStatus;
+    ChessMovements* _pMovements;
 
     bool isPieceSetOnStartFields();
     void sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);

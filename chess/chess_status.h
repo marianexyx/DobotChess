@@ -2,10 +2,9 @@
 #define CHESS_STATUS_H
 
 #pragma once
+#include "chess.h"
 #include "chess/end_of_game_types.h"
 #include "chess/turn_types.h"
-
-enum MOVES_LISTS { ML_HISTORY, ML_LEGAL };
 
 class Chess;
 
@@ -17,6 +16,7 @@ private:
     Chess* _pChess;
     Chessboard* _pBoardMain;
     Clients* _pClientsList;
+    ChessMovements* _pMovements;
 
     END_TYPE _FENGameState;
     WHOSE_TURN _WhoseTurn;

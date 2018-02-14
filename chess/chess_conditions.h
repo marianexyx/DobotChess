@@ -2,11 +2,15 @@
 #define CHESS_CONDITIONS_H
 
 #pragma once
-#include "chess.h"
 #include "chess/request_types.h"
+#include "chess.h"
 
 //future: wszystkie errory zapisywać w plikach z logami, z oznaczeniami kto, co, kiedy...
 //...wysyłał i w jakich okolicznościach
+
+class Clients;
+class ChessMovements;
+class ChessStatus;
 
 class ChessConditions
 {
@@ -14,6 +18,9 @@ class ChessConditions
 
 private:
     Chess* _pChess;
+    Clients* _pClientsList;
+    ChessMovements* _pMovements;
+    ChessStatus* _pStatus;
 
     bool isRequestParameterInProperFormat(clientRequest request);
     bool isRequestAppropriateToGameStatus(REQUEST_TYPE Type);

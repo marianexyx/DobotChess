@@ -2,16 +2,26 @@
 #define CHESS_BOT_H
 
 #pragma once
+#include <QObject>
+#include <QString>
+#include <QDebug>
+#include "vars/log.h"
 #include "chess.h"
+//#include "chess_resets.h"
 
 class Chess;
+//class ChessResets;
 
-class ChessBot
+class ChessBot: public QObject
 {
+    Q_OBJECT
+
     friend class Chess;
 
 private:
     Chess* _pChess;
+    //ChessResets* _pResets;
+    //ArduinoUsb* _pUsb;
 
     bool _bAI;
     bool _bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
