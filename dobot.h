@@ -20,6 +20,9 @@
 #include "dobot/dobot_servo.h"
 #include "dobot/dobot_queue.h"
 
+class DobotQueue;
+struct ServoArduino;
+
 class Dobot: public QObject
 {
     Q_OBJECT

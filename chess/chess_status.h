@@ -2,21 +2,20 @@
 #define CHESS_STATUS_H
 
 #pragma once
-#include "chess.h"
-#include "chess/end_of_game_types.h"
-#include "chess/turn_types.h"
-
-class Chess;
+#include "chess/vars/end_of_game_types.h"
+#include "chess/vars/turn_types.h"
+#include "chessboard.h"
+#include "client.h"
+#include "piece_controller.h"
 
 class ChessStatus
 {
     friend class Chess;
 
 private:
-    Chess* _pChess;
     Chessboard* _pBoardMain;
     Clients* _pClientsList;
-    ChessMovements* _pMovements;
+    PieceController* _pPieceController;
 
     END_TYPE _FENGameState;
     WHOSE_TURN _WhoseTurn;
@@ -27,8 +26,9 @@ private:
 
     WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
 
-//public:
-    ChessStatus(Chess* pChess);
+public:
+    ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
+                Clients* pClientsList);
     ~ChessStatus() {}
 
     void saveStatusData(QString QStrStatus);
@@ -46,7 +46,6 @@ private:
     void clearLegalMoves();
     void clearHistoryMoves();
 
-public:
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
     static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
@@ -54,7 +53,6 @@ public:
     bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
     bool isMoveARequestForPromotion(QString QStrMove){
         return _legalMoves.contains(QStrMove + "q")? true : false; }
-    bool isMoveRemoving();
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
 

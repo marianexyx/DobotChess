@@ -1,11 +1,9 @@
 #include "chess_movements.h"
 
-ChessMovements::ChessMovements(Chess* pChess)
+ChessMovements::ChessMovements(Chessboard *pBoardMain, Chessboard *pBoardRemoved)
 {
-    _pChess = pChess; 
-    _pBoardMain = _pChess->getBoardMainPointer();
-    _pBoardRemoved = _pChess->getBoardRemovedPointer();
-    _pStatus = _pChess->getStatusPointer();
+    _pBoardMain = pBoardMain;
+    _pBoardRemoved = pBoardRemoved;
 }
 
 Field* ChessMovements::findKingFieldInCastling(Field* pField)
@@ -176,6 +174,13 @@ SEQUENCE_TYPE ChessMovements::findMoveType(QString QStrMove)
         qDebug() << "ERROR: ChessMovements::findMoveType(): move is illegal:" << QStrMove;
         return ST_NONE;
     }
+}
+
+bool ChessMovements::isMoveRemoving()
+{
+    if (_pBoardMain->getField(_PosMove.to)->getPieceOnField() != nullptr)
+        return true;
+    else return false;
 }
 
 bool ChessMovements::isMoveSet()

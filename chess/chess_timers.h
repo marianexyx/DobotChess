@@ -2,12 +2,8 @@
 #define CHESS_TIMERS_H
 
 #pragma once
-#include "chess.h"
 #include <QTimer>
-
-class Chess;
-class ChessStatus;
-class ChessResets;
+#include "client.h"
 
 class ChessTimers: public QObject
 {
@@ -16,9 +12,6 @@ class ChessTimers: public QObject
     friend class Chess;
 
 private:
-    Chess* _pChess;
-    ChessStatus* _pStatus;
-    ChessResets* _pResets;
     Clients* _pClientsList;
 
     QTimer* _whiteTimer;
@@ -38,7 +31,7 @@ private slots:
     void timeOutStartQueue();
 
 public:
-    ChessTimers(Chess* pChess);
+    ChessTimers(Clients* pClientsList);
 
     void startGameTimer();
     void resetGameTimers();

@@ -1,11 +1,7 @@
 #include "chess_bot.h"
 
-ChessBot::ChessBot(Chess *pChess)
+ChessBot::ChessBot()
 {
-    _pChess = pChess;
-    //_pResets = _pChess->getResetsPointer();
-    //_pUsb = _pChess->getUsbPointer();
-
     _bAI = false;
     _bUndo = false;
     _bIsIgorsAiSimulatedAsPlayer2 = false;
@@ -16,15 +12,15 @@ void ChessBot::undoOk()
     _bUndo = true; //zapamiętaj że cofnięcie ruchu miało miejsce
     //niech się wykona cały ruch Igora, łącznie ze sprawdzeniem wszystkich...
     //...dziwnych ruchów tak aby też wykonał się dobrze mechanicznie
-    _pChess->sendDataToClient("move " + _QStrAIPiecieFromTo);
+    //future: _pChess->sendDataToClient("move " + _QStrAIPiecieFromTo);
 }
 
 void ChessBot::thinkOk(QString QStrMsg)
 {
-    emit _pChess->addTextToLogPTE("AI is ready to start move\n", LOG_CORE);
+    //future: emit _pChess->addTextToLogPTE("AI is ready to start move\n", LOG_CORE);
 
     _QStrAIPiecieFromTo = QStrMsg.mid(3,4); //zapisz w pamięci ruch wymyślony przez bota
-    _pChess->sendMsgToTcp("undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz...
+    //future: _pChess->sendMsgToTcp("undo 1"); //...i wróć do stanu sprzed ruchu Igora, by zaraz...
     //...przeciągnąć go przez cały kod sprawdzający ruchy, by wiedzieć jak ramie ma się poruszać...
     //...w szczególnych przypadkach.
 }

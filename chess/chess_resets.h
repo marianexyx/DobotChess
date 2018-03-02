@@ -2,31 +2,24 @@
 #define CHESS_RESETS_H
 
 #pragma once
-#include "chess.h"
-
-class Clients;
-class ChessStatus;
-class ChessTimers;
-class ChessMovements;
+#include "chess/vars/end_of_game_types.h"
+#include "client.h"
+#include "chessboard.h"
 
 class ChessResets
 {
     friend class Chess;
 
 private:
-    Chess* _pChess;
     Clients* _pClientsList;
-    ChessTimers* _pTimers;
-    ChessStatus* _pStatus;
-    ChessMovements* _pMovements;
 
     bool isPieceSetOnStartFields();
     void sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
     void changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear);
-    bool isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2);
+    bool isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2);
 
 public:
-    ChessResets(Chess* pChess);
+    ChessResets(Clients* pClientsList);
 
     void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
     void resetPiecePositions();

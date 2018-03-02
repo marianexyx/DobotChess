@@ -1,19 +1,19 @@
 #include "xml_reader.h"
 
-XmlReader::XmlReader(QString QStrFileName)
+XmlReader::XmlReader(QString QStrFileName):
+    xmlFile(QStrFileName)
 {
-    xmlFile(QStrFileName);
     if (!xmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "ERROR: XmlReader::XmlReader(): failed to load file";
-        return -1;
+        return;
     }
     else
     {
         if(xmlDoc.setContent(&xmlFile))
         {
             qDebug() << "ERROR: XmlReader::XmlReader(): failed to load document";
-            return -1;
+            return;
         }
         xmlFile.close();
     }

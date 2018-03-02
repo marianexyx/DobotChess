@@ -1,18 +1,12 @@
 #include "chess.h"
 
-Chess::Chess(Clients* pClientsList, Dobot* pDobot, Chessboard* pBoardMain,
+Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceSet* pPieceSet, Chessboard* pBoardMain,
              Chessboard* pBoardRemoved, Chessboard* pBoardChenard, Websockets* pWebsockets,
              TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
-    _pTimers = new ChessTimers(this);
-    _pMovements = new ChessMovements(this);
-    _pBot = new ChessBot(this);
-    _pStatus = new ChessStatus(this);
-    _pResets = new ChessResets(this) ;
-    _pConditions = new ChessConditions(this);
-
     _pClientsList = pClientsList;
     _pDobot = pDobot;
+    _pPieceSet = pPieceSet;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
     _pBoardChenard = pBoardChenard;
@@ -20,15 +14,19 @@ Chess::Chess(Clients* pClientsList, Dobot* pDobot, Chessboard* pBoardMain,
     _pTCPMsgs = pTCPMsgs;
     _pUsb = _pDobot->getArduinoPointer();
 
+    _pBot = new ChessBot();
+    _pStatus = new ChessStatus(_pPieceSet, _pBoardMain, _pClientsList);
+    _pMovements = new ChessMovements(_pBoardMain, _pBoardRemoved);
+    _pResets = new ChessResets(_pClientsList) ;
+    _pTimers = new ChessTimers(_pClientsList);
+    _pConditions = new ChessConditions(_pClientsList);
+
     _pBoardMain->isBoardReal(B_MAIN); //todo: to sa testy
 
     _PlayerSource = PlayerSource;
 
     _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
     _request.clear();
-
-    for (int i=1; i>=32; ++i)
-        _pPiece[i] = new Piece(i);
 
     connect(_pUsb, SIGNAL(msgFromUsbToChess(QString)),
             this, SLOT(checkMsgFromUsb(QString)));
@@ -48,11 +46,11 @@ Chess::~Chess()
     delete _pConditions;
 }
 
-void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
+void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
 {
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
 
-    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, pClient))
+    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, client))
     {
         _request.type = requestType(QStrMsg, SHOW_ERRORS);
         _request.param = _pConditions->extractParameter(_request.type, QStrMsg);
@@ -66,9 +64,9 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
     switch(_request.type)
     {
     case RT_NEW_GAME:
-        if (pClient == _pClientsList->getPlayer(PT_WHITE))
+        if (client == *_pClientsList->getPlayer(PT_WHITE))
             this->playerWantToStartNewGame(PT_WHITE);
-        else if (pClient == _pClientsList->getPlayer(PT_BLACK))
+        else if (client == *_pClientsList->getPlayer(PT_BLACK))
             this->playerWantToStartNewGame(PT_BLACK);
         break;
     case RT_PROMOTE_TO:
@@ -77,35 +75,35 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client* pClient)
         this->manageMoveRequest(_request);
         break;
     case RT_GET_TABLE_DATA:
-        this->sendDataToClient(this->getTableData(), pClient);
+        this->sendDataToClient(this->getTableData(), &client);
         break;
     case RT_GIVE_UP:
-        _pResets->restartGame(ET_GIVE_UP, pClient);
+        _pResets->restartGame(ET_GIVE_UP, &client);
         break;
     case RT_SIT_ON:
-        _pClientsList->setPlayerType(pClient, playerTypeFromQStr(_request.param));
+        _pClientsList->setPlayerType(client, playerTypeFromQStr(_request.param));
         if (_pClientsList->isGameTableOccupied())
             _pTimers->startQueueTimer();
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_STAND_UP:
-        _pClientsList->clearPlayerType(_pClientsList->getClientType(pClient));
+        _pClientsList->clearPlayerType(_pClientsList->getClientType(client));
         _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_IM:
-        this->newClientName(pClient, _request);
+        this->newClientName(client, _request);
         break;
     case RT_QUEUE_ME:
-        _pClientsList->addClientToQueue(pClient);
+        _pClientsList->addClientToQueue(client);
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_LEAVE_QUEUE:
-        _pClientsList->removeClientFromQueue(pClient);
+        _pClientsList->removeClientFromQueue(client);
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_CLIENT_LEFT:
-        this->removeClient(pClient);
+        this->removeClient(client);
         break;
     default:
         qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received _request.type:"
@@ -228,43 +226,6 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
     this->sendDataToClient(QStrMsgForActivePlayer, pPlayer);
 }
 
-void Chess::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
-                                              VERTICAL_MOVE VertMove)
-{
-    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), SHOW_ERRORS) return;
-
-    if (VertMove == VM_GRAB)
-    {
-        if (!this->isPieceSetOk()) return;
-        if (pField->getPieceOnField(SHOW_ERRORS) == nullptr) return;
-
-        emit this->addTextToLogPTE("Queue: grab piece " +
-                                   QString::number(pField->getPieceOnField()->getNr()) +
-                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
-                                   " from field " + pField->getNrAsQStr(), LOG_CORE);
-        _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
-        pRealBoard->clearField(pField);
-
-        if (!this->isPieceSetOk()) return;
-    }
-    else if (VertMove == VM_PUT)
-    {
-        if (!this->isPieceSetOk()) return;
-
-        emit this->addTextToLogPTE("Queue: put piece " +
-                                   _pPiece[_pDobot->getItemInGripper()]->getName() +
-                                   " on " + boardTypeAsQstr(pRealBoard->getBoardType()) +
-                                   " on field " + pField->getNrAsQStr(), LOG_CORE);
-        pRealBoard->setPieceOnField(_pPiece[_pDobot->getItemInGripper()], pField);
-        _pDobot->clearGripper();
-
-        if (!this->isPieceSetOk()) return;
-    }
-
-    Point3D xyz = pField->getLocation3D();
-    _pDobot->queueMoveSequence(xyz, Piece::dMaxPieceHeight, VertMove);
-}
-
 void Chess::sendMsgToTcp(QString QStrMsg)
 {
     emit this->addTextToLogPTE("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
@@ -272,34 +233,34 @@ void Chess::sendMsgToTcp(QString QStrMsg)
     _pTCPMsgs->queueCmd(_PlayerSource, QStrMsg);
 }
 
-void Chess::newClientName(Client* pClient, clientRequest request)
+void Chess::newClientName(Client& client, clientRequest request)
 {
     if (!_pClientsList->isClientNameExists(request.param))
     {
-        _pClientsList->setClientName(pClient, request.param);
-        this->sendDataToClient(this->getTableData(), pClient);
+        _pClientsList->setClientName(client, request.param);
+        this->sendDataToClient(this->getTableData(), &client);
     }
     else //double login
     {
         _pClientsList->getClientSocket(request.param)->sendTextMessage("logout:doubleLogin");
-        if (_pClientsList->isClientAPlayer(pClient))
-            _pResets->restartGame(ET_SOCKET_LOST, pClient);
-        _pClientsList->setClientName(pClient, request.param);
+        if (_pClientsList->isClientAPlayer(client))
+            _pResets->restartGame(ET_SOCKET_LOST, &client);
+        _pClientsList->setClientName(client, request.param);
     }
 }
 
-void Chess::removeClient(Client* pClient)
+void Chess::removeClient(Client& client)
 {
-    if (_pClientsList->isClientAPlayer(pClient))
+    if (_pClientsList->isClientAPlayer(client))
     {
-        emit this->addTextToLogPTE(playerTypeAsQStr(pClient->type)
+        emit this->addTextToLogPTE(playerTypeAsQStr(client.type)
                                    + " player disconnected\n", LOG_CORE);
-        _pResets->restartGame(ET_SOCKET_LOST, pClient);
+        _pResets->restartGame(ET_SOCKET_LOST, &client);
     }
     else //future: strange behavior with those info- seen more often then we should
         emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
 
-    _pClientsList->removeClient(pClient);
+    _pClientsList->removeClient(client);
 
     emit this->setBoardDataLabel(std::to_string(_pClientsList->getClientsList().size()).c_str(),
                             BDL_SOCKETS_ONLINE);
@@ -443,62 +404,6 @@ void Chess::continueGameplay()
                  << communicationTypeAsQStr(_PlayerSource);
 
     this->sendMsgToTcp("status");
-}
-
-bool Chess::isPieceSetOk()
-{
-    for (short sPiece=1; sPiece>=32; ++sPiece)
-    {
-        bool bPieceExists = false;
-        for (short sField=1; sField>=64; ++sField)
-        {
-            if (_pBoardMain->getField(sField)->getPieceOnField() == _pPiece[sPiece] ||
-                    _pBoardRemoved->getField(sField)->getPieceOnField() == _pPiece[sPiece] ||
-                    _pDobot->getItemInGripper() == sPiece)
-            {
-                bPieceExists = true;
-                break;
-            }
-        }
-        if (!bPieceExists)
-        {
-            qDebug() << "ERROR: Chess::isPieceSetOk(): it isn't, missing piece nr:" << sPiece;
-            return false;
-        }
-    }
-    return true;
-}
-
-bool Chess::isPieceStayOnItsStartingField(Piece* pPiece)
-{
-    if (pPiece == nullptr)
-    {
-        qDebug() << "ERROR: Chess::isPieceStayOnItsStartingField(): piece can't be nullptr";
-        return false;
-    }
-
-    Field* pStartFieldOfPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
-    if (pPiece == pStartFieldOfPiece->getPieceOnField())
-        return true;
-    else return false;
-}
-
-Field* Chess::searchForPieceActualFieldOnMainBoard(Piece* pPiece)
-{
-    if (pPiece == nullptr)
-    {
-        qDebug() << "ERROR: Chess::searchForPieceActualFieldOnMainBoard(): piece == nullptr";
-        return nullptr;
-    }
-
-    for (short sField=1; sField>=64; ++sField)
-    {
-        Field* pField = _pBoardMain->getField(sField);
-        if (pPiece == pField->getPieceOnField())
-            return pField;
-    }
-
-    return nullptr;
 }
 
 QString Chess::getTableData()

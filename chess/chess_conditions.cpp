@@ -1,14 +1,11 @@
 #include "chess_conditions.h"
 
-ChessConditions::ChessConditions(Chess* pChess)
+ChessConditions::ChessConditions(Clients* pClientsList)
 {
-    _pChess = pChess;
-    _pClientsList = _pChess->getClientsPointer();
-    _pMovements = _pChess->getMovementsPointer();
-    _pStatus = _pChess->getStatusPointer();
+    _pClientsList = pClientsList;
 }
 
-bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender)
+bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client& sender)
 {
     clientRequest r;
 
@@ -20,8 +17,8 @@ bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSen
 
     if (!this->isRequestParameterInProperFormat(r)) return false;
     if (!this->isRequestAppropriateToGameStatus(r.type)) return false;
-    if (!this->isSenderAppropriate(pSender, r.type)) return false;
-    if (!this->isThereAnySpecialConditionBeenMet(pSender, r)) return false;
+    if (!this->isSenderAppropriate(sender, r.type)) return false;
+    if (!this->isThereAnySpecialConditionBeenMet(sender, r)) return false;
 
     return true;
 }
@@ -90,13 +87,13 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type)
     }
 }
 
-bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
+bool ChessConditions::isSenderAppropriate(Client& sender, REQUEST_TYPE Type)
 {
-    if (!_pClientsList->isClientInList(pSender)) return false;
+    if (!_pClientsList->isClientInList(sender)) return false;
 
-    bool bLogged = _pClientsList->isClientLoggedIn(pSender);
-    bool bSittingOnChair = _pClientsList->isClientAPlayer(pSender);
-    bool bInQueue = _pClientsList->isClientInQueue(pSender);
+    bool bLogged = _pClientsList->isClientLoggedIn(sender);
+    bool bSittingOnChair = _pClientsList->isClientAPlayer(sender);
+    bool bInQueue = _pClientsList->isClientInQueue(sender);
 
     switch(Type)
     {
@@ -121,29 +118,32 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
     }
 }
 
-bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request)
+bool ChessConditions::isThereAnySpecialConditionBeenMet(Client& sender, clientRequest request)
 {
     switch(request.type)
     {
     case RT_NONE:
-        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = RT_NONE";
+        qDebug() << "ERROR: ChessConditions::isThereAnySpecialConditionBeenMet(): "
+                    "Type = RT_NONE";
         return false;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((_pClientsList->getClientType(pSender) == PT_WHITE
+        if ((_pClientsList->getClientType(sender) == PT_WHITE
              && _pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (_pClientsList->getClientType(pSender) == PT_BLACK
+                (_pClientsList->getClientType(sender) == PT_BLACK
                  && _pStatus->getWhoseTurn() == BLACK_TURN))
             return true;
         else return false;
     case RT_SIT_ON:
+    {
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
         if (_pClientsList->isPlayerChairEmpty(PlayerChair, SHOW_ERRORS) &&
-                !_pClientsList->isClientAPlayer(pSender, SHOW_ERRORS))
+                !_pClientsList->isClientAPlayer(sender, SHOW_ERRORS))
             return true;
         else return false;
+    }
     case RT_IM: //name == empty || name = actual
-        if (pSender->name.isEmpty() || _pClientsList->getClientName(pSender) == request.param)
+        if (sender.name.isEmpty() || _pClientsList->getClientName(sender) == request.param)
             return true;
         else return false;
     case RT_QUEUE_ME:
@@ -151,11 +151,11 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
             return true;
         else return false;
     case RT_LEAVE_QUEUE:
-        if (_pClientsList->isClientInQueue(pSender))
+        if (_pClientsList->isClientInQueue(sender))
             return true;
         else return false;
     case RT_CLIENT_LEFT:
-        if (_pClientsList->isClientInList(pSender))
+        if (_pClientsList->isClientInList(sender))
             return true;
         else return false;
     default: return true;

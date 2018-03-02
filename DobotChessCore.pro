@@ -18,72 +18,72 @@ TARGET = DobotChessCore
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    mainwindow.cpp \
-    chess.cpp \
-    dobot.cpp \
-    tcpmsgs.cpp \
-    chessboard.cpp \
-    websockets.cpp \
-    arduinousb.cpp \
-    sql.cpp \
-    piece.cpp \
-    field.cpp \
-    chess/chess_timers.cpp \
-    chess/chess_movements.cpp \
     chess/chess_bot.cpp \
-    chess/chess_status.cpp \
-    client.cpp \
+    chess/chess_conditions.cpp \
+    chess/chess_movements.cpp \
     chess/chess_resets.cpp \
-    xml_reader.cpp \
+    chess/chess_status.cpp \
+    chess/chess_timers.cpp \
     dobot/dobot_queue.cpp \
     dobot/dobot_servo.cpp \
-    chess/chess_conditions.cpp
+    arduinousb.cpp \
+    chess.cpp \
+    chessboard.cpp \
+    client.cpp \
+    dobot.cpp \
+    field.cpp \
+    mainwindow.cpp \
+    piece.cpp \
+    sql.cpp \
+    tcpmsgs.cpp \
+    websockets.cpp \
+    xml_reader.cpp \
+    piece_controller.cpp
 
 HEADERS  +=  \
-    websockets.h \
-    tcpmsgs.h \
-    chessboard.h \
-    dobot.h \
-    arduinousb.h \
-    chess.h \
-    ui_mainwindow.h \
-    DobotDll/DobotDll.h \
-    DobotDll/DobotType.h \
-    mainwindow.h \
-    vars/log.h \
-    vars/basic_vars.h \
-    vars/board_axis.h \
-    vars/dobot_moves.h \
-    vars/board_data_labels.h \
-    vars/players_types.h \
-    vars/sequence_types.h \
-    vars/end_of_game_types.h \
-    vars/board_types.h \
-    vars/turn_types.h \
-    sql.h \
-    piece.h \
-    vars/posotion_on_board.h \
-    field.h \
-    chess/chess_timers.h \
-    chess/chess_movements.h \
     chess/chess_bot.h \
-    chess/chess_status.h \
-    vars/game_status.h \
-    client.h \
+    chess/chess_conditions.h \
+    chess/chess_movements.h \
     chess/chess_resets.h \
-    xml_reader.h \
+    chess/chess_status.h \
+    chess/chess_timers.h \
+    chess/game_status.h \
+    chess/request_types.h \
+    chess/sequence_types.h \
+    chess/turn_types.h \
     dobot/dobot_queue.h \
     dobot/dobot_servo.h \
-    chess/chess_conditions.h \
-    vars/request_types.h \
-    vars/chenard_io_msgs.h \
-    dobot/dobot_moves.h \
-    chess/request_types.h \
-    chess/chenard_io_msgs.h \
-    chess/game_status.h \
-    chess/turn_types.h \
-    chess/sequence_types.h \
-    chess/end_of_game_types.h
+    DobotDll/DobotDll.h \
+    DobotDll/DobotType.h \
+    vars/basic_vars.h \
+    vars/board_axis.h \
+    vars/board_data_labels.h \
+    vars/board_types.h \
+    vars/log.h \
+    vars/players_types.h \
+    vars/position_on_board.h \
+    arduinousb.h \
+    chess.h \
+    chessboard.h \
+    client.h \
+    dobot.h \
+    field.h \
+    mainwindow.h \
+    piece.h \
+    sql.h \
+    tcpmsgs.h \
+    ui_mainwindow.h \
+    websockets.h \
+    xml_reader.h \
+    chess/vars/chenard_io_msgs.h \
+    chess/vars/end_of_game_types.h \
+    chess/vars/game_status.h \
+    chess/vars/request_types.h \
+    chess/vars/sequence_types.h \
+    chess/vars/turn_types.h \
+    dobot/vars/dobot_moves.h \
+    piece_set.h \
+    piece_controller.h
 
 FORMS    += mainwindow.ui
 

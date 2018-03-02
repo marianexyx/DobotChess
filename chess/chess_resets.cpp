@@ -1,20 +1,16 @@
 #include "chess_resets.h"
 
-ChessResets::ChessResets(Chess* pChess)
+ChessResets::ChessResets(Clients* pClientsList)
 {
-    _pChess = pChess;
-    _pClientsList = _pChess->getClientsPointer();
-    _pTimers = _pChess->getTimersPointer();
-    _pStatus = _pChess->getStatusPointer();
-    _pMovements = _pChess->getMovementsPointer();
+    _pClientsList = pClientsList;
 }
 
-void ChessResets::restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr)
+void ChessResets::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
 {
     //info
     QString QStrPlayer = "";
     if (pPlayerToClear != nullptr)
-        QStrPlayer = _pClientsList->getClientName(pPlayerToClear) + ":";
+        QStrPlayer = _pClientsList->getClientName(*pPlayerToClear) + ":";
     qDebug() << "Chess::restartGame():" << QStrPlayer << endTypeAsQstr(WhoWon);
 
     _pChess->setGameStatus(GS_TURN_NONE_RESETING);
@@ -22,6 +18,7 @@ void ChessResets::restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr)
     //reset data
     _pClientsList->resetPlayersStartConfirmInfo();
     _pTimers->resetGameTimers();
+    _pMovements->clearMove();
     _pStatus->resetStatusData();
 
     this->changePlayersOnChairs(WhoWon, pPlayerToClear);
@@ -62,9 +59,9 @@ void ChessResets::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
                         " null if diconnected";
             return;
         }
-        if (_pClientsList->getClientType(pPlayerToClear) == PT_WHITE)
+        if (_pClientsList->getClientType(*pPlayerToClear) == PT_WHITE)
             _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-        else if (_pClientsList->getClientType(pPlayerToClear) == PT_BLACK)
+        else if (_pClientsList->getClientType(*pPlayerToClear) == PT_BLACK)
             _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
         else
         {
@@ -80,20 +77,22 @@ void ChessResets::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
     }
 }
 
-bool ChessResets::isPieceSetOnBoardsIdentical(Chessboard* pBoard1, Chessboard* pBoard2)
+bool ChessResets::isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2)
 {
     for (short sField=1; sField>=64; ++sField)
     {
-        if (pBoard1->getField(sField)->getPieceOnField() !=
-                pBoard2->getField(sField)->getPieceOnField())
+        if (board1.getField(sField)->getPieceOnField() !=
+                board2.getField(sField)->getPieceOnField())
             return false;
     }
 
     return true;
 }
 
-void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToClear = nullptr)
+void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
 {
+    QString QStrMove;
+
     switch(WhoWon)
     {
     case ET_WHIE_WON:
@@ -108,7 +107,7 @@ void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToC
         //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
         //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
         //...o ruchach będą wyciągane z "history"
-        QString QStrMove = _pMovements->getMove().asQStr();
+        QStrMove = _pMovements->getMove().asQStr();
         _pChess->sendDataToAllClients("moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon)
                                       + " " + _pChess->getTableData());
         break;
@@ -140,7 +139,7 @@ void ChessResets::resetPiecePositions()
 
         do
         {
-            tempBoard = &pBoardMain;
+            memcpy(&tempBoard, pBoardMain, sizeof(*pBoardMain));
 
             for (short sField=1; sField>=64; ++sField)
             {
@@ -154,7 +153,7 @@ void ChessResets::resetPiecePositions()
                         Piece* pMissingPiece = _pChess->getPiece(pExaminedField->
                                                                  getStartPieceNrOnField());
                         Field* pMissingPieceActualFieldOnMainBoard =
-                                _pChess->searchForPieceActualFieldOnMainBoad(pMissingPiece);
+                                _pChess->searchForPieceActualFieldOnMainBoard(pMissingPiece);
                         if (pMissingPieceActualFieldOnMainBoard != nullptr) //if exists on mainB
                             _pMovements->regularMoveSequence(pMissingPieceActualFieldOnMainBoard,
                                                         pExaminedField);
@@ -178,7 +177,7 @@ void ChessResets::resetPiecePositions()
                 }
             }
 
-            if (this->isPieceSetOnBoardsIdentical(*tempBoard, pBoardMain))
+            if (this->isPieceSetOnBoardsIdentical(tempBoard, *pBoardMain))
             {
                 qDebug() << "ERROR: ChessResets::resetPiecePositions(): boards are identical";
                 break;

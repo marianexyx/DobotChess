@@ -6,11 +6,6 @@
 #include <QString>
 #include <QDebug>
 #include "vars/log.h"
-#include "chess.h"
-//#include "chess_resets.h"
-
-class Chess;
-//class ChessResets;
 
 class ChessBot: public QObject
 {
@@ -19,10 +14,6 @@ class ChessBot: public QObject
     friend class Chess;
 
 private:
-    Chess* _pChess;
-    //ChessResets* _pResets;
-    //ArduinoUsb* _pUsb;
-
     bool _bAI;
     bool _bUndo; //dzięki tej fladze będziemy wiedzieli czy odpowiedź...
     //...na 'status' z tcp dotyczy wykonanego ruchu gracza lub igora
@@ -30,7 +21,7 @@ private:
     QString _QStrAIPiecieFromTo; //zapamiętany kolejny ruch bota czekający na wywołanie
 
 public:
-    ChessBot(Chess* pChess);
+    ChessBot();
     ~ChessBot() {}
 
     void undoOk(); //future: i co dalej to robi?

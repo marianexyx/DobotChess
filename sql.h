@@ -2,7 +2,6 @@
 #define SQL_H
 
 #pragma once
-
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>

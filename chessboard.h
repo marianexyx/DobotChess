@@ -8,7 +8,6 @@
 #include <typeinfo>
 #include <limits>
 #include "field.h"
-#include "piece.h"
 #include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
 #include "vars/board_types.h"

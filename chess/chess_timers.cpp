@@ -1,13 +1,10 @@
 #include "chess_timers.h"
 
-ChessTimers::ChessTimers(Chess *pChess):
+ChessTimers::ChessTimers(Clients* pClientsList):
     _lTimersStartTime(1000*60*30), //30min
     _lTimersStartQueue(1000*60*2) //2min
 {
-    _pChess = pChess;
-    _pStatus = _pChess->getStatusPointer();
-    _pResets = _pChess->getResetsPointer();
-    _pClientsList = _pChess->getClientsPointer();
+    _pClientsList = pClientsList;
 
     _whiteTimer = new QTimer();
     _blackTimer = new QTimer();
@@ -61,6 +58,7 @@ void ChessTimers::timeOutStartQueue()
         _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
     if (_pClientsList->isGameTableOccupied())
+        //todo: jak wrzucę to do chess, to dodać zmianę stanu gry
         this->startQueueTimer();
     else _pChess->setGameStatus(GS_TURN_NONE_WAITING_FOR_PLAYERS);
 

@@ -5,6 +5,7 @@ DobotServo::DobotServo(Dobot *pDobot):
     _fGripClosed(7.55f)
 {
     _pDobot = pDobot;
+    _pQueue = _pDobot->getQueuePointer();
 
     _gripperServo.address = 4;
     _gripperServo.frequency = 50;
@@ -46,7 +47,7 @@ void DobotServo::changeGripperAngle(float fDutyCycle) //info: powinno działać
 
 void DobotServo::moveServoManually()
 {
-    if (_arduinoGripperStates.first().ID <= _n64RealTimeDobotActualID)
+    if (_arduinoGripperStates.first().ID <= _pQueue->getRealTimeDobotActualID())
     {
         QString QStrServoState =
                 _arduinoGripperStates.first().isGripperOpen ? "Open" : "Close";
@@ -60,19 +61,19 @@ void DobotServo::moveServoManually()
     _pDobot->showArduinoGripperStateListInUI(_arduinoGripperStates);
 }
 
-void DobotServo::openGripper(int64_t ID)
+void DobotServo::openGripper(uint64_t ID)
 {
     _gripperServo.dutyCycle = _fGripOpened;
     Dobot::isArmReceivedCorrectCmd(SetIOPWM(&_gripperServo, true, &ID), SHOW_ERRORS);
 }
 
-void DobotServo::closeGripper(int64_t ID)
+void DobotServo::closeGripper(uint64_t ID)
 {
     _gripperServo.dutyCycle = _fGripClosed;
     Dobot::isArmReceivedCorrectCmd(SetIOPWM(&_gripperServo, true, &ID), SHOW_ERRORS);
 
     //wait for the servo to be closed //todo: 2 id w 1 ruchu
-    Dobot::isArmReceivedCorrectCmd(SetWAITCmd(&_gripperMoveDelay, true, &move.ID), SHOW_ERRORS);
+    Dobot::isArmReceivedCorrectCmd(SetWAITCmd(&_gripperMoveDelay, true, &ID), SHOW_ERRORS);
 }
 
 void DobotServo::addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType)
@@ -85,9 +86,9 @@ void DobotServo::addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType)
     }
 
     ServoArduino servoState;
-    servoState.ID = _n64CoreQueuedCmdID;
-    servoState.isGripperOpen = (State == DM_OPEN) ? true : false;
-    qDebug() << "DobotQueue::addArmMoveToQueue():" << dobotMoveAsQstr(State);
+    servoState.ID = _pQueue->getCoreQueuedCmdID();
+    servoState.isGripperOpen = (MoveType == DM_OPEN) ? true : false;
+    qDebug() << "DobotQueue::addArmMoveToQueue():" << dobotMoveAsQstr(MoveType);
 
     _arduinoGripperStates << servoState;
 }

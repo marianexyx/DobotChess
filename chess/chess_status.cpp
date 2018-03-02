@@ -1,21 +1,13 @@
 #include "chess_status.h"
 
-ChessStatus::ChessStatus(Chess *pChess)
+ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
+                         Clients* pClientsList)
 {
-    _pChess = pChess;
-    _pBoardMain = _pChess->getBoardMainPointer();
-    _pClientsList = _pChess->getClientsPointer();
-    _pMovements = _pChess->getMovementsPointer();
+    _pBoardMain = pBoardMain;
+    _pClientsList = pClientsList;
+    _pPieceController = pPieceController;
 
     _WhoseTurn = NO_TURN;
-}
-
-bool ChessStatus::isMoveRemoving()
-{
-    PosOnBoard MoveTo = _pMovements->getMove().to;
-    if (_pBoardMain->getField(MoveTo)->getPieceOnField() != nullptr)
-        return true;
-    else return false;
 }
 
 /*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign,
@@ -63,16 +55,18 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
     PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
     PosOnBoard BlackKingStartFieldPos(L_E, D_8);
 
-    Piece* WhiteKing = _pChess->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
-    Piece* BlackKing = _pChess->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
+    Piece* WhiteKing =
+            _pPieceController->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
+    Piece* BlackKing =
+            _pPieceController->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
 
-    if ((_pChess->isPieceStayOnItsStartingField(WhiteKing) &&
+    if ((_pPieceController->isPieceStayOnItsStartingField(WhiteKing) &&
          ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q")) ||
             (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K"))))
             ||
-            (_pChess->isPieceStayOnItsStartingField(BlackKing) &&
-            (QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q")) ||
-            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k"))))
+            (_pPieceController->isPieceStayOnItsStartingField(BlackKing) &&
+            ((QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q")) ||
+            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k")))))
         return true;
     else return false;
 }
@@ -129,7 +123,6 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
 void ChessStatus::resetStatusData()
 {
-    _pMovements->clearMove();
     this->setWhoseTurn(NO_TURN);
     this->clearLegalMoves();
     this->clearHistoryMoves();

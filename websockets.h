@@ -2,7 +2,6 @@
 #define WEBSOCKETS_H
 
 #pragma once
-
 #include "QtWebSockets/QWebSocketServer"
 #include "QtWebSockets/QWebSocket"
 #include <QtCore/QObject>

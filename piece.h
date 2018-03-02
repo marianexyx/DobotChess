@@ -2,11 +2,10 @@
 #define PIECE_H
 
 #pragma once
-
 #include "QDebug"
 #include "QString"
 #include "vars/players_types.h"
-#include "vars/posotion_on_board.h"
+#include "vars/position_on_board.h"
 
 enum PIECE_TYPE
 {

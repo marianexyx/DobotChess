@@ -1,6 +1,7 @@
 #ifndef TCPMSGS_H
 #define TCPMSGS_H
 
+#pragma once
 #include <QTcpSocket>
 #include <QString>
 #include "vars/log.h"

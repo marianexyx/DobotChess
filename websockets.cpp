@@ -32,7 +32,7 @@ void Websockets::onNewConnection()
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
-    _pClientsList->newClient(pSocket);
+    _pClientsList->newClient(*pSocket);
     emit this->addTextToLogPTE("New connection \n", LOG_WEBSOCKET);
     _pClientsList->showClientsInUI();
 }

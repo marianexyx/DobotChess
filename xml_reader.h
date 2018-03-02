@@ -19,7 +19,7 @@ private:
 public:
     XmlReader(QString QStrFileName);
 
-    ListElements(QDomElement root, QString QStrTagName, QString QStrAttribute);
+    void ListElements(QDomElement root, QString QStrTagName, QString QStrAttribute);
 };
 
 #endif // XML_READER_H

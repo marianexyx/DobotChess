@@ -1,6 +1,7 @@
 #ifndef ARDUINOUSB_H
 #define ARDUINOUSB_H
 
+#pragma once
 #include <QObject>
 #include <QDebug>
 #include <QSerialPort>

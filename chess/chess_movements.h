@@ -2,21 +2,16 @@
 #define CHESS_MOVEMENTS_H
 
 #pragma once
-#include "vars/posotion_on_board.h"
-#include "chess.h"
-
-class Chess;
-class ChessStatus;
+#include "chess/vars/sequence_types.h"
+#include "chessboard.h"
 
 class ChessMovements
 {
     friend class Chess;
 
 private:
-    Chess* _pChess;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
-    ChessStatus* _pStatus;
 
     SEQUENCE_TYPE _MoveType;
     PosFromTo _PosMove;
@@ -24,13 +19,14 @@ private:
     void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }
 
 public:
-    ChessMovements(Chess* pChess);
+    ChessMovements(Chessboard* pBoardMain, Chessboard* pBoardRemoved);
     ~ChessMovements();
 
     Field* findKingFieldInCastling(Field* pField);
     Field* findRookFieldInCastling(Field* pField);
     void goToSafeRemovedFieldIfNeeded(Field* pFieldDest);
     SEQUENCE_TYPE findMoveType(QString QStrMove);
+    bool isMoveRemoving();
 
     void doMoveSequence();
     void regularMoveSequence(Field* pFrom, Field* pTo);

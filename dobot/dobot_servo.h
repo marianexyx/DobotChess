@@ -5,6 +5,7 @@
 #include "dobot.h"
 
 class Dobot;
+class DobotQueue;
 
 struct ServoArduino
 {
@@ -17,6 +18,7 @@ class DobotServo
 {
 private:
     Dobot* _pDobot;
+    DobotQueue* _pQueue;
 
     IOPWM _gripperServo;
     QList<ServoArduino> _arduinoGripperStates;
@@ -29,8 +31,8 @@ public:
     void checkPWMForErrors();
     void changeGripperAngle(float fDutyCycle); //service usage
     void moveServoManually();
-    void openGripper(int64_t ID);
-    void closeGripper(int64_t ID);
+    void openGripper(uint64_t ID);
+    void closeGripper(uint64_t ID);
     void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType);
 
     bool isServoListEmpty() const { return _arduinoGripperStates.isEmpty() ? true : false; }

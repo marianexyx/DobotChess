@@ -1,11 +1,12 @@
 #include "client.h"
 
 //future: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
-void Clients::newClient(QWebSocket* pClientSocket)
+void Clients::newClient(QWebSocket& clientSocket)
 {
     Client newClient;
     newClient.ID = this->getNextAvailableClientID();
-    newClient.socket = pClientSocket;
+    newClient.socket = &clientSocket; //future: jeżeli ten parametr jest jako const, to nie...
+    //...zadziała. dlaczego? przecież tylko przypisuje, a nie zmieniam
     newClient.name.clear();
     newClient.queue = -1;
     newClient.isStartClickedByPlayer = false;
@@ -14,7 +15,7 @@ void Clients::newClient(QWebSocket* pClientSocket)
     _clients << newClient;
 }
 
-void Clients::setClientName(Client* client, QString QStrName)
+void Clients::setClientName(const Client& client, QString QStrName)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -27,7 +28,7 @@ void Clients::setClientName(Client* client, QString QStrName)
 
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
             Client changedClient = cl;
             changedClient.name = QStrName;
@@ -49,13 +50,13 @@ void Clients::setClientName(Client* client, QString QStrName)
     qDebug() << "ERROR: Clients::setClientName(): client not found";
 }
 
-void Clients::setPlayerType(Client* client, PLAYER_TYPE Type)
+void Clients::setPlayerType(Client& client, PLAYER_TYPE Type)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
-            if (Type != PT_NONE && client->queue > 0)
+            if (Type != PT_NONE && client.queue > 0)
             {
                 qDebug() << "ERROR: Clients::setPlayerType(): client in queue can not"
                             " sit on chair";
@@ -117,11 +118,11 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
     else qDebug() << "WARNING: Clients::clearPlayerType(): already clear";
 }
 
-void Clients::setClientStartConfirmation(Client* client, bool bState)
+void Clients::setClientStartConfirmation(Client& client, bool bState)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
             if(bState && cl.isStartClickedByPlayer == bState)
                 qDebug() << "WARNING: Clients::setClientStartConfirmation(Client client, "
@@ -175,11 +176,11 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
     qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
 }
 
-void Clients::addClientToQueue(Client* client)
+void Clients::addClientToQueue(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
             if (cl.queue > 0)
             {
@@ -204,7 +205,7 @@ void Clients::addClientToQueue(Client* client)
     }
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
             Client changedClient = cl;
             changedClient.queue = (maxQueue == 0) ? 1 : maxQueue + 1;
@@ -227,11 +228,11 @@ void Clients::addClientToQueue(Client* client)
     emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
-void Clients::removeClient(Client* client)
+void Clients::removeClient(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
             cl.socket->deleteLater(); //todo: jest sens to usuwać skoro to nie jest wskaźnik?...
             //...a może to musi być wskaźnik by dało się to wogle usunąć?
@@ -254,11 +255,11 @@ void Clients::removeClient(Client* client)
     }
 }
 
-void Clients::removeClientFromQueue(Client* client)
+void Clients::removeClientFromQueue(Client &client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
         {
             Client changedClient = cl;
             changedClient.queue = -1;
@@ -293,13 +294,13 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
     if (this->getQueuedClientsList() != QUEUE_EMPTY)
     {
         Client* nextQueuedClient;
-        if (this->isClientInList(this->getNextQueuedClient()))
+        if (this->isClientInList(*this->getNextQueuedClient()))
             nextQueuedClient = this->getNextQueuedClient();
         else return;
 
-        this->removeClientFromQueue(nextQueuedClient);
-        this->setPlayerType(nextQueuedClient, Chair);
-        this->setClientStartConfirmation(nextQueuedClient, false);
+        this->removeClientFromQueue(*nextQueuedClient);
+        this->setPlayerType(*nextQueuedClient, Chair);
+        this->setClientStartConfirmation(*nextQueuedClient, false);
 
         emit this->setBoardDataLabel(this->getPlayerName(Chair),
                                       Chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
@@ -308,9 +309,8 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
     }
 }
 
-bool Clients::isClientInList(Client* pClient)
+bool Clients::isClientInList(Client& client)
 {
-    Client client = *pClient;
     /*todo: muszę chyba zrobić tak wszędzie, tj:
     -porobić dereferencje we wszystkich argumentach podawanych jako wskaźniki wg linku poniżej:
     https://stackoverflow.com/questions/14420257/cpp-c-get-pointer-value-or-depointerize-pointer
@@ -333,7 +333,10 @@ Client* Clients::getClient(QWebSocket* pClientSocket)
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.socket == pClientSocket)
-            return cl;
+        {
+            Client* pClient = &cl;
+            return pClient;
+        }
     }
     qDebug() << "ERROR: Clients::getClient(QWebSocket): client not found";
     return nullptr;
@@ -344,7 +347,10 @@ Client* Clients::getClient(int64_t n64ClientID)
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.ID == n64ClientID)
-            return cl;
+        {
+            Client* pClient = &cl;
+            return pClient;
+        }
     }
     qDebug() << "ERROR: Clients::getClient(int64_t): client not found. ID =" << n64ClientID;
     return nullptr;
@@ -355,7 +361,10 @@ Client* Clients::getPlayer(PLAYER_TYPE Type)
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.type == Type)
-            return cl;
+        {
+            Client* pClient = &cl;
+            return pClient;
+        }
     }
     qDebug() << "ERROR: Clients::getPlayer(PLAYER_TYPE): client not found";
     return nullptr;
@@ -371,7 +380,7 @@ QWebSocket* Clients::getClientSocket(QString QStrPlayerName)
     return nullptr;
 }
 
-QString Clients::getClientName(Client client)
+QString Clients::getClientName(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -382,7 +391,7 @@ QString Clients::getClientName(Client client)
     return "";
 }
 
-bool Clients::isClientLoggedIn(Client client)
+bool Clients::isClientLoggedIn(Client& client)
 {
     if (!this->getClientName(client).isEmpty()) return true;
     else return false;
@@ -403,7 +412,10 @@ Client* Clients::getNextQueuedClient()
         {
             qDebug() << "Clients::getNextQueuedClient(): client.name =" <<
                         cl.name;
-            return cl;
+            {
+                Client* pClient = &cl;
+                return pClient;
+            }
         }
     }
     qDebug() << "ERROR: Clients::getNextQueuedClient(): client not found";
@@ -483,11 +495,11 @@ QString Clients::getQueuedClientsList()
     qDebug() << "Clients::testQueuedClients(): QStrQueuedClients =" << QStrQueuedClients;
 }*/
 
-PLAYER_TYPE Clients::getClientType(Client* client)
+PLAYER_TYPE Clients::getClientType(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == *client)
+        if (cl == client)
             return cl.type;
     }
     qDebug() << "ERROR: Clients::getClientType(): socket not found";
@@ -516,7 +528,7 @@ bool Clients::isGameTableOccupied()
     else return true;
 }
 
-int64_t Clients::getClientPosInQueue(Client client)
+int64_t Clients::getClientPosInQueue(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -592,7 +604,7 @@ QString Clients::getPlayerName(PLAYER_TYPE Type)
     }
 }
 
-bool Clients::isClientInQueue(Client client)
+bool Clients::isClientInQueue(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -646,7 +658,7 @@ int Clients::getAmountOfQueuedClients()
     else return 0;
 }
 
-bool Clients::isClientAPlayer(Client* client, bool bErrorLog /*= false*/)
+bool Clients::isClientAPlayer(Client& client, bool bErrorLog /*= false*/)
 {
     if (this->getClientType(client) == PT_WHITE ||
             this->getClientType(client) == PT_BLACK )
@@ -670,7 +682,7 @@ bool Clients::isClientIDExists(int64_t n64ID)
     return false;
 }
 
-int64_t Clients::getClientID(Client client)
+int64_t Clients::getClientID(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
