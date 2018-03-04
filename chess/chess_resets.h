@@ -12,17 +12,18 @@ class ChessResets
 
 private:
     Clients* _pClientsList;
+    Chessboard* _pBoardCoreMain;
 
-    bool isPieceSetOnStartFields();
-    void sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
+    bool isPieceSetOnStartFields(); //todo: do chessboardu?
+    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, PosFromTo* pMove = nullptr,
+                          Client* pPlayerToClear = nullptr);
     void changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear);
     bool isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2);
 
 public:
-    ChessResets(Clients* pClientsList);
-
-    void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
+    ChessResets(Clients* pClientsList, Chessboard* pBoardCoreMain);
     void resetPiecePositions();
+
 };
 
 #endif // CHESS_RESETS_H

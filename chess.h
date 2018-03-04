@@ -30,9 +30,11 @@ class Chess: public QObject
 private:
     Clients* _pClientsList;
     Dobot* _pDobot;
-    PieceSet* _pPieceSet;
-    Chessboard* _pBoardMain;
-    Chessboard* _pBoardRemoved;
+    PieceController* _pPieceController;
+    Chessboard* _pBoardRealMain;
+    Chessboard* _pBoardRealRemoved;
+    Chessboard* _pBoardCoreMain;
+    Chessboard* _pBoardCoreRemoved;
     Chessboard* _pBoardChenard;
     Websockets* _pWebsockets;
     TCPMsgs* _pTCPMsgs;
@@ -64,11 +66,14 @@ private:
     void startNewGameInCore();
     void manageMoveRequest(clientRequest request);
     void continueGameplay();
+    void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
+    bool isMoveOkForCoreBoards(PosFromTo PosMove, SEQUENCE_TYPE Type);
 
 public:
-    Chess(Clients* pClientsList, Dobot* pDobot, PieceSet *pPieceSet, Chessboard* pBoardMain,
-          Chessboard* pBoardRemoved, Chessboard* pBoardChenard, Websockets* pWebsockets,
-          TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
+    Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,
+          Chessboard* pBoardRealMain, Chessboard* pBoardRealRemoved,
+          Chessboard* pBoardCoreMain, Chessboard* pBoardCoreRemoved, Chessboard* pBoardChenard,
+          Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 
     void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }
@@ -84,6 +89,11 @@ public slots:
     void checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond);
     void checkMsgFromUsb(QString QStrMsg);
     QString getTableData();
+    void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
+    void showLegalMovesInUI(QStringList legalMoves);
+    void showHistoryMovesInUI(QStringList historyMoves);
+    void timeOutStart();
+    void timeOutPlayer(PLAYER_TYPE Player);
 
 signals:
     void addTextToLogPTE(QString, LOG);

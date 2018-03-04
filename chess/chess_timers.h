@@ -4,11 +4,12 @@
 #pragma once
 #include <QTimer>
 #include "client.h"
+#include "chess/vars/turn_types.h"
+#include "chess/vars/game_status.h"
 
 class ChessTimers: public QObject
 {
     Q_OBJECT
-
     friend class Chess;
 
 private:
@@ -26,9 +27,9 @@ private:
     void stopBoardTimers();
 
 private slots:
-    void playerTimeOut(PLAYER_TYPE Player);
+    void playerTimeOut(PLAYER_TYPE Player) { emit this->timeOutPlayer(Player); }
     void updateTimeLabels();
-    void timeOutStartQueue();
+    void startTimeOut();
 
 public:
     ChessTimers(Clients* pClientsList);
@@ -36,14 +37,19 @@ public:
     void startGameTimer();
     void resetGameTimers();
     QString milisecToClockTime(long lMilis);
-    void switchPlayersTimers();
-    void startQueueTimer();
+    void switchPlayersTimers(WHOSE_TURN Turn);
+    GAME_STATUS startQueueTimer();
     void stopQueueTimer();
 
     int getWhiteTimeLeft();
     int getBlackTimeLeft();
     int getStartTimeLeft() { return _startQueueTimer->remainingTime(); }
     bool isStartTimerRunning() { return _startQueueTimer->isActive(); }
+
+signals:
+    void setBoardDataLabel(QString, BOARD_DATA_LABEL);
+    void timeOutStart();
+    void timeOutPlayer(PLAYER_TYPE);
 };
 
 #endif // CHESS_TIMERS_H

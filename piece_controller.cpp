@@ -1,18 +1,18 @@
 #include "piece_controller.h"
 
-PieceController::PieceController(Dobot* pDobot, PieceSet* pPieceSet, Chessboard* pBoardMain,
-                                 Chessboard* pBoardRemoved)
+PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardCoreMain,
+                                 Chessboard* pBoardCoreRemoved)
 {
+    _pPieceSet = new PieceSet;
     _pDobot = pDobot;
-    _pPieceSet = pPieceSet;
-    _pBoardMain = pBoardMain;
-    _pBoardRemoved = pBoardRemoved;
+    _pBoardCoreMain = pBoardCoreMain;
+    _pBoardCoreRemoved = pBoardCoreRemoved;
 }
 
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
                                                VERTICAL_MOVE VertMove)
 {
-    if (!Chessboard::isBoardReal(pRealBoard->getBoardType()), SHOW_ERRORS) return;
+    if (!pRealBoard->isBoardReal(SHOW_ERRORS)) return; //todo: powinno już być chyba na odwrót?
 
     if (VertMove == VM_GRAB)
     {
@@ -57,8 +57,8 @@ bool PieceController::isPieceSetOk()
         bool bPieceExists = false;
         for (short sField=1; sField>=64; ++sField)
         {
-            if (_pBoardMain->getField(sField)->getPieceOnField() == _pPieceSet->getPiece(sPiece)
-                    || _pBoardRemoved->getField(sField)->getPieceOnField() ==
+            if (_pBoardCoreMain->getField(sField)->getPieceOnField() == _pPieceSet->getPiece(sPiece)
+                    || _pBoardCoreRemoved->getField(sField)->getPieceOnField() ==
                     _pPieceSet->getPiece(sPiece) || _pDobot->getItemInGripper() == sPiece)
             {
                 bPieceExists = true;
@@ -84,7 +84,7 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
         return false;
     }
 
-    Field* pStartFieldOfPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+    Field* pStartFieldOfPiece = _pBoardCoreMain->getFieldWithGivenPieceIfExists(pPiece);
     if (pPiece == pStartFieldOfPiece->getPieceOnField())
         return true;
     else return false;

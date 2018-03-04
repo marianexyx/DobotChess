@@ -9,6 +9,10 @@
 
 const bool SHOW_ERRORS = true;
 
+const bool REAL = true;
+const bool IMAGINARY = false;
+
+
 enum COMMUNICATION_TYPE { WEBSITE = 1, ARDUINO, TEST };
 inline QString communicationTypeAsQStr(COMMUNICATION_TYPE Type)
 {

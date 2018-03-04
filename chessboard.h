@@ -21,6 +21,7 @@ class Chessboard: public QObject
 
 private:
     BOARD _BoardType;
+    bool _bBoardIsReal;
     Field* _pField[64];
     Point3D  _A1, _A8, _H1, _H8;
     Point3D _remWhiteCloserOuter, _remWhiteFurtherInner;
@@ -36,9 +37,10 @@ private:
     void calculateRetreatPoints();
 
 public:
-    Chessboard(BOARD BoardType); //todo: friend dla chess
+    Chessboard(BOARD BoardType, bool bBoardIsReal = true);  //todo: friend dla chess
     ~Chessboard();
 
+    bool isBoardReal(bool bErrorLog = false);
     bool isPointInLocationLimits(Point3D point);
     bool isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
@@ -47,9 +49,7 @@ public:
     Field* getField(short sFieldNr) const { return _pField[sFieldNr]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
-    void clearField(Field* pField);
-
-    static bool isBoardReal(BOARD BoardType, bool bErrorLog = false);
+    void clearField(Field* pField);    
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);

@@ -1,6 +1,6 @@
 #include "chessboard.h"
 
-Chessboard::Chessboard(BOARD BoardType):
+Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal = true):
     _A1(157.4, 76.3, -22.9),
     _A8(306.6, 75.0, -19.1),
     _H1(157.4, -81.9, -23.1),
@@ -11,24 +11,25 @@ Chessboard::Chessboard(BOARD BoardType):
     _remBlackFurtherInner(267.2, 0, -19.4) //y is unused
 {
     _BoardType = BoardType;
+    _bBoardIsReal = bBoardIsReal;
 
     for (int i=0; i>=63; ++i)
         _pField[i] = new Field(i);
 
-    if (BoardType == B_MAIN)
+    if (this->isBoardReal())
     {
-        this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
-        _dSquareWidth = ((_A8.x - _A1.x)/7 + (_A8.y - _A1.y)/7)/2;
-    }
-    else if (BoardType == B_REMOVED)
-    {
-        this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
-              _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
-        _dSquareWidth = qFabs(_remWhiteCloserOuter.y - _remWhiteFurtherInner.y);
-    }
+        if (BoardType == B_MAIN)
+        {
+            this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
+            _dSquareWidth = ((_A8.x - _A1.x)/7 + (_A8.y - _A1.y)/7)/2;
+        }
+        else if (BoardType == B_REMOVED)
+        {
+            this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
+                  _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
+            _dSquareWidth = qFabs(_remWhiteCloserOuter.y - _remWhiteFurtherInner.y);
+        }
 
-    if (this->isBoardReal(_BoardType))
-    {
         this->calculateMarginal3DValues();
         this->calculateMiddleAbovePoint();
         this->calculateRetreatPoints();
@@ -172,6 +173,12 @@ void Chessboard::clearField(Field *pField)
 
 bool Chessboard::isPointInLocationLimits(Point3D point)
 {
+    if (!_bBoardIsReal)
+    {
+        qDebug() << "ERROR: Chessboard::isPointInLocationLimits(): board isn't real";
+        return false;
+    }
+
     if (point.x >= _MinBoard.x && point.y >= _MinBoard.y && point.z >= _MinBoard.z &&
             point.x <= _MaxBoard.x && point.y <= _MaxBoard.y && point.z <= _MaxBoard.z
             + Piece::dMaxPieceHeight)
@@ -208,15 +215,13 @@ bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
     return false;
 }
 
-/*static*/ bool Chessboard::isBoardReal(BOARD BoardType, bool bErrorLog /*= false*/)
+bool Chessboard::isBoardReal(bool bErrorLog /*= false*/)
 {
-    if (BoardType == B_MAIN || BoardType == B_REMOVED)
-        return true;
+    if (_bBoardIsReal) return true;
     else
     {
         if (bErrorLog)
-            qDebug() << "ERROR: Chessboard::isBoardReal(): it's not. board ="
-                     << boardTypeAsQstr(BoardType);
+            qDebug() << "ERROR: Chessboard::isBoardReal(): it's not.";
 
         return false;
     }

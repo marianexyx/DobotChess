@@ -1,27 +1,28 @@
 #include "chess.h"
 
-Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceSet* pPieceSet, Chessboard* pBoardMain,
-             Chessboard* pBoardRemoved, Chessboard* pBoardChenard, Websockets* pWebsockets,
-             TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
+Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,
+             Chessboard *pBoardRealMain, Chessboard *pBoardRealRemoved,
+             Chessboard* pBoardCoreMain, Chessboard* pBoardCoreRemoved, Chessboard* pBoardChenard,
+             Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
     _pClientsList = pClientsList;
     _pDobot = pDobot;
-    _pPieceSet = pPieceSet;
-    _pBoardMain = pBoardMain;
-    _pBoardRemoved = pBoardRemoved;
+    _pPieceController = pPieceController;
+    _pBoardRealMain = pBoardRealMain;
+    _pBoardRealRemoved = pBoardRealRemoved;
+    _pBoardCoreMain = pBoardCoreMain;
+    _pBoardCoreRemoved = pBoardCoreRemoved;
     _pBoardChenard = pBoardChenard;
     _pWebsockets = pWebsockets;
     _pTCPMsgs = pTCPMsgs;
     _pUsb = _pDobot->getArduinoPointer();
 
     _pBot = new ChessBot();
-    _pStatus = new ChessStatus(_pPieceSet, _pBoardMain, _pClientsList);
-    _pMovements = new ChessMovements(_pBoardMain, _pBoardRemoved);
-    _pResets = new ChessResets(_pClientsList) ;
+    _pStatus = new ChessStatus(_pPieceController, _pBoardCoreMain, _pClientsList);
+    _pMovements = new ChessMovements(_pPieceController, _pBoardCoreMain, _pBoardCoreRemoved);
+    _pResets = new ChessResets(_pClientsList, _pBoardCoreMain) ;
     _pTimers = new ChessTimers(_pClientsList);
     _pConditions = new ChessConditions(_pClientsList);
-
-    _pBoardMain->isBoardReal(B_MAIN); //todo: to sa testy
 
     _PlayerSource = PlayerSource;
 
@@ -34,6 +35,16 @@ Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceSet* pPieceSet, Chessboa
             this, SLOT(checkMsgFromChenard(QString, QString)));
     connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, Client*)),
             this, SLOT(checkMsgFromWebsockets(QString, Client*)));
+    connect(_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+            this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+    connect(_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+            this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+    connect(_pStatus, SIGNAL(showLegalMovesInUI(QStringList)),
+            this, SLOT(showLegalMovesInUI(QStringList)));
+    connect(_pStatus, SIGNAL(showHistoryMovesInUI(QStringList)),
+            this, SLOT(showHistoryMovesInUI(QStringList)));
+    connect(_pTimers, SIGNAL(timeOutStart()), this, SLOT(timeOutStart()));
+    connect(_pTimers, SIGNAL(timeOutPlayer(PLAYER_TYPE)), this, SLOT(timeOutPlayer(PLAYER_TYPE)));
 }
 
 Chess::~Chess()
@@ -83,7 +94,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
     case RT_SIT_ON:
         _pClientsList->setPlayerType(client, playerTypeFromQStr(_request.param));
         if (_pClientsList->isGameTableOccupied())
-            _pTimers->startQueueTimer();
+            _ChessGameStatus = _pTimers->startQueueTimer();
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_STAND_UP:
@@ -319,7 +330,7 @@ void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
     if (_PlayerSource == WEBSITE)
     {
         if (_pClientsList->isGameTableOccupied())
-            _pTimers->startQueueTimer();
+            _ChessGameStatus = _pTimers->startQueueTimer();
         else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
         this->sendDataToAllClients("resetComplited"); //don't add tableData- only chess data...
@@ -367,8 +378,10 @@ void Chess::manageMoveRequest(clientRequest request)
         this->tellPlayerThatHeGaveBadMove(request.param);
     else
     {
-        _pMovements->setMove(request.param); //no need for earlier clear
-        _pMovements->doMoveSequence();
+        _pStatus->setMove(request.param); //no need for earlier clear
+        if (this->isMoveOkForCoreBoards(_pStatus->getMove(), _pStatus->getMoveType()))
+            _pMovements->doMoveSequence(_pStatus->getMove(), _pStatus->getMoveType());
+        else return;
         this->sendMsgToTcp("move " + request.param);
     }
 }
@@ -377,7 +390,7 @@ void Chess::continueGameplay()
 {
     if (_PlayerSource == WEBSITE)
     {
-        _pTimers->switchPlayersTimers();
+        _pTimers->switchPlayersTimers(_pStatus->getWhoseTurn());
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
         this->sendDataToAllClients("moveOk " + _pMovements->getMove().asQStr() + " " +
@@ -404,6 +417,36 @@ void Chess::continueGameplay()
                  << communicationTypeAsQStr(_PlayerSource);
 
     this->sendMsgToTcp("status");
+}
+
+void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
+{
+    //info
+    QString QStrPlayer = "";
+    if (pPlayerToClear != nullptr)
+        QStrPlayer = _pClientsList->getClientName(*pPlayerToClear) + ":";
+    qDebug() << "Chess::restartGame():" << QStrPlayer << endTypeAsQstr(WhoWon);
+
+    _ChessGameStatus = GS_TURN_NONE_RESETING;
+
+    //reset data
+    _pClientsList->resetPlayersStartConfirmInfo();
+    _pTimers->resetGameTimers();
+    _pMovements->clearMove();
+    _pStatus->resetStatusData();
+
+    _pResets->changePlayersOnChairs(WhoWon, pPlayerToClear);
+    this->sendDataToAllClients(_pResets->getEndGameMsg(WhoWon, this->getTableData()));
+    //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
+    //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
+    //dowiedzą że nastąpił koniec gry
+    _pResets->resetPiecePositions();
+}
+
+bool Chess::isMoveOkForCoreBoards(PosFromTo PosMove, SEQUENCE_TYPE Type)
+{
+    //wykonaj fikcyjny ruch
+    //jezeli nie było problemów to zwróć true
 }
 
 QString Chess::getTableData()
@@ -434,4 +477,30 @@ QString Chess::getTableData()
 
     qDebug() << "Chess::getTableData(): QStrTableData =" << QStrTableData;
     return QStrTableData;
+}
+
+void Chess::timeOutStart()
+{
+    _pClientsList->resetPlayersStartConfirmInfo();
+
+    if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    if (!_pClientsList->isStartClickedByPlayer(PT_BLACK))
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+
+    if (_pClientsList->isGameTableOccupied())
+        _ChessGameStatus = _pTimers->startQueueTimer();
+    else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
+
+    this->sendDataToAllClients(this->getTableData());
+}
+
+void Chess::timeOutPlayer(PLAYER_TYPE Player)
+{
+    _pResets->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
+}
+
+void Chess::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)
+{
+    emit this->setBoardDataLabel(QStrLabel, LabelType);
 }

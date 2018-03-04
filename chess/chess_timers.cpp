@@ -21,48 +21,31 @@ ChessTimers::ChessTimers(Clients* pClientsList):
     connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_WHITE)));
     connect(_blackTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_BLACK)));
     connect(_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
-    connect(_startQueueTimer, SIGNAL(timeout()), this, SLOT(timeOutStartQueue()));
+    connect(_startQueueTimer, SIGNAL(timeout()), this, SLOT(startTimeOut()));
     _nRemainingWhiteTime = _lTimersStartTime;
     _nRemainingBlackTime = _lTimersStartTime;
-}
-
-void ChessTimers::playerTimeOut(PLAYER_TYPE Player)
-{
-    _pResets->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
 }
 
 void ChessTimers::updateTimeLabels()
 {
     if (_whiteTimer->isActive())
-        emit _pChess->setBoardDataLabel(this->milisecToClockTime(_whiteTimer->remainingTime()),
+        emit this->setBoardDataLabel(this->milisecToClockTime(_whiteTimer->remainingTime()),
                                        BDL_WHITE_TIME);
     else if (_blackTimer->isActive())
-        emit _pChess->setBoardDataLabel(this->milisecToClockTime(_blackTimer->remainingTime()),
+        emit this->setBoardDataLabel(this->milisecToClockTime(_blackTimer->remainingTime()),
                                        BDL_BLACK_TIME);
 
     if (_startQueueTimer->isActive())
-        emit _pChess->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
+        emit this->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
                                        BDL_QUEUE_TIME);
 
-    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_lTimersStartQueue), BDL_QUEUE_TIME);
+    emit this->setBoardDataLabel(this->milisecToClockTime(_lTimersStartQueue), BDL_QUEUE_TIME);
 }
 
-void ChessTimers::timeOutStartQueue()
+void ChessTimers::startTimeOut()
 {    
     this->stopQueueTimer();
-    _pClientsList->resetPlayersStartConfirmInfo();
-
-    if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-    if (!_pClientsList->isStartClickedByPlayer(PT_BLACK))
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
-
-    if (_pClientsList->isGameTableOccupied())
-        //todo: jak wrzucę to do chess, to dodać zmianę stanu gry
-        this->startQueueTimer();
-    else _pChess->setGameStatus(GS_TURN_NONE_WAITING_FOR_PLAYERS);
-
-    _pChess->sendDataToAllClients(_pChess->getTableData());
+    emit this->timeOutStart();
 }
 
 void ChessTimers::startGameTimer()
@@ -85,8 +68,8 @@ void ChessTimers::resetGameTimers()
     _blackTimer->setInterval(_lTimersStartTime);
     _nRemainingWhiteTime = _whiteTimer->interval();
     _nRemainingBlackTime = _blackTimer->interval();
-    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_lTimersStartTime), BDL_WHITE_TIME);
-    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_lTimersStartTime), BDL_BLACK_TIME);
+    emit this->setBoardDataLabel(this->milisecToClockTime(_lTimersStartTime), BDL_WHITE_TIME);
+    emit this->setBoardDataLabel(this->milisecToClockTime(_lTimersStartTime), BDL_BLACK_TIME);
 }
 
 QString ChessTimers::milisecToClockTime(long lMilis)
@@ -105,9 +88,9 @@ QString ChessTimers::milisecToClockTime(long lMilis)
     else return "00:00";
 }
 
-void ChessTimers::switchPlayersTimers()
+void ChessTimers::switchPlayersTimers(WHOSE_TURN Turn)
 {
-    if (_pStatus->getWhoseTurn() == WHITE_TURN)
+    if (Turn == WHITE_TURN)
     {
         _nRemainingBlackTime = _blackTimer->remainingTime();
         _blackTimer->stop();
@@ -115,7 +98,7 @@ void ChessTimers::switchPlayersTimers()
         _whiteTimer->setInterval(_nRemainingWhiteTime);
         _whiteTimer->start();
     }
-    else if (_pStatus->getWhoseTurn() == BLACK_TURN)
+    else if (Turn == BLACK_TURN)
     {
         _nRemainingWhiteTime = _whiteTimer->remainingTime();
         _whiteTimer->stop();
@@ -125,20 +108,20 @@ void ChessTimers::switchPlayersTimers()
     }
     else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
                      "white or black.  it's' ="
-                  << turnTypeAsQstr(_pStatus->getWhoseTurn());
+                  << turnTypeAsQstr(Turn);
 }
 
-void ChessTimers::startQueueTimer()
+GAME_STATUS ChessTimers::startQueueTimer()
 {
-    _pChess->setGameStatus(GS_TURN_NONE_WAITING_FOR_START_CONFIRMS);
-
     qDebug() << "Chessboard::startQueueTimer()";
     _startQueueTimer->stop();
     _startQueueTimer->setInterval(_lTimersStartQueue);
-    emit _pChess->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
+    emit this->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
                                    BDL_QUEUE_TIME);
     _startQueueTimer->start();
     _updateLabelTimer->start();
+
+    return GS_TURN_NONE_WAITING_FOR_START_CONFIRMS;
 }
 
 void ChessTimers::stopQueueTimer() //stop == reset

@@ -1,37 +1,9 @@
 #include "chess_resets.h"
 
-ChessResets::ChessResets(Clients* pClientsList)
+ChessResets::ChessResets(Clients* pClientsList, Chessboard *pBoardCoreMain)
 {
     _pClientsList = pClientsList;
-}
-
-void ChessResets::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
-{
-    //info
-    QString QStrPlayer = "";
-    if (pPlayerToClear != nullptr)
-        QStrPlayer = _pClientsList->getClientName(*pPlayerToClear) + ":";
-    qDebug() << "Chess::restartGame():" << QStrPlayer << endTypeAsQstr(WhoWon);
-
-    _pChess->setGameStatus(GS_TURN_NONE_RESETING);
-
-    //reset data
-    _pClientsList->resetPlayersStartConfirmInfo();
-    _pTimers->resetGameTimers();
-    _pMovements->clearMove();
-    _pStatus->resetStatusData();
-
-    this->changePlayersOnChairs(WhoWon, pPlayerToClear);
-    this->sendEndGameMsgToAllClients(WhoWon);
-
-    //todo: wygląda na to że funkcja resetu załącza się jeszcze zanim odpowiedź poleci na...
-    //...stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się dowiedzą...
-    //...że nastąpił koniec gry (patrz niżej)
-    //todo: info reseting powinno na stronie wyskakiwać zawsze, jak napotkamy koniec...
-    //... gry- samo z siebie. nie potrzeba tego wysyłać za każdym razem
-    _pChess->sendDataToAllClients("reseting");
-
-    this->resetPiecePositions();
+    _pBoardCoreMain = pBoardCoreMain;
 }
 
 void ChessResets::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
@@ -89,9 +61,12 @@ bool ChessResets::isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& bo
     return true;
 }
 
-void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
+QString ChessResets::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
+                                   PosFromTo* pMove /*= nullptr*/,
+                                   Client* pPlayerToClear /*= nullptr*/)
 {
     QString QStrMove;
+    QString QStrReturnMsg;
 
     switch(WhoWon)
     {
@@ -100,33 +75,45 @@ void ChessResets::sendEndGameMsgToAllClients(END_TYPE WhoWon, Client* pPlayerToC
     case ET_DRAW:
         if (pPlayerToClear != nullptr)
         {
-            qDebug() << "ERROR: ChessResets::sendEndGameMsgToAllClients(): pPlayerToClear must"
+            qDebug() << "ERROR: ChessResets::getEndGameMsg(): pPlayerToClear must"
                         " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
-            return;
+            return "";
         }
+        if (pMove == nullptr)
+        {
+            qDebug() << "ERROR: ChessResets::getEndGameMsg(): pMove can't"
+                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+            return "";
+        }
+        else QStrMove = *pMove->asQStr();
         //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
         //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
         //...o ruchach będą wyciągane z "history"
-        QStrMove = _pMovements->getMove().asQStr();
-        _pChess->sendDataToAllClients("moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon)
-                                      + " " + _pChess->getTableData());
-        break;
+
+        QStrReturnMsg = "moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon)
+                + " " + QStrTableData;
+        return QStrReturnMsg;
     case ET_TIMEOUT_GAME:
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
         if (pPlayerToClear == nullptr)
         {
-            qDebug() << "ERROR: ChessResets::sendEndGameMsgToAllClients(): pPlayerToClear can't"
+            qDebug() << "ERROR: ChessResets::getEndGameMsg(): pPlayerToClear can't"
                         " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
-            return;
+            return "";
         }
-        _pChess->sendDataToAllClients(endTypeAsQstr(WhoWon) +
-                     playerTypeAsQStr(pPlayerToClear->type) + " " + _pChess->getTableData());
-        break;
+        if (pMove != nullptr)
+        {
+            qDebug() << "WARNING: ChessResets::getEndGameMsg(): pMove should"
+                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+        }
+        QStrReturnMsg = endTypeAsQstr(WhoWon) + playerTypeAsQStr(pPlayerToClear->type)
+                + " " + QStrTableData;
+        return QStrReturnMsg;
     default:
-        qDebug() << "ERROR: ChessResets::sendEndGameMsgToAllClients: unknown WhoWon val="
+        qDebug() << "ERROR: ChessResets::getEndGameMsg: unknown WhoWon val="
                  << WhoWon;
-        return;
+        return "";
     }
 }
 
@@ -134,16 +121,15 @@ void ChessResets::resetPiecePositions()
 {
     if (!this->isPieceSetOnStartFields())
     {
-        Chessboard tempBoard(B_CHENARD); //chenard board type needs no xyz values in constructor
-        Chessboard* pBoardMain = _pChess->getBoardMainPointer();
+        Chessboard tempBoard(B_MAIN, IMAGINARY);
 
         do
         {
-            memcpy(&tempBoard, pBoardMain, sizeof(*pBoardMain));
+            memcpy(&tempBoard, _pBoardCoreMain, sizeof(*_pBoardCoreMain));
 
             for (short sField=1; sField>=64; ++sField)
             {
-                Field* pExaminedField = pBoardMain->getField(sField);
+                Field* pExaminedField = _pBoardCoreMain->getField(sField);
                 Piece* pPieceOnExaminedField = pExaminedField->getPieceOnField();
 
                 if (!_pChess->isPieceStayOnItsStartingField(pPieceOnExaminedField))
@@ -162,10 +148,10 @@ void ChessResets::resetPiecePositions()
                     else //checking field is occupied
                     {
                         Field* pFieldToPutAsidePiece =
-                                pBoardMain->getField(pPieceOnExaminedField->getStartFieldNr());
+                                _pBoardCoreMain->getField(pPieceOnExaminedField->getStartFieldNr());
                         Piece* pPieceOnPutAsideField = pFieldToPutAsidePiece->getPieceOnField();
                         Field* pStartFieldOfPieceOnPutAsideField =
-                                pBoardMain->getField(pPieceOnPutAsideField->getStartFieldNr());
+                                _pBoardCoreMain->getField(pPieceOnPutAsideField->getStartFieldNr());
 
                         if (pPieceOnPutAsideField == nullptr)
                             _pMovements->regularMoveSequence(pExaminedField,
@@ -177,7 +163,7 @@ void ChessResets::resetPiecePositions()
                 }
             }
 
-            if (this->isPieceSetOnBoardsIdentical(tempBoard, *pBoardMain))
+            if (this->isPieceSetOnBoardsIdentical(tempBoard, *_pBoardCoreMain))
             {
                 qDebug() << "ERROR: ChessResets::resetPiecePositions(): boards are identical";
                 break;
