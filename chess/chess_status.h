@@ -15,7 +15,7 @@ class ChessStatus: public QObject
     friend class Chess;
 
 private:
-    Chessboard* _pBoardCoreMain;
+    Chessboard* _pBoardMain;
     Clients* _pClientsList;
     PieceController* _pPieceController;
 
@@ -31,7 +31,7 @@ private:
     WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
 
 public:
-    ChessStatus(PieceController* pPieceController, Chessboard* pBoardCoreMain,
+    ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
                 Clients* pClientsList);
     ~ChessStatus() {}
 

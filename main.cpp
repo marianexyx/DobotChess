@@ -11,18 +11,15 @@ int main(int argc, char *argv[])
     ArduinoUsb USB001;
     PieceController PieceController001;
     Chessboard BoardChenard001(B_MAIN, IMAGINARY);
-    Chessboard BoardRealMain001(B_MAIN, REAL);
-    Chessboard BoardRealRemoved001(B_REMOVED, REAL);
-    Chessboard BoardCoreMain001(B_MAIN, IMAGINARY);
-    Chessboard BoardCoreRemoved001(B_REMOVED, IMAGINARY);
+    Chessboard BoardMain001(B_MAIN, IMAGINARY);
+    Chessboard BoardRemoved001(B_REMOVED, IMAGINARY);
     Dobot DobotArm001(&USB001);
     Websockets Websockety(&ClientsList, 1234);
     //TODO: odpalać server websocket po konstruktorze mainwindow
     TCPMsgs TCPMsgs001;
-    Chess Chess001(&ClientsList, &PieceController001, &DobotArm001, &BoardRealMain001,
-                   &BoardRealRemoved001, &BoardCoreMain001, &BoardCoreRemoved001,
-                   &BoardChenard001, &Websockety, &TCPMsgs001, WEBSITE);
-    MainWindow mainwindow(&Websockety, &BoardRealMain001, &BoardRealRemoved001, &BoardChenard001,
+    Chess Chess001(&ClientsList, &PieceController001, &DobotArm001, &BoardMain001,
+                   &BoardRemoved001, &BoardChenard001, &Websockety, &TCPMsgs001, WEBSITE);
+    MainWindow mainwindow(&Websockety, &BoardMain001, &BoardRemoved001, &BoardChenard001,
                           &TCPMsgs001, &USB001, &DobotArm001, &Chess001, &ClientsList);
     mainwindow.show();
 

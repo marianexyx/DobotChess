@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     chess/chess_bot.cpp \
     chess/chess_conditions.cpp \
     chess/chess_movements.cpp \
-    chess/chess_resets.cpp \
     chess/chess_status.cpp \
     chess/chess_timers.cpp \
     dobot/dobot_queue.cpp \
@@ -44,7 +43,6 @@ HEADERS  +=  \
     chess/chess_bot.h \
     chess/chess_conditions.h \
     chess/chess_movements.h \
-    chess/chess_resets.h \
     chess/chess_status.h \
     chess/chess_timers.h \
     chess/game_status.h \

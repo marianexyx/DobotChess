@@ -1,9 +1,9 @@
 #include "chess_status.h"
 
-ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardCoreMain,
+ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
                          Clients* pClientsList)
 {
-    _pBoardCoreMain = pBoardCoreMain;
+    _pBoardMain = pBoardMain;
     _pClientsList = pClientsList;
     _pPieceController = pPieceController;
 
@@ -70,7 +70,7 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 
 bool ChessStatus::isMoveRemoving()
 {
-    if (_pBoardCoreMain->getField(_PosMove.to)->getPieceOnField() != nullptr)
+    if (_pBoardMain->getField(_PosMove.to)->getPieceOnField() != nullptr)
         return true;
     else return false;
 }
@@ -99,7 +99,7 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
     PosOnBoard MoveFrom = _PosMove.from;
-    Piece* piece = _pBoardCoreMain->getField(MoveFrom)->getPieceOnField();
+    Piece* piece = _pBoardMain->getField(MoveFrom)->getPieceOnField();
 
     if (QStrMoveToTest.right(2) == _QStrEnpassant && (piece->getType() == P_PAWN &&
          ((Piece::Color(piece->getNr()) == PT_WHITE && _WhoseTurn == WHITE_TURN)
@@ -130,7 +130,7 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "ChessStatus::saveStatusData(): QStrFENBoard =" << QStrFENBoard;
-        emit _pBoardCoreMain->showBoardInUI(QStrFENBoard, _pBoardCoreMain->getBoardType());
+        emit _pBoardMain->showBoardInUI(QStrFENBoard, _pBoardMain->getBoardType());
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
@@ -159,7 +159,7 @@ void ChessStatus::resetStatusData()
     this->setWhoseTurn(NO_TURN);
     this->clearLegalMoves();
     this->clearHistoryMoves();
-    emit _pBoardCoreMain->clearBoardInUI();
+    emit _pBoardMain->clearBoardInUI();
 }
 
 void ChessStatus::setMove(QString QStrMove)

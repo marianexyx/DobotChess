@@ -12,11 +12,11 @@ class PieceController
 private:
     Dobot* _pDobot;
     PieceSet* _pPieceSet;
-    Chessboard* _pBoardCoreMain;
-    Chessboard* _pBoardCoreRemoved;
+    Chessboard* _pBoardMain;
+    Chessboard* _pBoardRemoved;
 
 public:
-    PieceController(Dobot* pDobot, Chessboard* pBoardCoreMain, Chessboard* pBoardCoreRemoved);
+    PieceController(Dobot* pDobot, Chessboard* pBoardMain, Chessboard* pBoardRemoved);
 
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE VertMove = VM_NONE);

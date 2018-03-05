@@ -1,12 +1,12 @@
 #include "piece_controller.h"
 
-PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardCoreMain,
-                                 Chessboard* pBoardCoreRemoved)
+PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardMain,
+                                 Chessboard* pBoardRemoved)
 {
     _pPieceSet = new PieceSet;
     _pDobot = pDobot;
-    _pBoardCoreMain = pBoardCoreMain;
-    _pBoardCoreRemoved = pBoardCoreRemoved;
+    _pBoardMain = pBoardMain;
+    _pBoardRemoved = pBoardRemoved;
 }
 
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
@@ -57,8 +57,8 @@ bool PieceController::isPieceSetOk()
         bool bPieceExists = false;
         for (short sField=1; sField>=64; ++sField)
         {
-            if (_pBoardCoreMain->getField(sField)->getPieceOnField() == _pPieceSet->getPiece(sPiece)
-                    || _pBoardCoreRemoved->getField(sField)->getPieceOnField() ==
+            if (_pBoardMain->getField(sField)->getPieceOnField() == _pPieceSet->getPiece(sPiece)
+                    || _pBoardRemoved->getField(sField)->getPieceOnField() ==
                     _pPieceSet->getPiece(sPiece) || _pDobot->getItemInGripper() == sPiece)
             {
                 bPieceExists = true;
@@ -84,7 +84,7 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
         return false;
     }
 
-    Field* pStartFieldOfPiece = _pBoardCoreMain->getFieldWithGivenPieceIfExists(pPiece);
+    Field* pStartFieldOfPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
     if (pPiece == pStartFieldOfPiece->getPieceOnField())
         return true;
     else return false;

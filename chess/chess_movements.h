@@ -11,13 +11,16 @@ class ChessMovements
     friend class Chess;
 
 private:
-    Chessboard* _pBoardCoreMain;
-    Chessboard* _pBoardCoreRemoved;
+    Chessboard* _pBoardMain;
+    Chessboard* _pBoardRemoved;
     PieceController* _pPieceController;
 
+    bool isPieceSetOnStartFields(); //todo: do chessboardu jakoś?
+    bool isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2);
+
 public:
-    ChessMovements(PieceController* pPieceController, Chessboard* pBoardCoreMain,
-                   Chessboard* pBoardCoreRemoved);
+    ChessMovements(PieceController* pPieceController, Chessboard* pBoardMain,
+                   Chessboard* pBoardRemoved);
     ~ChessMovements();
 
     Field* findKingFieldInCastling(Field* pField);
@@ -30,6 +33,8 @@ public:
     void castlingMoveSequence(Field* pFrom, Field* pTo);
     void enpassantMoveSequence(Field* pFrom, Field* pTo);
     void promoteMoveSequence(Field* pFrom, Field* pTo);
+    void resetPiecePositions();
+
 };
 
 #endif // CHESS_MOVEMENTS_H

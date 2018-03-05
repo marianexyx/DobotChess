@@ -1,28 +1,24 @@
 #include "chess.h"
 
 Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,
-             Chessboard *pBoardRealMain, Chessboard *pBoardRealRemoved,
-             Chessboard* pBoardCoreMain, Chessboard* pBoardCoreRemoved, Chessboard* pBoardChenard,
+             Chessboard* pBoardMain, Chessboard* pBoardRemoved, Chessboard* pBoardChenard,
              Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
     _pClientsList = pClientsList;
     _pDobot = pDobot;
     _pPieceController = pPieceController;
-    _pBoardRealMain = pBoardRealMain;
-    _pBoardRealRemoved = pBoardRealRemoved;
-    _pBoardCoreMain = pBoardCoreMain;
-    _pBoardCoreRemoved = pBoardCoreRemoved;
+    _pBoardMain = pBoardMain;
+    _pBoardRemoved = pBoardRemoved;
     _pBoardChenard = pBoardChenard;
     _pWebsockets = pWebsockets;
     _pTCPMsgs = pTCPMsgs;
     _pUsb = _pDobot->getArduinoPointer();
 
     _pBot = new ChessBot();
-    _pStatus = new ChessStatus(_pPieceController, _pBoardCoreMain, _pClientsList);
-    _pMovements = new ChessMovements(_pPieceController, _pBoardCoreMain, _pBoardCoreRemoved);
-    _pResets = new ChessResets(_pClientsList, _pBoardCoreMain) ;
+    _pStatus = new ChessStatus(_pPieceController, _pBoardMain, _pClientsList);
+    _pMovements = new ChessMovements(_pPieceController, _pBoardMain, _pBoardRemoved);
     _pTimers = new ChessTimers(_pClientsList);
-    _pConditions = new ChessConditions(_pClientsList);
+    _pConditions = new ChessConditions(_pClientsList, _pStatus);
 
     _PlayerSource = PlayerSource;
 
@@ -44,7 +40,8 @@ Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceContro
     connect(_pStatus, SIGNAL(showHistoryMovesInUI(QStringList)),
             this, SLOT(showHistoryMovesInUI(QStringList)));
     connect(_pTimers, SIGNAL(timeOutStart()), this, SLOT(timeOutStart()));
-    connect(_pTimers, SIGNAL(timeOutPlayer(PLAYER_TYPE)), this, SLOT(timeOutPlayer(PLAYER_TYPE)));
+    connect(_pTimers, SIGNAL(timeOutPlayer(PLAYER_TYPE)),
+            this, SLOT(timeOutPlayer(PLAYER_TYPE)));
 }
 
 Chess::~Chess()
@@ -53,7 +50,6 @@ Chess::~Chess()
     delete _pMovements;
     delete _pBot;
     delete _pStatus;
-    delete _pResets;
     delete _pConditions;
 }
 
@@ -61,7 +57,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
 {
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
 
-    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, client))
+    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, client, _ChessGameStatus))
     {
         _request.type = requestType(QStrMsg, SHOW_ERRORS);
         _request.param = _pConditions->extractParameter(_request.type, QStrMsg);
@@ -89,7 +85,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
         this->sendDataToClient(this->getTableData(), &client);
         break;
     case RT_GIVE_UP:
-        _pResets->restartGame(ET_GIVE_UP, &client);
+        this->restartGame(ET_GIVE_UP, &client);
         break;
     case RT_SIT_ON:
         _pClientsList->setPlayerType(client, playerTypeFromQStr(_request.param));
@@ -151,7 +147,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
             //...ruchu (tj. zdjął blokadę przed kojenym ruchem)
         }
         else //ET_WHIE_WON, ET_BLACK_WON, ET_DRAW
-            _pResets->restartGame(_pStatus->getFENGameState());
+            this->restartGame(_pStatus->getFENGameState());
         break;
     case CMT_LEGAL:
         _pStatus->setLegalMoves(QStrTcpRespond);
@@ -255,7 +251,7 @@ void Chess::newClientName(Client& client, clientRequest request)
     {
         _pClientsList->getClientSocket(request.param)->sendTextMessage("logout:doubleLogin");
         if (_pClientsList->isClientAPlayer(client))
-            _pResets->restartGame(ET_SOCKET_LOST, &client);
+            this->restartGame(ET_SOCKET_LOST, &client);
         _pClientsList->setClientName(client, request.param);
     }
 }
@@ -266,7 +262,7 @@ void Chess::removeClient(Client& client)
     {
         emit this->addTextToLogPTE(playerTypeAsQStr(client.type)
                                    + " player disconnected\n", LOG_CORE);
-        _pResets->restartGame(ET_SOCKET_LOST, &client);
+        this->restartGame(ET_SOCKET_LOST, &client);
     }
     else //future: strange behavior with those info- seen more often then we should
         emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
@@ -321,6 +317,60 @@ void Chess::sendDataToAllClients(QString QStrMsg)
     else
         qDebug() << "ERROR: Chess::sendDataToAllClients(): unknown _PlayerSource val ="
                  << communicationTypeAsQStr(_PlayerSource);
+}
+
+QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
+                             PosFromTo* pMove /*= nullptr*/, Client* pPlayerToClear /*= nullptr*/)
+{
+    QString QStrMove;
+    QString QStrReturnMsg;
+
+    switch(WhoWon)
+    {
+    case ET_WHIE_WON:
+    case ET_BLACK_WON:
+    case ET_DRAW:
+        if (pPlayerToClear != nullptr)
+        {
+            qDebug() << "ERROR: Chess::getEndGameMsg(): pPlayerToClear must"
+                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+            return "";
+        }
+        if (pMove == nullptr)
+        {
+            qDebug() << "ERROR: Chess::getEndGameMsg(): pMove can't"
+                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+            return "";
+        }
+        else QStrMove = *pMove->asQStr(); //todo: mogę już brać getterem tą wartość, zamiast par
+        //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
+        //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
+        //...o ruchach będą wyciągane z "history"
+
+        QStrReturnMsg = "moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon)
+                + " " + QStrTableData;
+        return QStrReturnMsg;
+    case ET_TIMEOUT_GAME:
+    case ET_GIVE_UP:
+    case ET_SOCKET_LOST:
+        if (pPlayerToClear == nullptr)
+        {
+            qDebug() << "ERROR: Chess::getEndGameMsg(): pPlayerToClear can't"
+                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+            return "";
+        }
+        if (pMove != nullptr)
+        {
+            qDebug() << "WARNING: Chess::getEndGameMsg(): pMove should"
+                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+        }
+        QStrReturnMsg = endTypeAsQstr(WhoWon) + playerTypeAsQStr(pPlayerToClear->type)
+                + " " + QStrTableData;
+        return QStrReturnMsg;
+    default:
+        qDebug() << "ERROR: Chess::getEndGameMsg: unknown WhoWon val=" << WhoWon;
+        return "";
+    }
 }
 
 void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
@@ -435,18 +485,59 @@ void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
     _pMovements->clearMove();
     _pStatus->resetStatusData();
 
-    _pResets->changePlayersOnChairs(WhoWon, pPlayerToClear);
-    this->sendDataToAllClients(_pResets->getEndGameMsg(WhoWon, this->getTableData()));
+    this->changePlayersOnChairs(WhoWon, pPlayerToClear);
+    this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData()));
     //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
     //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
     //dowiedzą że nastąpił koniec gry
-    _pResets->resetPiecePositions();
+    _pMovements->resetPiecePositions();
 }
 
 bool Chess::isMoveOkForCoreBoards(PosFromTo PosMove, SEQUENCE_TYPE Type)
 {
     //wykonaj fikcyjny ruch
     //jezeli nie było problemów to zwróć true
+}
+
+void Chess::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
+{
+    switch(WhoWon)
+    {
+    case ET_WHIE_WON:
+    case ET_BLACK_WON:
+    case ET_DRAW:
+    case ET_TIMEOUT_GAME:
+        if (pPlayerToClear != nullptr)
+        {
+            qDebug() << "ERROR: Chess::changePlayersOnChairs(): player must be"
+                        " null if not disconnected";
+            return;
+        }
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        break;
+    case ET_GIVE_UP:
+    case ET_SOCKET_LOST:
+        if (pPlayerToClear == nullptr)
+        {
+            qDebug() << "ERROR: Chess::changePlayersOnChairs(): player can't be"
+                        " null if diconnected";
+            return;
+        }
+        if (_pClientsList->getClientType(*pPlayerToClear) == PT_WHITE)
+            _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        else if (_pClientsList->getClientType(*pPlayerToClear) == PT_BLACK)
+            _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        else
+        {
+            qDebug() << "ERROR: Chess::changePlayersOnChairs(): wrong player type:" << WhoWon;
+            return;
+        }
+        break;
+    default:
+        qDebug() << "ERROR: Chess::changePlayersOnChairs(): unknown ETWhoWon val=" << WhoWon;
+        return;
+    }
 }
 
 QString Chess::getTableData()
@@ -497,7 +588,7 @@ void Chess::timeOutStart()
 
 void Chess::timeOutPlayer(PLAYER_TYPE Player)
 {
-    _pResets->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
+    this->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
 }
 
 void Chess::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)

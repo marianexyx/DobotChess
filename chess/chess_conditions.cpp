@@ -1,11 +1,13 @@
 #include "chess_conditions.h"
 
-ChessConditions::ChessConditions(Clients* pClientsList)
+ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 {
     _pClientsList = pClientsList;
+    _pStatus = pStatus;
 }
 
-bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client& sender)
+bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client& sender,
+                                                   GAME_STATUS GS)
 {
     clientRequest r;
 
@@ -16,7 +18,7 @@ bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client& send
         r.param = this->extractParameter(r.type, QStrMsg);
 
     if (!this->isRequestParameterInProperFormat(r)) return false;
-    if (!this->isRequestAppropriateToGameStatus(r.type)) return false;
+    if (!this->isRequestAppropriateToGameStatus(r.type, GS)) return false;
     if (!this->isSenderAppropriate(sender, r.type)) return false;
     if (!this->isThereAnySpecialConditionBeenMet(sender, r)) return false;
 
@@ -28,8 +30,8 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
     switch(request.type)
     {
     case RT_MOVE:
-        if (_pMovements->findMoveType(request.param) == ST_NONE ||
-                _pMovements->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
+        if (_pStatus->findMoveType(request.param) == ST_NONE ||
+                _pStatus->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
             return false;
         else return true;
     case RT_SIT_ON:
@@ -65,7 +67,7 @@ QString ChessConditions::extractParameter(REQUEST_TYPE Type, QString QStrRequest
 }
 
 
-bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type)
+bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_STATUS Status)
 {
     GAME_STATUS Status = _pChess->getGameStatus();
 

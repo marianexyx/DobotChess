@@ -19,9 +19,8 @@
 #include "chess/chess_bot.h"
 #include "chess/chess_status.h"
 #include "chess/chess_movements.h"
-#include "chess/chess_resets.h"
 #include "chess/chess_timers.h"
-#include "chess/chess_conditions.h"
+#include "chess/chess_conditions.h" //must be last
 
 class Chess: public QObject
 {
@@ -31,10 +30,8 @@ private:
     Clients* _pClientsList;
     Dobot* _pDobot;
     PieceController* _pPieceController;
-    Chessboard* _pBoardRealMain;
-    Chessboard* _pBoardRealRemoved;
-    Chessboard* _pBoardCoreMain;
-    Chessboard* _pBoardCoreRemoved;
+    Chessboard* _pBoardMain;
+    Chessboard* _pBoardRemoved;
     Chessboard* _pBoardChenard;
     Websockets* _pWebsockets;
     TCPMsgs* _pTCPMsgs;
@@ -45,7 +42,6 @@ private:
     ChessBot* _pBot;
     ChessTimers* _pTimers;
     ChessStatus* _pStatus;
-    ChessResets* _pResets;
     ChessConditions* _pConditions;
     ChessMovements* _pMovements;
 
@@ -60,6 +56,8 @@ private:
     void removeClient(Client& client);
     void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
     void sendDataToAllClients(QString QStrMsg);
+    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, PosFromTo* pMove = nullptr,
+                          Client* pPlayerToClear = nullptr);
 
     //gameplay methods
     void coreIsReadyForNewGame();
@@ -68,11 +66,11 @@ private:
     void continueGameplay();
     void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
     bool isMoveOkForCoreBoards(PosFromTo PosMove, SEQUENCE_TYPE Type);
+    void changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear);
 
 public:
     Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,
-          Chessboard* pBoardRealMain, Chessboard* pBoardRealRemoved,
-          Chessboard* pBoardCoreMain, Chessboard* pBoardCoreRemoved, Chessboard* pBoardChenard,
+          Chessboard* pBoardMain, Chessboard* pBoardRemoved, Chessboard* pBoardChenard,
           Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 

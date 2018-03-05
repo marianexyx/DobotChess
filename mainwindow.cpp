@@ -3,8 +3,8 @@
 
 QT_USE_NAMESPACE
 
-MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardCoreMain,
-                       Chessboard* pBoardCoreRemoved, Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
+MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
+                       Chessboard* pBoardRemoved, Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
                        ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Clients* pClientsList,
                        QWidget* parent):
     QMainWindow(parent),
@@ -15,8 +15,8 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardCoreMain,
 
     _pDobot = pDobot;
     _pWebSockets = pWebSockets;
-    _pBoardCoreMain = pBoardCoreMain;
-    _pBoardCoreRemoved = pBoardCoreRemoved;
+    _pBoardMain = pBoardMain;
+    _pBoardRemoved = pBoardRemoved;
     _pBoardChenard = pBoardChenard;
     _pTCPMsg = pTCPMsg;
     _pUsb = pUsb;
@@ -45,17 +45,17 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardCoreMain,
             this, SLOT(writeInConsole(QString, LOG)));
     connect(_pChess, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardCoreMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+    connect(_pBoardMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardCoreRemoved, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+    connect(_pBoardRemoved, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pClientsList, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardCoreMain, SIGNAL(clearBoardInUI()), //no need connect for removed
+    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed
             this, SLOT(clearBoardInUI()));
-    connect(_pBoardCoreMain, SIGNAL(showBoardInUI(QString, BOARD)),
+    connect(_pBoardMain, SIGNAL(showBoardInUI(QString, BOARD)),
             this, SLOT(showBoardInUI(QString, BOARD)));
-    connect(_pBoardCoreRemoved, SIGNAL(showBoardInUI(QString, BOARD)),
+    connect(_pBoardRemoved, SIGNAL(showBoardInUI(QString, BOARD)),
             this, SLOT(showBoardInUI(QString, BOARD)));
     connect(_pBoardChenard, SIGNAL(showBoardInUI(QString, BOARD)),
             this, SLOT(showBoardInUI(QString, BOARD)));
@@ -501,9 +501,9 @@ void MainWindow::on_startGmPosBtn_clicked()
                                                     _pDobot->getHomePos().z);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomLowerMainBoardSafeCorner);
         Point3D rightBottomHigherMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                     _pBoardCoreMain->getBoardPoint3D(BP_MIDDLE).z);
+                                                     _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardCoreMain->getBoardPoint3D(BP_MIDDLE));
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
     }
     else
         qDebug() << "ERROR: MainWindow::on_startGmPosBtn_clicked(): Dobot not in home positions";
@@ -514,9 +514,9 @@ void MainWindow::on_startDtPosBtn_clicked()
 {
     this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
 
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardCoreMain->getBoardPoint3D(BP_MIDDLE));
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
     Point3D rightBottomHigherMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                _pBoardCoreMain->getBoardPoint3D(BP_MIDDLE).z);
+                                                _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
     _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
     Point3D rightBottomLowerMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
                                                 _pDobot->getHomePos().z);
