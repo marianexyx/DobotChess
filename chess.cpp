@@ -77,7 +77,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
             this->playerWantToStartNewGame(PT_BLACK);
         break;
     case RT_PROMOTE_TO:
-        _request.param = _pMovements->getMove().asQStr() + _request.param; // w/o break
+        _request.param = _pStatus->getMove().asQStr() + _request.param; // w/o break
     case RT_MOVE:
         this->manageMoveRequest(_request);
         break;
@@ -319,8 +319,7 @@ void Chess::sendDataToAllClients(QString QStrMsg)
                  << communicationTypeAsQStr(_PlayerSource);
 }
 
-QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
-                             PosFromTo* pMove /*= nullptr*/, Client* pPlayerToClear /*= nullptr*/)
+QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPlayerToClear /*= nullptr*/)
 {
     QString QStrMove;
     QString QStrReturnMsg;
@@ -336,13 +335,7 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
                         " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
             return "";
         }
-        if (pMove == nullptr)
-        {
-            qDebug() << "ERROR: Chess::getEndGameMsg(): pMove can't"
-                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
-            return "";
-        }
-        else QStrMove = *pMove->asQStr(); //todo: mogę już brać getterem tą wartość, zamiast par
+        else QStrMove = _pStatus->getMove().asQStr();
         //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
         //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
         //...o ruchach będą wyciągane z "history"
@@ -358,11 +351,6 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
             qDebug() << "ERROR: Chess::getEndGameMsg(): pPlayerToClear can't"
                         " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
             return "";
-        }
-        if (pMove != nullptr)
-        {
-            qDebug() << "WARNING: Chess::getEndGameMsg(): pMove should"
-                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
         }
         QStrReturnMsg = endTypeAsQstr(WhoWon) + playerTypeAsQStr(pPlayerToClear->type)
                 + " " + QStrTableData;
@@ -418,7 +406,7 @@ void Chess::manageMoveRequest(clientRequest request)
 {
     if (_pStatus->isMoveARequestForPromotion(request.param))
     {
-        _pMovements->setMove(request.param);
+        _pStatus->setMove(request.param);
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
                                                                     GS_TURN_BLACK_PROMOTE;
         this->sendDataToClient("promoteToWhat", _pClientsList->getPlayer(
@@ -443,7 +431,7 @@ void Chess::continueGameplay()
         _pTimers->switchPlayersTimers(_pStatus->getWhoseTurn());
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
-        this->sendDataToAllClients("moveOk " + _pMovements->getMove().asQStr() + " " +
+        this->sendDataToAllClients("moveOk " + _pStatus->getMove().asQStr() + " " +
                                    turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
     }
     else if (_PlayerSource == ARDUINO)

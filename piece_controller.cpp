@@ -90,11 +90,11 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
     else return false;
 }
 
-Field* PieceController::searchForPieceActualFieldOnMainBoard(Chessboard* pBoard, Piece* pPiece)
+Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece)
 {
     if (pPiece == nullptr)
     {
-        qDebug() << "ERROR: PieceController::searchForPieceActualFieldOnMainBoard(): "
+        qDebug() << "ERROR: PieceController::searchForPieceActualFieldOnBoard(): "
                     "piece == nullptr";
         return nullptr;
     }

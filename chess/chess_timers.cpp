@@ -106,14 +106,14 @@ void ChessTimers::switchPlayersTimers(WHOSE_TURN Turn)
         _blackTimer->setInterval(_nRemainingBlackTime);
         _blackTimer->start();
     }
-    else qDebug() << "ERROR: Chessboard::switchPlayersTimers(): getWhoseTurn isn't "
+    else qDebug() << "ERROR: ChessTimers::switchPlayersTimers(): getWhoseTurn isn't "
                      "white or black.  it's' ="
                   << turnTypeAsQstr(Turn);
 }
 
 GAME_STATUS ChessTimers::startQueueTimer()
 {
-    qDebug() << "Chessboard::startQueueTimer()";
+    qDebug() << "ChessTimers::startQueueTimer()";
     _startQueueTimer->stop();
     _startQueueTimer->setInterval(_lTimersStartQueue);
     emit this->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),

@@ -3,7 +3,6 @@ INPUT(
 ./release\chess_bot.o
 ./release\chess_conditions.o
 ./release\chess_movements.o
-./release\chess_resets.o
 ./release\chess_status.o
 ./release\chess_timers.o
 ./release\dobot_queue.o
@@ -20,7 +19,9 @@ INPUT(
 ./release\tcpmsgs.o
 ./release\websockets.o
 ./release\xml_reader.o
+./release\piece_controller.o
 ./release\moc_chess_bot.o
+./release\moc_chess_status.o
 ./release\moc_chess_timers.o
 ./release\moc_dobot_queue.o
 ./release\moc_arduinousb.o

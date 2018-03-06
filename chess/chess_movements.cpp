@@ -180,14 +180,15 @@ void ChessMovements::resetPiecePositions()
                 Field* pExaminedField = _pBoardMain->getField(sField);
                 Piece* pPieceOnExaminedField = pExaminedField->getPieceOnField();
 
-                if (!_pChess->isPieceStayOnItsStartingField(pPieceOnExaminedField))
+                if (!_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
                     if (pExaminedField->getPieceOnField() == nullptr)
                     { //if checking field is empty
-                        Piece* pMissingPiece = _pChess->getPiece(pExaminedField->
+                        Piece* pMissingPiece = _pPieceController->getPiece(pExaminedField->
                                                                  getStartPieceNrOnField());
                         Field* pMissingPieceActualFieldOnMainBoard =
-                                _pChess->searchForPieceActualFieldOnMainBoard(pMissingPiece);
+                                _pPieceController->searchForPieceActualFieldOnBoard(_pBoardMain,
+                                                                                    pMissingPiece);
                         if (pMissingPieceActualFieldOnMainBoard != nullptr) //if exists on mainB
                             this->regularMoveSequence(pMissingPieceActualFieldOnMainBoard,
                                                         pExaminedField);
@@ -229,7 +230,8 @@ bool ChessMovements::isPieceSetOnStartFields()
     for (short sField=1; sField>=64; ++sField)
     {
         Field* pField = _pChess->getBoardMainPointer()->getField(sField);
-        Piece* pStartingPieceOnField = _pChess->getPiece(pField->getStartPieceNrOnField());
+        Piece* pStartingPieceOnField =
+                _pPieceController->getPiece(pField->getStartPieceNrOnField());
         if (pStartingPieceOnField != pField->getPieceOnField())
             return false;
     }

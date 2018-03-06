@@ -56,8 +56,7 @@ private:
     void removeClient(Client& client);
     void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
     void sendDataToAllClients(QString QStrMsg);
-    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, PosFromTo* pMove = nullptr,
-                          Client* pPlayerToClear = nullptr);
+    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPlayerToClear = nullptr);
 
     //gameplay methods
     void coreIsReadyForNewGame();
@@ -81,6 +80,16 @@ public:
 
     GAME_STATUS getGameStatus() const { return _ChessGameStatus; }
     clientRequest getLastRequest() const { return _request; }
+
+    Clients* getClientsPointer() { return _pClientsList; }
+    Chessboard* getBoardMainPointer() { return _pBoardMain; }
+    Chessboard* getBoardRemovedPointer() { return _pBoardRemoved; }
+
+    ChessTimers* getTimersPointer() { return _pTimers; }
+    ChessMovements* getMovementsPointer() { return _pMovements; }
+    ChessBot* getBotPointer() { return _pBot; }
+    ChessStatus* getStatusPointer() { return _pStatus; }
+    ChessConditions* getConditionsPointer() { return _pConditions; }
 
 public slots:
     void checkMsgFromWebsockets(QString QStrMsg, Client& client);

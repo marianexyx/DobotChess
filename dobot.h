@@ -16,7 +16,7 @@
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
-#include "dobot/dobot_moves.h" //todo: types
+#include "dobot/vars/dobot_moves.h" //todo: types
 #include "dobot/dobot_servo.h"
 #include "dobot/dobot_queue.h"
 
