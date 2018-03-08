@@ -3,6 +3,7 @@
 
 #pragma once
 #include <QTimer>
+#include <QtMath>
 #include "client.h"
 #include "chess/vars/turn_types.h"
 #include "chess/vars/game_status.h"

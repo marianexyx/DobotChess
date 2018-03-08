@@ -3,7 +3,7 @@
 
 QT_USE_NAMESPACE
 
-MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
+MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceController, Chessboard* pBoardMain,
                        Chessboard* pBoardRemoved, Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
                        ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Clients* pClientsList,
                        QWidget* parent):
@@ -15,6 +15,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
 
     _pDobot = pDobot;
     _pWebSockets = pWebSockets;
+    _pPieceController = pPieceController;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
     _pBoardChenard = pBoardChenard;
@@ -41,9 +42,11 @@ MainWindow::MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
             this, SLOT(writeInConsole(QString, LOG)));
     connect(_pUsb, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
+    connect(_pPieceController, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
     connect(_pClientsList, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pChess, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+    connect(_pChess, SIGNAL(setBoardDataLabelIn(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pBoardMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
@@ -223,7 +226,7 @@ void MainWindow::on_sendBtn_clicked()
 {
     qDebug() << "sendBtn clicked";
 
-    _pChess->getMovementsPointer()->clearMove();
+    _pChess->getStatusPointer()->clearMove();
 
     bool bConversionXOk, bConversionYOk, bConversionZOk;
 
@@ -384,7 +387,7 @@ void MainWindow::on_homeBtn_clicked()
 
 void MainWindow::on_upBtn_clicked()
 {
-    if (_pChess->getMovementsPointer()->isMoveSet())
+    if (_pChess->getStatusPointer()->isMoveSet())
         _pDobot->addArmMoveToQueue(DM_UP);
     else
         qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
@@ -392,7 +395,7 @@ void MainWindow::on_upBtn_clicked()
 
 void MainWindow::on_downBtn_clicked()
 {
-    if (_pChess->getMovementsPointer()->isMoveSet())
+    if (_pChess->getStatusPointer()->isMoveSet())
         _pDobot->addArmMoveToQueue(DM_DOWN);
     else
         qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";

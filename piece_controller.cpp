@@ -36,7 +36,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
 
         QString QStrMsg = "Queue: put piece "
                 + _pPieceSet->getPiece(_pDobot->getItemInGripper())->getName()
-                + " on " + boardTypeAsQstr(pRealBoard->getBoardType()
+                + " on " + boardTypeAsQstr(pRealBoard->getBoardType())
                 + " on field " + pField->getNrAsQStr();
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 

@@ -188,7 +188,7 @@ void ChessStatus::setLegalMoves(QString QStrMsg)
 void ChessStatus::setLegalMoves(QStringList moves)
 {
     _legalMoves = moves;
-    emit this->showLegalMovesInUI(_legalMoves);
+    emit this->showLegalMoves(_legalMoves);
 }
 
 void ChessStatus::setHistoryMoves(QString QStrMsg)
@@ -211,7 +211,7 @@ void ChessStatus::setHistoryMoves(QString QStrMsg)
 void ChessStatus::setHistoryMoves(QStringList moves)
 {
     _historyMoves = moves;
-    emit this->showHistoryMovesInUI(_legalMoves);
+    emit this->showHistoryMoves(_legalMoves);
 }
 
 WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
@@ -244,11 +244,11 @@ PLAYER_TYPE ChessStatus::getActivePlayerType()
 void ChessStatus::clearLegalMoves()
 {
     _legalMoves.clear();
-    emit this->showLegalMovesInUI(_legalMoves);
+    emit this->showLegalMoves(_legalMoves);
 }
 
 void ChessStatus::clearHistoryMoves()
 {
     _historyMoves.clear();
-    emit this->showHistoryMovesInUI(_legalMoves);
+    emit this->showHistoryMoves(_legalMoves);
 }

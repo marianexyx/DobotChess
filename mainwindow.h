@@ -15,6 +15,7 @@
 #include "dobot.h"
 #include "chess.h"
 #include "client.h"
+#include "piece_controller.h"
 
 namespace Ui
 {
@@ -26,9 +27,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Websockets* pWebSockets, Chessboard* pBoardMain,
-                        Chessboard* pBoardRemoved,  Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
-                        ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Clients* pClientsList,
+    explicit MainWindow(Websockets* pWebSockets, PieceController* pPieceController,
+                        Chessboard* pBoardMain, Chessboard* pBoardRemoved,
+                        Chessboard *pBoardChenard, TCPMsgs* pTCPMsg, ArduinoUsb* pUsb,
+                        Dobot* pDobot, Chess* pChess, Clients* pClientsList,
                         QWidget* parent = 0);
 
     virtual ~MainWindow();
@@ -37,6 +39,7 @@ private:
     Ui::MainWindow *ui;
 
     Dobot* _pDobot;
+    PieceController* _pPieceController;
     Websockets* _pWebSockets;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;

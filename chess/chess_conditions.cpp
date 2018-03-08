@@ -69,8 +69,6 @@ QString ChessConditions::extractParameter(REQUEST_TYPE Type, QString QStrRequest
 
 bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_STATUS Status)
 {
-    GAME_STATUS Status = _pChess->getGameStatus();
-
     switch(Type)
     {
     case RT_NONE:

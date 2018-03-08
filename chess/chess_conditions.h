@@ -26,7 +26,8 @@ private:
 //public:
     ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 
-    bool isClientRequestCanBeAccepted(QString QStrMsg, Client& sender);
+    bool isClientRequestCanBeAccepted(QString QStrMsg, Client& sender,
+                                      GAME_STATUS GS);
     QString extractParameter(REQUEST_TYPE Type, QString QStrRequest);
 };
 

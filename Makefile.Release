@@ -59,11 +59,12 @@ SOURCES       = main.cpp \
 		field.cpp \
 		mainwindow.cpp \
 		piece.cpp \
+		piece_controller.cpp \
 		sql.cpp \
 		tcpmsgs.cpp \
 		websockets.cpp \
 		xml_reader.cpp \
-		piece_controller.cpp release\moc_chess_bot.cpp \
+		vars\position_on_board.cpp release\moc_chess_bot.cpp \
 		release\moc_chess_status.cpp \
 		release\moc_chess_timers.cpp \
 		release\moc_dobot_queue.cpp \
@@ -73,6 +74,7 @@ SOURCES       = main.cpp \
 		release\moc_client.cpp \
 		release\moc_dobot.cpp \
 		release\moc_mainwindow.cpp \
+		release\moc_piece_controller.cpp \
 		release\moc_tcpmsgs.cpp \
 		release\moc_websockets.cpp
 OBJECTS       = release/main.o \
@@ -91,11 +93,12 @@ OBJECTS       = release/main.o \
 		release/field.o \
 		release/mainwindow.o \
 		release/piece.o \
+		release/piece_controller.o \
 		release/sql.o \
 		release/tcpmsgs.o \
 		release/websockets.o \
 		release/xml_reader.o \
-		release/piece_controller.o \
+		release/position_on_board.o \
 		release/moc_chess_bot.o \
 		release/moc_chess_status.o \
 		release/moc_chess_timers.o \
@@ -106,6 +109,7 @@ OBJECTS       = release/main.o \
 		release/moc_client.o \
 		release/moc_dobot.o \
 		release/moc_mainwindow.o \
+		release/moc_piece_controller.o \
 		release/moc_tcpmsgs.o \
 		release/moc_websockets.o
 
@@ -116,15 +120,18 @@ DIST          = DobotDll/DobotDll.lib \
 		DobotDll/msvcr120.dll \
 		DobotDll/Qt5Core.dll \
 		DobotDll/Qt5Network.dll \
-		DobotDll/Qt5SerialPort.dll chess\chess_bot.h \
+		DobotDll/Qt5SerialPort.dll chess\vars\chenard_io_msgs.h \
+		chess\vars\end_of_game_types.h \
+		chess\vars\game_status.h \
+		chess\vars\request_types.h \
+		chess\vars\sequence_types.h \
+		chess\vars\turn_types.h \
+		chess\chess_bot.h \
 		chess\chess_conditions.h \
 		chess\chess_movements.h \
 		chess\chess_status.h \
 		chess\chess_timers.h \
-		chess\game_status.h \
-		chess\request_types.h \
-		chess\sequence_types.h \
-		chess\turn_types.h \
+		dobot\vars\dobot_moves.h \
 		dobot\dobot_queue.h \
 		dobot\dobot_servo.h \
 		DobotDll\DobotDll.h \
@@ -144,20 +151,13 @@ DIST          = DobotDll/DobotDll.lib \
 		field.h \
 		mainwindow.h \
 		piece.h \
+		piece_set.h \
+		piece_controller.h \
 		sql.h \
 		tcpmsgs.h \
 		ui_mainwindow.h \
 		websockets.h \
-		xml_reader.h \
-		chess\vars\chenard_io_msgs.h \
-		chess\vars\end_of_game_types.h \
-		chess\vars\game_status.h \
-		chess\vars\request_types.h \
-		chess\vars\sequence_types.h \
-		chess\vars\turn_types.h \
-		dobot\vars\dobot_moves.h \
-		piece_set.h \
-		piece_controller.h main.cpp \
+		xml_reader.h main.cpp \
 		chess\chess_bot.cpp \
 		chess\chess_conditions.cpp \
 		chess\chess_movements.cpp \
@@ -173,11 +173,12 @@ DIST          = DobotDll/DobotDll.lib \
 		field.cpp \
 		mainwindow.cpp \
 		piece.cpp \
+		piece_controller.cpp \
 		sql.cpp \
 		tcpmsgs.cpp \
 		websockets.cpp \
 		xml_reader.cpp \
-		piece_controller.cpp
+		vars\position_on_board.cpp
 QMAKE_TARGET  = DobotChessCore
 DESTDIR        = DobotDll\ #avoid trailing-slash linebreak
 TARGET         = DobotChessCore.exe
@@ -200,7 +201,7 @@ dist:
 	$(ZIP) DobotChessCore.zip $(SOURCES) $(DIST) DobotChessCore.pro ..\Qt\5.6\mingw49_32\mkspecs\features\spec_pre.prf ..\Qt\5.6\mingw49_32\mkspecs\qdevice.pri ..\Qt\5.6\mingw49_32\mkspecs\features\device_config.prf ..\Qt\5.6\mingw49_32\mkspecs\common\angle.conf ..\Qt\5.6\mingw49_32\mkspecs\qconfig.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dcore.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dcore_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dinput.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dinput_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dlogic.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dlogic_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquick.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquick_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickinput.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickinput_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickrender.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3dquickrender_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3drender.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_3drender_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_axbase.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_axbase_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_axcontainer.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_axcontainer_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_axserver.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_axserver_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_bluetooth.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_bluetooth_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_bootstrap_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_clucene_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_concurrent.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_concurrent_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_core.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_core_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_dbus.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_dbus_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_designer.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_designer_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_designercomponents_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_gui.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_gui_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_help.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_help_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_labscontrols_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_labstemplates_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_location.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_location_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_multimedia.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_multimedia_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_multimediawidgets.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_multimediawidgets_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_network.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_network_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_nfc.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_nfc_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_opengl.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_opengl_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_openglextensions.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_openglextensions_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_platformsupport_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_positioning.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_positioning_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_printsupport.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_printsupport_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_qml.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_qml_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_qmldevtools_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_qmltest.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_qmltest_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_quick.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_quick_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_quickparticles_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_quickwidgets.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_quickwidgets_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_script.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_script_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_scripttools.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_scripttools_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_sensors.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_sensors_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_serialbus.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_serialbus_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_serialport.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_serialport_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_sql.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_sql_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_svg.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_svg_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_testlib.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_testlib_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_uiplugin.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_uitools.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_uitools_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_webchannel.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_webchannel_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_websockets.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_websockets_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_widgets.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_widgets_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_winextras.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_winextras_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_xml.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_xml_private.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_xmlpatterns.pri ..\Qt\5.6\mingw49_32\mkspecs\modules\qt_lib_xmlpatterns_private.pri ..\Qt\5.6\mingw49_32\mkspecs\features\qt_functions.prf ..\Qt\5.6\mingw49_32\mkspecs\features\qt_config.prf ..\Qt\5.6\mingw49_32\mkspecs\features\win32\qt_config.prf ..\Qt\5.6\mingw49_32\mkspecs\win32-g++\qmake.conf ..\Qt\5.6\mingw49_32\mkspecs\features\spec_post.prf ..\Qt\5.6\mingw49_32\mkspecs\features\exclusive_builds.prf ..\Qt\5.6\mingw49_32\mkspecs\features\default_pre.prf ..\Qt\5.6\mingw49_32\mkspecs\features\win32\default_pre.prf ..\Qt\5.6\mingw49_32\mkspecs\features\resolve_config.prf ..\Qt\5.6\mingw49_32\mkspecs\features\exclusive_builds_post.prf ..\Qt\5.6\mingw49_32\mkspecs\features\default_post.prf ..\Qt\5.6\mingw49_32\mkspecs\features\build_pass.prf ..\Qt\5.6\mingw49_32\mkspecs\features\qml_debug.prf ..\Qt\5.6\mingw49_32\mkspecs\features\win32\rtti.prf ..\Qt\5.6\mingw49_32\mkspecs\features\precompile_header.prf ..\Qt\5.6\mingw49_32\mkspecs\features\warn_on.prf ..\Qt\5.6\mingw49_32\mkspecs\features\qt.prf ..\Qt\5.6\mingw49_32\mkspecs\features\resources.prf ..\Qt\5.6\mingw49_32\mkspecs\features\moc.prf ..\Qt\5.6\mingw49_32\mkspecs\features\win32\opengl.prf ..\Qt\5.6\mingw49_32\mkspecs\features\uic.prf ..\Qt\5.6\mingw49_32\mkspecs\features\win32\windows.prf ..\Qt\5.6\mingw49_32\mkspecs\features\testcase_targets.prf ..\Qt\5.6\mingw49_32\mkspecs\features\exceptions.prf ..\Qt\5.6\mingw49_32\mkspecs\features\yacc.prf ..\Qt\5.6\mingw49_32\mkspecs\features\lex.prf DobotChessCore.pro ..\Qt\5.6\mingw49_32\lib\qtmain.prl ..\Qt\5.6\mingw49_32\lib\Qt5PrintSupport.prl ..\Qt\5.6\mingw49_32\lib\Qt5Widgets.prl ..\Qt\5.6\mingw49_32\lib\Qt5Gui.prl ..\Qt\5.6\mingw49_32\lib\Qt5WebSockets.prl ..\Qt\5.6\mingw49_32\lib\Qt5Network.prl ..\Qt\5.6\mingw49_32\lib\Qt5Xml.prl ..\Qt\5.6\mingw49_32\lib\Qt5Sql.prl ..\Qt\5.6\mingw49_32\lib\Qt5SerialPort.prl ..\Qt\5.6\mingw49_32\lib\Qt5Core.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) release\main.o release\chess_bot.o release\chess_conditions.o release\chess_movements.o release\chess_status.o release\chess_timers.o release\dobot_queue.o release\dobot_servo.o release\arduinousb.o release\chess.o release\chessboard.o release\client.o release\dobot.o release\field.o release\mainwindow.o release\piece.o release\sql.o release\tcpmsgs.o release\websockets.o release\xml_reader.o release\piece_controller.o release\moc_chess_bot.o release\moc_chess_status.o release\moc_chess_timers.o release\moc_dobot_queue.o release\moc_arduinousb.o release\moc_chess.o release\moc_chessboard.o release\moc_client.o release\moc_dobot.o release\moc_mainwindow.o release\moc_tcpmsgs.o release\moc_websockets.o
+	-$(DEL_FILE) release\main.o release\chess_bot.o release\chess_conditions.o release\chess_movements.o release\chess_status.o release\chess_timers.o release\dobot_queue.o release\dobot_servo.o release\arduinousb.o release\chess.o release\chessboard.o release\client.o release\dobot.o release\field.o release\mainwindow.o release\piece.o release\piece_controller.o release\sql.o release\tcpmsgs.o release\websockets.o release\xml_reader.o release\position_on_board.o release\moc_chess_bot.o release\moc_chess_status.o release\moc_chess_timers.o release\moc_dobot_queue.o release\moc_arduinousb.o release\moc_chess.o release\moc_chessboard.o release\moc_client.o release\moc_dobot.o release\moc_mainwindow.o release\moc_piece_controller.o release\moc_tcpmsgs.o release\moc_websockets.o
 
 distclean: clean 
 	-$(DEL_FILE) $(DESTDIR_TARGET)
@@ -216,9 +217,9 @@ compiler_no_pch_compiler_make_all:
 compiler_no_pch_compiler_clean:
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: release/moc_chess_bot.cpp release/moc_chess_status.cpp release/moc_chess_timers.cpp release/moc_dobot_queue.cpp release/moc_arduinousb.cpp release/moc_chess.cpp release/moc_chessboard.cpp release/moc_client.cpp release/moc_dobot.cpp release/moc_mainwindow.cpp release/moc_tcpmsgs.cpp release/moc_websockets.cpp
+compiler_moc_header_make_all: release/moc_chess_bot.cpp release/moc_chess_status.cpp release/moc_chess_timers.cpp release/moc_dobot_queue.cpp release/moc_arduinousb.cpp release/moc_chess.cpp release/moc_chessboard.cpp release/moc_client.cpp release/moc_dobot.cpp release/moc_mainwindow.cpp release/moc_piece_controller.cpp release/moc_tcpmsgs.cpp release/moc_websockets.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) release\moc_chess_bot.cpp release\moc_chess_status.cpp release\moc_chess_timers.cpp release\moc_dobot_queue.cpp release\moc_arduinousb.cpp release\moc_chess.cpp release\moc_chessboard.cpp release\moc_client.cpp release\moc_dobot.cpp release\moc_mainwindow.cpp release\moc_tcpmsgs.cpp release\moc_websockets.cpp
+	-$(DEL_FILE) release\moc_chess_bot.cpp release\moc_chess_status.cpp release\moc_chess_timers.cpp release\moc_dobot_queue.cpp release\moc_arduinousb.cpp release\moc_chess.cpp release\moc_chessboard.cpp release\moc_client.cpp release\moc_dobot.cpp release\moc_mainwindow.cpp release\moc_piece_controller.cpp release\moc_tcpmsgs.cpp release\moc_websockets.cpp
 release/moc_chess_bot.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QObject \
 		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
@@ -330,7 +331,6 @@ release/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qnamespace.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qarraydata.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringbuilder.h \
-		chess/vars/end_of_game_types.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qalgorithms.h \
@@ -362,6 +362,7 @@ release/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qset.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
+		chess/vars/end_of_game_types.h \
 		chess/vars/turn_types.h \
 		chessboard.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
@@ -462,6 +463,7 @@ release/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		piece_set.h \
@@ -525,6 +527,8 @@ release/moc_chess_timers.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QTimer \
 		../Qt/5.6/mingw49_32/include/QtCore/qvarlengtharray.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontainerfwd.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qobject_impl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
+		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		client.h \
 		../Qt/5.6/mingw49_32/include/QtWebSockets/QWebSocket \
 		../Qt/5.6/mingw49_32/include/QtWebSockets/qwebsocket.h \
@@ -572,6 +576,7 @@ release/moc_chess_timers.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QTimer \
 		../Qt/5.6/mingw49_32/include/QtCore/QByteArray \
 		vars/players_types.h \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/board_data_labels.h \
 		chess/vars/turn_types.h \
 		chess/vars/game_status.h \
@@ -708,6 +713,7 @@ release/moc_dobot_queue.cpp: dobot.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		dobot/dobot_queue.h
@@ -926,6 +932,7 @@ release/moc_chess.cpp: ../Qt/5.6/mingw49_32/include/QtWidgets/QScrollBar \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		vars/board_data_labels.h \
@@ -977,12 +984,12 @@ release/moc_chess.cpp: ../Qt/5.6/mingw49_32/include/QtWidgets/QScrollBar \
 		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
-		chess/chess_status.h \
-		piece_controller.h \
 		chess/chess_movements.h \
+		piece_controller.h \
 		chess/chess_timers.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
+		chess/chess_status.h \
 		chess.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSql -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore chess.h -o release\moc_chess.cpp
 
@@ -1168,6 +1175,7 @@ release/moc_client.cpp: ../Qt/5.6/mingw49_32/include/QtWebSockets/QWebSocket \
 		../Qt/5.6/mingw49_32/include/QtCore/QByteArray \
 		vars/players_types.h \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/board_data_labels.h \
 		client.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSql -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore client.h -o release\moc_client.cpp
@@ -1301,6 +1309,7 @@ release/moc_dobot.cpp: ../Qt/5.6/mingw49_32/include/QtCore/QObject \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot.h \
 		dobot/dobot_queue.h \
@@ -1478,6 +1487,7 @@ release/moc_mainwindow.cpp: ../Qt/5.6/mingw49_32/include/QtWidgets/QMainWindow \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		chess.h \
@@ -1497,14 +1507,160 @@ release/moc_mainwindow.cpp: ../Qt/5.6/mingw49_32/include/QtWidgets/QMainWindow \
 		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
-		chess/chess_status.h \
-		piece_controller.h \
 		chess/chess_movements.h \
+		piece_controller.h \
 		chess/chess_timers.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
+		chess/chess_status.h \
 		mainwindow.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSql -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore mainwindow.h -o release\moc_mainwindow.cpp
+
+release/moc_piece_controller.cpp: vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QString \
+		../Qt/5.6/mingw49_32/include/QtCore/qstring.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qchar.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qglobal.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qconfig.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qfeatures.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsystemdetection.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qprocessordetection.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcompilerdetection.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtypeinfo.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtypetraits.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qisenum.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsysinfo.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlogging.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qflags.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbasicatomic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_bootstrap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qgenericatomic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_cxx11.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_gcc.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_msvc.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_armv7.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_armv6.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_armv5.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_ia64.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_x86.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_unix.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qglobalstatic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmutex.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qnumeric.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qversiontagging.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbytearray.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qrefcount.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qnamespace.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qarraydata.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qstringbuilder.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
+		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qalgorithms.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qhash.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qiterator.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qhashfunctions.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qpair.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbytearraylist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qstringlist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qregexp.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qstringmatcher.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtextstream.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qiodevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs_impl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcoreevent.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qscopedpointer.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmetatype.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvarlengtharray.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcontainerfwd.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobject_impl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlocale.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvariant.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qshareddata.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvector.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qset.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
+		dobot.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QObject \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QMessageBox \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qmessagebox.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qdialog.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qwidget.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qwindowdefs.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qwindowdefs_win.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmargins.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpaintdevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qrect.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsize.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpalette.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qcolor.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qrgb.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qrgba64.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qbrush.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qmatrix.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpolygon.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qregion.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qdatastream.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qline.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtransform.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpainterpath.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qimage.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpixelformat.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpixmap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsharedpointer.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsharedpointer_impl.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfont.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfontmetrics.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfontinfo.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qsizepolicy.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qcursor.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qkeysequence.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qevent.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qurl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qurlquery.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qfile.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qfiledevice.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qvector2d.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtouchdevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QSignalMapper \
+		../Qt/5.6/mingw49_32/include/QtCore/qsignalmapper.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QTimer \
+		../Qt/5.6/mingw49_32/include/QtCore/qtimer.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbasictimer.h \
+		../Qt/5.6/mingw49_32/include/QtGui/QValidator \
+		../Qt/5.6/mingw49_32/include/QtGui/qvalidator.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qregularexpression.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QList \
+		DobotDll/DobotDll.h \
+		DobotDll/DobotType.h \
+		arduinousb.h \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
+		vars/basic_vars.h \
+		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
+		dobot/dobot_servo.h \
+		dobot/dobot_queue.h \
+		piece_set.h \
+		piece.h \
+		vars/players_types.h \
+		vars/position_on_board.h \
+		chessboard.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
+		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
+		field.h \
+		vars/board_data_labels.h \
+		vars/board_types.h \
+		piece_controller.h
+	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSql -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore piece_controller.h -o release\moc_piece_controller.cpp
 
 release/moc_tcpmsgs.cpp: ../Qt/5.6/mingw49_32/include/QtNetwork/QTcpSocket \
 		../Qt/5.6/mingw49_32/include/QtNetwork/qtcpsocket.h \
@@ -1577,6 +1733,7 @@ release/moc_tcpmsgs.cpp: ../Qt/5.6/mingw49_32/include/QtNetwork/QTcpSocket \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/basic_vars.h \
 		tcpmsgs.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSql -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore tcpmsgs.h -o release\moc_tcpmsgs.cpp
@@ -1686,6 +1843,7 @@ release/moc_websockets.cpp: ../Qt/5.6/mingw49_32/include/QtWebSockets/QWebSocket
 		client.h \
 		vars/players_types.h \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/board_data_labels.h \
 		websockets.h
 	C:\Qt\5.6\mingw49_32\bin\moc.exe $(DEFINES) -D__GNUC__ -DWIN32 -IC:/Qt/5.6/mingw49_32/mkspecs/win32-g++ -IC:/DobotChess -IC:/DobotChess/DobotDll -IC:/Qt/5.6/mingw49_32/include -IC:/Qt/5.6/mingw49_32/include/QtPrintSupport -IC:/Qt/5.6/mingw49_32/include/QtWidgets -IC:/Qt/5.6/mingw49_32/include/QtGui -IC:/Qt/5.6/mingw49_32/include/QtANGLE -IC:/Qt/5.6/mingw49_32/include/QtWebSockets -IC:/Qt/5.6/mingw49_32/include/QtNetwork -IC:/Qt/5.6/mingw49_32/include/QtXml -IC:/Qt/5.6/mingw49_32/include/QtSql -IC:/Qt/5.6/mingw49_32/include/QtSerialPort -IC:/Qt/5.6/mingw49_32/include/QtCore websockets.h -o release\moc_websockets.cpp
@@ -1882,6 +2040,7 @@ release/main.o: main.cpp mainwindow.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		chess.h \
@@ -1901,12 +2060,12 @@ release/main.o: main.cpp mainwindow.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
-		chess/chess_status.h \
-		piece_controller.h \
 		chess/chess_movements.h \
+		piece_controller.h \
 		chess/chess_timers.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
+		chess/chess_status.h \
 		../Qt/5.6/mingw49_32/include/QtWidgets/QApplication \
 		../Qt/5.6/mingw49_32/include/QtWidgets/qapplication.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcoreapplication.h \
@@ -2163,6 +2322,7 @@ release/chess_conditions.o: chess/chess_conditions.cpp chess/chess_conditions.h 
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		piece_set.h
@@ -2207,36 +2367,30 @@ release/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qnamespace.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qarraydata.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringbuilder.h \
-		chessboard.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
-		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QObject \
-		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs_impl.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qlist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
+		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qalgorithms.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qhash.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qiterator.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlist.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qhashfunctions.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qpair.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qbytearraylist.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringlist.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qregexp.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringmatcher.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtextstream.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qiodevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs_impl.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcoreevent.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qscopedpointer.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qmetatype.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qvarlengtharray.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontainerfwd.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qobject_impl.h \
-		field.h \
-		piece.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
-		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qhash.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qmap.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qtextstream.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qiodevice.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qlocale.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qvariant.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qshareddata.h \
@@ -2244,6 +2398,12 @@ release/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qset.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
+		chessboard.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
+		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QObject \
+		field.h \
+		piece.h \
 		vars/players_types.h \
 		vars/position_on_board.h \
 		vars/board_axis.h \
@@ -2310,6 +2470,7 @@ release/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		piece_set.h
@@ -2354,7 +2515,6 @@ release/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qnamespace.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qarraydata.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringbuilder.h \
-		chess/vars/end_of_game_types.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qalgorithms.h \
@@ -2386,6 +2546,7 @@ release/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qset.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
+		chess/vars/end_of_game_types.h \
 		chess/vars/turn_types.h \
 		chessboard.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
@@ -2486,6 +2647,7 @@ release/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		piece_set.h
@@ -2549,6 +2711,8 @@ release/chess_timers.o: chess/chess_timers.cpp chess/chess_timers.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qvarlengtharray.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontainerfwd.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qobject_impl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
+		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		client.h \
 		../Qt/5.6/mingw49_32/include/QtWebSockets/QWebSocket \
 		../Qt/5.6/mingw49_32/include/QtWebSockets/qwebsocket.h \
@@ -2596,6 +2760,7 @@ release/chess_timers.o: chess/chess_timers.cpp chess/chess_timers.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QByteArray \
 		vars/players_types.h \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/board_data_labels.h \
 		chess/vars/turn_types.h \
 		chess/vars/game_status.h
@@ -2732,6 +2897,7 @@ release/dobot_queue.o: dobot/dobot_queue.cpp dobot/dobot_queue.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\dobot_queue.o dobot\dobot_queue.cpp
 
@@ -2866,6 +3032,7 @@ release/dobot_servo.o: dobot/dobot_servo.cpp dobot/dobot_servo.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_queue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\dobot_servo.o dobot\dobot_servo.cpp
 
@@ -3083,6 +3250,7 @@ release/chess.o: chess.cpp chess.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		vars/board_data_labels.h \
@@ -3134,12 +3302,12 @@ release/chess.o: chess.cpp chess.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
-		chess/chess_status.h \
-		piece_controller.h \
 		chess/chess_movements.h \
+		piece_controller.h \
 		chess/chess_timers.h \
 		chess/chess_conditions.h \
-		chess/vars/request_types.h
+		chess/vars/request_types.h \
+		chess/chess_status.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\chess.o chess.cpp
 
 release/chessboard.o: chessboard.cpp chessboard.h \
@@ -3325,6 +3493,7 @@ release/client.o: client.cpp client.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QByteArray \
 		vars/players_types.h \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/board_data_labels.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\client.o client.cpp
 
@@ -3458,6 +3627,7 @@ release/dobot.o: dobot.cpp dobot.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\dobot.o dobot.cpp
@@ -3710,6 +3880,7 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
 		vars/basic_vars.h \
 		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
 		dobot/dobot_queue.h \
 		chess.h \
@@ -3729,12 +3900,12 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
-		chess/chess_status.h \
-		piece_controller.h \
 		chess/chess_movements.h \
+		piece_controller.h \
 		chess/chess_timers.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
+		chess/chess_status.h \
 		ui_mainwindow.h \
 		../Qt/5.6/mingw49_32/include/QtWidgets/QAction \
 		../Qt/5.6/mingw49_32/include/QtWidgets/qaction.h \
@@ -3878,6 +4049,152 @@ release/piece.o: piece.cpp piece.h \
 		vars/position_on_board.h \
 		vars/board_axis.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\piece.o piece.cpp
+
+release/piece_controller.o: piece_controller.cpp piece_controller.h \
+		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QString \
+		../Qt/5.6/mingw49_32/include/QtCore/qstring.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qchar.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qglobal.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qconfig.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qfeatures.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsystemdetection.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qprocessordetection.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcompilerdetection.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtypeinfo.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtypetraits.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qisenum.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsysinfo.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlogging.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qflags.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbasicatomic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_bootstrap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qgenericatomic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_cxx11.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_gcc.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_msvc.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_armv7.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_armv6.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_armv5.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_ia64.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_x86.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qatomic_unix.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qglobalstatic.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmutex.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qnumeric.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qversiontagging.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbytearray.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qrefcount.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qnamespace.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qarraydata.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qstringbuilder.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
+		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qalgorithms.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qhash.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qiterator.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qhashfunctions.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qpair.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbytearraylist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qstringlist.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qregexp.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qstringmatcher.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtextstream.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qiodevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs_impl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcoreevent.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qscopedpointer.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmetatype.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvarlengtharray.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcontainerfwd.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobject_impl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlocale.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvariant.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qshareddata.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvector.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qset.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
+		dobot.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QObject \
+		../Qt/5.6/mingw49_32/include/QtWidgets/QMessageBox \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qmessagebox.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qdialog.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qwidget.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qwindowdefs.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qwindowdefs_win.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmargins.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpaintdevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qrect.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsize.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpalette.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qcolor.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qrgb.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qrgba64.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qbrush.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qmatrix.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpolygon.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qregion.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qdatastream.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qline.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtransform.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpainterpath.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qimage.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpixelformat.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qpixmap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsharedpointer.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qsharedpointer_impl.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfont.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfontmetrics.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qfontinfo.h \
+		../Qt/5.6/mingw49_32/include/QtWidgets/qsizepolicy.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qcursor.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qkeysequence.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qevent.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qurl.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qurlquery.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qfile.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qfiledevice.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qvector2d.h \
+		../Qt/5.6/mingw49_32/include/QtGui/qtouchdevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QSignalMapper \
+		../Qt/5.6/mingw49_32/include/QtCore/qsignalmapper.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QTimer \
+		../Qt/5.6/mingw49_32/include/QtCore/qtimer.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qbasictimer.h \
+		../Qt/5.6/mingw49_32/include/QtGui/QValidator \
+		../Qt/5.6/mingw49_32/include/QtGui/qvalidator.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qregularexpression.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QList \
+		DobotDll/DobotDll.h \
+		DobotDll/DobotType.h \
+		arduinousb.h \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
+		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
+		vars/basic_vars.h \
+		vars/board_axis.h \
+		dobot/vars/dobot_moves.h \
+		dobot/dobot_servo.h \
+		dobot/dobot_queue.h \
+		piece_set.h \
+		piece.h \
+		vars/players_types.h \
+		vars/position_on_board.h \
+		chessboard.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
+		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
+		field.h \
+		vars/board_data_labels.h \
+		vars/board_types.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\piece_controller.o piece_controller.cpp
 
 release/sql.o: sql.cpp sql.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QObject \
@@ -4028,6 +4345,7 @@ release/tcpmsgs.o: tcpmsgs.cpp tcpmsgs.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/basic_vars.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QDataStream \
 		../Qt/5.6/mingw49_32/include/QtCore/qdatastream.h
@@ -4139,6 +4457,7 @@ release/websockets.o: websockets.cpp websockets.h \
 		client.h \
 		vars/players_types.h \
 		vars/log.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
 		vars/board_data_labels.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\websockets.o websockets.cpp
 
@@ -4340,8 +4659,7 @@ release/xml_reader.o: xml_reader.cpp xml_reader.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QFile
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\xml_reader.o xml_reader.cpp
 
-release/piece_controller.o: piece_controller.cpp piece_controller.h \
-		vars/log.h \
+release/position_on_board.o: vars/position_on_board.cpp vars/position_on_board.h \
 		../Qt/5.6/mingw49_32/include/QtCore/QString \
 		../Qt/5.6/mingw49_32/include/QtCore/qstring.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qchar.h \
@@ -4379,111 +4697,39 @@ release/piece_controller.o: piece_controller.cpp piece_controller.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qnamespace.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qarraydata.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringbuilder.h \
-		dobot.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QObject \
-		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs_impl.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qlist.h \
+		vars/board_axis.h \
+		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
+		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qalgorithms.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qhash.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qiterator.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qlist.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qhashfunctions.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qpair.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qbytearraylist.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringlist.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qregexp.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qstringmatcher.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qmap.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qtextstream.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qiodevice.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobject.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qobjectdefs_impl.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcoreevent.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qscopedpointer.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qmetatype.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qvarlengtharray.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qcontainerfwd.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qobject_impl.h \
-		../Qt/5.6/mingw49_32/include/QtWidgets/QMessageBox \
-		../Qt/5.6/mingw49_32/include/QtWidgets/qmessagebox.h \
-		../Qt/5.6/mingw49_32/include/QtWidgets/qdialog.h \
-		../Qt/5.6/mingw49_32/include/QtWidgets/qwidget.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qwindowdefs.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qwindowdefs_win.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qmargins.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qpaintdevice.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qrect.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qsize.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qpalette.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qcolor.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qrgb.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qrgba64.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qbrush.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qvector.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qmatrix.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qpolygon.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qregion.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qdatastream.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qiodevice.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qline.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qtransform.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qpainterpath.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qimage.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qpixelformat.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qpixmap.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qsharedpointer.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qshareddata.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qhash.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qsharedpointer_impl.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qfont.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qfontmetrics.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qfontinfo.h \
-		../Qt/5.6/mingw49_32/include/QtWidgets/qsizepolicy.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qcursor.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qkeysequence.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qevent.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qvariant.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qmap.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qdebug.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qtextstream.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qlocale.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvariant.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qshareddata.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qvector.h \
+		../Qt/5.6/mingw49_32/include/QtCore/qpoint.h \
 		../Qt/5.6/mingw49_32/include/QtCore/qset.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qurl.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qurlquery.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qfile.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qfiledevice.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qvector2d.h \
-		../Qt/5.6/mingw49_32/include/QtGui/qtouchdevice.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QDebug \
-		../Qt/5.6/mingw49_32/include/QtCore/QSignalMapper \
-		../Qt/5.6/mingw49_32/include/QtCore/qsignalmapper.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QTimer \
-		../Qt/5.6/mingw49_32/include/QtCore/qtimer.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qbasictimer.h \
-		../Qt/5.6/mingw49_32/include/QtGui/QValidator \
-		../Qt/5.6/mingw49_32/include/QtGui/qvalidator.h \
-		../Qt/5.6/mingw49_32/include/QtCore/qregularexpression.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QList \
-		DobotDll/DobotDll.h \
-		DobotDll/DobotType.h \
-		arduinousb.h \
-		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPort \
-		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialport.h \
-		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportglobal.h \
-		../Qt/5.6/mingw49_32/include/QtSerialPort/QSerialPortInfo \
-		../Qt/5.6/mingw49_32/include/QtSerialPort/qserialportinfo.h \
-		vars/basic_vars.h \
-		vars/board_axis.h \
-		dobot/dobot_servo.h \
-		dobot/dobot_queue.h \
-		piece_set.h \
-		piece.h \
-		vars/players_types.h \
-		vars/position_on_board.h \
-		chessboard.h \
-		../Qt/5.6/mingw49_32/include/QtCore/QtMath \
-		../Qt/5.6/mingw49_32/include/QtCore/qmath.h \
-		field.h \
-		vars/board_data_labels.h \
-		vars/board_types.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\piece_controller.o piece_controller.cpp
+		../Qt/5.6/mingw49_32/include/QtCore/qcontiguouscache.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\position_on_board.o vars\position_on_board.cpp
 
 release/moc_chess_bot.o: release/moc_chess_bot.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_chess_bot.o release\moc_chess_bot.cpp
@@ -4514,6 +4760,9 @@ release/moc_dobot.o: release/moc_dobot.cpp
 
 release/moc_mainwindow.o: release/moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_mainwindow.o release\moc_mainwindow.cpp
+
+release/moc_piece_controller.o: release/moc_piece_controller.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_piece_controller.o release\moc_piece_controller.cpp
 
 release/moc_tcpmsgs.o: release/moc_tcpmsgs.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\moc_tcpmsgs.o release\moc_tcpmsgs.cpp

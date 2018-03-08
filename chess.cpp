@@ -32,12 +32,12 @@ Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceContro
     connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, Client*)),
             this, SLOT(checkMsgFromWebsockets(QString, Client*)));
     connect(_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
-            this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
+            this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
-            this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pStatus, SIGNAL(showLegalMovesInUI(QStringList)),
-            this, SLOT(showLegalMovesInUI(QStringList)));
-    connect(_pStatus, SIGNAL(showHistoryMovesInUI(QStringList)),
+            this, SLOT(setBoardDataLabelInForm(QString, BOARD_DATA_LABEL)));
+    connect(_pStatus, SIGNAL(showLegalMoves(QStringList)),
+            this, SLOT(showLegalMovesInForm(QStringList)));
+    connect(_pStatus, SIGNAL(showHistoryMoves(QStringList)),
             this, SLOT(showHistoryMovesInUI(QStringList)));
     connect(_pTimers, SIGNAL(timeOutStart()), this, SLOT(timeOutStart()));
     connect(_pTimers, SIGNAL(timeOutPlayer(PLAYER_TYPE)),
@@ -269,7 +269,7 @@ void Chess::removeClient(Client& client)
 
     _pClientsList->removeClient(client);
 
-    emit this->setBoardDataLabel(std::to_string(_pClientsList->getClientsList().size()).c_str(),
+    emit this->setBoardDataLabelInUI(std::to_string(_pClientsList->getClientsList().size()).c_str(),
                             BDL_SOCKETS_ONLINE);
     emit _pClientsList->showClientsList(_pClientsList->getClientsList());
 }
@@ -417,9 +417,7 @@ void Chess::manageMoveRequest(clientRequest request)
     else
     {
         _pStatus->setMove(request.param); //no need for earlier clear
-        if (this->isMoveOkForCoreBoards(_pStatus->getMove(), _pStatus->getMoveType()))
-            _pMovements->doMoveSequence(_pStatus->getMove(), _pStatus->getMoveType());
-        else return;
+        _pMovements->doMoveSequence(_pStatus->getMove(), _pStatus->getMoveType());
         this->sendMsgToTcp("move " + request.param);
     }
 }
@@ -470,7 +468,7 @@ void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
     //reset data
     _pClientsList->resetPlayersStartConfirmInfo();
     _pTimers->resetGameTimers();
-    _pMovements->clearMove();
+    _pStatus->clearMove();
     _pStatus->resetStatusData();
 
     this->changePlayersOnChairs(WhoWon, pPlayerToClear);
@@ -478,13 +476,8 @@ void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
     //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
     //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
     //dowiedzą że nastąpił koniec gry
-    _pMovements->resetPiecePositions();
-}
-
-bool Chess::isMoveOkForCoreBoards(PosFromTo PosMove, SEQUENCE_TYPE Type)
-{
-    //wykonaj fikcyjny ruch
-    //jezeli nie było problemów to zwróć true
+    if(_pMovements->resetPiecePositions())
+        this->coreIsReadyForNewGame();
 }
 
 void Chess::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
@@ -579,7 +572,17 @@ void Chess::timeOutPlayer(PLAYER_TYPE Player)
     this->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
 }
 
-void Chess::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)
+void Chess::setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType)
 {
     emit this->setBoardDataLabel(QStrLabel, LabelType);
+}
+
+void Chess::showLegalMovesInForm(QStringList legalMoves)
+{
+    emit this->showLegalMovesInUI(legalMoves);
+}
+
+void Chess::showHistoryMovesInForm(QStringList historyMoves)
+{
+    emit this->showHistoryMovesInUI(historyMoves);
 }

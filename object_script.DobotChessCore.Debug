@@ -15,11 +15,12 @@ INPUT(
 ./debug\field.o
 ./debug\mainwindow.o
 ./debug\piece.o
+./debug\piece_controller.o
 ./debug\sql.o
 ./debug\tcpmsgs.o
 ./debug\websockets.o
 ./debug\xml_reader.o
-./debug\piece_controller.o
+./debug\position_on_board.o
 ./debug\moc_chess_bot.o
 ./debug\moc_chess_status.o
 ./debug\moc_chess_timers.o
@@ -30,6 +31,7 @@ INPUT(
 ./debug\moc_client.o
 ./debug\moc_dobot.o
 ./debug\moc_mainwindow.o
+./debug\moc_piece_controller.o
 ./debug\moc_tcpmsgs.o
 ./debug\moc_websockets.o
 );

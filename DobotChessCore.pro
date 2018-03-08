@@ -33,22 +33,26 @@ SOURCES += main.cpp\
     field.cpp \
     mainwindow.cpp \
     piece.cpp \
+    piece_controller.cpp \
     sql.cpp \
     tcpmsgs.cpp \
     websockets.cpp \
     xml_reader.cpp \
-    piece_controller.cpp
+    vars/position_on_board.cpp
 
 HEADERS  +=  \
+    chess/vars/chenard_io_msgs.h \
+    chess/vars/end_of_game_types.h \
+    chess/vars/game_status.h \
+    chess/vars/request_types.h \
+    chess/vars/sequence_types.h \
+    chess/vars/turn_types.h \
     chess/chess_bot.h \
     chess/chess_conditions.h \
     chess/chess_movements.h \
     chess/chess_status.h \
     chess/chess_timers.h \
-    chess/game_status.h \
-    chess/request_types.h \
-    chess/sequence_types.h \
-    chess/turn_types.h \
+    dobot/vars/dobot_moves.h \
     dobot/dobot_queue.h \
     dobot/dobot_servo.h \
     DobotDll/DobotDll.h \
@@ -68,20 +72,13 @@ HEADERS  +=  \
     field.h \
     mainwindow.h \
     piece.h \
+    piece_set.h \
+    piece_controller.h \
     sql.h \
     tcpmsgs.h \
     ui_mainwindow.h \
     websockets.h \
-    xml_reader.h \
-    chess/vars/chenard_io_msgs.h \
-    chess/vars/end_of_game_types.h \
-    chess/vars/game_status.h \
-    chess/vars/request_types.h \
-    chess/vars/sequence_types.h \
-    chess/vars/turn_types.h \
-    dobot/vars/dobot_moves.h \
-    piece_set.h \
-    piece_controller.h
+    xml_reader.h
 
 FORMS    += mainwindow.ui
 

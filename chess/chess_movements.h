@@ -21,7 +21,7 @@ private:
 public:
     ChessMovements(PieceController* pPieceController, Chessboard* pBoardMain,
                    Chessboard* pBoardRemoved);
-    ~ChessMovements();
+    ~ChessMovements() {}
 
     Field* findKingFieldInCastling(Field* pField);
     Field* findRookFieldInCastling(Field* pField);
@@ -33,8 +33,7 @@ public:
     void castlingMoveSequence(Field* pFrom, Field* pTo);
     void enpassantMoveSequence(Field* pFrom, Field* pTo);
     void promoteMoveSequence(Field* pFrom, Field* pTo);
-    void resetPiecePositions();
-
+    bool resetPiecePositions();
 };
 
 #endif // CHESS_MOVEMENTS_H

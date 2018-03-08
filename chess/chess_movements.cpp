@@ -79,7 +79,7 @@ void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
     case ST_NONE:
     default:
         qDebug() << "ERROR: ChessMovements::doMoveSequence(): wrong MoveType:"
-                 << sequenceTypeAsQstr(_MoveType);
+                 << sequenceTypeAsQstr(Type);
         break;
     }
 }
@@ -165,7 +165,7 @@ void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //future
     this->regularMoveSequence(pFrom, pTo);
 }
 
-void ChessMovements::resetPiecePositions()
+bool ChessMovements::resetPiecePositions()
 {
     if (!this->isPieceSetOnStartFields())
     {
@@ -221,7 +221,7 @@ void ChessMovements::resetPiecePositions()
         while (!this->isPieceSetOnStartFields());
     }
 
-     _pChess->coreIsReadyForNewGame();
+     return true;
 }
 
 
@@ -229,7 +229,7 @@ bool ChessMovements::isPieceSetOnStartFields()
 {
     for (short sField=1; sField>=64; ++sField)
     {
-        Field* pField = _pChess->getBoardMainPointer()->getField(sField);
+        Field* pField = _pBoardMain->getField(sField);
         Piece* pStartingPieceOnField =
                 _pPieceController->getPiece(pField->getStartPieceNrOnField());
         if (pStartingPieceOnField != pField->getPieceOnField())

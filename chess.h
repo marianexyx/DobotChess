@@ -17,10 +17,9 @@
 #include "piece_set.h"
 #include "chessboard.h"
 #include "chess/chess_bot.h"
-#include "chess/chess_status.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_timers.h"
-#include "chess/chess_conditions.h" //must be last
+#include "chess/chess_conditions.h" //must be last. chess_status.h included here
 
 class Chess: public QObject
 {
@@ -64,7 +63,6 @@ private:
     void manageMoveRequest(clientRequest request);
     void continueGameplay();
     void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
-    bool isMoveOkForCoreBoards(PosFromTo PosMove, SEQUENCE_TYPE Type);
     void changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear);
 
 public:
@@ -96,9 +94,9 @@ public slots:
     void checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond);
     void checkMsgFromUsb(QString QStrMsg);
     QString getTableData();
-    void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
-    void showLegalMovesInUI(QStringList legalMoves);
-    void showHistoryMovesInUI(QStringList historyMoves);
+    void setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType);
+    void showLegalMovesInForm(QStringList legalMoves);
+    void showHistoryMovesInForm(QStringList historyMoves);
     void timeOutStart();
     void timeOutPlayer(PLAYER_TYPE Player);
 

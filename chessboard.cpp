@@ -1,6 +1,6 @@
 #include "chessboard.h"
 
-Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal = true):
+Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/):
     _A1(157.4, 76.3, -22.9),
     _A8(306.6, 75.0, -19.1),
     _H1(157.4, -81.9, -23.1),

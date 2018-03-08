@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     //todo: jak wrzucam poniżej PieceController001, to masę wskaźników mogę z niego wyciągać
     Chess Chess001(&ClientsList, &DobotArm001, &PieceController001, &BoardMain001,
                    &BoardRemoved001, &BoardChenard001, &Websockety, &TCPMsgs001, WEBSITE);
-    MainWindow mainwindow(&Websockety, &BoardMain001, &BoardRemoved001, &BoardChenard001,
+    MainWindow mainwindow(&Websockety, &PieceController001, &BoardMain001, &BoardRemoved001, &BoardChenard001,
                           &TCPMsgs001, &USB001, &DobotArm001, &Chess001, &ClientsList);
     mainwindow.show();
 

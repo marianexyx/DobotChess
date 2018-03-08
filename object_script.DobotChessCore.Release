@@ -15,11 +15,12 @@ INPUT(
 ./release\field.o
 ./release\mainwindow.o
 ./release\piece.o
+./release\piece_controller.o
 ./release\sql.o
 ./release\tcpmsgs.o
 ./release\websockets.o
 ./release\xml_reader.o
-./release\piece_controller.o
+./release\position_on_board.o
 ./release\moc_chess_bot.o
 ./release\moc_chess_status.o
 ./release\moc_chess_timers.o
@@ -30,6 +31,7 @@ INPUT(
 ./release\moc_client.o
 ./release\moc_dobot.o
 ./release\moc_mainwindow.o
+./release\moc_piece_controller.o
 ./release\moc_tcpmsgs.o
 ./release\moc_websockets.o
 );

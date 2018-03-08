@@ -7,8 +7,10 @@
 #include "piece_set.h"
 #include "chessboard.h"
 
-class PieceController
+class PieceController: public QObject
 {
+    Q_OBJECT
+
 private:
     Dobot* _pDobot;
     PieceSet* _pPieceSet;
@@ -25,6 +27,9 @@ public:
     Field* searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece);
 
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
+
+signals:
+    void addTextToLogPTE(QString, LOG);
 };
 
 #endif // PIECE_CONTROLLER_H

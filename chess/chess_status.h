@@ -79,8 +79,8 @@ public:
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
-    void showLegalMovesInUI(QStringList);
-    void showHistoryMovesInUI(QStringList);
+    void showLegalMoves(QStringList);
+    void showHistoryMoves(QStringList);
 };
 
 #endif // CHESS_STATUS_H
