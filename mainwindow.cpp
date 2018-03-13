@@ -46,7 +46,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
             this, SLOT(writeInConsole(QString, LOG)));
     connect(_pClientsList, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pChess, SIGNAL(setBoardDataLabelIn(QString, BOARD_DATA_LABEL)),
+    connect(_pChess, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pBoardMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
@@ -66,8 +66,8 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
             this, SLOT(showLegalMovesInUI(QStringList)));
     connect(_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
             this, SLOT(showHistoryMovesInUI(QStringList)));
-    connect(_pWebSockets, SIGNAL(showClientsList(QList<Clients>)),
-            this, SLOT(showClientsList(QList<Clients>)));
+    connect(_pClientsList, SIGNAL(showClientsList(QList<Client>)),
+            this, SLOT(showClientsList(QList<Client>)));
     connect(_pDobot, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobot, SIGNAL(AxisLabelText(QString, char)),

@@ -29,16 +29,16 @@ Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceContro
             this, SLOT(checkMsgFromUsb(QString)));
     connect(_pTCPMsgs, SIGNAL(msgFromTcpToChess(QString, QString)),
             this, SLOT(checkMsgFromChenard(QString, QString)));
-    connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, Client*)),
-            this, SLOT(checkMsgFromWebsockets(QString, Client*)));
+    connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, Client&)),
+            this, SLOT(checkMsgFromWebsockets(QString, Client&)));
     connect(_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
             this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
-            this, SLOT(setBoardDataLabelInForm(QString, BOARD_DATA_LABEL)));
+            this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(_pStatus, SIGNAL(showLegalMoves(QStringList)),
             this, SLOT(showLegalMovesInForm(QStringList)));
     connect(_pStatus, SIGNAL(showHistoryMoves(QStringList)),
-            this, SLOT(showHistoryMovesInUI(QStringList)));
+            this, SLOT(showHistoryMovesInForm(QStringList)));
     connect(_pTimers, SIGNAL(timeOutStart()), this, SLOT(timeOutStart()));
     connect(_pTimers, SIGNAL(timeOutPlayer(PLAYER_TYPE)),
             this, SLOT(timeOutPlayer(PLAYER_TYPE)));

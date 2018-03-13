@@ -10,6 +10,8 @@ Websockets::Websockets(Clients* pClientsList, quint16 port, QObject* parent):
                                               QWebSocketServer::NonSecureMode, this);
     if (_pWebSocketServer->listen(QHostAddress::Any, port))
     {
+        qDebug() << "Websockets::Websockets(): connecting to port:" << port;
+
         connect(_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
 
@@ -50,7 +52,7 @@ void Websockets::receivedMsg(QString QStrMsg)
     else return;
 
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-    emit this->msgFromWebsocketsToChess(QStrMsg, _pClientsList->getClient(pSocket));
+    emit this->msgFromWebsocketsToChess(QStrMsg, *_pClientsList->getClient(pSocket));
 }
 
 void Websockets::sendMsgToClient(QString QStrMsg, Client* pClient)
@@ -81,5 +83,5 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 void Websockets::socketDisconnected()
 {
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-    emit this->msgFromWebsocketsToChess("clientLeft", _pClientsList->getClient(pSocket));
+    emit this->msgFromWebsocketsToChess("clientLeft", *_pClientsList->getClient(pSocket));
 }

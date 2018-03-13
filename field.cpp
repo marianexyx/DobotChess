@@ -1,13 +1,12 @@
 #include "field.h"
 
-Field::Field(short sFieldNr)
+Field::Field(short sFieldNr): _location3D()
 {
     if (Field::isInRange(sFieldNr))
         _sNr = sFieldNr;
     else return;
 
     _pPieceOnField = nullptr;
-
     _sStartPieceNrOnField = Field::startPieceNrOnField(sFieldNr);
 }
 
@@ -98,6 +97,14 @@ void Field::clearField()
         qDebug() << "ERROR: Field::clearField(): field is already clear. field ="
                  << Field::nrAsQStr(_sNr) << ", piece nr on it =" << _pPieceOnField->getNr();
     _pPieceOnField = nullptr;
+}
+
+Point3D Field::getLocation3D()
+{
+    if (!_location3D.isPointSet())
+        qDebug() << "ERROR: Field::getLocation3D(): _location3D not set";
+
+    return _location3D;
 }
 
 bool Field::isFieldOccupied(bool bErrorLog /*= false*/)

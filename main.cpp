@@ -5,7 +5,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    qDebug() << "first msg";
     //todo: niektóre obiekty są pośrednie i mogę być tworzone wewnątrz innych, a potem...
     //...przekazywane dalej
     Clients ClientsList;

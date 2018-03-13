@@ -18,8 +18,8 @@ ChessTimers::ChessTimers(Clients* pClientsList):
     _blackTimer->setSingleShot(true);
     _updateLabelTimer->setSingleShot(false);
     _startQueueTimer->setSingleShot(true);
-    connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_WHITE)));
-    connect(_blackTimer, SIGNAL(timeout()), this, SLOT(playerTimeOut(PT_BLACK)));
+    connect(_whiteTimer, SIGNAL(timeout()), this, SLOT(whiteTimeOut()));
+    connect(_blackTimer, SIGNAL(timeout()), this, SLOT(blackTimeOut()));
     connect(_updateLabelTimer, SIGNAL(timeout()), this, SLOT(updateTimeLabels()));
     connect(_startQueueTimer, SIGNAL(timeout()), this, SLOT(startTimeOut()));
     _nRemainingWhiteTime = _lTimersStartTime;

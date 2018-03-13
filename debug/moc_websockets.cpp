@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Websockets_t {
-    QByteArrayData data[13];
-    char stringdata0[164];
+    QByteArrayData data[14];
+    char stringdata0[172];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -37,20 +37,21 @@ QT_MOC_LITERAL(2, 27, 0), // ""
 QT_MOC_LITERAL(3, 28, 3), // "LOG"
 QT_MOC_LITERAL(4, 32, 24), // "msgFromWebsocketsToChess"
 QT_MOC_LITERAL(5, 57, 7), // "QStrMsg"
-QT_MOC_LITERAL(6, 65, 7), // "Client*"
+QT_MOC_LITERAL(6, 65, 7), // "Client&"
 QT_MOC_LITERAL(7, 73, 7), // "pClient"
 QT_MOC_LITERAL(8, 81, 18), // "socketDisconnected"
 QT_MOC_LITERAL(9, 100, 11), // "receivedMsg"
 QT_MOC_LITERAL(10, 112, 15), // "onNewConnection"
 QT_MOC_LITERAL(11, 128, 15), // "sendMsgToClient"
-QT_MOC_LITERAL(12, 144, 19) // "sendMsgToAllClients"
+QT_MOC_LITERAL(12, 144, 7), // "Client*"
+QT_MOC_LITERAL(13, 152, 19) // "sendMsgToAllClients"
 
     },
     "Websockets\0addTextToLogPTE\0\0LOG\0"
     "msgFromWebsocketsToChess\0QStrMsg\0"
-    "Client*\0pClient\0socketDisconnected\0"
+    "Client&\0pClient\0socketDisconnected\0"
     "receivedMsg\0onNewConnection\0sendMsgToClient\0"
-    "sendMsgToAllClients"
+    "Client*\0sendMsgToAllClients"
 };
 #undef QT_MOC_LITERAL
 
@@ -76,7 +77,7 @@ static const uint qt_meta_data_Websockets[] = {
        9,    1,   60,    2, 0x0a /* Public */,
       10,    0,   63,    2, 0x0a /* Public */,
       11,    2,   64,    2, 0x0a /* Public */,
-      12,    1,   69,    2, 0x0a /* Public */,
+      13,    1,   69,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -86,7 +87,7 @@ static const uint qt_meta_data_Websockets[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    5,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 6,    5,    7,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 12,    5,    7,
     QMetaType::Void, QMetaType::QString,    5,
 
        0        // eod
@@ -99,7 +100,7 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->addTextToLogPTE((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
-        case 1: _t->msgFromWebsocketsToChess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< Client*(*)>(_a[2]))); break;
+        case 1: _t->msgFromWebsocketsToChess((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< Client(*)>(_a[2]))); break;
         case 2: _t->socketDisconnected(); break;
         case 3: _t->receivedMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 4: _t->onNewConnection(); break;
@@ -117,7 +118,7 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
-            typedef void (Websockets::*_t)(QString , Client * );
+            typedef void (Websockets::*_t)(QString , Client & );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Websockets::msgFromWebsocketsToChess)) {
                 *result = 1;
                 return;
@@ -170,7 +171,7 @@ void Websockets::addTextToLogPTE(QString _t1, LOG _t2)
 }
 
 // SIGNAL 1
-void Websockets::msgFromWebsocketsToChess(QString _t1, Client * _t2)
+void Websockets::msgFromWebsocketsToChess(QString _t1, Client & _t2)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

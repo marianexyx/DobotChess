@@ -29,7 +29,7 @@ public:
     void setPieceOnField(Piece* pPiece);
     void clearField();
 
-    Point3D getLocation3D() const { return _location3D; }
+    Point3D getLocation3D();
     bool isFieldOccupied(bool bErrorLog = false);
     short getNr() const { return _sNr; }
     PosOnBoard getPos() const { return Field::Pos(_sNr); }

@@ -20,6 +20,9 @@ void DobotServo::checkPWMForErrors()
 {
     //info: typedef struct tagIOPWM {uint8_t address; float frequency; float dutyCycle;}IOPWM;
     IOPWM PWMData;
+    PWMData.address = 0.f;
+    PWMData.frequency = 0.f;
+    PWMData.dutyCycle = 0.f;
     if (PWMData.address != 0 && PWMData.frequency != 0 &&
             PWMData.dutyCycle != 0)
     {

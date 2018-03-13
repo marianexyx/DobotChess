@@ -37,8 +37,17 @@ struct Point3D
 
     bool operator==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
 
-    Point3D(): x(0.0), y(0.0), z(0.0) {}
+    Point3D(): x(0.f), y(0.f), z(0.f) {}
     Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}
+
+    bool isPointSet()
+    {
+        if (x == 0.f &&
+                y == 0.f &&
+                z == 0.f)
+            return false;
+        else return true;
+    }
 };
 
 enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
