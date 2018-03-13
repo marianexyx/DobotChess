@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'piece_controller.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,12 +12,14 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'piece_controller.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.0. It"
+#error "This file was generated using the moc from 5.10.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_PieceController_t {
     QByteArrayData data[4];
     char stringdata0[37];
@@ -72,10 +74,9 @@ void PieceController::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
-        void **func = reinterpret_cast<void **>(_a[1]);
         {
             typedef void (PieceController::*_t)(QString , LOG );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&PieceController::addTextToLogPTE)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&PieceController::addTextToLogPTE)) {
                 *result = 0;
                 return;
             }
@@ -83,9 +84,9 @@ void PieceController::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
     }
 }
 
-const QMetaObject PieceController::staticMetaObject = {
+QT_INIT_METAOBJECT const QMetaObject PieceController::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_PieceController.data,
-      qt_meta_data_PieceController,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_PieceController,  qt_static_metacall, nullptr, nullptr}
 };
 
 
@@ -96,9 +97,9 @@ const QMetaObject *PieceController::metaObject() const
 
 void *PieceController::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_PieceController.stringdata0))
-        return static_cast<void*>(const_cast< PieceController*>(this));
+        return static_cast<void*>(this);
     return QObject::qt_metacast(_clname);
 }
 
@@ -122,7 +123,8 @@ int PieceController::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void PieceController::addTextToLogPTE(QString _t1, LOG _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
+QT_WARNING_POP
 QT_END_MOC_NAMESPACE

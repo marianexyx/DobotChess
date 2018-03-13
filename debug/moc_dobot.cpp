@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'dobot.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,12 +13,14 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'dobot.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.0. It"
+#error "This file was generated using the moc from 5.10.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Dobot_t {
     QByteArrayData data[28];
     char stringdata0[384];
@@ -141,59 +143,58 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
-        void **func = reinterpret_cast<void **>(_a[1]);
         {
             typedef void (Dobot::*_t)(QString , LOG );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::addTextToLogPTE)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::addTextToLogPTE)) {
                 *result = 0;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)(QString , short );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::JointLabelText)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::JointLabelText)) {
                 *result = 1;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)(QString , char );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::AxisLabelText)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::AxisLabelText)) {
                 *result = 2;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)(bool );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::RefreshDobotButtonsStates)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::RefreshDobotButtonsStates)) {
                 *result = 3;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)(QString , QString , QString );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::deviceLabels)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::deviceLabels)) {
                 *result = 4;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)();
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::DobotErrorMsgBox)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::DobotErrorMsgBox)) {
                 *result = 5;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)(int , int , int , int , int );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::queueLabels)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::queueLabels)) {
                 *result = 6;
                 return;
             }
         }
         {
             typedef void (Dobot::*_t)(QList<ServoArduino> );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Dobot::showArduinoGripperStateList)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::showArduinoGripperStateList)) {
                 *result = 7;
                 return;
             }
@@ -201,9 +202,9 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
     }
 }
 
-const QMetaObject Dobot::staticMetaObject = {
+QT_INIT_METAOBJECT const QMetaObject Dobot::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_Dobot.data,
-      qt_meta_data_Dobot,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_Dobot,  qt_static_metacall, nullptr, nullptr}
 };
 
 
@@ -214,9 +215,9 @@ const QMetaObject *Dobot::metaObject() const
 
 void *Dobot::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_Dobot.stringdata0))
-        return static_cast<void*>(const_cast< Dobot*>(this));
+        return static_cast<void*>(this);
     return QObject::qt_metacast(_clname);
 }
 
@@ -240,55 +241,56 @@ int Dobot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void Dobot::addTextToLogPTE(QString _t1, LOG _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void Dobot::JointLabelText(QString _t1, short _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 
 // SIGNAL 2
 void Dobot::AxisLabelText(QString _t1, char _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 
 // SIGNAL 3
 void Dobot::RefreshDobotButtonsStates(bool _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);
 }
 
 // SIGNAL 4
 void Dobot::deviceLabels(QString _t1, QString _t2, QString _t3)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)) };
     QMetaObject::activate(this, &staticMetaObject, 4, _a);
 }
 
 // SIGNAL 5
 void Dobot::DobotErrorMsgBox()
 {
-    QMetaObject::activate(this, &staticMetaObject, 5, Q_NULLPTR);
+    QMetaObject::activate(this, &staticMetaObject, 5, nullptr);
 }
 
 // SIGNAL 6
 void Dobot::queueLabels(int _t1, int _t2, int _t3, int _t4, int _t5)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)), const_cast<void*>(reinterpret_cast<const void*>(&_t5)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)), const_cast<void*>(reinterpret_cast<const void*>(&_t5)) };
     QMetaObject::activate(this, &staticMetaObject, 6, _a);
 }
 
 // SIGNAL 7
 void Dobot::showArduinoGripperStateList(QList<ServoArduino> _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 7, _a);
 }
+QT_WARNING_POP
 QT_END_MOC_NAMESPACE

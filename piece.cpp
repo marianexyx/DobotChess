@@ -4,7 +4,11 @@ Piece::Piece(short sPieceID)
 {
     if (Piece::isInRange(sPieceID))
         _PieceType = Piece::Type(sPieceID);
-    else return;
+    else
+    {
+        qDebug() << "ERROR: Piece::Piece:";
+        return;
+    }
 
     _sPieceID = sPieceID;
     _PieceColor = Piece::Color(sPieceID);
@@ -70,7 +74,11 @@ Piece::Piece(short sPieceID)
 
 /*static*/ PIECE_TYPE Piece::Type(short sPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return P_ERROR;
+    if (!Piece::isInRange(sPieceNr))
+    {
+        qDebug() << "ERROR: Piece::Type:";
+        return P_ERROR;
+    }
 
     PIECE_TYPE PieceType;
 
@@ -118,15 +126,25 @@ Piece::Piece(short sPieceID)
     short sPieceNr = static_cast<short>(pieceLines.Letter) +
             static_cast<short>(pieceLines.Digit - 1) * 8;
 
+    qDebug() << "Piece::nr(): sPieceNr =" << sPieceNr;
+
     if (Piece::isInRange(sPieceNr)) return sPieceNr;
-    else return -1;
+    else
+    {
+        qDebug() << "ERROR: Piece::nr:";
+        return -1;
+    }
 }
 
 /*static*/ PosOnBoard Pos(short sPieceNr);
 
 /*static*/ short Piece::startFieldNr(short sPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return -1;
+    if (!Piece::isInRange(sPieceNr))
+    {
+        qDebug() << "ERROR: Piece::startFieldNr:";
+        return -1;
+    }
 
     if (sPieceNr <= 16) return sPieceNr;
     else return sPieceNr + 32;
@@ -135,7 +153,11 @@ Piece::Piece(short sPieceID)
 /*static*/ PosOnBoard Piece::startFieldPos(short sPieceNr)
 {
     PosOnBoard PieceLines;
-    if (!Piece::isInRange(sPieceNr)) return PieceLines;
+    if (!Piece::isInRange(sPieceNr))
+    {
+        qDebug() << "ERROR: Piece::startFieldPos:";
+        return PieceLines;
+    }
 
     if (sPieceNr % 8 != 0)
     {
@@ -149,7 +171,8 @@ Piece::Piece(short sPieceID)
     }
 
     if (!Piece::isInRange(Piece::nr(PieceLines)))
-        qDebug() << "ERROR: Piece::startFieldPos(): piece isn't in range after conversation";
+        qDebug() << "ERROR: Piece::startFieldPos(): piece isn't "
+                    "in range after conversation";
 
     return PieceLines;
 }

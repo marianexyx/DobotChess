@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,15 +13,17 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'mainwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.0. It"
+#error "This file was generated using the moc from 5.10.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[79];
-    char stringdata0[1441];
+    char stringdata0[1442];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -77,38 +79,38 @@ QT_MOC_LITERAL(43, 641, 10), // "nCoreMaxId"
 QT_MOC_LITERAL(44, 652, 11), // "nCoreIdLeft"
 QT_MOC_LITERAL(45, 664, 10), // "CoreNextId"
 QT_MOC_LITERAL(46, 675, 30), // "showActualDobotQueuedCmdIDList"
-QT_MOC_LITERAL(47, 706, 16), // "QList<DobotMove>"
-QT_MOC_LITERAL(48, 723, 4), // "list"
-QT_MOC_LITERAL(49, 728, 27), // "showArduinoGripperStateList"
-QT_MOC_LITERAL(50, 756, 19), // "QList<ServoArduino>"
-QT_MOC_LITERAL(51, 776, 23), // "on_calibrateBtn_clicked"
-QT_MOC_LITERAL(52, 800, 16), // "on_upBtn_clicked"
-QT_MOC_LITERAL(53, 817, 18), // "on_downBtn_clicked"
-QT_MOC_LITERAL(54, 836, 29), // "on_resetDobotIndexBtn_clicked"
-QT_MOC_LITERAL(55, 866, 16), // "on_AIBtn_clicked"
-QT_MOC_LITERAL(56, 883, 25), // "on_AIEnemySendBtn_clicked"
-QT_MOC_LITERAL(57, 909, 15), // "showClientsList"
-QT_MOC_LITERAL(58, 925, 13), // "QList<Client>"
-QT_MOC_LITERAL(59, 939, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(60, 959, 9), // "nUsbPorst"
-QT_MOC_LITERAL(61, 969, 36), // "on_portsComboBox_currentIndex..."
-QT_MOC_LITERAL(62, 1006, 25), // "on_reloadPortsBtn_clicked"
-QT_MOC_LITERAL(63, 1032, 21), // "on_sendUsbBtn_clicked"
-QT_MOC_LITERAL(64, 1054, 25), // "on_openGripperBtn_clicked"
-QT_MOC_LITERAL(65, 1080, 26), // "on_closeGripperBtn_clicked"
-QT_MOC_LITERAL(66, 1107, 24), // "on_startGmPosBtn_clicked"
-QT_MOC_LITERAL(67, 1132, 24), // "on_startDtPosBtn_clicked"
-QT_MOC_LITERAL(68, 1157, 29), // "on_SimulateFromUsbBtn_clicked"
-QT_MOC_LITERAL(69, 1187, 21), // "on_sendTcpBtn_clicked"
-QT_MOC_LITERAL(70, 1209, 30), // "on_sendTcpLineEdit_textChanged"
-QT_MOC_LITERAL(71, 1240, 38), // "on_SimulateFromUsbLineEdit_te..."
-QT_MOC_LITERAL(72, 1279, 18), // "on_homeBtn_clicked"
-QT_MOC_LITERAL(73, 1298, 25), // "on_usbCmdLine_textChanged"
-QT_MOC_LITERAL(74, 1324, 25), // "on_middleAboveBtn_clicked"
-QT_MOC_LITERAL(75, 1350, 18), // "on_sendBtn_clicked"
-QT_MOC_LITERAL(76, 1369, 23), // "on_xPTPEdit_textChanged"
-QT_MOC_LITERAL(77, 1393, 23), // "on_yPTPEdit_textChanged"
-QT_MOC_LITERAL(78, 1417, 23) // "on_zPTPEdit_textChanged"
+QT_MOC_LITERAL(47, 706, 17), // "QList<DobotMove*>"
+QT_MOC_LITERAL(48, 724, 4), // "list"
+QT_MOC_LITERAL(49, 729, 27), // "showArduinoGripperStateList"
+QT_MOC_LITERAL(50, 757, 19), // "QList<ServoArduino>"
+QT_MOC_LITERAL(51, 777, 23), // "on_calibrateBtn_clicked"
+QT_MOC_LITERAL(52, 801, 16), // "on_upBtn_clicked"
+QT_MOC_LITERAL(53, 818, 18), // "on_downBtn_clicked"
+QT_MOC_LITERAL(54, 837, 29), // "on_resetDobotIndexBtn_clicked"
+QT_MOC_LITERAL(55, 867, 16), // "on_AIBtn_clicked"
+QT_MOC_LITERAL(56, 884, 25), // "on_AIEnemySendBtn_clicked"
+QT_MOC_LITERAL(57, 910, 15), // "showClientsList"
+QT_MOC_LITERAL(58, 926, 13), // "QList<Client>"
+QT_MOC_LITERAL(59, 940, 19), // "updatePortsComboBox"
+QT_MOC_LITERAL(60, 960, 9), // "nUsbPorst"
+QT_MOC_LITERAL(61, 970, 36), // "on_portsComboBox_currentIndex..."
+QT_MOC_LITERAL(62, 1007, 25), // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(63, 1033, 21), // "on_sendUsbBtn_clicked"
+QT_MOC_LITERAL(64, 1055, 25), // "on_openGripperBtn_clicked"
+QT_MOC_LITERAL(65, 1081, 26), // "on_closeGripperBtn_clicked"
+QT_MOC_LITERAL(66, 1108, 24), // "on_startGmPosBtn_clicked"
+QT_MOC_LITERAL(67, 1133, 24), // "on_startDtPosBtn_clicked"
+QT_MOC_LITERAL(68, 1158, 29), // "on_SimulateFromUsbBtn_clicked"
+QT_MOC_LITERAL(69, 1188, 21), // "on_sendTcpBtn_clicked"
+QT_MOC_LITERAL(70, 1210, 30), // "on_sendTcpLineEdit_textChanged"
+QT_MOC_LITERAL(71, 1241, 38), // "on_SimulateFromUsbLineEdit_te..."
+QT_MOC_LITERAL(72, 1280, 18), // "on_homeBtn_clicked"
+QT_MOC_LITERAL(73, 1299, 25), // "on_usbCmdLine_textChanged"
+QT_MOC_LITERAL(74, 1325, 25), // "on_middleAboveBtn_clicked"
+QT_MOC_LITERAL(75, 1351, 18), // "on_sendBtn_clicked"
+QT_MOC_LITERAL(76, 1370, 23), // "on_xPTPEdit_textChanged"
+QT_MOC_LITERAL(77, 1394, 23), // "on_yPTPEdit_textChanged"
+QT_MOC_LITERAL(78, 1418, 23) // "on_zPTPEdit_textChanged"
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
@@ -130,7 +132,8 @@ QT_MOC_LITERAL(78, 1417, 23) // "on_zPTPEdit_textChanged"
     "setQueueLabels\0nSpaceLeft\0nDobotId\0"
     "nCoreMaxId\0nCoreIdLeft\0CoreNextId\0"
     "showActualDobotQueuedCmdIDList\0"
-    "QList<DobotMove>\0list\0showArduinoGripperStateList\0"
+    "QList<DobotMove*>\0list\0"
+    "showArduinoGripperStateList\0"
     "QList<ServoArduino>\0on_calibrateBtn_clicked\0"
     "on_upBtn_clicked\0on_downBtn_clicked\0"
     "on_resetDobotIndexBtn_clicked\0"
@@ -290,7 +293,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 15: _t->on_emulatePlayerMsgLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 16: _t->on_sendSimulatedMsgBtn_clicked(); break;
         case 17: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
-        case 18: _t->showActualDobotQueuedCmdIDList((*reinterpret_cast< QList<DobotMove>(*)>(_a[1]))); break;
+        case 18: _t->showActualDobotQueuedCmdIDList((*reinterpret_cast< QList<DobotMove*>(*)>(_a[1]))); break;
         case 19: _t->showArduinoGripperStateList((*reinterpret_cast< QList<ServoArduino>(*)>(_a[1]))); break;
         case 20: _t->on_calibrateBtn_clicked(); break;
         case 21: _t->on_upBtn_clicked(); break;
@@ -323,9 +326,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     }
 }
 
-const QMetaObject MainWindow::staticMetaObject = {
+QT_INIT_METAOBJECT const QMetaObject MainWindow::staticMetaObject = {
     { &QMainWindow::staticMetaObject, qt_meta_stringdata_MainWindow.data,
-      qt_meta_data_MainWindow,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_MainWindow,  qt_static_metacall, nullptr, nullptr}
 };
 
 
@@ -336,9 +339,9 @@ const QMetaObject *MainWindow::metaObject() const
 
 void *MainWindow::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_MainWindow.stringdata0))
-        return static_cast<void*>(const_cast< MainWindow*>(this));
+        return static_cast<void*>(this);
     return QMainWindow::qt_metacast(_clname);
 }
 
@@ -358,4 +361,5 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     }
     return _id;
 }
+QT_WARNING_POP
 QT_END_MOC_NAMESPACE

@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'chess.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,12 +12,14 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'chess.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.0. It"
+#error "This file was generated using the moc from 5.10.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Chess_t {
     QByteArrayData data[28];
     char stringdata0[383];
@@ -137,7 +139,7 @@ void Chess::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 5: _t->checkMsgFromChenard((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 6: _t->checkMsgFromUsb((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 7: { QString _r = _t->getTableData();
-            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = _r; }  break;
+            if (_a[0]) *reinterpret_cast< QString*>(_a[0]) = std::move(_r); }  break;
         case 8: _t->setBoardDataLabelInUI((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABEL(*)>(_a[2]))); break;
         case 9: _t->showLegalMovesInForm((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
         case 10: _t->showHistoryMovesInForm((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
@@ -147,31 +149,30 @@ void Chess::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
-        void **func = reinterpret_cast<void **>(_a[1]);
         {
             typedef void (Chess::*_t)(QString , LOG );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chess::addTextToLogPTE)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Chess::addTextToLogPTE)) {
                 *result = 0;
                 return;
             }
         }
         {
             typedef void (Chess::*_t)(QString , BOARD_DATA_LABEL );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chess::setBoardDataLabel)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Chess::setBoardDataLabel)) {
                 *result = 1;
                 return;
             }
         }
         {
             typedef void (Chess::*_t)(QStringList );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chess::showLegalMovesInUI)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Chess::showLegalMovesInUI)) {
                 *result = 2;
                 return;
             }
         }
         {
             typedef void (Chess::*_t)(QStringList );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Chess::showHistoryMovesInUI)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Chess::showHistoryMovesInUI)) {
                 *result = 3;
                 return;
             }
@@ -179,9 +180,9 @@ void Chess::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
     }
 }
 
-const QMetaObject Chess::staticMetaObject = {
+QT_INIT_METAOBJECT const QMetaObject Chess::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_Chess.data,
-      qt_meta_data_Chess,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_Chess,  qt_static_metacall, nullptr, nullptr}
 };
 
 
@@ -192,9 +193,9 @@ const QMetaObject *Chess::metaObject() const
 
 void *Chess::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_Chess.stringdata0))
-        return static_cast<void*>(const_cast< Chess*>(this));
+        return static_cast<void*>(this);
     return QObject::qt_metacast(_clname);
 }
 
@@ -218,28 +219,29 @@ int Chess::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void Chess::addTextToLogPTE(QString _t1, LOG _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void Chess::setBoardDataLabel(QString _t1, BOARD_DATA_LABEL _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 
 // SIGNAL 2
 void Chess::showLegalMovesInUI(QStringList _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 
 // SIGNAL 3
 void Chess::showHistoryMovesInUI(QStringList _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);
 }
+QT_WARNING_POP
 QT_END_MOC_NAMESPACE

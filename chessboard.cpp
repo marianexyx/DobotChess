@@ -73,7 +73,7 @@ void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
                     letter*(((A1.z-H1.z)/7.f)-
                             ((digit/14.f)*(((H8.z-H1.z)/7.f)-((A8.z-A1.z)/7.f))));
 
-            _pField[Piece::nr(pos)]->setField3DLocation(p3D);
+            _pField[Field::nr(pos)]->setField3DLocation(p3D);
         }
     }
 }

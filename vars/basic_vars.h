@@ -33,8 +33,9 @@ struct Point3D
     double y;
     double z;
 
-    void operator =(const struct Point3D& p) { x = p.x; y = p.y; z = p.z; }
-    bool operator ==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
+    Point3D& operator=(Point3D& p) {return p; }
+
+    bool operator==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
 
     Point3D(): x(0.0), y(0.0), z(0.0) {}
     Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}

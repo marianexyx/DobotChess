@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'chess_status.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.6.0)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.10.1)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -12,12 +12,14 @@
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'chess_status.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.6.0. It"
+#error "This file was generated using the moc from 5.10.1. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_ChessStatus_t {
     QByteArrayData data[6];
     char stringdata0[80];
@@ -82,24 +84,23 @@ void ChessStatus::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
-        void **func = reinterpret_cast<void **>(_a[1]);
         {
             typedef void (ChessStatus::*_t)(QString , BOARD_DATA_LABEL );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ChessStatus::setBoardDataLabel)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&ChessStatus::setBoardDataLabel)) {
                 *result = 0;
                 return;
             }
         }
         {
             typedef void (ChessStatus::*_t)(QStringList );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ChessStatus::showLegalMoves)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&ChessStatus::showLegalMoves)) {
                 *result = 1;
                 return;
             }
         }
         {
             typedef void (ChessStatus::*_t)(QStringList );
-            if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&ChessStatus::showHistoryMoves)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&ChessStatus::showHistoryMoves)) {
                 *result = 2;
                 return;
             }
@@ -107,9 +108,9 @@ void ChessStatus::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
     }
 }
 
-const QMetaObject ChessStatus::staticMetaObject = {
+QT_INIT_METAOBJECT const QMetaObject ChessStatus::staticMetaObject = {
     { &QObject::staticMetaObject, qt_meta_stringdata_ChessStatus.data,
-      qt_meta_data_ChessStatus,  qt_static_metacall, Q_NULLPTR, Q_NULLPTR}
+      qt_meta_data_ChessStatus,  qt_static_metacall, nullptr, nullptr}
 };
 
 
@@ -120,9 +121,9 @@ const QMetaObject *ChessStatus::metaObject() const
 
 void *ChessStatus::qt_metacast(const char *_clname)
 {
-    if (!_clname) return Q_NULLPTR;
+    if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_ChessStatus.stringdata0))
-        return static_cast<void*>(const_cast< ChessStatus*>(this));
+        return static_cast<void*>(this);
     return QObject::qt_metacast(_clname);
 }
 
@@ -146,21 +147,22 @@ int ChessStatus::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 // SIGNAL 0
 void ChessStatus::setBoardDataLabel(QString _t1, BOARD_DATA_LABEL _t2)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 
 // SIGNAL 1
 void ChessStatus::showLegalMoves(QStringList _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);
 }
 
 // SIGNAL 2
 void ChessStatus::showHistoryMoves(QStringList _t1)
 {
-    void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
+QT_WARNING_POP
 QT_END_MOC_NAMESPACE

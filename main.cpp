@@ -5,12 +5,13 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    qDebug() << "first msg";
     //todo: niektóre obiekty są pośrednie i mogę być tworzone wewnątrz innych, a potem...
     //...przekazywane dalej
     Clients ClientsList;
     ArduinoUsb USB001;
-    Chessboard BoardChenard001(B_MAIN, IMAGINARY);
-    Chessboard BoardMain001(B_MAIN, IMAGINARY);
+    Chessboard BoardChenard001(B_MAIN, REAL);
+    Chessboard BoardMain001(B_MAIN, REAL);
     Chessboard BoardRemoved001(B_REMOVED, IMAGINARY);
     Dobot DobotArm001(&USB001);
     PieceController PieceController001(&DobotArm001, &BoardMain001, &BoardRemoved001);
@@ -26,4 +27,3 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
-

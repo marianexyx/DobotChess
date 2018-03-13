@@ -14,6 +14,9 @@ struct DobotMove
     uint64_t ID;
     DOBOT_MOVE_TYPE type;
     Point3D xyz;
+
+    DobotMove() :ID(0), type(DM_NONE), xyz(0,0,0) {}
+    DobotMove(uint64_t id, DOBOT_MOVE_TYPE MT, Point3D p): ID(id), type(MT), xyz(p) {}
 };
 
 class DobotQueue: public QObject
@@ -27,8 +30,8 @@ private:
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
     uint _unQueuedCmdLeftSpace;
-    QList<DobotMove> _queuedCmdIDList;
-    DobotMove _lowestIDMoveInList;
+    QList<DobotMove*> _queuedCmdIDList;
+    uint64_t _lowestIDMoveInList;
     uint64_t _un64RetreatID;
     uint64_t _un64LastDobotIDShownInUI;
 
@@ -59,7 +62,7 @@ public:
     int64_t getRealTimeDobotActualID() const { return _un64RealTimeDobotActualID; }
 
 signals:
-    void showActualDobotQueuedCmdIDList(QList<DobotMove>);
+    void showActualDobotQueuedCmdIDList(QList<DobotMove*>);
 };
 
 #endif // DOBOT_QUEUE_H
