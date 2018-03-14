@@ -33,8 +33,8 @@ struct Point3D
     double y;
     double z;
 
+    //todo: zrozumieć do końca. operator równości chyba nie działa.
     Point3D& operator=(Point3D& p) {return p; }
-
     bool operator==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
 
     Point3D(): x(0.f), y(0.f), z(0.f) {}
@@ -42,10 +42,7 @@ struct Point3D
 
     bool isPointSet()
     {
-        if (x == 0.f &&
-                y == 0.f &&
-                z == 0.f)
-            return false;
+        if (x == 0.f && y == 0.f && z == 0.f) return false;
         else return true;
     }
 };

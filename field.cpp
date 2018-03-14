@@ -1,6 +1,6 @@
 #include "field.h"
 
-Field::Field(short sFieldNr): _location3D()
+Field::Field(short sFieldNr)
 {
     if (Field::isInRange(sFieldNr))
         _sNr = sFieldNr;
@@ -79,6 +79,14 @@ Field::Field(short sFieldNr): _location3D()
 {
     short sFieldID = Field::nr(fieldLines);
     return Field::startPieceNrOnField(sFieldID);
+}
+
+void Field::setField3DLocation(Point3D point)
+{
+    //_location3D = point; //todo naprawić operator
+    _location3D.x = point.x;
+    _location3D.y = point.y;
+    _location3D.z = point.z;
 }
 
 void Field::setPieceOnField(Piece *pPiece)

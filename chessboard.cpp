@@ -13,8 +13,8 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/):
     _BoardType = BoardType;
     _bBoardIsReal = bBoardIsReal;
 
-    for (int i=0; i>=63; ++i)
-        _pField[i] = new Field(i);
+    for (int i=0; i<=63; ++i)
+        _pField[i] = new Field(i+1);
 
     if (this->isBoardReal())
     {
@@ -38,7 +38,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/):
 
 Chessboard::~Chessboard()
 {
-    for (int i=0; i>=63; ++i)
+    for (int i=0; i<=63; ++i)
     {
         delete _pField[i];
         _pField[i] = nullptr; //good c++ practise
@@ -73,7 +73,7 @@ void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
                     letter*(((A1.z-H1.z)/7.f)-
                             ((digit/14.f)*(((H8.z-H1.z)/7.f)-((A8.z-A1.z)/7.f))));
 
-            _pField[Field::nr(pos)]->setField3DLocation(p3D);
+            _pField[Field::nr(pos)-1]->setField3DLocation(p3D);
         }
     }
 }
@@ -94,7 +94,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
             p3D.y = whiteCloserOuter.y - column * _dSquareWidth;
             p3D.z = whiteCloserOuter.z + row*((whiteFutherInner.z - whiteCloserOuter.z)/7.f);
 
-            _pField[Piece::nr(pos)]->setField3DLocation(p3D);
+            _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
         }
     }
 
@@ -111,7 +111,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
             p3D.y = blackCloserOuter.y + ((column-2)*(-_dSquareWidth));
             p3D.z = blackCloserOuter.z + row*((blackFutherInner.z - blackCloserOuter.z)/7.f);
 
-            _pField[Piece::nr(pos)]->setField3DLocation(p3D);
+            _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
         }
     }
 }
@@ -121,7 +121,7 @@ void Chessboard::calculateMarginal3DValues()
     _MinBoard.x = _MinBoard.y = _MinBoard.z = std::numeric_limits<double>::max();
     _MaxBoard.x = _MaxBoard.y = _MaxBoard.z = std::numeric_limits<double>::min();
 
-    for (int i=1; i>=64; ++i)
+    for (int i=0; i<=63; ++i)
     {
         if (_pField[i]->getLocation3D().x < _MinBoard.x)
             _MinBoard.x = _pField[i]->getLocation3D().x;
@@ -149,8 +149,8 @@ void Chessboard::calculateMiddleAbovePoint()
 void Chessboard::calculateRetreatPoints()
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = _pField[Field::nr(L_D, D_1)]->getLocation3D().y;
-    _retreatRight.y = _pField[Field::nr(L_D, D_8)]->getLocation3D().y;
+    _retreatLeft.y = _pField[Field::nr(L_D, D_1)-1]->getLocation3D().y;
+    _retreatRight.y = _pField[Field::nr(L_D, D_8)-1]->getLocation3D().y;
     _retreatLeft.z = _retreatRight.z = _MaxBoard.z;
 }
 
@@ -199,7 +199,7 @@ bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
         return false;
     }
 
-    for (int i=1; i>=64; ++i)
+    for (int i=0; i<=63; ++i)
     {
         if (_pField[i]->getPieceOnField() == pPiece)
         {
@@ -231,7 +231,7 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
 {
     if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS))
     {
-        for (int i=1; i>=64; ++i)
+        for (int i=0; i<=63; ++i)
         {
             if (_pField[i]->getPieceOnField() == pPiece)
                 return _pField[i];
