@@ -29,7 +29,6 @@ Websockets::~Websockets()
 
 void Websockets::onNewConnection()
 {
-    qDebug() << "Websockets::onNewConnection()";
     QWebSocket* pSocket = _pWebSocketServer->nextPendingConnection();
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
@@ -39,7 +38,7 @@ void Websockets::onNewConnection()
     _pClientsList->showClientsInUI();
 }
 
-//Q_FOREACH (QWebSocket *pNextClient, _pClientsList) ma być depreciated
+//future: Q_FOREACH (QWebSocket *pNextClient, _pClientsList) ma być depreciated
 //na korzyść: "for (QWebSocket *pClient : qAsConst(_pClientsList))"
 //póki nie zmieniam wersji to może tak zostać
 
@@ -51,8 +50,19 @@ void Websockets::receivedMsg(QString QStrMsg)
         qDebug() << "Websockets::receivedMsg():" << QStrMsg;
     else return;
 
-    QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-    emit this->msgFromWebsocketsToChess(QStrMsg, *_pClientsList->getClient(pSocket));
+    QWebSocket* pSocket = qobject_cast<QWebSocket*>(sender());
+    if (!_pClientsList->isClientInList(_pClientsList->getClient(pSocket)))
+    {
+        qDebug() << "WARNING: Websockets::receivedMsg(): sender not in clients list";
+        return;
+    }
+
+    QString QStrSenderName = _pClientsList->getClient(pSocket).name;
+    qDebug() << "Websockets::receivedMsg(): client: name =" << QStrSenderName
+             << "queue =" << QString::number(_pClientsList->getClient(pSocket).queue)
+             << "ID =" << QString::number(_pClientsList->getClient(pSocket).ID);
+
+    emit this->msgFromWebsocketsToChess(QStrMsg, _pClientsList->getClient(pSocket).ID);
 }
 
 void Websockets::sendMsgToClient(QString QStrMsg, Client* pClient)
@@ -83,5 +93,9 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 void Websockets::socketDisconnected()
 {
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-    emit this->msgFromWebsocketsToChess("clientLeft", *_pClientsList->getClient(pSocket));
+
+    Client client = _pClientsList->getClient(pSocket);
+    qDebug() << "Websockets::socketDisconnected(): approaching isClientInList()";
+    if (_pClientsList->isClientInList(client))
+        emit this->msgFromWebsocketsToChess("clientLeft", client.ID);
 }

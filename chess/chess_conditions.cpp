@@ -6,23 +6,77 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
     _pStatus = pStatus;
 }
 
-bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client& sender,
+bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
                                                    GAME_STATUS GS)
 {
+    QString QStrSenderID = QString::number(pSender->ID);
+    QString QStrSenderName = pSender->name;
+    QString QStrSenderQueue = QString::number(pSender->queue);
+    QString QStrSenderType = playerTypeAsQStr(pSender->type);
+    qDebug() << "ChessConditions::isClientRequestCanBeAccepted(): sender data: "
+                "ID =" << QStrSenderID << ", name =" << QStrSenderName
+             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;
+
     clientRequest r;
 
-    if (requestType(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;
-    r.type = requestType(QStrMsg, SHOW_ERRORS);
+    if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;
 
-    if (r.type == RT_MOVE || r.type == RT_SIT_ON || r.type == RT_IM || r.type == RT_PROMOTE_TO)
-        r.param = this->extractParameter(r.type, QStrMsg);
+    r.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
+    r.param = this->extractParameterIfTypeIsInProperFormat(r.type, QStrMsg);
 
-    if (!this->isRequestParameterInProperFormat(r)) return false;
     if (!this->isRequestAppropriateToGameStatus(r.type, GS)) return false;
-    if (!this->isSenderAppropriate(sender, r.type)) return false;
-    if (!this->isThereAnySpecialConditionBeenMet(sender, r)) return false;
+    if (!this->isSenderAppropriate(pSender, r.type)) return false;
+    if (!this->isThereAnySpecialConditionBeenMet(pSender, r)) return false;
 
     return true;
+}
+
+QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type,
+                                                                QString QStrMsg)
+{
+    QString QStrParam;
+    if (this->isRequestAParameterType(Type))
+    {
+        QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
+
+        qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                    "extracted param =" << QStrParam;
+
+        clientRequest r;
+        r.type = Type;
+        r.param = QStrParam;
+        if (this->isRequestParameterInProperFormat(r))
+        {
+            qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                        "param in proper format. return it";
+            return QStrParam;
+        }
+        else
+        {
+            qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                        "param not in proper format. return ''";
+            return "";
+        }
+    }
+    else return "";
+}
+
+bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog /* = false */)
+{
+    switch(Type)
+    {
+    case RT_MOVE:
+    case RT_SIT_ON:
+    case RT_IM:
+    case RT_PROMOTE_TO:
+        return true;
+    default:
+        if (bErrorLog)
+            qDebug() << "ERROR: ChessConditions::isRequestAParameterType(): unknown "
+                        "REQUEST_TYPE:" << requestTypeAsQStr(Type);
+
+        return false;
+    }
 }
 
 bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
@@ -49,21 +103,9 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
         else return false;
     default:
         qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): unknown "
-                    "_request.type:" << requestTypeAsQStr(request.type);
+                    "request.type:" << requestTypeAsQStr(request.type);
         return false;
     }
-}
-
-QString ChessConditions::extractParameter(REQUEST_TYPE Type, QString QStrRequest)
-{
-    if (Type != RT_MOVE && Type != RT_SIT_ON && Type != RT_IM && Type != RT_PROMOTE_TO)
-    {
-        qDebug() << "ERROR: ChessConditions::extractParameter(): this kind of request.type"
-                    " can't contain a parameter:" << requestTypeAsQStr(Type);
-        return "";
-    }
-
-    return QStrRequest.mid(requestTypeAsQStr(Type).length() + 1);
 }
 
 
@@ -87,38 +129,67 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
     }
 }
 
-bool ChessConditions::isSenderAppropriate(Client& sender, REQUEST_TYPE Type)
+bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
-    if (!_pClientsList->isClientInList(sender)) return false;
+    QString QStrSenderID = QString::number(pSender->ID);
+    QString QStrSenderName = pSender->name; //assert error: { Q_ASSERT(&other != this); d->ref.ref(); }
+    QString QStrSenderQueue = QString::number(pSender->queue);
+    QString QStrSenderType = playerTypeAsQStr(pSender->type);
+    qDebug() << "ChessConditions::isSenderAppropriate(): approaching isClientInList()."
+                "sender data: ID =" << QStrSenderID << ", name =" << QStrSenderName
+             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;
 
-    bool bLogged = _pClientsList->isClientLoggedIn(sender);
-    bool bSittingOnChair = _pClientsList->isClientAPlayer(sender);
-    bool bInQueue = _pClientsList->isClientInQueue(sender);
+    if (!_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
 
+    bool bLogged = _pClientsList->isClientLoggedIn(*pSender);
+    bool bSittingOnChair = _pClientsList->isClientAPlayer(*pSender);
+    bool bInQueue = _pClientsList->isClientInQueue(*pSender);
+
+    bool bSuccess = false;
     switch(Type)
     {
     case RT_NONE:
         qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = RT_NONE";
-        return false;
+        bSuccess = false;
+        break;
     case RT_NEW_GAME:
     case RT_MOVE:
     case RT_GIVE_UP:
     case RT_STAND_UP:
     case RT_PROMOTE_TO:
-        if (bSittingOnChair && !bInQueue) return true;
-        else return false;
+        if (bSittingOnChair && !bInQueue) bSuccess = true;
+        else bSuccess = false;
+        break;
     case RT_SIT_ON:
     case RT_QUEUE_ME:
-        if (bLogged && !bSittingOnChair && !bInQueue) return true;
-        else return false;
+        if (bLogged && !bSittingOnChair && !bInQueue) bSuccess = true;
+        else bSuccess = false;
+        break;
     case RT_LEAVE_QUEUE:
-        if (bLogged && !bSittingOnChair && bInQueue) return true;
-        else return false;
-    default: return true; //case getTableDataAsJSON
+        if (bLogged && !bSittingOnChair && bInQueue) bSuccess = true;
+        else bSuccess = false;
+        break;
+    case RT_GET_TABLE_DATA:
+    case RT_IM:
+    case RT_CLIENT_LEFT:
+        bSuccess = true;
+        break;
+    default:
+        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): unknown REQUEST TYPE =" << Type;
+        bSuccess = false;
     }
+
+    if (!bSuccess)
+    {
+        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = " << requestTypeAsQStr(Type)
+                 << ". bLogged =" << bLogged << ", bSittingOnChair =" << bSittingOnChair
+                 << ", bInQueue =" << bInQueue;
+    }
+
+    return bSuccess;
 }
 
-bool ChessConditions::isThereAnySpecialConditionBeenMet(Client& sender, clientRequest request)
+bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request)
 {
     switch(request.type)
     {
@@ -128,22 +199,22 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client& sender, clientRe
         return false;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((_pClientsList->getClientType(sender) == PT_WHITE
+        if ((_pClientsList->getClientType(*pSender) == PT_WHITE
              && _pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (_pClientsList->getClientType(sender) == PT_BLACK
+                (_pClientsList->getClientType(*pSender) == PT_BLACK
                  && _pStatus->getWhoseTurn() == BLACK_TURN))
             return true;
         else return false;
     case RT_SIT_ON:
     {
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
-        if (_pClientsList->isPlayerChairEmpty(PlayerChair, SHOW_ERRORS) &&
-                !_pClientsList->isClientAPlayer(sender, SHOW_ERRORS))
+        if (_pClientsList->isPlayerChairEmpty(PlayerChair) &&
+                !_pClientsList->isClientAPlayer(*pSender))
             return true;
         else return false;
     }
     case RT_IM: //name == empty || name = actual
-        if (sender.name.isEmpty() || _pClientsList->getClientName(sender) == request.param)
+        if (pSender->name.isEmpty() || _pClientsList->getClientName(*pSender) == request.param)
             return true;
         else return false;
     case RT_QUEUE_ME:
@@ -151,11 +222,13 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client& sender, clientRe
             return true;
         else return false;
     case RT_LEAVE_QUEUE:
-        if (_pClientsList->isClientInQueue(sender))
+        if (_pClientsList->isClientInQueue(*pSender))
             return true;
         else return false;
     case RT_CLIENT_LEFT:
-        if (_pClientsList->isClientInList(sender))
+        qDebug() << "ChessConditions::isThereAnySpecialConditionBeenMet():"
+                    " approaching isClientInList()";
+        if (_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
             return true;
         else return false;
     default: return true;

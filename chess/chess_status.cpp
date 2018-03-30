@@ -221,7 +221,7 @@ WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
     else
     {
         return NO_TURN;
-        qDebug () << "ERROR: ChessStatus::whoseTurn(); unknown parameter:" << QStrWhoseTurn;
+        qDebug() << "ERROR: ChessStatus::whoseTurn(); unknown parameter:" << QStrWhoseTurn;
     }
 }
 

@@ -383,12 +383,141 @@ debug/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		vars/basic_vars.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		client.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/QWebSocket \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QUrl \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QAbstractSocket \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
@@ -403,8 +532,6 @@ debug/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslError \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslerror.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslcertificate.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qssl.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFlags \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslConfiguration \
@@ -428,10 +555,7 @@ debug/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qwidget.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs_win.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpaintdevice.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpalette.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcolor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qrgb.h \
@@ -440,8 +564,6 @@ debug/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qmatrix.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpolygon.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qregion.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtransform.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpainterpath.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qimage.h \
@@ -454,18 +576,12 @@ debug/moc_chess_status.cpp: chess/vars/sequence_types.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcursor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qkeysequence.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qevent.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvector2d.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QSignalMapper \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
@@ -998,6 +1114,122 @@ debug/moc_chess.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QScrollB
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtMath \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
 		field.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		chess/chess_bot.h \
 		chess/chess_movements.h \
 		piece_controller.h \
@@ -1086,6 +1318,137 @@ debug/moc_chessboard.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtMath
 		vars/basic_vars.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		chessboard.h \
 		debug/moc_predefs.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/bin/moc.exe
@@ -1455,13 +1818,136 @@ debug/moc_mainwindow.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMa
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QAbstractSocket \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QObject \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
+		vars/basic_vars.h \
 		websockets.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/QWebSocketServer \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocketserver.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsockets_global.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocketprotocol.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QObject \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QHostAddress \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qhostaddress.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslConfiguration \
@@ -1469,8 +1955,6 @@ debug/moc_mainwindow.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMa
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslerror.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslcertificate.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qssl.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFlags \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslError \
@@ -1491,11 +1975,8 @@ debug/moc_mainwindow.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMa
 		vars/board_data_labels.h \
 		dobot.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		arduinousb.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/QSerialPort \
@@ -1503,7 +1984,6 @@ debug/moc_mainwindow.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMa
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/qserialportglobal.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/QSerialPortInfo \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/qserialportinfo.h \
-		vars/basic_vars.h \
 		vars/board_axis.h \
 		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
@@ -1522,7 +2002,6 @@ debug/moc_mainwindow.cpp: D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMa
 		vars/position_on_board.h \
 		chessboard.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtMath \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
 		chess/chess_movements.h \
@@ -1678,6 +2157,124 @@ debug/moc_piece_controller.cpp: vars/log.h \
 		field.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		piece_controller.h \
 		debug/moc_predefs.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/bin/moc.exe
@@ -2016,13 +2613,136 @@ debug/main.o: main.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QAbstractSocket \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QObject \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
+		vars/basic_vars.h \
 		websockets.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/QWebSocketServer \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocketserver.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsockets_global.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocketprotocol.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QObject \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QHostAddress \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qhostaddress.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslConfiguration \
@@ -2030,8 +2750,6 @@ debug/main.o: main.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslerror.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslcertificate.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qssl.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFlags \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslError \
@@ -2052,11 +2770,8 @@ debug/main.o: main.cpp mainwindow.h \
 		vars/board_data_labels.h \
 		dobot.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		arduinousb.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/QSerialPort \
@@ -2064,7 +2779,6 @@ debug/main.o: main.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/qserialportglobal.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/QSerialPortInfo \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/qserialportinfo.h \
-		vars/basic_vars.h \
 		vars/board_axis.h \
 		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
@@ -2083,7 +2797,6 @@ debug/main.o: main.cpp mainwindow.h \
 		vars/position_on_board.h \
 		chessboard.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtMath \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
 		chess/chess_movements.h \
@@ -2094,8 +2807,6 @@ debug/main.o: main.cpp mainwindow.h \
 		chess/chess_status.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QApplication \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qapplication.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qdesktopwidget.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qguiapplication.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qinputmethod.h
@@ -2288,6 +2999,133 @@ debug/chess_conditions.o: chess/chess_conditions.cpp chess/chess_conditions.h \
 		vars/board_axis.h \
 		vars/basic_vars.h \
 		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		piece_controller.h \
 		dobot.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMessageBox \
@@ -2300,10 +3138,7 @@ debug/chess_conditions.o: chess/chess_conditions.cpp chess/chess_conditions.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qwidget.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs_win.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpaintdevice.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpalette.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcolor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qrgb.h \
@@ -2312,8 +3147,6 @@ debug/chess_conditions.o: chess/chess_conditions.cpp chess/chess_conditions.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qmatrix.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpolygon.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qregion.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtransform.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpainterpath.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qimage.h \
@@ -2326,18 +3159,12 @@ debug/chess_conditions.o: chess/chess_conditions.cpp chess/chess_conditions.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcursor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qkeysequence.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qevent.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvector2d.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QSignalMapper \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
@@ -2432,6 +3259,137 @@ debug/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		vars/basic_vars.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		piece_controller.h \
 		vars/log.h \
 		dobot.h \
@@ -2445,10 +3403,7 @@ debug/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qwidget.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs_win.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpaintdevice.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpalette.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcolor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qrgb.h \
@@ -2457,8 +3412,6 @@ debug/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qmatrix.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpolygon.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qregion.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtransform.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpainterpath.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qimage.h \
@@ -2471,20 +3424,12 @@ debug/chess_movements.o: chess/chess_movements.cpp chess/chess_movements.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcursor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qkeysequence.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qevent.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvector2d.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QSignalMapper \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
@@ -2581,12 +3526,141 @@ debug/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		vars/basic_vars.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		client.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/QWebSocket \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QUrl \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QAbstractSocket \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
@@ -2601,8 +3675,6 @@ debug/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslError \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslerror.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslcertificate.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qssl.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFlags \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslConfiguration \
@@ -2626,10 +3698,7 @@ debug/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qwidget.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qwindowdefs_win.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpaintdevice.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpalette.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcolor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qrgb.h \
@@ -2638,8 +3707,6 @@ debug/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qmatrix.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpolygon.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qregion.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtransform.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpainterpath.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qimage.h \
@@ -2652,18 +3719,12 @@ debug/chess_status.o: chess/chess_status.cpp chess/chess_status.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qcursor.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qkeysequence.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qevent.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvector2d.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QSignalMapper \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
@@ -3321,6 +4382,122 @@ debug/chess.o: chess.cpp chess.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtMath \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
 		field.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
 		chess/chess_bot.h \
 		chess/chess_movements.h \
 		piece_controller.h \
@@ -3406,7 +4583,138 @@ debug/chessboard.o: chessboard.cpp chessboard.h \
 		vars/board_axis.h \
 		vars/basic_vars.h \
 		vars/board_data_labels.h \
-		vars/board_types.h
+		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatastream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfiledevice.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmargins.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrect.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsize.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignalmapper.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurl.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qurlquery.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\chessboard.o chessboard.cpp
 
 debug/client.o: client.cpp client.h \
@@ -3842,13 +5150,136 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QAbstractSocket \
 		DobotDll/DobotDll.h \
 		DobotDll/DobotType.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QObject \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
+		vars/basic_vars.h \
 		websockets.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/QWebSocketServer \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocketserver.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsockets_global.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWebSockets/qwebsocketprotocol.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QObject \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QHostAddress \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qhostaddress.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslConfiguration \
@@ -3856,8 +5287,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslsocket.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslerror.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qsslcertificate.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qssl.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFlags \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QSslError \
@@ -3878,11 +5307,8 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		vars/board_data_labels.h \
 		dobot.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QTimer \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimer.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbasictimer.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QValidator \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qvalidator.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qregularexpression.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/QList \
 		arduinousb.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/QSerialPort \
@@ -3890,7 +5316,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/qserialportglobal.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/QSerialPortInfo \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSerialPort/qserialportinfo.h \
-		vars/basic_vars.h \
 		vars/board_axis.h \
 		dobot/vars/dobot_moves.h \
 		dobot/dobot_servo.h \
@@ -3909,7 +5334,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		vars/position_on_board.h \
 		chessboard.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtMath \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
 		field.h \
 		chess/chess_bot.h \
 		chess/chess_movements.h \
@@ -3924,8 +5348,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qactiongroup.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QApplication \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qapplication.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qdesktopwidget.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qguiapplication.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qinputmethod.h \
@@ -3944,7 +5366,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qtabbar.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qrubberband.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qframe.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QGridLayout \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qgridlayout.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qlayout.h \
@@ -3956,7 +5377,6 @@ debug/mainwindow.o: mainwindow.cpp mainwindow.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qheaderview.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractitemview.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QLabel \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qlabel.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QLineEdit \
@@ -4201,7 +5621,125 @@ debug/piece_controller.o: piece_controller.cpp piece_controller.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmath.h \
 		field.h \
 		vars/board_data_labels.h \
-		vars/board_types.h
+		vars/board_types.h \
+		xml_reader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCore \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QtCoreDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracteventdispatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventloop.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractnativeeventfilter.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstractstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qabstracttransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydataops.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qarraydatapointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbitarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbuffer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qbytearraymatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcache.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcollator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineoption.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcommandlineparser.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcoreapplication.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qcryptographichash.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdatetime.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdeadlinetimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qelapsedtimer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdiriterator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeasingcurve.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qendian.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qeventtransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qexception.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfactoryinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfileselector.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QStringList \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfilesystemwatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfinalstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuture.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfutureinterface.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrunnable.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresultstore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturesynchronizer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qfuturewatcher.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhistorystate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qidentityproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qisenum.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonarray.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonvalue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsondocument.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qjsonobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibrary.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlibraryinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qversionnumber.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlinkedlist.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qlockfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qloggingcategory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmessageauthenticationcode.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmetaobject.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedata.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimedatabase.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qmimetype.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qobjectcleanuphandler.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qoperatingsystemversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qparallelanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpauseanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qplugin.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpointer.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpluginloader.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qprocess.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qpropertyanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qvariantanimation.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qqueue.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qrandom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qreadwritelock.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qresource.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsavefile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qscopedvaluerollback.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsequentialanimationgroup.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsettings.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsharedmemory.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsignaltransition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsocketnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsortfilterproxymodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstack.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstandardpaths.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstate.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstatemachine.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstorageinfo.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qstringlistmodel.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qsystemsemaphore.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporarydir.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QScopedPointer \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtemporaryfile.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextboundaryfinder.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtextcodec.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthread.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadpool.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qthreadstorage.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimeline.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtimezone.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtranslator.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtypetraits.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/quuid.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwaitcondition.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qwineventnotifier.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qxmlstream.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qtcoreversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXml \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/QtXmlDepends \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlglobal.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxml-config.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qdom.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\piece_controller.o piece_controller.cpp
 
 debug/sql.o: sql.cpp sql.h \
@@ -4658,7 +6196,9 @@ debug/xml_reader.o: xml_reader.cpp xml_reader.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qxml.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtXml/qtxmlversion.h \
 		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QDebug \
-		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QFile \
+		D:/Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QString \
+		vars/basic_vars.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\xml_reader.o xml_reader.cpp
 
 debug/position_on_board.o: vars/position_on_board.cpp vars/position_on_board.h \

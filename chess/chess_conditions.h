@@ -18,17 +18,20 @@ private:
     Clients* _pClientsList;
     ChessStatus* _pStatus;
 
+    QString extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg);
+    bool isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog = false);
     bool isRequestParameterInProperFormat(clientRequest request);
     bool isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_STATUS Status);
-    bool isSenderAppropriate(Client& sender, REQUEST_TYPE Type);
-    bool isThereAnySpecialConditionBeenMet(Client& sender, clientRequest request);
+    bool isSenderAppropriate(Client *pSender, REQUEST_TYPE Type);
+    bool isThereAnySpecialConditionBeenMet(Client *pSender, clientRequest request);
 
+    //todo: jak publiczność jest załatwiana pomiędzy klasami chess? tak jak tu wszędzie? wydaje...
+    //...się ttuaj że to działa
 //public:
     ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 
-    bool isClientRequestCanBeAccepted(QString QStrMsg, Client& sender,
+    bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
                                       GAME_STATUS GS);
-    QString extractParameter(REQUEST_TYPE Type, QString QStrRequest);
 };
 
 #endif // CHESS_CONDITIONS_H

@@ -52,7 +52,7 @@ private:
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     void sendMsgToTcp(QString QStrMsg);
     void newClientName(Client& client, clientRequest request);
-    void removeClient(Client& client);
+    void removeClientFromList(Client& client);
     void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
     void sendDataToAllClients(QString QStrMsg);
     QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPlayerToClear = nullptr);
@@ -90,7 +90,7 @@ public:
     ChessConditions* getConditionsPointer() { return _pConditions; }
 
 public slots:
-    void checkMsgFromWebsockets(QString QStrMsg, Client& client);
+    void checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID);
     void checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond);
     void checkMsgFromUsb(QString QStrMsg);
     QString getTableData();

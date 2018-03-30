@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Chess_t {
     QByteArrayData data[28];
-    char stringdata0[383];
+    char stringdata0[388];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -41,34 +41,34 @@ QT_MOC_LITERAL(6, 62, 18), // "showLegalMovesInUI"
 QT_MOC_LITERAL(7, 81, 20), // "showHistoryMovesInUI"
 QT_MOC_LITERAL(8, 102, 22), // "checkMsgFromWebsockets"
 QT_MOC_LITERAL(9, 125, 7), // "QStrMsg"
-QT_MOC_LITERAL(10, 133, 7), // "Client&"
-QT_MOC_LITERAL(11, 141, 6), // "client"
-QT_MOC_LITERAL(12, 148, 19), // "checkMsgFromChenard"
-QT_MOC_LITERAL(13, 168, 14), // "QStrTcpMsgType"
-QT_MOC_LITERAL(14, 183, 14), // "QStrTcpRespond"
-QT_MOC_LITERAL(15, 198, 15), // "checkMsgFromUsb"
-QT_MOC_LITERAL(16, 214, 12), // "getTableData"
-QT_MOC_LITERAL(17, 227, 21), // "setBoardDataLabelInUI"
-QT_MOC_LITERAL(18, 249, 9), // "QStrLabel"
-QT_MOC_LITERAL(19, 259, 9), // "LabelType"
-QT_MOC_LITERAL(20, 269, 20), // "showLegalMovesInForm"
-QT_MOC_LITERAL(21, 290, 10), // "legalMoves"
-QT_MOC_LITERAL(22, 301, 22), // "showHistoryMovesInForm"
-QT_MOC_LITERAL(23, 324, 12), // "historyMoves"
-QT_MOC_LITERAL(24, 337, 12), // "timeOutStart"
-QT_MOC_LITERAL(25, 350, 13), // "timeOutPlayer"
-QT_MOC_LITERAL(26, 364, 11), // "PLAYER_TYPE"
-QT_MOC_LITERAL(27, 376, 6) // "Player"
+QT_MOC_LITERAL(10, 133, 7), // "int64_t"
+QT_MOC_LITERAL(11, 141, 11), // "n64SenderID"
+QT_MOC_LITERAL(12, 153, 19), // "checkMsgFromChenard"
+QT_MOC_LITERAL(13, 173, 14), // "QStrTcpMsgType"
+QT_MOC_LITERAL(14, 188, 14), // "QStrTcpRespond"
+QT_MOC_LITERAL(15, 203, 15), // "checkMsgFromUsb"
+QT_MOC_LITERAL(16, 219, 12), // "getTableData"
+QT_MOC_LITERAL(17, 232, 21), // "setBoardDataLabelInUI"
+QT_MOC_LITERAL(18, 254, 9), // "QStrLabel"
+QT_MOC_LITERAL(19, 264, 9), // "LabelType"
+QT_MOC_LITERAL(20, 274, 20), // "showLegalMovesInForm"
+QT_MOC_LITERAL(21, 295, 10), // "legalMoves"
+QT_MOC_LITERAL(22, 306, 22), // "showHistoryMovesInForm"
+QT_MOC_LITERAL(23, 329, 12), // "historyMoves"
+QT_MOC_LITERAL(24, 342, 12), // "timeOutStart"
+QT_MOC_LITERAL(25, 355, 13), // "timeOutPlayer"
+QT_MOC_LITERAL(26, 369, 11), // "PLAYER_TYPE"
+QT_MOC_LITERAL(27, 381, 6) // "Player"
 
     },
     "Chess\0addTextToLogPTE\0\0LOG\0setBoardDataLabel\0"
     "BOARD_DATA_LABEL\0showLegalMovesInUI\0"
     "showHistoryMovesInUI\0checkMsgFromWebsockets\0"
-    "QStrMsg\0Client&\0client\0checkMsgFromChenard\0"
-    "QStrTcpMsgType\0QStrTcpRespond\0"
-    "checkMsgFromUsb\0getTableData\0"
-    "setBoardDataLabelInUI\0QStrLabel\0"
-    "LabelType\0showLegalMovesInForm\0"
+    "QStrMsg\0int64_t\0n64SenderID\0"
+    "checkMsgFromChenard\0QStrTcpMsgType\0"
+    "QStrTcpRespond\0checkMsgFromUsb\0"
+    "getTableData\0setBoardDataLabelInUI\0"
+    "QStrLabel\0LabelType\0showLegalMovesInForm\0"
     "legalMoves\0showHistoryMovesInForm\0"
     "historyMoves\0timeOutStart\0timeOutPlayer\0"
     "PLAYER_TYPE\0Player"
@@ -135,7 +135,7 @@ void Chess::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 1: _t->setBoardDataLabel((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABEL(*)>(_a[2]))); break;
         case 2: _t->showLegalMovesInUI((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
         case 3: _t->showHistoryMovesInUI((*reinterpret_cast< QStringList(*)>(_a[1]))); break;
-        case 4: _t->checkMsgFromWebsockets((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< Client(*)>(_a[2]))); break;
+        case 4: _t->checkMsgFromWebsockets((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< int64_t(*)>(_a[2]))); break;
         case 5: _t->checkMsgFromChenard((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         case 6: _t->checkMsgFromUsb((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 7: { QString _r = _t->getTableData();

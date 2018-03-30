@@ -41,7 +41,7 @@ public slots:
 
 signals:
     void addTextToLogPTE(QString, LOG);
-    void msgFromWebsocketsToChess(QString QStrMsg, Client& pClient);
+    void msgFromWebsocketsToChess(QString QStrMsg, int64_t n64SenderID);
 };
 
 #endif // Websockets_H

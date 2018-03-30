@@ -262,7 +262,8 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
         ui->logPTE->clear();
         return;
     }
-    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " + logAsQstr(TypeOfMsg) + QStrMsg;
+    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " +
+            logAsQstr(TypeOfMsg) + QStrMsg;
     ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
     qDebug() << QStrMsg;
 
@@ -485,7 +486,7 @@ void MainWindow::on_closeGripperBtn_clicked()
 
 void MainWindow::on_middleAboveBtn_clicked()
 {
-    Point3D mid; //todo: ciągnąc z xml
+    Point3D mid; //todo: obliczac z innych punktow
     _pDobot->addArmMoveToQueue(DM_TO_POINT, mid);
 }
 
@@ -584,28 +585,28 @@ void MainWindow::showArduinoGripperStateList(QList<ServoArduino> list)
 void MainWindow::showClientsList(QList<Client> list)
 {
     QString QStrClientsList;
-    Client item;
+    Client client;
 
     for(int i=0; i<list.count(); ++i)
     {
-       item = list.at(i);
+       client = list.at(i);
        QStrClientsList += QString::number(i+1) + ". ";
 
        QString QStrName = "-";
-       if (!item.name.isNull())
-           QStrName = item.name;
+       if (!client.name.isNull())
+           QStrName = client.name;
        QStrClientsList += QStrName;
 
-       if (item.type != PT_NONE)
+       if (client.type != PT_NONE)
        {
-           QString QStrPlayerType = playerTypeAsQStr(item.type);
-           QString QStrStartState = item.isStartClickedByPlayer ? "1" : "0";
+           QString QStrPlayerType = playerTypeAsQStr(client.type);
+           QString QStrStartState = client.isStartClickedByPlayer ? "1" : "0";
            QStrClientsList += ", plr: " + QStrPlayerType + ", st:" + QStrStartState;
        }
-       else if (item.queue != -1)
-           QStrClientsList += ", q:" + QString::number(item.queue);
+       else if (client.queue != -1)
+           QStrClientsList += ", q:" + QString::number(client.queue);
 
-       QStrClientsList += "\n";
+       QStrClientsList += ", ID:" + QString::number(client.ID) + "\n";
     }
     ui->clientsPTE->clear();
     ui->clientsPTE->setPlainText(QStrClientsList);

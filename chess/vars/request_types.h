@@ -31,7 +31,7 @@ struct clientRequest
     void clear() { type = RT_NONE; param.clear(); }
 };
 
-inline REQUEST_TYPE requestType(QString QStrRequest, bool bErrorLog = false)
+inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = false)
 {   
     if (QStrRequest == "newGame") return RT_NEW_GAME;
     else if (QStrRequest.left(4) == "move") return RT_MOVE;
@@ -47,7 +47,7 @@ inline REQUEST_TYPE requestType(QString QStrRequest, bool bErrorLog = false)
     else
     {
         if (bErrorLog)
-            qDebug() << "ERROR: requestType(): not a valid type. QStrRequest =" << QStrRequest;
+            qDebug() << "ERROR: requestTypeFromQStr(): not a valid type. QStrRequest =" << QStrRequest;
 
         return RT_NONE;
     }

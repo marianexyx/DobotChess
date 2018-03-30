@@ -9,6 +9,7 @@
 #include "vars/players_types.h"
 #include "vars/log.h"
 #include "vars/board_data_labels.h"
+#include "vars/basic_vars.h"
 #include "typeinfo"
 
 const QString QUEUE_EMPTY = "queueEmpty";
@@ -22,23 +23,16 @@ struct Client //todo: class friend to Clients
     bool isStartClickedByPlayer;
     int64_t queue;
 
-    bool operator ==(const struct Client& cl)
-    {
-        return socket == cl.socket &&
-                name == cl.name &&
-                type == cl.type &&
-                isStartClickedByPlayer == cl.isStartClickedByPlayer &&
-                queue == cl.queue;
-    }
+    bool operator ==(const struct Client& cl) { return ID == cl.ID; }
 };
 
 class Clients: public QObject
 {
     Q_OBJECT
 
-private:
-    QList<Client> _clients;
 public:
+    QList<Client> _clients;
+
     Clients(): _clients() {}
 
     void newClient(QWebSocket& clientSocket);
@@ -51,19 +45,19 @@ public:
     void setClientStartConfirmation(Client& client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
     void addClientToQueue(Client& client);
-    void removeClient(Client& client);
+    void removeClientFromList(Client& client);
     void removeClientFromQueue(Client& client);
     void resetPlayersStartConfirmInfo();
     void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
     QList<Client> getClientsList() const { return _clients; }
-    bool isClientInList(Client& client);
-    Client* getClient(QWebSocket* pClientSocket);
-    Client* getClient(int64_t n64ClientID);
+    bool isClientInList(const Client& client, bool bErrorLog = false);
+    Client getClient(QWebSocket* pClientSocket);
+    Client getClient(int64_t n64ClientID);
     Client* getPlayer(PLAYER_TYPE Type);
     QWebSocket* getClientSocket(QString QStrPlayerName);
     QString getClientName(Client& client);
-    Client* getNextQueuedClient();
+    Client getNextQueuedClient();
     QString getQueuedClientsList();
     PLAYER_TYPE getClientType(Client& client);
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);

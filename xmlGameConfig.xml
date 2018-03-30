@@ -1,4 +1,7 @@
  <?xml version="1.0" encoding="ISO-8859-1" ?>
+ <piece>
+    <param ID="0" name="height" val="50"/>
+  </piece>
  <points>
     <point ID="0" name="mainFieldA1" x="100" y="100" z="30"/>
     <point ID="1" name="mainFieldA8" x="100" y="100" z="30"/>
@@ -11,3 +14,7 @@
     <point ID="8" name="home" x="100" y="100" z="30"/>
     <point ID="9" name="homeToMiddleAbove" x="100" y="100" z="30"/>
  </points>
+ <gripper>
+    <state ID="0" name="open" pwm="5"/>
+    <state ID="0" name="close" pwm="3"/>
+ </gripper>

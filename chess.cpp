@@ -29,8 +29,8 @@ Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceContro
             this, SLOT(checkMsgFromUsb(QString)));
     connect(_pTCPMsgs, SIGNAL(msgFromTcpToChess(QString, QString)),
             this, SLOT(checkMsgFromChenard(QString, QString)));
-    connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, Client&)),
-            this, SLOT(checkMsgFromWebsockets(QString, Client&)));
+    connect(_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, int64_t)),
+            this, SLOT(checkMsgFromWebsockets(QString, int64_t)));
     connect(_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
             this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
@@ -53,14 +53,22 @@ Chess::~Chess()
     delete _pConditions;
 }
 
-void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
+void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
 {
+    //future: używać wszędzie ID
+    Client client = _pClientsList->getClient(n64SenderID);
+    QString QStrClientName = client.name;
+    qDebug() << "Chess::checkMsgFromWebsockets(): client of name =" << QStrClientName
+             << "queue =" << QString::number(client.queue)
+             << ", ID =" << QString::number(client.ID);
+
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
 
-    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, client, _ChessGameStatus))
+    if (_pConditions->isClientRequestCanBeAccepted(QStrMsg, &client, _ChessGameStatus))
     {
-        _request.type = requestType(QStrMsg, SHOW_ERRORS);
-        _request.param = _pConditions->extractParameter(_request.type, QStrMsg);
+        _request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
+        _request.param = _pConditions->extractParameterIfTypeIsInProperFormat(_request.type,
+                                                                              QStrMsg);
     }
     else
     {
@@ -71,9 +79,9 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
     switch(_request.type)
     {
     case RT_NEW_GAME:
-        if (client == *_pClientsList->getPlayer(PT_WHITE))
+        if (&client == _pClientsList->getPlayer(PT_WHITE))
             this->playerWantToStartNewGame(PT_WHITE);
-        else if (client == *_pClientsList->getPlayer(PT_BLACK))
+        else if (&client == _pClientsList->getPlayer(PT_BLACK))
             this->playerWantToStartNewGame(PT_BLACK);
         break;
     case RT_PROMOTE_TO:
@@ -110,7 +118,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, Client& client)
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_CLIENT_LEFT:
-        this->removeClient(client);
+        this->removeClientFromList(client);
         break;
     default:
         qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received _request.type:"
@@ -256,8 +264,9 @@ void Chess::newClientName(Client& client, clientRequest request)
     }
 }
 
-void Chess::removeClient(Client& client)
+void Chess::removeClientFromList(Client& client)
 {
+    qDebug() << "Chess::removeClientFromList()";
     if (_pClientsList->isClientAPlayer(client))
     {
         emit this->addTextToLogPTE(playerTypeAsQStr(client.type)
@@ -267,7 +276,7 @@ void Chess::removeClient(Client& client)
     else //future: strange behavior with those info- seen more often then we should
         emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
 
-    _pClientsList->removeClient(client);
+    _pClientsList->removeClientFromList(client);
 
     emit this->setBoardDataLabelInUI(std::to_string(_pClientsList->getClientsList().size()).c_str(),
                             BDL_SOCKETS_ONLINE);
@@ -277,7 +286,7 @@ void Chess::removeClient(Client& client)
 void Chess::sendDataToClient(QString QStrMsg, Client* pClient /* = nullptr*/)
 {
     emit this->addTextToLogPTE("Sending msg to " + communicationTypeAsQStr(_PlayerSource)
-                                + ": " + QStrMsg, LOG_CORE);
+                                + ": " + QStrMsg + "\n", LOG_CORE);
 
     if (_PlayerSource == WEBSITE)
     {

@@ -23,15 +23,15 @@ inline QString logAsQstr(LOG Log)
     QString QStrLog;
     switch(Log)
     {
-    case LOG_NOTHING: QStrLog = "nothing";
-    case LOG_CORE: QStrLog = "core";
-    case LOG_DOBOT: QStrLog = "dobot";
-    case LOG_TCP: QStrLog = "tcp";
-    case LOG_WEBSOCKET: QStrLog = "websocket";
-    case LOG_MAINWINDOW: QStrLog = "mainwindow";
-    case LOG_USB: QStrLog = "usb";
-    case LOG_USB_SENT: QStrLog = "usbSent";
-    case LOG_USB_RECEIVED: QStrLog = "usbReceived";
+    case LOG_NOTHING: QStrLog = "nothing"; break;
+    case LOG_CORE: QStrLog = "core"; break;
+    case LOG_DOBOT: QStrLog = "dobot"; break;
+    case LOG_TCP: QStrLog = "tcp"; break;
+    case LOG_WEBSOCKET: QStrLog = "websocket"; break;
+    case LOG_MAINWINDOW: QStrLog = "mainwindow"; break;
+    case LOG_USB: QStrLog = "usb"; break;
+    case LOG_USB_SENT: QStrLog = "usbSent"; break;
+    case LOG_USB_RECEIVED: QStrLog = "usbReceived"; break;
     default:
         qDebug() << "ERROR: logAsQstr(): wrong arg = " << Log;
         return "";

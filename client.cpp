@@ -8,18 +8,25 @@ void Clients::newClient(QWebSocket& clientSocket)
     newClient.socket = &clientSocket; //future: jeżeli ten parametr jest jako const, to nie...
     //...zadziała. dlaczego? przecież tylko przypisuje, a nie zmieniam
     newClient.name.clear();
-    newClient.queue = -1;
+    newClient.queue = 0; //todo: wcześniej było -1. będzie ok?
     newClient.isStartClickedByPlayer = false;
     newClient.type = PT_NONE;
+
+    qDebug() << "Clients::newClient(): created new client. ID =" << newClient.ID
+             << ", name =" << newClient.name << ", queue =" << newClient.queue
+             << ", start =" << newClient.isStartClickedByPlayer
+             << ", type =" << playerTypeAsQStr(newClient.type);
 
     _clients << newClient;
 }
 
 void Clients::setClientName(const Client& client, QString QStrName)
 {
+    qDebug() << "inside Clients::setClientName(): incoming name parameter:" << QStrName;
+
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl.name == QStrName)
+        if (cl.name == QStrName && !cl.name.isEmpty())
         {
             qDebug() << "ERROR: Clients::setClientName(): name" << QStrName << "already exists.";
             return;
@@ -58,8 +65,9 @@ void Clients::setPlayerType(Client& client, PLAYER_TYPE Type)
         {
             if (Type != PT_NONE && client.queue > 0)
             {
-                qDebug() << "ERROR: Clients::setPlayerType(): client in queue can not"
-                            " sit on chair";
+                qDebug() << "ERROR: Clients::setPlayerType(): client" << client.name
+                            << "in queue can not sit on chair. player type ="
+                            << playerTypeAsQStr(Type) << ", client.queue =" << client.queue;
                 return;
             }
 
@@ -228,8 +236,9 @@ void Clients::addClientToQueue(Client& client)
     emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
 }
 
-void Clients::removeClient(Client& client)
+void Clients::removeClientFromList(Client& client)
 {
+    qDebug() << "Clients::removeClientFromList()";
     Q_FOREACH (Client cl, _clients)
     {
         if (cl == client)
@@ -238,9 +247,9 @@ void Clients::removeClient(Client& client)
             //...a może to musi być wskaźnik by dało się to wogle usunąć?
 
             if(!_clients.removeOne(cl))
-                qDebug() << "ERROR: Clients::removeClient(): client not found";;
+                qDebug() << "ERROR: Clients::removeClientFromList(): client can't be removed";
 
-            //return;
+            return;
 
             //info: erlier working code in chess class:
             /*for(int i = 0; i < _pClientsList->getClientsList().count(); ++i)
@@ -253,6 +262,7 @@ void Clients::removeClient(Client& client)
             }*/
         }
     }
+    qDebug() << "ERROR: Clients::removeClientFromList(): client not found";
 }
 
 void Clients::removeClientFromQueue(Client &client)
@@ -293,14 +303,16 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
 
     if (this->getQueuedClientsList() != QUEUE_EMPTY)
     {
-        Client* nextQueuedClient;
-        if (this->isClientInList(*this->getNextQueuedClient()))
+        Client nextQueuedClient;
+        qDebug() << "Clients::cleanChairAndPutThereNextQueuedClientIfExist(): "
+                    "approaching isClientInList()";
+        if (this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS))
             nextQueuedClient = this->getNextQueuedClient();
         else return;
 
-        this->removeClientFromQueue(*nextQueuedClient);
-        this->setPlayerType(*nextQueuedClient, Chair);
-        this->setClientStartConfirmation(*nextQueuedClient, false);
+        this->removeClientFromQueue(nextQueuedClient);
+        this->setPlayerType(nextQueuedClient, Chair);
+        this->setClientStartConfirmation(nextQueuedClient, false);
 
         emit this->setBoardDataLabel(this->getPlayerName(Chair),
                                       Chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
@@ -309,51 +321,67 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
     }
 }
 
-bool Clients::isClientInList(Client& client)
+bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
 {
-    /*todo: muszę chyba zrobić tak wszędzie, tj:
-    -porobić dereferencje we wszystkich argumentach podawanych jako wskaźniki wg linku poniżej:
-    https://stackoverflow.com/questions/14420257/cpp-c-get-pointer-value-or-depointerize-pointer
-    -chyba najlepiej poczytać o wskaźnikach i referencjach znowu
-    -pozmieniać nazewnictwo wskaźników z client na pClient
-    -najprawdopodobniej będzie się to dało jakoś zwięźle zapisać
-    -wstawić wskaźniki do wszystkich metod w tej klasie, bo nie wszystkie mają
-    */
+    qDebug() << "Clients::isClientInList(): client basic data: ID ="
+             << QString::number(client.ID) << ", name =" << client.name
+             << ", queue =" << QString::number(client.queue);
+
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl.ID == client.ID)
             return true;
     }
-    qDebug() << "ERROR: Clients::isClientInList(): client not found";
+
+    if (bErrorLog)
+        qDebug() << "ERROR: Clients::isClientInList(): client of not found";
+    else qDebug() << "WARNING: Clients::isClientInList(): client not found";
+
     return false;
 }
 
-Client* Clients::getClient(QWebSocket* pClientSocket)
+Client Clients::getClient(QWebSocket* pClientSocket)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.socket == pClientSocket)
         {
-            Client* pClient = &cl;
-            return pClient;
+            Client& client = cl;
+            qDebug() << "Clients::getClient(QWebSocket*): client found. his name ="
+                     << client.name << ", ID =" << client.ID << ", queue =" << client.queue;
+            return client;
         }
     }
     qDebug() << "ERROR: Clients::getClient(QWebSocket): client not found";
-    return nullptr;
+    Client client;
+    return client;
 }
 
-Client* Clients::getClient(int64_t n64ClientID)
+Client Clients::getClient(int64_t n64ClientID)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.ID == n64ClientID)
         {
-            Client* pClient = &cl;
-            return pClient;
+            qDebug() << "Clients::getClient(int64_t): found client ID. cl basic"
+                        " data: name =" << cl.name
+                     << ", queue =" << QString::number(cl.queue)
+                     << ", ID =" << QString::number(cl.ID);
+
+            Client& client = cl; //todo: tworzę tu pointer, więc
+            //on ginie po wyjściu z funkcji??
+
+            qDebug() << "Clients::getClient(): returning ref to found client. "
+                        "his basic data: name =" << client.name
+                     << ", queue =" << QString::number(client.queue)
+                     << ", ID =" << QString::number(client.ID);
+
+            return client;
         }
     }
     qDebug() << "ERROR: Clients::getClient(int64_t): client not found. ID =" << n64ClientID;
-    return nullptr;
+    Client client;
+    return client;
 }
 
 Client* Clients::getPlayer(PLAYER_TYPE Type)
@@ -397,7 +425,7 @@ bool Clients::isClientLoggedIn(Client& client)
     else return false;
 }
 
-Client* Clients::getNextQueuedClient()
+Client Clients::getNextQueuedClient()
 {
     int64_t minQueue = std::numeric_limits<int64_t>::max();
     Q_FOREACH (Client cl, _clients)
@@ -412,14 +440,11 @@ Client* Clients::getNextQueuedClient()
         {
             qDebug() << "Clients::getNextQueuedClient(): client.name =" <<
                         cl.name;
-            {
-                Client* pClient = &cl;
-                return pClient;
-            }
+            return cl;
         }
     }
     qDebug() << "ERROR: Clients::getNextQueuedClient(): client not found";
-    Client* client = nullptr;
+    Client client;
     return client;
 }
 
@@ -608,9 +633,9 @@ bool Clients::isClientInQueue(Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
-        if (cl == client)
+        if (cl.ID == client.ID)
         {
-            if (cl.queue >= 0)
+            if (cl.queue > 0)
                 return true;
             else return false;
         }
@@ -695,32 +720,39 @@ int64_t Clients::getClientID(Client& client)
 
 int64_t Clients::getNextAvailableClientID()
 {
-    int64_t minID = std::numeric_limits<int64_t>::max();
     int64_t maxID = 0;
-    Q_FOREACH (Client client, _clients)
+
+    Q_FOREACH (Client client, _clients) //find max queued ID
     {
-        if (client.ID > 0 && client.ID > maxID)
+        if (client.ID > maxID)
             maxID = client.ID;
     }
-    if (maxID > 0)
+    return ++maxID;
+
+    /*
+    int64_t minID = std::numeric_limits<int64_t>::max();
+
+    if (maxID > 0) //if any client is connected
     {
-        Q_FOREACH (Client client, _clients)
+        Q_FOREACH (Client client, _clients) //find min queued ID
         {
             if (minID > client.ID && client.ID > 0)
                 minID = client.ID;
         }
-    }
-    else return 0;
 
-    if (maxID - minID == 1)
-        return maxID+1;
-    else if (maxID - minID > 1)
-        return minID+1;
-    else
-    {
-        qDebug() << "ERROR: Clients::getNextAvailableClientID(): minID > maxID";
-        return 0;
+        if (maxID - minID == 1) //if there is no empty IDs between min and max ID
+            return maxID+1; //return next biggest nr
+        else if (maxID - minID > 1) //if next max ID isn't next (from min) free ID to assign
+            return minID+1; //return 1st free nr in ID list
+        //future: nie mam wyszukiwania pierwszego pustego miejsca. zwracam tylko min+1, co w sumie może być zajęte
+        else
+        {
+            qDebug() << "ERROR: Clients::getNextAvailableClientID(): minID > maxID";
+            return 0;
+        }
     }
+    else return 1; //give 1st ID to 1st client
+    */
 }
 
 void Clients::showClientsInUI()

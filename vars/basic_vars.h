@@ -47,6 +47,16 @@ struct Point3D
     }
 };
 
+struct RealVars
+{
+    float fPieceHeight;
+    Point3D home;
+    Point3D A1, A8, H1, H8;
+    Point3D remWhiteCloserOuter, remWhiteFurtherInner;
+    Point3D remBlackCloserOuter, remBlackFurtherInner;
+    float fGripperOpened, fGripperClosed;
+};
+
 enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
 inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
 {

@@ -7,6 +7,7 @@ int main(int argc, char *argv[])
 
     //todo: niektóre obiekty są pośrednie i mogę być tworzone wewnątrz innych, a potem...
     //...przekazywane dalej
+    //XmlReader xmlReader001("xmlGameConfig.xml"); //todo
     Clients ClientsList;
     ArduinoUsb USB001;
     Chessboard BoardChenard001(B_MAIN, REAL);
