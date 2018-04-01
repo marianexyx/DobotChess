@@ -57,34 +57,37 @@ void Websockets::receivedMsg(QString QStrMsg)
         return;
     }
 
-    QString QStrSenderName = _pClientsList->getClient(pSocket).name;
+    /*QString QStrSenderName = _pClientsList->getClient(pSocket).name;
     qDebug() << "Websockets::receivedMsg(): client: name =" << QStrSenderName
              << "queue =" << QString::number(_pClientsList->getClient(pSocket).queue)
-             << "ID =" << QString::number(_pClientsList->getClient(pSocket).ID);
+             << "ID =" << QString::number(_pClientsList->getClient(pSocket).ID);*/
 
     emit this->msgFromWebsocketsToChess(QStrMsg, _pClientsList->getClient(pSocket).ID);
 }
 
-void Websockets::sendMsgToClient(QString QStrMsg, Client* pClient)
+void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 {
     qDebug() << "Websockets::sendMsgToClient(): received:" << QStrMsg;
 
-    if (pClient == nullptr)
+    if (n64ReceiverID < 1)
     {
-        qDebug() << "ERROR: Websockets::sendMsgToClient(): pClient == nullptr";
+        qDebug() << "ERROR: Websockets::sendMsgToClient(): receiver ID < 1";
         return;
     }
     else
     {
-        emit this->addTextToLogPTE("send to: " + pClient->name + " " + QStrMsg + "\n",
+        Client receiver = _pClientsList->getClient(n64ReceiverID);
+        QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
+        emit this->addTextToLogPTE("send to: " + receiver.name + " : " + QStrLog + "\n",
                                     LOG_WEBSOCKET);
-        pClient->socket->sendTextMessage(QStrMsg);
+        receiver.socket->sendTextMessage(QStrMsg);
     }
 }
 
 void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
-    emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
+    QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
+    emit this->addTextToLogPTE("send to all: " + QStrLog + "\n", LOG_WEBSOCKET);
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())
         client.socket->sendTextMessage(QStrMsg);

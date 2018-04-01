@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Websockets_t {
-    QByteArrayData data[15];
-    char stringdata0[184];
+    QByteArrayData data[14];
+    char stringdata0[182];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -43,16 +43,15 @@ QT_MOC_LITERAL(8, 85, 18), // "socketDisconnected"
 QT_MOC_LITERAL(9, 104, 11), // "receivedMsg"
 QT_MOC_LITERAL(10, 116, 15), // "onNewConnection"
 QT_MOC_LITERAL(11, 132, 15), // "sendMsgToClient"
-QT_MOC_LITERAL(12, 148, 7), // "Client*"
-QT_MOC_LITERAL(13, 156, 7), // "pClient"
-QT_MOC_LITERAL(14, 164, 19) // "sendMsgToAllClients"
+QT_MOC_LITERAL(12, 148, 13), // "n64ReceiverID"
+QT_MOC_LITERAL(13, 162, 19) // "sendMsgToAllClients"
 
     },
     "Websockets\0addTextToLogPTE\0\0LOG\0"
     "msgFromWebsocketsToChess\0QStrMsg\0"
     "int64_t\0n64SenderID\0socketDisconnected\0"
     "receivedMsg\0onNewConnection\0sendMsgToClient\0"
-    "Client*\0pClient\0sendMsgToAllClients"
+    "n64ReceiverID\0sendMsgToAllClients"
 };
 #undef QT_MOC_LITERAL
 
@@ -78,7 +77,7 @@ static const uint qt_meta_data_Websockets[] = {
        9,    1,   60,    2, 0x0a /* Public */,
       10,    0,   63,    2, 0x0a /* Public */,
       11,    2,   64,    2, 0x0a /* Public */,
-      14,    1,   69,    2, 0x0a /* Public */,
+      13,    1,   69,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -88,7 +87,7 @@ static const uint qt_meta_data_Websockets[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    5,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 12,    5,   13,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 6,    5,   12,
     QMetaType::Void, QMetaType::QString,    5,
 
        0        // eod
@@ -105,7 +104,7 @@ void Websockets::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 2: _t->socketDisconnected(); break;
         case 3: _t->receivedMsg((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 4: _t->onNewConnection(); break;
-        case 5: _t->sendMsgToClient((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< Client*(*)>(_a[2]))); break;
+        case 5: _t->sendMsgToClient((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< int64_t(*)>(_a[2]))); break;
         case 6: _t->sendMsgToAllClients((*reinterpret_cast< QString(*)>(_a[1]))); break;
         default: ;
         }

@@ -136,7 +136,7 @@ Piece::Piece(short sPieceID)
     }
 }
 
-/*static*/ PosOnBoard Pos(short sPieceNr);
+/*static*/ PosOnBoard Pos(short sPieceNr); //todo: co to??
 
 /*static*/ short Piece::startFieldNr(short sPieceNr)
 {

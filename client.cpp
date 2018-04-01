@@ -178,6 +178,8 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
             else qDebug() << "ERROR: Clients::setClientStartConfirmation(): iteration "
                              "error. iter val =" << nClientPos;
 
+            this->showClientsInUI();
+
             return;
         }
     }
@@ -323,9 +325,11 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
 
 bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
 {
-    qDebug() << "Clients::isClientInList(): client basic data: ID ="
+    /*qDebug() << "Clients::isClientInList(): client basic data: ID ="
              << QString::number(client.ID) << ", name =" << client.name
-             << ", queue =" << QString::number(client.queue);
+             << ", queue =" << QString::number(client.queue);*/
+
+    //todo:     if (_clients.contains())
 
     Q_FOREACH (Client cl, _clients)
     {
@@ -347,8 +351,8 @@ Client Clients::getClient(QWebSocket* pClientSocket)
         if (cl.socket == pClientSocket)
         {
             Client& client = cl;
-            qDebug() << "Clients::getClient(QWebSocket*): client found. his name ="
-                     << client.name << ", ID =" << client.ID << ", queue =" << client.queue;
+            /*qDebug() << "Clients::getClient(QWebSocket*): client found. his name ="
+                     << client.name << ", ID =" << client.ID << ", queue =" << client.queue;*/
             return client;
         }
     }
@@ -363,18 +367,18 @@ Client Clients::getClient(int64_t n64ClientID)
     {
         if (cl.ID == n64ClientID)
         {
-            qDebug() << "Clients::getClient(int64_t): found client ID. cl basic"
+            /*qDebug() << "Clients::getClient(int64_t): found client ID. cl basic"
                         " data: name =" << cl.name
                      << ", queue =" << QString::number(cl.queue)
-                     << ", ID =" << QString::number(cl.ID);
+                     << ", ID =" << QString::number(cl.ID);*/
 
             Client& client = cl; //todo: tworzę tu pointer, więc
             //on ginie po wyjściu z funkcji??
 
-            qDebug() << "Clients::getClient(): returning ref to found client. "
+            /*qDebug() << "Clients::getClient(int64_t): returning ref to found client. "
                         "his basic data: name =" << client.name
                      << ", queue =" << QString::number(client.queue)
-                     << ", ID =" << QString::number(client.ID);
+                     << ", ID =" << QString::number(client.ID);*/
 
             return client;
         }
@@ -384,18 +388,20 @@ Client Clients::getClient(int64_t n64ClientID)
     return client;
 }
 
-Client* Clients::getPlayer(PLAYER_TYPE Type)
+Client Clients::getPlayer(PLAYER_TYPE Type)
 {
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.type == Type)
         {
-            Client* pClient = &cl;
-            return pClient;
+            return cl;
+            //return _clients.at(_clients.indexOf(cl)); //todo: at/value?
         }
     }
+
     qDebug() << "ERROR: Clients::getPlayer(PLAYER_TYPE): client not found";
-    return nullptr;
+    Client cl;
+    return cl;
 }
 
 QWebSocket* Clients::getClientSocket(QString QStrPlayerName)
@@ -408,7 +414,7 @@ QWebSocket* Clients::getClientSocket(QString QStrPlayerName)
     return nullptr;
 }
 
-QString Clients::getClientName(Client& client)
+QString Clients::getClientName(const Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -520,16 +526,6 @@ QString Clients::getQueuedClientsList()
     qDebug() << "Clients::testQueuedClients(): QStrQueuedClients =" << QStrQueuedClients;
 }*/
 
-PLAYER_TYPE Clients::getClientType(Client& client)
-{
-    Q_FOREACH (Client cl, _clients)
-    {
-        if (cl == client)
-            return cl.type;
-    }
-    qDebug() << "ERROR: Clients::getClientType(): socket not found";
-    return PT_NONE;
-}
 
 bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
 {
@@ -685,8 +681,7 @@ int Clients::getAmountOfQueuedClients()
 
 bool Clients::isClientAPlayer(Client& client, bool bErrorLog /*= false*/)
 {
-    if (this->getClientType(client) == PT_WHITE ||
-            this->getClientType(client) == PT_BLACK )
+    if (client.type == PT_WHITE || client.type  == PT_BLACK )
         return true;
     else
     {

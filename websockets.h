@@ -36,7 +36,7 @@ public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac sl
     void onNewConnection();
 
 public slots:
-    void sendMsgToClient(QString QStrMsg, Client* pClient);
+    void sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID);
     void sendMsgToAllClients(QString QStrMsg);
 
 signals:

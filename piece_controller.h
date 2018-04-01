@@ -26,7 +26,12 @@ public:
     bool isPieceStayOnItsStartingField(Piece* pPiece);
     Field* searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece);
 
-    Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
+    Piece* getPiece(short sPieceNr) const
+    {
+        qDebug() << "PieceController getPiece(): piece nr =" << sPieceNr << ", pointer ="
+                 << _pPieceSet->getPiece(sPieceNr);
+        return _pPieceSet->getPiece(sPieceNr);
+    }
 
 signals:
     void addTextToLogPTE(QString, LOG);

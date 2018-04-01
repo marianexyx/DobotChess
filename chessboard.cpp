@@ -156,6 +156,7 @@ void Chessboard::calculateRetreatPoints()
 
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField)
 {
+    qDebug() << "inside Chessboard::setPieceOnField()";
     if (pField->isFieldOccupied(SHOW_ERRORS)) return;
     if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS)) return;
 
@@ -229,15 +230,20 @@ bool Chessboard::isBoardReal(bool bErrorLog /*= false*/)
 
 Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
 {
+    qDebug() << "inside Chessboard::getFieldWithGivenPieceIfExists(). piece nr ="
+             << pPiece->getNr();
+
     if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS))
     {
         for (int i=0; i<=63; ++i)
         {
-            if (_pField[i]->getPieceOnField() == pPiece)
+            if (_pField[i]->getPieceOnField()->getNr() == pPiece->getNr())
                 return _pField[i];
         }
     }
 
+    qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): piece of nr"
+             << pPiece->getNr() << "is not on" << boardTypeAsQstr(_BoardType);
     return nullptr;
 }
 

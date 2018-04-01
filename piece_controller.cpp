@@ -77,6 +77,8 @@ bool PieceController::isPieceSetOk()
 
 bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
 {
+    qDebug() << "inside PieceController::isPieceStayOnItsStartingField(). piece nr ="
+             << pPiece->getNr();
     if (pPiece == nullptr)
     {
         qDebug() << "PieceController: Chess::isPieceStayOnItsStartingField(): piece can't"
@@ -84,8 +86,20 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
         return false;
     }
 
+    //tutaj powinno być sprawdzone czy pole startowe podanej bierki jest równe...
+    //...bierce, która jest na tym startowym polu
+
+
     Field* pStartFieldOfPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
-    if (pPiece == pStartFieldOfPiece->getPieceOnField())
+    if (pStartFieldOfPiece == nullptr)
+    {
+        qDebug() << "PieceController::isPieceStayOnItsStartingField(): "
+                    "pStartFieldOfPiece is nullptr";
+        return false;
+    }
+    qDebug() << "PieceController::isPieceStayOnItsStartingField(): pStartFieldOfPiece nr ="
+             << pStartFieldOfPiece->getNr();
+    if (pPiece->getNr() == pStartFieldOfPiece->getPieceOnField()->getNr())
         return true;
     else return false;
 }

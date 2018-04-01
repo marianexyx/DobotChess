@@ -57,7 +57,7 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
         if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promo autotest
         else if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
-        else if (this->isMoveRemoving()) return ST_REMOVING;
+        else if (this->isMoveRemoving(QStrMove)) return ST_REMOVING;
         else if (this->isMovePromotion(QStrMove)) return ST_PROMOTION;
         else return ST_REGULAR;
     }
@@ -68,9 +68,10 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
     }
 }
 
-bool ChessStatus::isMoveRemoving()
+bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
 {
-    if (_pBoardMain->getField(_PosMove.to)->getPieceOnField() != nullptr)
+    PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
+    if (_pBoardMain->getField(move.to)->getPieceOnField() != nullptr)
         return true;
     else return false;
 }
@@ -80,16 +81,28 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
     PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
     PosOnBoard BlackKingStartFieldPos(L_E, D_8);
 
-    Piece* WhiteKing =
+    qDebug() << "ChessStatus::isMoveCastling(QString QStrMoveToTest): "
+             << "Field::startPieceNrOnField(WhiteKingStartFieldPos) ="
+             << Field::startPieceNrOnField(WhiteKingStartFieldPos)
+             << ", Field::startPieceNrOnField(BlackKingStartFieldPos) ="
+             << Field::startPieceNrOnField(BlackKingStartFieldPos);
+
+    Piece* pWhiteKing =
             _pPieceController->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
-    Piece* BlackKing =
+    Piece* pBlackKing =
             _pPieceController->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
 
-    if ((_pPieceController->isPieceStayOnItsStartingField(WhiteKing) &&
+    qDebug() << "ChessStatus::isMoveCastling(): pWhiteKing pointer =" << pWhiteKing
+             << ", pBlackKing pointer =" << pBlackKing;
+
+    qDebug() << "ChessStatus::isMoveCastling(). pWhiteKing nr =" << pWhiteKing->getNr()
+             << ", pBlackKing =" << pBlackKing->getNr();
+
+    if ((_pPieceController->isPieceStayOnItsStartingField(pWhiteKing) &&
          ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q")) ||
             (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K"))))
             ||
-            (_pPieceController->isPieceStayOnItsStartingField(BlackKing) &&
+            (_pPieceController->isPieceStayOnItsStartingField(pBlackKing) &&
             ((QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q")) ||
             (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k")))))
         return true;
@@ -98,8 +111,8 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 
 bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
-    PosOnBoard MoveFrom = _PosMove.from;
-    Piece* piece = _pBoardMain->getField(MoveFrom)->getPieceOnField();
+    PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
+    Piece* piece = _pBoardMain->getField(move.from)->getPieceOnField();
 
     if (QStrMoveToTest.right(2) == _QStrEnpassant && (piece->getType() == P_PAWN &&
          ((Piece::Color(piece->getNr()) == PT_WHITE && _WhoseTurn == WHITE_TURN)
@@ -145,8 +158,8 @@ void ChessStatus::saveStatusData(QString QStrStatus)
         qDebug() << "ChessStatus::saveStatusData(): QStrEnpassant =" << _QStrEnpassant;
         emit this->setBoardDataLabel(_QStrEnpassant, BDL_ENPASSANT);
 
-        QString QStrHalfMoveClock = QStrFENRecord.at(5);
-        QString QStrFullMoveNr = QStrFENRecord.at(6);
+        QString QStrHalfMoveClock = QStrFENRecord.at(5); //future
+        QString QStrFullMoveNr = QStrFENRecord.at(6); //future
         emit this->setBoardDataLabel(QStrHalfMoveClock + "/" + QStrFullMoveNr, BDL_MOVES);
     }
     else

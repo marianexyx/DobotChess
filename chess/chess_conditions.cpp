@@ -9,13 +9,13 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
                                                    GAME_STATUS GS)
 {
-    QString QStrSenderID = QString::number(pSender->ID);
+    /*QString QStrSenderID = QString::number(pSender->ID);
     QString QStrSenderName = pSender->name;
     QString QStrSenderQueue = QString::number(pSender->queue);
     QString QStrSenderType = playerTypeAsQStr(pSender->type);
     qDebug() << "ChessConditions::isClientRequestCanBeAccepted(): sender data: "
                 "ID =" << QStrSenderID << ", name =" << QStrSenderName
-             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;
+             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;*/
 
     clientRequest r;
 
@@ -39,22 +39,22 @@ QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Typ
     {
         QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
 
-        qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                    "extracted param =" << QStrParam;
+        /*qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                    "extracted param =" << QStrParam;*/
 
         clientRequest r;
         r.type = Type;
         r.param = QStrParam;
         if (this->isRequestParameterInProperFormat(r))
         {
-            qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                        "param in proper format. return it";
+            /*qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                        "param in proper format. return it";*/
             return QStrParam;
         }
         else
         {
-            qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                        "param not in proper format. return ''";
+            /*qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                        "param not in proper format. return ''";*/
             return "";
         }
     }
@@ -131,13 +131,13 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
 
 bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
-    QString QStrSenderID = QString::number(pSender->ID);
-    QString QStrSenderName = pSender->name; //assert error: { Q_ASSERT(&other != this); d->ref.ref(); }
+    /*QString QStrSenderID = QString::number(pSender->ID);
+    QString QStrSenderName = pSender->name;
     QString QStrSenderQueue = QString::number(pSender->queue);
     QString QStrSenderType = playerTypeAsQStr(pSender->type);
     qDebug() << "ChessConditions::isSenderAppropriate(): approaching isClientInList()."
                 "sender data: ID =" << QStrSenderID << ", name =" << QStrSenderName
-             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;
+             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;*/
 
     if (!_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
 
@@ -199,10 +199,8 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         return false;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((_pClientsList->getClientType(*pSender) == PT_WHITE
-             && _pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (_pClientsList->getClientType(*pSender) == PT_BLACK
-                 && _pStatus->getWhoseTurn() == BLACK_TURN))
+        if ((pSender->type == PT_WHITE && _pStatus->getWhoseTurn() == WHITE_TURN) ||
+                (pSender->type == PT_BLACK && _pStatus->getWhoseTurn() == BLACK_TURN))
             return true;
         else return false;
     case RT_SIT_ON:

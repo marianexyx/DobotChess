@@ -77,36 +77,40 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return;
 
     from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
-    from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
-    to.Letter = pieceLetterPos(QStrMoveFromTo.mid(3,1));
+    from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt());
+    to.Letter = pieceLetterPos(QStrMoveFromTo.mid(2,1));
     to.Digit = static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
 }
 
 /*static*/ bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
 {
+    qDebug() << "PosFromTo::isMoveInProperFormat(QString) =" << QStrMoveFromTo;
+
     if  (QStrMoveFromTo.length() == 4)
     {
         if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)
             return false;
 
-        if (static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt()) < D_1 ||
-                static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt()) > D_8)
+        if (static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt()) < D_1 ||
+                static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt()) > D_8)
         {
             qDebug() << "ERROR: PosFromTo::isMoveInProperFormat():"
-                        " pieceFromDigit is out of range <1, 8>. it ="
-                     << static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
+                        " pieceFromDigit is out of range <1, 8>. it's ="
+                     << static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt())
+                     << ", QStrMoveFromTo.mid(2,1) =" << QStrMoveFromTo.mid(1,1);
             return false;
         }
 
-        if (pieceLetterPos(QStrMoveFromTo.mid(3,1)) == L_X)
+        if (pieceLetterPos(QStrMoveFromTo.mid(2,1)) == L_X)
             return false;
 
-        if (static_cast<DIGIT>(QStrMoveFromTo.mid(4,1).toInt()) < D_1 ||
-                static_cast<DIGIT>(QStrMoveFromTo.mid(4,1).toInt()) > D_8)
+        if (static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt()) < D_1 ||
+                static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt()) > D_8)
         {
             qDebug() << "ERROR: PosFromTo::isMoveInProperFormat():"
-                        " pieceToDigit is out of range <1, 8>. it ="
-                     << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
+                        " pieceToDigit is out of range <1, 8>. it's ="
+                     << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt())
+                     << ", QStrMoveFromTo.right(1) =" << QStrMoveFromTo.right(1);
             return false;
         }
     }
@@ -127,8 +131,8 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     if (!PosFromTo::isMoveInProperFormat(QStrMoveFromTo)) return move;
 
     move.from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
-    move.from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(2,1).toInt());
-    move.to.Letter = pieceLetterPos(QStrMoveFromTo.mid(3,1));
+    move.from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt());
+    move.to.Letter = pieceLetterPos(QStrMoveFromTo.mid(2,1));
     move.to.Digit = static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
 
     return move;

@@ -73,12 +73,12 @@ inline bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bo
         break;
     default:
         qDebug() << "ERROR: chenardMsgTypeAsQStr(): wrong arg =" << Command;
-        return "";
+        bReturn = false;
     }
 
-    if (bReturn && bErrorLog)
+    if (!bReturn && bErrorLog)
         qDebug() << "ERROR: isChenardAnswerCorrect(): wrong answer:" << QStrAns
-                    << "for" << chenardMsgTypeAsQStr(CMT_NEW) << "command";
+                 << "for" << chenardMsgTypeAsQStr(CMT_NEW) << "command";
 
     return bReturn;
 }

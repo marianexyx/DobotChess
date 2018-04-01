@@ -57,10 +57,6 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
 {
     //future: używać wszędzie ID
     Client client = _pClientsList->getClient(n64SenderID);
-    QString QStrClientName = client.name;
-    qDebug() << "Chess::checkMsgFromWebsockets(): client of name =" << QStrClientName
-             << "queue =" << QString::number(client.queue)
-             << ", ID =" << QString::number(client.ID);
 
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
 
@@ -69,6 +65,8 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         _request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
         _request.param = _pConditions->extractParameterIfTypeIsInProperFormat(_request.type,
                                                                               QStrMsg);
+        qDebug() << "Chess::checkMsgFromWebsockets(): accepted client request: type ="
+                 << requestTypeAsQStr(_request.type) << ", param =" << _request.param;
     }
     else
     {
@@ -79,10 +77,12 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
     switch(_request.type)
     {
     case RT_NEW_GAME:
-        if (&client == _pClientsList->getPlayer(PT_WHITE))
+        if (client == _pClientsList->getPlayer(PT_WHITE))
             this->playerWantToStartNewGame(PT_WHITE);
-        else if (&client == _pClientsList->getPlayer(PT_BLACK))
+        else if (client == _pClientsList->getPlayer(PT_BLACK))
             this->playerWantToStartNewGame(PT_BLACK);
+        else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): switch: RT_NEW_GAME:"
+                         "client isn't a player";
         break;
     case RT_PROMOTE_TO:
         _request.param = _pStatus->getMove().asQStr() + _request.param; // w/o break
@@ -90,10 +90,10 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         this->manageMoveRequest(_request);
         break;
     case RT_GET_TABLE_DATA:
-        this->sendDataToClient(this->getTableData(), &client);
+        this->sendDataToClient(this->getTableData(), client);
         break;
     case RT_GIVE_UP:
-        this->restartGame(ET_GIVE_UP, &client);
+        this->restartGame(ET_GIVE_UP, client.type);
         break;
     case RT_SIT_ON:
         _pClientsList->setPlayerType(client, playerTypeFromQStr(_request.param));
@@ -102,7 +102,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_STAND_UP:
-        _pClientsList->clearPlayerType(_pClientsList->getClientType(client));
+        _pClientsList->clearPlayerType(client.type);
         _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
         this->sendDataToAllClients(this->getTableData());
         break;
@@ -137,7 +137,9 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         _pBot->checkAI();
 
     CHENARD_MSG_TYPE ProcessedChenardMsgType = ChenardMsgType(QStrTcpMsgType);
-    if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpMsgType, SHOW_ERRORS)) return;
+    qDebug() << "Chess::checkMsgFromChenard(): ProcessedChenardMsgType ="
+             << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
+    if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpRespond, SHOW_ERRORS)) return;
 
     switch(ProcessedChenardMsgType)
     {
@@ -236,9 +238,9 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
     qDebug() << "Chess::tellPlayerThatHeGaveBadMove():" << QStrMsg;
     QString QStrMsgForActivePlayer = "badMove " + QStrMsg + " "
             + turnTypeAsQstr(_pStatus->getWhoseTurn());
-    Client* pPlayer = _pClientsList->getPlayer(_pStatus->getActivePlayerType());
+    Client player = _pClientsList->getPlayer(_pStatus->getActivePlayerType());
 
-    this->sendDataToClient(QStrMsgForActivePlayer, pPlayer);
+    this->sendDataToClient(QStrMsgForActivePlayer, player);
 }
 
 void Chess::sendMsgToTcp(QString QStrMsg)
@@ -253,13 +255,13 @@ void Chess::newClientName(Client& client, clientRequest request)
     if (!_pClientsList->isClientNameExists(request.param))
     {
         _pClientsList->setClientName(client, request.param);
-        this->sendDataToClient(this->getTableData(), &client);
+        this->sendDataToClient(this->getTableData(), client);
     }
     else //double login
     {
         _pClientsList->getClientSocket(request.param)->sendTextMessage("logout:doubleLogin");
         if (_pClientsList->isClientAPlayer(client))
-            this->restartGame(ET_SOCKET_LOST, &client);
+            this->restartGame(ET_SOCKET_LOST, client.type);
         _pClientsList->setClientName(client, request.param);
     }
 }
@@ -271,7 +273,7 @@ void Chess::removeClientFromList(Client& client)
     {
         emit this->addTextToLogPTE(playerTypeAsQStr(client.type)
                                    + " player disconnected\n", LOG_CORE);
-        this->restartGame(ET_SOCKET_LOST, &client);
+        this->restartGame(ET_SOCKET_LOST, client.type);
     }
     else //future: strange behavior with those info- seen more often then we should
         emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
@@ -283,29 +285,18 @@ void Chess::removeClientFromList(Client& client)
     emit _pClientsList->showClientsList(_pClientsList->getClientsList());
 }
 
-void Chess::sendDataToClient(QString QStrMsg, Client* pClient /* = nullptr*/)
+void Chess::sendDataToClient(QString QStrMsg, Client client /* = Client */)
 {
+    QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
     emit this->addTextToLogPTE("Sending msg to " + communicationTypeAsQStr(_PlayerSource)
-                                + ": " + QStrMsg + "\n", LOG_CORE);
+                                + ": " + QStrLog + "\n", LOG_CORE);
 
     if (_PlayerSource == WEBSITE)
     {
-        if (pClient == nullptr)
-        {
-            qDebug() << "ERROR: Chess::sendDataToClient(): client can't be null "
-                        "with _PlayerSource == WEBSITE";
-            return;
-        }
-        _pWebsockets->sendMsgToClient(QStrMsg, pClient);
+        _pWebsockets->sendMsgToClient(QStrMsg, client.ID);
     }
     else if (_PlayerSource == ARDUINO)
     {
-        if (pClient != nullptr)
-        {
-            qDebug() << "ERROR: Chess::sendDataToClient(): client must be null "
-                        "with _PlayerSource == ARDUINO";
-            return;
-        }
         //future: nieujednolicone typy komunikatów web z arduino są, przez co...
         //...takie dziwne zmiany w locie (wynika to z virtualow i dziedziwczenia)
         if (QStrMsg.contains("promote")) QStrMsg = "promote";
@@ -328,7 +319,8 @@ void Chess::sendDataToAllClients(QString QStrMsg)
                  << communicationTypeAsQStr(_PlayerSource);
 }
 
-QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPlayerToClear /*= nullptr*/)
+QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
+                             PLAYER_TYPE PlayerToClear /* = PT_NONE */)
 {
     QString QStrMove;
     QString QStrReturnMsg;
@@ -338,10 +330,10 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPl
     case ET_WHIE_WON:
     case ET_BLACK_WON:
     case ET_DRAW:
-        if (pPlayerToClear != nullptr)
+        if (PlayerToClear != PT_NONE)
         {
-            qDebug() << "ERROR: Chess::getEndGameMsg(): pPlayerToClear must"
-                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+            qDebug() << "ERROR: Chess::getEndGameMsg(): PlayerToClear must"
+                        " be PT_NONE in" << endTypeAsQstr(WhoWon) << "end type";
             return "";
         }
         else QStrMove = _pStatus->getMove().asQStr();
@@ -355,13 +347,13 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPl
     case ET_TIMEOUT_GAME:
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
-        if (pPlayerToClear == nullptr)
+        if (PlayerToClear == PT_NONE)
         {
-            qDebug() << "ERROR: Chess::getEndGameMsg(): pPlayerToClear can't"
-                        " be nullptr in" << endTypeAsQstr(WhoWon) << "end type";
+            qDebug() << "ERROR: Chess::getEndGameMsg(): PlayerToClear can't"
+                        " be PT_NONE in" << endTypeAsQstr(WhoWon) << "end type";
             return "";
         }
-        QStrReturnMsg = endTypeAsQstr(WhoWon) + playerTypeAsQStr(pPlayerToClear->type)
+        QStrReturnMsg = endTypeAsQstr(WhoWon) + playerTypeAsQStr(PlayerToClear)
                 + " " + QStrTableData;
         return QStrReturnMsg;
     default:
@@ -464,12 +456,12 @@ void Chess::continueGameplay()
     this->sendMsgToTcp("status");
 }
 
-void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
+void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE */)
 {
     //info
-    QString QStrPlayer = "";
-    if (pPlayerToClear != nullptr)
-        QStrPlayer = _pClientsList->getClientName(*pPlayerToClear) + ":";
+    QString QStrPlayer;
+    if (PlayerToClear != PT_NONE)
+        QStrPlayer = _pClientsList->getClientName(_pClientsList->getPlayer(PlayerToClear)) + ":";
     qDebug() << "Chess::restartGame():" << QStrPlayer << endTypeAsQstr(WhoWon);
 
     _ChessGameStatus = GS_TURN_NONE_RESETING;
@@ -480,7 +472,7 @@ void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
     _pStatus->clearMove();
     _pStatus->resetStatusData();
 
-    this->changePlayersOnChairs(WhoWon, pPlayerToClear);
+    this->changePlayersOnChairs(WhoWon, PlayerToClear);
     this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData()));
     //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
     //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
@@ -489,7 +481,7 @@ void Chess::restartGame(END_TYPE WhoWon, Client* pPlayerToClear /*= nullptr*/)
         this->coreIsReadyForNewGame();
 }
 
-void Chess::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
+void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
 {
     switch(WhoWon)
     {
@@ -497,10 +489,10 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
     case ET_BLACK_WON:
     case ET_DRAW:
     case ET_TIMEOUT_GAME:
-        if (pPlayerToClear != nullptr)
+        if (PlayerToClear != PT_NONE)
         {
             qDebug() << "ERROR: Chess::changePlayersOnChairs(): player must be"
-                        " null if not disconnected";
+                        " PT_NONE if not disconnected";
             return;
         }
         _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
@@ -508,19 +500,19 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear)
         break;
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
-        if (pPlayerToClear == nullptr)
+        if (PlayerToClear == PT_NONE)
         {
             qDebug() << "ERROR: Chess::changePlayersOnChairs(): player can't be"
-                        " null if diconnected";
+                        " PT_NONE if diconnected";
             return;
         }
-        if (_pClientsList->getClientType(*pPlayerToClear) == PT_WHITE)
+        if (PlayerToClear == PT_WHITE)
             _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-        else if (_pClientsList->getClientType(*pPlayerToClear) == PT_BLACK)
+        else if (PlayerToClear == PT_BLACK)
             _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
         else
         {
-            qDebug() << "ERROR: Chess::changePlayersOnChairs(): wrong player type:" << WhoWon;
+            qDebug() << "ERROR: Chess::changePlayersOnChairs(): wrong player type:" << PlayerToClear;
             return;
         }
         break;
@@ -578,7 +570,7 @@ void Chess::timeOutStart()
 
 void Chess::timeOutPlayer(PLAYER_TYPE Player)
 {
-    this->restartGame(ET_TIMEOUT_GAME, _pClientsList->getPlayer(Player));
+    this->restartGame(ET_TIMEOUT_GAME, Player);
 }
 
 void Chess::setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType)

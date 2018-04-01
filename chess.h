@@ -53,17 +53,18 @@ private:
     void sendMsgToTcp(QString QStrMsg);
     void newClientName(Client& client, clientRequest request);
     void removeClientFromList(Client& client);
-    void sendDataToClient(QString QStrMsg, Client* pClient = nullptr);
+    void sendDataToClient(QString QStrMsg, Client client = Client());
     void sendDataToAllClients(QString QStrMsg);
-    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData, Client* pPlayerToClear = nullptr);
+    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
+                          PLAYER_TYPE PlayerToClear = PT_NONE);
 
     //gameplay methods
     void coreIsReadyForNewGame();
     void startNewGameInCore();
     void manageMoveRequest(clientRequest request);
     void continueGameplay();
-    void restartGame(END_TYPE WhoWon, Client* pPlayerToClear = nullptr);
-    void changePlayersOnChairs(END_TYPE WhoWon, Client* pPlayerToClear);
+    void restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear = PT_NONE);
+    void changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear);
 
 public:
     Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,

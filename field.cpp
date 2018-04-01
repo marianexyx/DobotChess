@@ -45,6 +45,14 @@ Field::Field(short sFieldNr)
 
 /*static*/ short Field::nr(PosOnBoard fieldLines)
 {
+    /*qDebug() << "static short Field::nr(PosOnBoard fieldLines): "
+                "fieldLines.Letter =" << fieldLines.Letter
+             << ", fieldLines.Digit - 1 =" << fieldLines.Digit - 1
+             << ", static_cast<short>(fieldLines.Letter) ="
+             << static_cast<short>(fieldLines.Letter)
+             << ", static_cast<short>(fieldLines.Digit - 1) * 8 ="
+             << static_cast<short>(fieldLines.Digit - 1) * 8;*/
+
     short sFieldNr = static_cast<short>(fieldLines.Letter) +
             static_cast<short>(fieldLines.Digit - 1) * 8;
 
@@ -131,6 +139,10 @@ Piece* Field::getPieceOnField(bool bErrorLog /*= false*/) const
 {
     if (bErrorLog && _pPieceOnField == nullptr)
         qDebug() << "ERROR: Field::getPieceOnField(): piece == nullptr";
+
+    if (_pPieceOnField != nullptr)
+        qDebug() << "Field::getPieceOnField(): piece nr =" << _pPieceOnField->getNr();
+    else qDebug() << "Field::getPieceOnField(): piece == nullptr";
 
     return _pPieceOnField;
 }

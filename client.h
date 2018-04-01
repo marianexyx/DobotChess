@@ -54,12 +54,11 @@ public:
     bool isClientInList(const Client& client, bool bErrorLog = false);
     Client getClient(QWebSocket* pClientSocket);
     Client getClient(int64_t n64ClientID);
-    Client* getPlayer(PLAYER_TYPE Type);
+    Client getPlayer(PLAYER_TYPE Type);
     QWebSocket* getClientSocket(QString QStrPlayerName);
-    QString getClientName(Client& client);
+    QString getClientName(const Client& client);
     Client getNextQueuedClient();
     QString getQueuedClientsList();
-    PLAYER_TYPE getClientType(Client& client);
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
     bool isGameTableOccupied();
     int64_t getClientPosInQueue(Client& client);
