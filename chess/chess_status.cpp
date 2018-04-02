@@ -81,22 +81,10 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
     PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
     PosOnBoard BlackKingStartFieldPos(L_E, D_8);
 
-    qDebug() << "ChessStatus::isMoveCastling(QString QStrMoveToTest): "
-             << "Field::startPieceNrOnField(WhiteKingStartFieldPos) ="
-             << Field::startPieceNrOnField(WhiteKingStartFieldPos)
-             << ", Field::startPieceNrOnField(BlackKingStartFieldPos) ="
-             << Field::startPieceNrOnField(BlackKingStartFieldPos);
-
     Piece* pWhiteKing =
             _pPieceController->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
     Piece* pBlackKing =
             _pPieceController->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
-
-    qDebug() << "ChessStatus::isMoveCastling(): pWhiteKing pointer =" << pWhiteKing
-             << ", pBlackKing pointer =" << pBlackKing;
-
-    qDebug() << "ChessStatus::isMoveCastling(). pWhiteKing nr =" << pWhiteKing->getNr()
-             << ", pBlackKing =" << pBlackKing->getNr();
 
     if ((_pPieceController->isPieceStayOnItsStartingField(pWhiteKing) &&
          ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q")) ||

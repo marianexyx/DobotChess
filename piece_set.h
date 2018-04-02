@@ -13,8 +13,8 @@ private:
 public:
     PieceSet()
     {
-        for (int i=1; i>=32; ++i)
-            _pPiece[i] = new Piece(i);
+        for (int i=0; i<=31; ++i)
+            _pPiece[i] = new Piece(i+1);
     }
 
     Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }

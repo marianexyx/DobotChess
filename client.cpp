@@ -22,8 +22,6 @@ void Clients::newClient(QWebSocket& clientSocket)
 
 void Clients::setClientName(const Client& client, QString QStrName)
 {
-    qDebug() << "inside Clients::setClientName(): incoming name parameter:" << QStrName;
-
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.name == QStrName && !cl.name.isEmpty())

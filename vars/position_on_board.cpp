@@ -84,8 +84,6 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
 
 /*static*/ bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
 {
-    qDebug() << "PosFromTo::isMoveInProperFormat(QString) =" << QStrMoveFromTo;
-
     if  (QStrMoveFromTo.length() == 4)
     {
         if (pieceLetterPos(QStrMoveFromTo.left(1)) == L_X)

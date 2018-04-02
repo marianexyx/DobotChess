@@ -43,13 +43,13 @@ public:
 
     bool isBoardReal(bool bErrorLog = false);
     bool isPointInLocationLimits(Point3D point);
-    bool isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
+    bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
     BOARD getBoardType() const { return _BoardType; }
     Point3D getBoardPoint3D(BOARD_POINTS BP) const;
     Field* getField(short sFieldNr) const { return _pField[sFieldNr-1]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)-1]; }
-    Field* getFieldWithGivenPieceIfExists(Piece* pPiece);
+    Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);
     void clearField(Field* pField);    
 
 signals:

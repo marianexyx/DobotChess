@@ -48,9 +48,9 @@ Chessboard::~Chessboard()
 void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
                                                        Point3D H1, Point3D H8)
 {
-    for (int digit = 0; digit <= 7; digit++)
+    for (int digit=0; digit<=7; ++digit)
     {
-        for (int letter = 0; letter <= 7; letter++)
+        for (int letter=0; letter<=7; ++letter)
         {
             PosOnBoard pos;
             pos.Letter = static_cast<LETTER>(letter+1);
@@ -156,9 +156,8 @@ void Chessboard::calculateRetreatPoints()
 
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField)
 {
-    qDebug() << "inside Chessboard::setPieceOnField()";
     if (pField->isFieldOccupied(SHOW_ERRORS)) return;
-    if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS)) return;
+    if (this->isPieceAlreadyExistsOnBoard(pPiece, SHOW_ERRORS)) return;
 
     pField->setPieceOnField(pPiece);
     qDebug() << "Chessboard::setPieceOnField(): new pieceNr:" << pPiece->getNr()
@@ -192,21 +191,25 @@ bool Chessboard::isPointInLocationLimits(Point3D point)
     }
 }
 
-bool Chessboard::isPieceExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
+bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
 {
-    if (pPiece != nullptr)
+    if (pPiece == nullptr)
     {
-        qDebug() << "ERROR: Chessboard::isPieceExistsOnBoard(): piece can't be nullptr";
+        qDebug() << "ERROR: Chessboard::isPieceAlreadyExistsOnBoard(): piece can't be nullptr";
         return false;
     }
 
     for (int i=0; i<=63; ++i)
     {
-        if (_pField[i]->getPieceOnField() == pPiece)
+        qDebug() << "Chessboard::isPieceAlreadyExistsOnBoard(): comparing "
+                    "_pField[i]->getPieceOnField()->getNr() ="
+                 << _pField[i]->getPieceOnField()->getNr()
+                 << ", pPiece->getNr() =" << pPiece->getNr();
+        if (_pField[i]->getPieceOnField()->getNr() == pPiece->getNr())
         {
             if (bErrorLog)
             {
-                qDebug() << "ERROR: Chessboard::isPieceExistsOnBoard(): this piece "
+                qDebug() << "ERROR: Chessboard::isPieceAlreadyExistsOnBoard(): this piece "
                             "already exist on board. piece =" << pPiece->getNr() <<
                             "on field =" << _pField[i]->getNrAsQStr();
             }
@@ -228,22 +231,50 @@ bool Chessboard::isBoardReal(bool bErrorLog /*= false*/)
     }
 }
 
-Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece)
+Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog /*= false*/)
 {
-    qDebug() << "inside Chessboard::getFieldWithGivenPieceIfExists(). piece nr ="
-             << pPiece->getNr();
+    qDebug() << "inside Chessboard::getFieldWithGivenPieceIfExists()";
 
-    if (this->isPieceExistsOnBoard(pPiece, SHOW_ERRORS))
+    if (pPiece == nullptr)
+        qDebug() << "ERROR: Chessboard::getFieldWithGivenPieceIfExists(): "
+                    "piece can't be nullptr";
+
+    if (!this->isPieceAlreadyExistsOnBoard(pPiece, SHOW_ERRORS))
     {
         for (int i=0; i<=63; ++i)
         {
-            if (_pField[i]->getPieceOnField()->getNr() == pPiece->getNr())
-                return _pField[i];
+            if (_pField[i]->getPieceOnField() != nullptr)
+            {
+                qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): "
+                            "_pField[i]->getPieceOnField() != nullptr. gonna use"
+                            "_pField[i]->getNr() func";
+                qDebug() << "Chessboard::getFieldWithGivenPieceIfExists():"
+                            "comparing (for ==) given piece nr =" << pPiece->getNr()
+                         << "with piece nr =" << _pField[i]->getPieceOnField()->getNr()
+                         << "on field nr =" << _pField[i]->getNr();
+
+                if (_pField[i]->getPieceOnField()->getNr() == pPiece->getNr())
+                {
+                    qDebug() << "gonna use _pField[i]->getNr() func";
+                    qDebug() << "Chessboard::getFieldWithGivenPieceIfExists():"
+                                "found field. it's nr =" << _pField[i]->getNr();
+                    return _pField[i];
+                }
+            }
+            else if (_pField[i]->getPieceOnField() == nullptr)
+                qDebug() << "Chessboard::getFieldWithGivenPieceIfExists():"
+                            "(_pField[i]->getPieceOnField() == nullptr";
         }
     }
+    else qDebug() << "WARNING: Chessboard::getFieldWithGivenPieceIfExists(): "
+                     "PieceAlreadyExistsOnBoard";
 
-    qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): piece of nr"
-             << pPiece->getNr() << "is not on" << boardTypeAsQstr(_BoardType);
+    if (bErrorLog)
+        qDebug() << "ERROR: Chessboard::getFieldWithGivenPieceIfExists(): "
+                    "field not found. return nullptr";
+
+    qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): reached end of function";
+
     return nullptr;
 }
 

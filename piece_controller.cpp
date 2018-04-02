@@ -3,10 +3,17 @@
 PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardMain,
                                  Chessboard* pBoardRemoved)
 {
-    _pPieceSet = new PieceSet;
+    _pPieceSet = new PieceSet();
     _pDobot = pDobot;
     _pBoardMain = pBoardMain;
     _pBoardRemoved = pBoardRemoved;
+
+    for (int i=0; i<=63; ++i) //fill board with pieces on their start positions
+    {
+        short sStartPieceNr = _pBoardMain->getField(i+1)->getStartPieceNrOnField();
+        if (sStartPieceNr > 0)
+            _pBoardMain->getField(i+1)->setPieceOnField(this->getPiece(sStartPieceNr));
+    }
 }
 
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
@@ -52,10 +59,10 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
 
 bool PieceController::isPieceSetOk()
 {
-    for (short sPiece=1; sPiece>=32; ++sPiece)
+    for (short sPiece=1; sPiece<=32; ++sPiece)
     {
         bool bPieceExists = false;
-        for (short sField=1; sField>=64; ++sField)
+        for (short sField=1; sField<=64; ++sField)
         {
             if (_pBoardMain->getField(sField)->getPieceOnField() == _pPieceSet->getPiece(sPiece)
                     || _pBoardRemoved->getField(sField)->getPieceOnField() ==
@@ -77,28 +84,21 @@ bool PieceController::isPieceSetOk()
 
 bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
 {
-    qDebug() << "inside PieceController::isPieceStayOnItsStartingField(). piece nr ="
-             << pPiece->getNr();
     if (pPiece == nullptr)
     {
-        qDebug() << "PieceController: Chess::isPieceStayOnItsStartingField(): piece can't"
-                    " be nullptr";
+        qDebug() << "ERROR: PieceController: Chess::isPieceStayOnItsStartingField(): "
+                    "piece can't be nullptr";
         return false;
     }
-
-    //tutaj powinno być sprawdzone czy pole startowe podanej bierki jest równe...
-    //...bierce, która jest na tym startowym polu
-
 
     Field* pStartFieldOfPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
     if (pStartFieldOfPiece == nullptr)
     {
-        qDebug() << "PieceController::isPieceStayOnItsStartingField(): "
-                    "pStartFieldOfPiece is nullptr";
+        qDebug() << "ERROR: PieceController::isPieceStayOnItsStartingField(): "
+                    "pStartFieldOfPiece can't be nullptr";
         return false;
     }
-    qDebug() << "PieceController::isPieceStayOnItsStartingField(): pStartFieldOfPiece nr ="
-             << pStartFieldOfPiece->getNr();
+
     if (pPiece->getNr() == pStartFieldOfPiece->getPieceOnField()->getNr())
         return true;
     else return false;
@@ -113,7 +113,7 @@ Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Pie
         return nullptr;
     }
 
-    for (short sField=1; sField>=64; ++sField)
+    for (short sField=1; sField<=64; ++sField)
     {
         Field* pField = pBoard->getField(sField);
         if (pPiece == pField->getPieceOnField())

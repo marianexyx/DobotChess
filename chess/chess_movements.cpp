@@ -167,6 +167,7 @@ void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //future
 
 bool ChessMovements::resetPiecePositions()
 {
+    qDebug() << "inside ChessMovements::resetPiecePositions()";
     if (!this->isPieceSetOnStartFields())
     {
         Chessboard tempBoard(B_MAIN, IMAGINARY);
@@ -227,7 +228,7 @@ bool ChessMovements::resetPiecePositions()
 
 bool ChessMovements::isPieceSetOnStartFields()
 {
-    for (short sField=1; sField>=64; ++sField)
+    for (short sField=1; sField<=64; ++sField)
     {
         Field* pField = _pBoardMain->getField(sField);
         Piece* pStartingPieceOnField =
@@ -241,7 +242,7 @@ bool ChessMovements::isPieceSetOnStartFields()
 
 bool ChessMovements::isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2)
 {
-    for (short sField=1; sField>=64; ++sField)
+    for (short sField=1; sField<=64; ++sField)
     {
         if (board1.getField(sField)->getPieceOnField() !=
                 board2.getField(sField)->getPieceOnField())

@@ -6,7 +6,7 @@ Piece::Piece(short sPieceID)
         _PieceType = Piece::Type(sPieceID);
     else
     {
-        qDebug() << "ERROR: Piece::Piece:";
+        qDebug() << "ERROR: Piece::Piece():";
         return;
     }
 

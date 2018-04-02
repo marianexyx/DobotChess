@@ -15,7 +15,7 @@ private:
 
 public:
     Field(short sFieldID);
-    ~Field() {}
+    ~Field() { qDebug() << "Field::~Field(): destroying field nr =" << _sNr; }
 
     static bool isInRange(short sFieldNr);
     static PosOnBoard Pos(short sFieldNr);

@@ -192,7 +192,7 @@ void Dobot::initDobot()
     SetEndEffectorParams(&endEffectorParams, false, NULL);
     
     JOGJointParams jogJointParams;
-    for (int i = 0; i < 4; i++)
+    for (int i=0; i<4; ++i)
     {
         jogJointParams.velocity[i] = _ARM_MAX_VELOCITY;
         jogJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
@@ -200,7 +200,7 @@ void Dobot::initDobot()
     SetJOGJointParams(&jogJointParams, false, NULL);
     
     JOGCoordinateParams jogCoordinateParams;
-    for (int i = 0; i < 4; i++)
+    for (int i=0; i<4; ++i)
     {
         jogCoordinateParams.velocity[i] = _ARM_MAX_VELOCITY;
         jogCoordinateParams.acceleration[i] = _ARM_MAX_ACCELERATION;
@@ -213,7 +213,7 @@ void Dobot::initDobot()
     SetJOGCommonParams(&jogCommonParams, false, NULL);
     
     PTPJointParams ptpJointParams;
-    for (int i = 0; i < 4; i++)
+    for (int i=0; i<4; ++i)
     {
         ptpJointParams.velocity[i] = _ARM_MAX_VELOCITY;
         ptpJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
