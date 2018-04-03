@@ -17,7 +17,7 @@ public:
             _pPiece[i] = new Piece(i+1);
     }
 
-    Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr]; }
+    Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr-1]; }
 };
 
 #endif // PIECE_SET_H

@@ -167,7 +167,6 @@ void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //future
 
 bool ChessMovements::resetPiecePositions()
 {
-    qDebug() << "inside ChessMovements::resetPiecePositions()";
     if (!this->isPieceSetOnStartFields())
     {
         Chessboard tempBoard(B_MAIN, IMAGINARY);
@@ -176,7 +175,7 @@ bool ChessMovements::resetPiecePositions()
         {
             memcpy(&tempBoard, _pBoardMain, sizeof(*_pBoardMain));
 
-            for (short sField=1; sField>=64; ++sField)
+            for (short sField=1; sField<=64; ++sField)
             {
                 Field* pExaminedField = _pBoardMain->getField(sField);
                 Piece* pPieceOnExaminedField = pExaminedField->getPieceOnField();

@@ -102,6 +102,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_STAND_UP:
+        qDebug() << "Chess::checkMsgFromWebsockets(): case RT_STAND_UP";
         _pClientsList->clearPlayerType(client.type);
         _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
         this->sendDataToAllClients(this->getTableData());
@@ -148,13 +149,12 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         break;
     case CMT_STATUS:
         _pStatus->saveStatusData(QStrTcpRespond);
-
         if (_pStatus->getFENGameState() == ET_NONE)
         {
             this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_HISTORY));
             this->continueGameplay(); //future: zrobić to kiedyś tak by dopiero w...
             //...odpowiedzi na legal core wysyłał na stronę potwiedzenie wykonania...
-            //...ruchu (tj. zdjął blokadę przed kojenym ruchem)
+            //...ruchu (tj. zdjął blokadę przed kojenym ruchem)- stary koment?
         }
         else //ET_WHIE_WON, ET_BLACK_WON, ET_DRAW
             this->restartGame(_pStatus->getFENGameState());
@@ -169,7 +169,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
     case CMT_MOVE:
-        this->continueGameplay();
+        this->sendMsgToTcp("status");
         break;
     case CMT_THINK:
         if (_PlayerSource == ARDUINO)
@@ -237,7 +237,7 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
 {
     qDebug() << "Chess::tellPlayerThatHeGaveBadMove():" << QStrMsg;
     QString QStrMsgForActivePlayer = "badMove " + QStrMsg + " "
-            + turnTypeAsQstr(_pStatus->getWhoseTurn());
+            + turnTypeAsBriefQstr(_pStatus->getWhoseTurn());
     Client player = _pClientsList->getPlayer(_pStatus->getActivePlayerType());
 
     this->sendDataToClient(QStrMsgForActivePlayer, player);
@@ -330,13 +330,7 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
     case ET_WHIE_WON:
     case ET_BLACK_WON:
     case ET_DRAW:
-        if (PlayerToClear != PT_NONE)
-        {
-            qDebug() << "ERROR: Chess::getEndGameMsg(): PlayerToClear must"
-                        " be PT_NONE in" << endTypeAsQstr(WhoWon) << "end type";
-            return "";
-        }
-        else QStrMove = _pStatus->getMove().asQStr();
+        QStrMove = _pStatus->getMove().asQStr();
         //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
         //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
         //...o ruchach będą wyciągane z "history"
@@ -347,12 +341,6 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
     case ET_TIMEOUT_GAME:
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
-        if (PlayerToClear == PT_NONE)
-        {
-            qDebug() << "ERROR: Chess::getEndGameMsg(): PlayerToClear can't"
-                        " be PT_NONE in" << endTypeAsQstr(WhoWon) << "end type";
-            return "";
-        }
         QStrReturnMsg = endTypeAsQstr(WhoWon) + playerTypeAsQStr(PlayerToClear)
                 + " " + QStrTableData;
         return QStrReturnMsg;
@@ -431,7 +419,7 @@ void Chess::continueGameplay()
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
         this->sendDataToAllClients("moveOk " + _pStatus->getMove().asQStr() + " " +
-                                   turnTypeAsQstr(_pStatus->getWhoseTurn()) + " continue");
+                                   turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) + " continue");
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -449,11 +437,8 @@ void Chess::continueGameplay()
             this->sendDataToClient("IgorHasEndedMove"); //niech gracz wykonuje swój kolejny ruch
         }
     }
-    else
-        qDebug() << "ERROR: Chess::continueGameplay(): unknown _PlayerSource val ="
+    else qDebug() << "ERROR: Chess::continueGameplay(): unknown _PlayerSource val ="
                  << communicationTypeAsQStr(_PlayerSource);
-
-    this->sendMsgToTcp("status");
 }
 
 void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE */)
@@ -524,11 +509,9 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
 
 QString Chess::getTableData()
 {
-    //TABLE_DATA{"wplr":"WHITE","bplr":"BLACK","turn":"wt",
-    //"wtime":345581,"btime":300000,"queue":"empty"}
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +
             "\",\"bplr\":\"" + _pClientsList->getPlayerName(PT_BLACK) +
-            "\",\"turn\":\"" +  turnTypeAsQstr(_pStatus->getWhoseTurn()) +
+            "\",\"turn\":\"" +  turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) +
             "\",\"wtime\":" + QString::number(_pTimers->getWhiteTimeLeft())  +
             ",\"btime\":" + QString::number(_pTimers->getBlackTimeLeft()) +
             ",\"queue\":\"" + _pClientsList->getQueuedClientsList();

@@ -20,7 +20,20 @@ inline QString turnTypeAsQstr(WHOSE_TURN turn)
     case BLACK_TURN: return "blackTurn";
     default:
         qDebug() << "ERROR: wrong turnTypeAsQstr arg =" << turn;
-        return "";
+        return "error";
+    }
+}
+
+inline QString turnTypeAsBriefQstr(WHOSE_TURN turn)
+{
+    switch(turn)
+    {
+    case NO_TURN: return "nt";
+    case WHITE_TURN: return "wt";
+    case BLACK_TURN: return "bt";
+    default:
+        qDebug() << "ERROR: wrong turnTypeAsBriefQstr arg =" << turn;
+        return "er";
     }
 }
 

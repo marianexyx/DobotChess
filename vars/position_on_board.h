@@ -18,10 +18,10 @@ struct PosOnBoard
     PosOnBoard(QString QStrBoardPos);
 
     static QString posAsQStr(PosOnBoard Pos)
-    { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit+1); }
+    { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit); }
 
     void setLetterFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
-    QString getAsQStr() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit+1); }
+    QString getAsQStr() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit); }
 };
 
 struct PosFromTo

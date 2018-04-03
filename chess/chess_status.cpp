@@ -27,8 +27,7 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
 
 /*static*/ bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog /*= false*/)
 {
-    if (ChessStatus::isSignProperPromotionType(QStrMove.right(1), SHOW_ERRORS)
-            && QStrMove.length() == 5)
+    if (ChessStatus::isSignProperPromotionType(QStrMove.right(1)) && QStrMove.length() == 5)
         return true;
     else
     {
@@ -101,6 +100,8 @@ bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
     Piece* piece = _pBoardMain->getField(move.from)->getPieceOnField();
+
+    if (piece == nullptr) return false;
 
     if (QStrMoveToTest.right(2) == _QStrEnpassant && (piece->getType() == P_PAWN &&
          ((Piece::Color(piece->getNr()) == PT_WHITE && _WhoseTurn == WHITE_TURN)

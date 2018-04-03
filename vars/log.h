@@ -26,7 +26,7 @@ inline QString logAsQstr(LOG Log)
     case LOG_NOTHING: QStrLog = "nothing"; break;
     case LOG_CORE: QStrLog = "core"; break;
     case LOG_DOBOT: QStrLog = "dobot"; break;
-    case LOG_TCP: QStrLog = "tcp"; break;
+    case LOG_TCP: QStrLog = "TCP"; break;
     case LOG_WEBSOCKET: QStrLog = "websocket"; break;
     case LOG_MAINWINDOW: QStrLog = "mainwindow"; break;
     case LOG_USB: QStrLog = "usb"; break;

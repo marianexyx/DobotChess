@@ -14,10 +14,7 @@ Field::Field(short sFieldNr)
 /*static*/ bool Field::isInRange(short sFieldNr)
 {
     if (sFieldNr < 1 || sFieldNr > 64)
-    {
-        qDebug() << "ERROR: Field: fieldNr out of range 1-64:" << sFieldNr;
         return false;
-    }
     else return true;
 }
 
@@ -29,7 +26,7 @@ Field::Field(short sFieldNr)
     if (sFieldNr % 8 != 0)
     {
         FieldLines.Digit = static_cast<DIGIT>((sFieldNr / 8) + 1);
-        FieldLines.Letter  = static_cast<LETTER>(sFieldNr - (FieldLines.Digit * 8));
+        FieldLines.Letter  = static_cast<LETTER>(sFieldNr - ((FieldLines.Digit - 1) * 8));
     }
     else
     {
@@ -38,7 +35,8 @@ Field::Field(short sFieldNr)
     }
 
     if (!Field::isInRange(Field::nr(FieldLines)))
-        qDebug() << "ERROR: Field::Pos(): field isn't in range after conversation";
+        qDebug() << "ERROR: Field::Pos(): field isn't in range after conversation. it's ="
+                 << Field::nr(FieldLines);
 
     return FieldLines;
 }
@@ -71,7 +69,7 @@ Field::Field(short sFieldNr)
     if (!Field::isInRange(sFieldNr)) return -1;
 
     if (sFieldNr <= 16) return sFieldNr;
-    else if (sFieldNr >= 48) return sFieldNr - 32;
+    else if (sFieldNr >= 49) return sFieldNr - 32;
     else return 0;
 }
 
@@ -101,7 +99,7 @@ void Field::setPieceOnField(Piece *pPiece)
 
 void Field::clearField()
 {
-    if (_pPieceOnField != nullptr)
+    if (_pPieceOnField == nullptr)
         qDebug() << "ERROR: Field::clearField(): field is already clear. field ="
                  << Field::nrAsQStr(_sNr) << ", piece nr on it =" << _pPieceOnField->getNr();
     _pPieceOnField = nullptr;

@@ -91,16 +91,9 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
         return false;
     }
 
-    Field* pStartFieldOfPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
-    if (pStartFieldOfPiece == nullptr)
-    {
-        qDebug() << "ERROR: PieceController::isPieceStayOnItsStartingField(): "
-                    "pStartFieldOfPiece can't be nullptr";
-        return false;
-    }
-
-    if (pPiece->getNr() == pStartFieldOfPiece->getPieceOnField()->getNr())
-        return true;
+    Field* pActualFieldOfGIvenPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+    if (pActualFieldOfGIvenPiece == nullptr) return false;
+    if (pPiece->getStartFieldNr() == pActualFieldOfGIvenPiece->getNr()) return true;
     else return false;
 }
 

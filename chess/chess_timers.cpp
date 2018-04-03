@@ -94,7 +94,6 @@ void ChessTimers::switchPlayersTimers(WHOSE_TURN Turn)
     {
         _nRemainingBlackTime = _blackTimer->remainingTime();
         _blackTimer->stop();
-
         _whiteTimer->setInterval(_nRemainingWhiteTime);
         _whiteTimer->start();
     }
@@ -102,7 +101,6 @@ void ChessTimers::switchPlayersTimers(WHOSE_TURN Turn)
     {
         _nRemainingWhiteTime = _whiteTimer->remainingTime();
         _whiteTimer->stop();
-
         _blackTimer->setInterval(_nRemainingBlackTime);
         _blackTimer->start();
     }
@@ -113,11 +111,11 @@ void ChessTimers::switchPlayersTimers(WHOSE_TURN Turn)
 
 GAME_STATUS ChessTimers::startQueueTimer()
 {
-    qDebug() << "ChessTimers::startQueueTimer()";
     _startQueueTimer->stop();
     _startQueueTimer->setInterval(_lTimersStartQueue);
     emit this->setBoardDataLabel(this->milisecToClockTime(_startQueueTimer->remainingTime()),
                                    BDL_QUEUE_TIME);
+
     _startQueueTimer->start();
     _updateLabelTimer->start();
 

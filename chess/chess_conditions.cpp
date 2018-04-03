@@ -39,29 +39,19 @@ QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Typ
     {
         QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
 
-        /*qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                    "extracted param =" << QStrParam;*/
+        qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
+                    "extracted param =" << QStrParam;
 
         clientRequest r;
         r.type = Type;
         r.param = QStrParam;
-        if (this->isRequestParameterInProperFormat(r))
-        {
-            /*qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                        "param in proper format. return it";*/
-            return QStrParam;
-        }
-        else
-        {
-            /*qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                        "param not in proper format. return ''";*/
-            return "";
-        }
+        if (this->isRequestParameterInProperFormat(r)) return QStrParam;
+        else return "";
     }
     else return "";
 }
 
-bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog /* = false */)
+bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog /*= false*/)
 {
     switch(Type)
     {
@@ -81,31 +71,43 @@ bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog 
 
 bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
 {
+    bool bReturn = false;
+
     switch(request.type)
     {
     case RT_MOVE:
         if (_pStatus->findMoveType(request.param) == ST_NONE ||
                 _pStatus->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
-            return false;
-        else return true;
+            bReturn = false;
+        else bReturn = true;
+        break;
     case RT_SIT_ON:
         if (playerTypeFromQStr(request.param) != PT_WHITE &&
                 playerTypeFromQStr(request.param) != PT_BLACK)
-            return false;
-        else return true;
+            bReturn = false;
+        else bReturn = true;
+        break;
     case RT_IM:
         if (request.param.isEmpty())
-            return false;
-        else return true;
+            bReturn = false;
+        else bReturn = true;
+        break;
     case RT_PROMOTE_TO:
         if (ChessStatus::isSignProperPromotionType(request.param))
-            return true;
-        else return false;
+            bReturn = false;
+        else bReturn = true;
+        break;
     default:
         qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): unknown "
                     "request.type:" << requestTypeAsQStr(request.type);
-        return false;
+        bReturn = true;
     }
+
+    if (!bReturn)
+        qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): requirements"
+                    " not met (==false) in:" << requestTypeAsQStr(request.type);
+
+    return bReturn;
 }
 
 

@@ -12,11 +12,6 @@ void Clients::newClient(QWebSocket& clientSocket)
     newClient.isStartClickedByPlayer = false;
     newClient.type = PT_NONE;
 
-    qDebug() << "Clients::newClient(): created new client. ID =" << newClient.ID
-             << ", name =" << newClient.name << ", queue =" << newClient.queue
-             << ", start =" << newClient.isStartClickedByPlayer
-             << ", type =" << playerTypeAsQStr(newClient.type);
-
     _clients << newClient;
 }
 
@@ -299,6 +294,7 @@ void Clients::resetPlayersStartConfirmInfo()
 
 void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
 {
+    qDebug() << "Clients::cleanChairAndPutThereNextQueuedClientIfExist()";
     this->clearPlayerType(Chair);
 
     if (this->getQueuedClientsList() != QUEUE_EMPTY)

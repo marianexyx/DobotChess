@@ -103,7 +103,7 @@ void TCPMsgs::connected()
 
 void TCPMsgs::disconnected()
 {
-    qDebug() << "disconnected...";
+    qDebug() << "TCPMsgs::disconnected()";
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes) //mówi nam ile bajtów wysłaliśmy do tcp
@@ -148,9 +148,9 @@ void TCPMsgs::readyRead() //funckja odbierająca odpowiedź z tcp z wcześniej w
             return;
         }
 
-        qDebug() << "ID =" << QStrData.n64TcpID << ", sender =" << QStrData.nSender
-                 << ", msgForTcp =" << QStrData.QStrMsgForTcp << ", msgFromTcp ="
-                 << QStrMsgFromTcp;
+        qDebug() << "TCPMsgs::readyRead(): ID =" << QStrData.n64TcpID << ", sender ="
+                 << QStrData.nSender << ", msgForTcp =" << QStrData.QStrMsgForTcp
+                 << ", msgFromTcp =" << QStrMsgFromTcp;
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
     }
