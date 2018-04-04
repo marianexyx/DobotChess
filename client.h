@@ -38,8 +38,10 @@ public:
     void newClient(QWebSocket& clientSocket);
     //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w...
     //...działaniu i pozamieniać wtedy nazwy na pClient
-    //raczej wszystki wxkaźniki typu klient powinny być referencjai. inne typy mogą być gwiazdkami
-    void setClientName(const Client& client, QString QStrName); //todo: sprobowac wszedzi dac const
+    //raczej wszystki wxkaźniki typu klient powinny być referencjai. inne typy...
+    //...mogą być gwiazdkami
+    //todo: sprobowac wszedzi dac const
+    void setClientName(const Client& client, QString QStrName);
     void setPlayerType(Client& client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
     void setClientStartConfirmation(Client& client, bool bState);

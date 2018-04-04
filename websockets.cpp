@@ -98,7 +98,6 @@ void Websockets::socketDisconnected()
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
 
     Client client = _pClientsList->getClient(pSocket);
-    qDebug() << "Websockets::socketDisconnected(): approaching isClientInList()";
     if (_pClientsList->isClientInList(client))
         emit this->msgFromWebsocketsToChess("clientLeft", client.ID);
 }

@@ -28,11 +28,11 @@ private:
 
 public:
     Piece(short sPieceID);
-    ~Piece();
+    ~Piece() { qDebug() << "destroying piece nr =" << _sPieceID; }
 
     bool operator ==(const class Piece& p) { return _sPieceID == p.getNr(); }
 
-    static constexpr double dMaxPieceHeight = 50.f;
+    //static constexpr float fMaxPieceHeight = 50.f;
 
     static bool isInRange(short sPieceNr);
     static PLAYER_TYPE Color(char chFENSign);

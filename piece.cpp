@@ -4,11 +4,7 @@ Piece::Piece(short sPieceID)
 {
     if (Piece::isInRange(sPieceID))
         _PieceType = Piece::Type(sPieceID);
-    else
-    {
-        qDebug() << "ERROR: Piece::Piece():";
-        return;
-    }
+    else return;
 
     _sPieceID = sPieceID;
     _PieceColor = Piece::Color(sPieceID);
@@ -126,14 +122,8 @@ Piece::Piece(short sPieceID)
     short sPieceNr = static_cast<short>(pieceLines.Letter) +
             static_cast<short>(pieceLines.Digit - 1) * 8;
 
-    qDebug() << "Piece::nr(): sPieceNr =" << sPieceNr;
-
     if (Piece::isInRange(sPieceNr)) return sPieceNr;
-    else
-    {
-        qDebug() << "ERROR: Piece::nr:";
-        return -1;
-    }
+    else return -1;
 }
 
 /*static*/ PosOnBoard Pos(short sPieceNr); //todo: co to??

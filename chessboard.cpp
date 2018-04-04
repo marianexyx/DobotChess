@@ -1,14 +1,16 @@
 #include "chessboard.h"
 
-Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/):
-    _A1(157.4, 76.3, -22.9),
+Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
+                       RealVars gameConfigVars /*= RealVars()*/):
+    fMaxPieceHeight(gameConfigVars.fPieceHeight)
+    /*_A1(157.4, 76.3, -22.9),
     _A8(306.6, 75.0, -19.1),
     _H1(157.4, -81.9, -23.1),
     _H8(305.6, -79.2, -19.3),
     _remWhiteCloserOuter(108.9, 176.0, -21.8),
     _remWhiteFurtherInner(259.0, 169.3, -19.5), //y is unused
     _remBlackCloserOuter(115.5, -148.4, -23.2),
-    _remBlackFurtherInner(267.2, 0, -19.4) //y is unused
+    _remBlackFurtherInner(267.2, 0, -19.4) //y is unused*/
 {
     _BoardType = BoardType;
     _bBoardIsReal = bBoardIsReal;
@@ -20,11 +22,21 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/):
     {
         if (BoardType == B_MAIN)
         {
+            _A1 = gameConfigVars.A1;
+            _A8 = gameConfigVars.A8;
+            _H1 = gameConfigVars.H1;
+            _H8 = gameConfigVars.H8;
+
             this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
             _dSquareWidth = ((_A8.x - _A1.x)/7 + (_A8.y - _A1.y)/7)/2;
         }
         else if (BoardType == B_REMOVED)
         {
+            _remWhiteCloserOuter = gameConfigVars.remWhiteCloserOuter;
+            _remWhiteFurtherInner = gameConfigVars.remWhiteFurtherInner;
+            _remBlackCloserOuter = gameConfigVars.remBlackCloserOuter;
+            _remBlackFurtherInner = gameConfigVars.remBlackFurtherInner;
+
             this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
                   _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
             _dSquareWidth = qFabs(_remWhiteCloserOuter.y - _remWhiteFurtherInner.y);
@@ -38,6 +50,9 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/):
 
 Chessboard::~Chessboard()
 {
+    qDebug() << "destroying board =" << boardTypeAsQstr(_BoardType)
+             << ", _bBoardIsReal =" << _bBoardIsReal;
+
     for (int i=0; i<=63; ++i)
     {
         delete _pField[i];
@@ -134,8 +149,8 @@ void Chessboard::calculateMarginal3DValues()
             _MaxBoard.x = _pField[i]->getLocation3D().x;
         if (_pField[i]->getLocation3D().y > _MaxBoard.y)
             _MaxBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z > _MaxBoard.z) //Piece::dMaxPieceHeight się skraca
-            _MaxBoard.z = _pField[i]->getLocation3D().z + Piece::dMaxPieceHeight ;
+        if (_pField[i]->getLocation3D().z > _MaxBoard.z) //fMaxPieceHeight się skraca
+            _MaxBoard.z = _pField[i]->getLocation3D().z + (double)fMaxPieceHeight;
     }
 }
 
@@ -154,16 +169,17 @@ void Chessboard::calculateRetreatPoints()
     _retreatLeft.z = _retreatRight.z = _MaxBoard.z;
 }
 
-void Chessboard::setPieceOnField(Piece* pPiece, Field* pField)
+void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*= false*/)
 {
     if (pField->isFieldOccupied(SHOW_ERRORS)) return;
     if (pPiece != nullptr && this->isPieceAlreadyExistsOnBoard(pPiece, SHOW_ERRORS)) return;
 
     pField->setPieceOnField(pPiece);
 
-    qDebug() << "Chessboard::setPieceOnField(): new pieceNr ="
-             << (pPiece == nullptr ? 0 : pPiece->getNr())
-             << "on fieldNr =" << pField->getNrAsQStr();
+    if (bDebugLog)
+        qDebug() << "Chessboard::setPieceOnField(): new pieceNr ="
+                 << (pPiece == nullptr ? 0 : pPiece->getNr())
+                 << "on fieldNr =" << pField->getNrAsQStr();
 }
 
 void Chessboard::clearField(Field *pField)
@@ -185,7 +201,7 @@ bool Chessboard::isPointInLocationLimits(Point3D point)
 
     if (point.x >= _MinBoard.x && point.y >= _MinBoard.y && point.z >= _MinBoard.z &&
             point.x <= _MaxBoard.x && point.y <= _MaxBoard.y && point.z <= _MaxBoard.z
-            + Piece::dMaxPieceHeight)
+            + (double)fMaxPieceHeight)
         return true;
     else
     {
@@ -197,18 +213,12 @@ bool Chessboard::isPointInLocationLimits(Point3D point)
 
 bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
 {
-    if (pPiece == nullptr)
-    {
-        qDebug() << "ERROR: Chessboard::isPieceAlreadyExistsOnBoard(): piece can't be nullptr";
-        return false;
-    }
-
     for (int i=0; i<=63; ++i)
     {
         short sPieceNr = (_pField[i]->getPieceOnField() == nullptr ?
                               0 : _pField[i]->getPieceOnField()->getNr());
 
-        if (sPieceNr == pPiece->getNr())
+        if (pPiece != nullptr && pPiece->getNr() == sPieceNr)
         {
             if (bErrorLog)
             {
@@ -236,11 +246,8 @@ bool Chessboard::isBoardReal(bool bErrorLog /*= false*/)
 
 Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog /*= false*/)
 {
-    if (pPiece == nullptr)
-        qDebug() << "ERROR: Chessboard::getFieldWithGivenPieceIfExists(): "
-                    "piece can't be nullptr";
-
-    if (!this->isPieceAlreadyExistsOnBoard(pPiece)) //don't SHOW_ERRORS
+    //no need for checking board, if piece isn't on it anyway
+    if (pPiece != nullptr &&this->isPieceAlreadyExistsOnBoard(pPiece)) //don't SHOW_ERRORS
     {
         for (int i=0; i<=63; ++i)
         {
@@ -254,8 +261,10 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog 
             }
         }
     }
+    else qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): piece don't exists"
+                     "on board";
 
-    if (bErrorLog)
+    //if (bErrorLog)
         qDebug() << "ERROR: Chessboard::getFieldWithGivenPieceIfExists(): "
                     "field not found. return nullptr";
 

@@ -1,8 +1,8 @@
 #include "dobot_servo.h"
 
-DobotServo::DobotServo(Dobot *pDobot):
-    _fGripOpened(6.9f), //future: ciągnąć z xml
-    _fGripClosed(7.55f)
+DobotServo::DobotServo(Dobot *pDobot, float fGripperOpened, float fGripperClosed):
+    _fGripOpened(fGripperOpened),
+    _fGripClosed(fGripperClosed)
 {
     _pDobot = pDobot;
     _pQueue = _pDobot->getQueuePointer();

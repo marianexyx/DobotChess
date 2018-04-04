@@ -38,13 +38,17 @@ private:
     void calculateRetreatPoints();
 
 public:
-    Chessboard(BOARD BoardType, bool bBoardIsReal = true);  //todo: friend dla chess
+    Chessboard(BOARD BoardType, bool bBoardIsReal = true,
+               RealVars gameConfigVars = RealVars());  //todo: friend dla chess
     ~Chessboard();
+
+    const float fMaxPieceHeight;
 
     bool isBoardReal(bool bErrorLog = false);
     bool isPointInLocationLimits(Point3D point);
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
-    void setPieceOnField(Piece* pPiece, Field* pField); //todo: friend dla chwytaka?
+    //todo: friend dla chwytaka?
+    void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
     BOARD getBoardType() const { return _BoardType; }
     Point3D getBoardPoint3D(BOARD_POINTS BP) const;
     Field* getField(short sFieldNr) const { return _pField[sFieldNr-1]; }

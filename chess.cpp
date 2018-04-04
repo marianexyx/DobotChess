@@ -70,10 +70,13 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
     }
     else
     {
-        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): client request can't be accepted";
+        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): "
+                    "client request can't be accepted";
         return;
     }
 
+    qDebug() << "Chess::checkMsgFromWebsockets(): switch: case:"
+             << requestTypeAsQStr(_request.type);
     switch(_request.type)
     {
     case RT_NEW_GAME:
@@ -81,8 +84,8 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
             this->playerWantToStartNewGame(PT_WHITE);
         else if (client == _pClientsList->getPlayer(PT_BLACK))
             this->playerWantToStartNewGame(PT_BLACK);
-        else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): switch: RT_NEW_GAME:"
-                         "client isn't a player";
+        else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): switch: "
+                         "RT_NEW_GAME: client isn't a player";
         break;
     case RT_PROMOTE_TO:
         _request.param = _pStatus->getMove().asQStr() + _request.param; // w/o break
@@ -102,8 +105,8 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_STAND_UP:
-        qDebug() << "Chess::checkMsgFromWebsockets(): case RT_STAND_UP";
         _pClientsList->clearPlayerType(client.type);
+        _pTimers->stopQueueTimer();
         _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
         this->sendDataToAllClients(this->getTableData());
         break;
@@ -142,6 +145,8 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
              << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
     if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpRespond, SHOW_ERRORS)) return;
 
+    qDebug() << "Chess::checkMsgFromChenard(): switch: case:"
+             << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
     switch(ProcessedChenardMsgType)
     {
     case CMT_NEW:
@@ -462,8 +467,12 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
     //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
     //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
     //dowiedzą że nastąpił koniec gry
+
+    //todo: tu się zacina cały program przy resetowaniu?
     if(_pMovements->resetPiecePositions())
         this->coreIsReadyForNewGame();
+
+    this->sendDataToAllClients(this->getTableData());
 }
 
 void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)

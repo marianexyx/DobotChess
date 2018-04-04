@@ -3,9 +3,19 @@
 XmlReader::XmlReader(QString QStrFileName):
     xmlFile(QStrFileName)
 {
+    if (!xmlFile.exists())
+    {
+        qDebug() << "ERROR: XmlReader::XmlReader(): file name:" << QStrFileName
+                 << "don't exists";
+        return;
+    }
+
+    QString errMsg;
     if (!xmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug() << "ERROR: XmlReader::XmlReader(): failed to load file";
+        errMsg = xmlFile.errorString();
+        qDebug() << "ERROR: XmlReader::XmlReader(): failed to load file:" << errMsg;
+
         return;
     }
     else
@@ -13,17 +23,36 @@ XmlReader::XmlReader(QString QStrFileName):
         if(xmlDoc.setContent(&xmlFile))
         {
             qDebug() << "ERROR: XmlReader::XmlReader(): failed to load document";
+            xmlFile.close();
             return;
         }
         xmlFile.close();
     }
 
-    QDomElement root  = xmlDoc.firstChildElement(); //get root element of document
 
-    this->listElements(root, "point", "name"); //???? x,y,z,????
 
-    //test it
-    QDomNodeList points = root.elementsByTagName("point");
+    /*QDomElement docElem = xmlDoc.documentElement();
+
+    QDomNode n = docElem.firstChild();
+    while(!n.isNull())
+    {
+        QDomElement e = n.toElement(); // try to convert the node to an element.
+        if(!e.isNull())
+        {
+            qDebug() << qPrintable(e.tagName()); // the node really is an element.
+        }
+         qDebug() << "dupa";
+        n = n.nextSibling();
+    }
+    qDebug() << "dupa2";*/
+
+
+
+    QDomElement root = xmlDoc.firstChildElement(); //get root element of document = <data>
+
+    this->listElements(root, "points", "point"); //???? x,y,z,????
+
+    QDomNodeList points = root.elementsByTagName("points");
     for (int i=0; i<points.count(); i++)
     {
         QDomNode pointNode = points.at(i);
@@ -33,16 +62,16 @@ XmlReader::XmlReader(QString QStrFileName):
             //do smtg
         }
     }
-
 }
 
+//roots for listElements are: <piece>, <points>, <gripper>
 void XmlReader::listElements(QDomElement root, QString QStrTagName, QString QStrAttribute)
 {
     QDomNodeList items = root.elementsByTagName(QStrTagName);
 
     qDebug() << "XmlReader::listElements(): total items =" << items.count();
 
-    for (int i=0; i<items.count(); i++)
+    for (int i=0; i<items.count(); ++i)
     {
         QDomNode itemNode = items.at(i); //node can be anything in document (elements
         //...are in tags propably
@@ -72,6 +101,7 @@ bool XmlReader::areVarsInLimits()
 {
     if (this->isPieceHeightInLimits(_vars.fPieceHeight) &&
             this->isPointInLimits(_vars.home) &&
+            this->isPointInLimits(_vars.homeToMiddleAbove) &&
             this->isPointInLimits(_vars.A1) &&
             this->isPointInLimits(_vars.A8) &&
             this->isPointInLimits(_vars.H1) &&
@@ -128,9 +158,3 @@ bool XmlReader::isGripperParamInLimits(float fGripperPar)
         return false;
     }
 }
-
-
-
-
-
-

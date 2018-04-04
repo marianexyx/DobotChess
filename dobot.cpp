@@ -3,26 +3,32 @@
 //TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian...
 //...tylko kalibracyjnych
 
-Dobot::Dobot(ArduinoUsb *pUsb):
+Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars):
     _ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
     _ARM_MAX_ACCELERATION(300)
 {
     _pUsb = pUsb;
 
     _pQueue = new DobotQueue(this);
-    _pServo = new DobotServo(this);
+    _pServo = new DobotServo(this, gameConfigVars.fGripperOpened,
+                             gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
     
     _bConnectedToDobot = false;
 
-    Point3D fakeMid(200,0,25);
+    Point3D fakeMid(200,0,25); //todo: liczyć
     _lastGivenPoint = fakeMid; //todo: pierwszy punkt jako middle above
 
-    _Home.x = 140; //todo: home ciągnąć z xml
+    /*_Home.x = 140;
     _Home.y = 0;
-    _Home.z = 10;
+    _Home.z = 10;*/
+    _Home.x = gameConfigVars.home.x;
+    _Home.y = gameConfigVars.home.y;
+    _Home.z = gameConfigVars.home.z;
     _Home.r = 0;
+
+    _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
 }
 
 Dobot::~Dobot()

@@ -201,7 +201,7 @@ void Clients::addClientToQueue(Client& client)
     }
 
     int64_t maxQueue = 0;
-    Q_FOREACH (Client cl, _clients)
+    Q_FOREACH (Client cl, _clients) //find max client queue
     {
         if (cl.queue > maxQueue)
             maxQueue = cl.queue;
@@ -217,18 +217,20 @@ void Clients::addClientToQueue(Client& client)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::addClientToQueue(): new queue ="
+                qDebug() << "Clients::addClientToQueue(): client named =" <<
+                            _clients.at(nClientPos).name <<  "queued in list with nr ="
                          << _clients.at(nClientPos).queue;
             }
-            else qDebug() << "ERROR: Clients::addClientToQueue(): iteration error. iter val ="
-                          << nClientPos;
+            else qDebug() << "ERROR: Clients::addClientToQueue(): iteration error. "
+                             "iter val =" << nClientPos;
 
             emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
             return;
         }
     }
-    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
+                                 BDL_QUEUE_PLAYERS);
 }
 
 void Clients::removeClientFromList(Client& client)
@@ -238,11 +240,12 @@ void Clients::removeClientFromList(Client& client)
     {
         if (cl == client)
         {
-            cl.socket->deleteLater(); //todo: jest sens to usuwać skoro to nie jest wskaźnik?...
-            //...a może to musi być wskaźnik by dało się to wogle usunąć?
+            cl.socket->deleteLater(); //todo: jest sens to usuwać skoro to nie jest...
+            //...wskaźnik? a może to musi być wskaźnik by dało się to wogle usunąć?
 
             if(!_clients.removeOne(cl))
-                qDebug() << "ERROR: Clients::removeClientFromList(): client can't be removed";
+                qDebug() << "ERROR: Clients::removeClientFromList(): "
+                            "client can't be removed";
 
             return;
 
@@ -280,7 +283,8 @@ void Clients::removeClientFromQueue(Client &client)
             return;
         }
     }
-    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
+                                 BDL_QUEUE_PLAYERS);
 }
 
 void Clients::resetPlayersStartConfirmInfo()
@@ -300,8 +304,6 @@ void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
     if (this->getQueuedClientsList() != QUEUE_EMPTY)
     {
         Client nextQueuedClient;
-        qDebug() << "Clients::cleanChairAndPutThereNextQueuedClientIfExist(): "
-                    "approaching isClientInList()";
         if (this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS))
             nextQueuedClient = this->getNextQueuedClient();
         else return;
@@ -345,8 +347,6 @@ Client Clients::getClient(QWebSocket* pClientSocket)
         if (cl.socket == pClientSocket)
         {
             Client& client = cl;
-            /*qDebug() << "Clients::getClient(QWebSocket*): client found. his name ="
-                     << client.name << ", ID =" << client.ID << ", queue =" << client.queue;*/
             return client;
         }
     }
@@ -430,7 +430,7 @@ Client Clients::getNextQueuedClient()
     int64_t minQueue = std::numeric_limits<int64_t>::max();
     Q_FOREACH (Client cl, _clients)
     {
-        if (minQueue > cl.queue && cl.queue >= 0)
+        if (minQueue > cl.queue && cl.queue > 0)
             minQueue = cl.queue;
     }
     qDebug() << "Clients::getNextQueuedClient(): minQueue =" << minQueue;
@@ -453,7 +453,7 @@ QString Clients::getQueuedClientsList()
     QString QStrQueuedClients;
     int64_t maxQueue = 0;
     int64_t minQueue = std::numeric_limits<int64_t>::max();
-    int64_t lastBigggestQueue = std::numeric_limits<int64_t>::max();
+    int64_t lastBiggestQueue = std::numeric_limits<int64_t>::max();
     Q_FOREACH (Client cl, _clients)
     {
         if (minQueue > cl.queue && cl.queue > 0)
@@ -467,35 +467,38 @@ QString Clients::getQueuedClientsList()
         {
             Q_FOREACH (Client cl, _clients)
             {
-                if (cl.queue > maxQueue && cl.queue < lastBigggestQueue)
+                if (cl.queue > maxQueue && cl.queue < lastBiggestQueue)
                     maxQueue = cl.queue;
             }
 
-            lastBigggestQueue = maxQueue;
+            lastBiggestQueue = maxQueue;
 
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl.queue == maxQueue)
                 {
+                    qDebug() << "Clients::getQueuedClientsList(): next queued "
+                                "client =" << cl.name;
                     QStrQueuedClients = cl.name + "," + QStrQueuedClients;
                     maxQueue = 0;
                 }
             }
             if (nLoopBreakingCounter > nNumberOFClients + 1)
             {
-                qDebug() << "ERROR: Clients::getQueuedClientsList(): incorrect loop break. "
-                            "nLoopBreakingCounter =" << nLoopBreakingCounter <<
+                qDebug() << "ERROR: Clients::getQueuedClientsList(): incorrect loop "
+                            "break. nLoopBreakingCounter =" << nLoopBreakingCounter <<
                             ", nNumberOFClients =" << nNumberOFClients+1;
                 break;
             }
             nLoopBreakingCounter++;
-        } while (lastBigggestQueue != minQueue);
+        } while (lastBiggestQueue != minQueue);
     }
     if (QStrQueuedClients.isEmpty())
         QStrQueuedClients = QUEUE_EMPTY;
-    else //usuń ostatni przecinek
+    else //remove last comma
         QStrQueuedClients = QStrQueuedClients.left(QStrQueuedClients.length() - 1);
 
+    qDebug() << "Clients::getQueuedClientsList(): 1 line list =" << QStrQueuedClients;
     return QStrQueuedClients;
 }
 
@@ -717,35 +720,11 @@ int64_t Clients::getNextAvailableClientID()
             maxID = client.ID;
     }
     return ++maxID;
-
-    /*
-    int64_t minID = std::numeric_limits<int64_t>::max();
-
-    if (maxID > 0) //if any client is connected
-    {
-        Q_FOREACH (Client client, _clients) //find min queued ID
-        {
-            if (minID > client.ID && client.ID > 0)
-                minID = client.ID;
-        }
-
-        if (maxID - minID == 1) //if there is no empty IDs between min and max ID
-            return maxID+1; //return next biggest nr
-        else if (maxID - minID > 1) //if next max ID isn't next (from min) free ID to assign
-            return minID+1; //return 1st free nr in ID list
-        //future: nie mam wyszukiwania pierwszego pustego miejsca. zwracam tylko min+1, co w sumie może być zajęte
-        else
-        {
-            qDebug() << "ERROR: Clients::getNextAvailableClientID(): minID > maxID";
-            return 0;
-        }
-    }
-    else return 1; //give 1st ID to 1st client
-    */
 }
 
 void Clients::showClientsInUI()
 {
     emit this->showClientsList(_clients);
-    emit this->setBoardDataLabel(std::to_string(_clients.size()).c_str(), BDL_SOCKETS_ONLINE);
+    emit this->setBoardDataLabel(std::to_string(_clients.size()).c_str(),
+                                 BDL_SOCKETS_ONLINE);
 }

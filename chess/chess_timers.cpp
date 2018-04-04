@@ -129,8 +129,6 @@ void ChessTimers::stopQueueTimer() //stop == reset
     this->updateTimeLabels();
 }
 
-//get/set:
-
 int ChessTimers::getWhiteTimeLeft()
 {
     if (_whiteTimer->remainingTime() != -1)

@@ -47,14 +47,15 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
                 + " on field " + pField->getNrAsQStr();
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
-        pRealBoard->setPieceOnField(_pPieceSet->getPiece(_pDobot->getItemInGripper()), pField);
+        pRealBoard->setPieceOnField(_pPieceSet->getPiece(_pDobot->getItemInGripper()),
+                                    pField, PRINT_DEBUG);
         _pDobot->clearGripper();
 
         if (!this->isPieceSetOk()) return;
     }
 
     Point3D xyz = pField->getLocation3D();
-    _pDobot->queueMoveSequence(xyz, Piece::dMaxPieceHeight, VertMove);
+    _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove);
 }
 
 bool PieceController::isPieceSetOk()
@@ -74,8 +75,8 @@ bool PieceController::isPieceSetOk()
         }
         if (!bPieceExists)
         {
-            qDebug() << "ERROR: PieceController::isPieceSetOk(): it isn't, missing piece nr:"
-                     << sPiece;
+            qDebug() << "ERROR: PieceController::isPieceSetOk(): it isn't, "
+                        "missing piece nr:" << sPiece;
             return false;
         }
     }

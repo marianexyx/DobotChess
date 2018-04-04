@@ -13,7 +13,7 @@ struct ServoArduino
     bool isGripperOpen;
 };
 
-//future: czy servo traktować jako po prostu gripper?
+//future: czy servo (nazwę) traktować jako po prostu gripper?
 class DobotServo
 {
 private:
@@ -26,7 +26,7 @@ private:
     WAITCmd _gripperMoveDelay;
 
 public:
-    DobotServo(Dobot* pDobot);
+    DobotServo(Dobot* pDobot, float fGripperOpened, float fGripperClosed);
 
     void checkPWMForErrors();
     void changeGripperAngle(float fDutyCycle); //service usage

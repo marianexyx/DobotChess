@@ -40,11 +40,12 @@ private:
     bool _bConnectedToDobot;
 
     HOMEParams _Home;
+    Point3D _homeToMiddleAbove;
     Point3D _realTimePoint;
     Point3D _lastGivenPoint;
 
 public:
-    Dobot(ArduinoUsb* pUsb);
+    Dobot(ArduinoUsb* pUsb, RealVars gameConfigVars);
     ~Dobot();
 
     static bool isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false);
@@ -67,6 +68,7 @@ public:
     bool isGripperEmpty() const { return _sItemIDInGripper == 0 ? true : false; }
     short getItemInGripper() const { return _sItemIDInGripper; }
     Point3D getHomePos();
+    Point3D getHomeToMiddleAbovePoint() const { return _homeToMiddleAbove; }
     Point3D getLastGivenPoint() const { return _lastGivenPoint; }
     //todo: poniższe: friends
     DobotServo* getServoPointer() const { return _pServo; }

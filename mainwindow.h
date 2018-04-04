@@ -11,7 +11,7 @@
 #include <QAbstractSocket>
 #include "DobotDll.h"
 #include "DobotType.h"
-//#include "xml_reader.h"
+#include "xml_reader.h"
 #include "websockets.h"
 #include "dobot.h"
 #include "chess.h"

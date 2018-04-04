@@ -490,41 +490,34 @@ void MainWindow::on_middleAboveBtn_clicked()
     _pDobot->addArmMoveToQueue(DM_TO_POINT, mid);
 }
 
-//todo: ogarnąć punkty przejściowe (xml'e najpierw)
 void MainWindow::on_startGmPosBtn_clicked()
-{ //todo: te punkty wstawić pierwej jako stałe z xmla
-    //todo: bezsensowny zawijaniec przez klasy:
+{
+    //future: bezsensowny zawijaniec przez klasy:
     if (ui->xLabel->text().toInt() == (int)_pDobot->getHomePos().x &&
             ui->yLabel->text().toInt() == (int)_pDobot->getHomePos().y &&
             ui->zLabel->text().toInt() == (int)_pDobot->getHomePos().z)
     {
         this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-        //todo: te liczby nazwać tym gdzie i czym są
-        Point3D rightBottomLowerMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                    _pDobot->getHomePos().z);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomLowerMainBoardSafeCorner);
-        Point3D rightBottomHigherMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                     _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
+        Point3D homeToMiddleTopPoint = _pDobot->getHomeToMiddleAbovePoint();
+        homeToMiddleTopPoint.z = _pBoardMain->getBoardPoint3D(BP_MIDDLE).z;
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, homeToMiddleTopPoint);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
     }
     else
         qDebug() << "ERROR: MainWindow::on_startGmPosBtn_clicked(): Dobot not in home positions";
 }
 
-//todo: ogarnąć punkty przejściowe
 void MainWindow::on_startDtPosBtn_clicked()
 {
     this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
 
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
-    Point3D rightBottomHigherMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                _pBoardMain->getBoardPoint3D(BP_MIDDLE).z);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomHigherMainBoardSafeCorner);
-    Point3D rightBottomLowerMainBoardSafeCorner(_pDobot->getHomePos().x, -103,
-                                                _pDobot->getHomePos().z);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, rightBottomLowerMainBoardSafeCorner);
+    Point3D homeToMiddleTopPoint = _pDobot->getHomeToMiddleAbovePoint();
+    homeToMiddleTopPoint.z = _pBoardMain->getBoardPoint3D(BP_MIDDLE).z;
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, homeToMiddleTopPoint);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
 }
 

@@ -8,6 +8,7 @@
 //...swój folder podklas
 
 const bool SHOW_ERRORS = true;
+const bool PRINT_DEBUG = true;
 
 const bool REAL = true;
 const bool IMAGINARY = false;
@@ -39,6 +40,7 @@ struct Point3D
 
     Point3D(): x(0.f), y(0.f), z(0.f) {}
     Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}
+    //Point3D(Point3D p3d): x(p3d.x), y(p3d.y), z(p3d.z) {}
 
     bool isPointSet()
     {
@@ -50,7 +52,7 @@ struct Point3D
 struct RealVars
 {
     float fPieceHeight;
-    Point3D home;
+    Point3D home, homeToMiddleAbove;
     Point3D A1, A8, H1, H8;
     Point3D remWhiteCloserOuter, remWhiteFurtherInner;
     Point3D remBlackCloserOuter, remBlackFurtherInner;

@@ -38,6 +38,14 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Field* pFieldDest)
 {
     //todo: mozliwe ze cale przjscia typu goToSafeRemovedField beda zbedne jezeli...
     //...kaze dobotowi isc ruchami kolistymi na przegubach
+
+    if (pFieldDest == nullptr)
+    {
+        qDebug() << "ERROR: ChessMovements::goToSafeRemovedFieldIfNeeded(): field"
+                    "can't be nullptr";
+        return;
+    }
+
     if (pFieldDest->getPos().Letter >= L_D)
     {
         return; //no need for safe move
@@ -60,12 +68,23 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Field* pFieldDest)
     }
 }
 
-
 void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
 {
+    qDebug() << "ChessMovements::doMoveSequence(): PosMove =" << PosMove.asQStr()
+             << ", type =" << sequenceTypeAsQstr(Type);
+
     Field* pFieldFrom = _pBoardMain->getField(PosMove.from);
     Field* pFieldTo = _pBoardMain->getField(PosMove.to);
 
+    if (pFieldFrom == nullptr || pFieldTo == nullptr)
+    {
+        qDebug() << "ERROR: ChessMovements::doMoveSequence(): pFieldFrom or pFieldTo"
+                    "is nullptr";
+        return;
+    }
+
+    qDebug() << "ChessMovements::doMoveSequence(): switch: case:"
+           << sequenceTypeAsQstr(Type);
     switch(Type)
     {
     case ST_REGULAR: this->regularMoveSequence(pFieldFrom, pFieldTo); break;
@@ -173,14 +192,15 @@ bool ChessMovements::resetPiecePositions()
 
         do
         {
-            memcpy(&tempBoard, _pBoardMain, sizeof(*_pBoardMain));
+            this->copyPiecesToBoard(*_pBoardMain, tempBoard); //todo: source = const?
 
             for (short sField=1; sField<=64; ++sField)
             {
                 Field* pExaminedField = _pBoardMain->getField(sField);
                 Piece* pPieceOnExaminedField = pExaminedField->getPieceOnField();
 
-                if (!_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
+                if (pPieceOnExaminedField != nullptr &&
+                        !_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
                     if (pExaminedField->getPieceOnField() == nullptr)
                     { //if checking field is empty
@@ -199,13 +219,11 @@ bool ChessMovements::resetPiecePositions()
                         Field* pFieldToPutAsidePiece =
                                 _pBoardMain->getField(pPieceOnExaminedField->getStartFieldNr());
                         Piece* pPieceOnPutAsideField = pFieldToPutAsidePiece->getPieceOnField();
-                        Field* pStartFieldOfPieceOnPutAsideField =
-                                _pBoardMain->getField(pPieceOnPutAsideField->getStartFieldNr());
 
                         if (pPieceOnPutAsideField == nullptr)
-                            this->regularMoveSequence(pExaminedField,
-                                                             pFieldToPutAsidePiece);
-                        else if (pExaminedField == pStartFieldOfPieceOnPutAsideField)
+                            this->regularMoveSequence(pExaminedField, pFieldToPutAsidePiece);
+                        else if (pExaminedField == _pBoardMain->getField(
+                                     pPieceOnPutAsideField->getStartFieldNr()))
                             this->removeMoveSequence(pExaminedField);
                         //else: iterate through all fields one more time (pieces pos will change)
                     }
@@ -214,16 +232,25 @@ bool ChessMovements::resetPiecePositions()
 
             if (this->isPieceSetOnBoardsIdentical(tempBoard, *_pBoardMain))
             {
-                qDebug() << "ERROR: ChessMovements::resetPiecePositions(): boards are identical";
+                qDebug() << "ChessMovements::resetPiecePositions(): boards are identical";
                 break;
             }
         }
         while (!this->isPieceSetOnStartFields());
     }
 
-     return true;
+    return true;
 }
 
+void ChessMovements::copyPiecesToBoard(Chessboard& source, Chessboard& target)
+{
+    for (short sField=1; sField<=64; ++sField)
+    {
+        Piece* pPieceOnSourceField = source.getField(sField)->getPieceOnField();
+        if (pPieceOnSourceField != nullptr)
+            target.setPieceOnField(pPieceOnSourceField, target.getField(sField));
+    }
+}
 
 bool ChessMovements::isPieceSetOnStartFields()
 {
@@ -232,6 +259,7 @@ bool ChessMovements::isPieceSetOnStartFields()
         Field* pField = _pBoardMain->getField(sField);
         Piece* pStartingPieceOnField =
                 _pPieceController->getPiece(pField->getStartPieceNrOnField());
+
         if (pStartingPieceOnField != pField->getPieceOnField())
             return false;
     }

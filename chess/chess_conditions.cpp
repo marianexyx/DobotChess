@@ -133,14 +133,6 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
 
 bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
-    /*QString QStrSenderID = QString::number(pSender->ID);
-    QString QStrSenderName = pSender->name;
-    QString QStrSenderQueue = QString::number(pSender->queue);
-    QString QStrSenderType = playerTypeAsQStr(pSender->type);
-    qDebug() << "ChessConditions::isSenderAppropriate(): approaching isClientInList()."
-                "sender data: ID =" << QStrSenderID << ", name =" << QStrSenderName
-             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;*/
-
     if (!_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
 
     bool bLogged = _pClientsList->isClientLoggedIn(*pSender);
@@ -226,8 +218,6 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
             return true;
         else return false;
     case RT_CLIENT_LEFT:
-        qDebug() << "ChessConditions::isThereAnySpecialConditionBeenMet():"
-                    " approaching isClientInList()";
         if (_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
             return true;
         else return false;
