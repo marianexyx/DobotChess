@@ -264,7 +264,7 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog 
     else qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): piece don't exists"
                      "on board";
 
-    //if (bErrorLog)
+    if (bErrorLog)
         qDebug() << "ERROR: Chessboard::getFieldWithGivenPieceIfExists(): "
                     "field not found. return nullptr";
 

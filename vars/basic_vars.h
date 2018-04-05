@@ -42,6 +42,8 @@ struct Point3D
     Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}
     //Point3D(Point3D p3d): x(p3d.x), y(p3d.y), z(p3d.z) {}
 
+    void setPoint(double dX, double dY, double dZ) { x = dX; y = dY; z = dZ; }
+    void setPoint(Point3D p3d) { x = p3d.x; y = p3d.y; z = p3d.z; }
     bool isPointSet()
     {
         if (x == 0.f && y == 0.f && z == 0.f) return false;

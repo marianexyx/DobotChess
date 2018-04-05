@@ -15,11 +15,14 @@
 class XmlReader
 {
 private:
-    QDomDocument xmlDoc;
-    QFile xmlFile;
+    QDomDocument _xmlDoc;
+    QFile _xmlFile;
     RealVars _vars;
 
-    bool areVarsInLimits();
+    void readPiece(QDomNodeList piece);
+    void readPoints(QDomNodeList points);
+    void readGripper(QDomNodeList gripper);
+
     bool isPieceHeightInLimits(float fPieceHeight);
     bool isPointInLimits(Point3D point);
     bool isGripperParamInLimits(float fGripperPar);
@@ -27,8 +30,8 @@ private:
 public:
     XmlReader(QString QStrFileName);
 
-    void listElements(QDomElement root, QString QStrTagName, QString QStrAttribute);
-    RealVars getRealVars();
+    bool isVarsStructInLimits();
+    RealVars getRealVars() { this->isVarsStructInLimits(); return _vars; }
 };
 
 #endif // XML_READER_H

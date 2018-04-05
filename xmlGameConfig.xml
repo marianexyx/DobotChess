@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <data>
 	<piece>
-		<param ID="0" name="height" val="50"/>
+		<param ID="0" name="height" val="50.0"/>
 	</piece>
 	<points>
-		<point ID="0" name="mainFieldA1" x="100" y="100" z="30"/>
-		<point ID="1" name="mainFieldA8" x="100" y="100" z="30"/>
-		<point ID="2" name="mainFieldH1" x="100" y="100" z="30"/>
-		<point ID="3" name="mainFieldH8" x="100" y="100" z="30"/>
-		<point ID="4" name="remField_1" x="100" y="100" z="30"/>
-		<point ID="5" name="remField_2" x="100" y="100" z="30"/>
-		<point ID="6" name="remField_3" x="100" y="100" z="30"/>
-		<point ID="7" name="remField_4" x="100" y="100" z="30"/>
-		<point ID="8" name="home" x="100" y="100" z="30"/>
-		<point ID="9" name="homeToMiddleAbove" x="100" y="100" z="30"/>
+		<point ID="0" name="mainFieldA1" x="157.4" y="76.3" z="-22.9"/>
+		<point ID="1" name="mainFieldA8" x="306.6" y="75.0" z="-19.1"/>
+		<point ID="2" name="mainFieldH1" x="157.4" y="-81.9" z="-23.1"/>
+		<point ID="3" name="mainFieldH8" x="305.6" y="-79.2" z="-19.3"/>
+		<point ID="4" name="remWhiteCloserOuter" x="108.9" y="176.0" z="-21.8"/>
+		<point ID="5" name="remWhiteFurtherInner" x="259.0" y="169.3" z="-19.5"/>
+		<point ID="6" name="remBlackCloserOuter" x="115.5" y="-148.4" z="-23.2"/>
+		<point ID="7" name="remBlackFurtherInner" x="267.2" y="0.0" z="-19.4"/>
+		<point ID="8" name="home" x="140.0" y="0.0" z="10.0"/>
+		<point ID="9" name="homeToMiddleAbove" x="140.0" y="-103.0" z="10.0"/>
 	</points>
 	<gripper>
-		<state ID="0" name="open" pwm="5"/>
-		<state ID="1" name="close" pwm="3"/>
+		<state ID="0" name="open" pwm="6.9"/>
+		<state ID="1" name="close" pwm="7.55"/>
 	</gripper>
-</data>	 
+</data>
