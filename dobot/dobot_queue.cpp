@@ -6,10 +6,11 @@ DobotQueue::DobotQueue(Dobot *pDobot)
     _pServo = pDobot->getServoPointer();
 
     _un64CoreQueuedCmdID = 1; //set 1st ID
-    _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max();
+    _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max(); //future
     _un64RealTimeDobotActualID = 0;
     _un64RetreatID = 0;
     _un64LastDobotIDShownInUI = 0;
+    _lowestIDMoveInList = 0;
 }
 
 void DobotQueue::parseNextMoveToArmIfPossible()
@@ -25,6 +26,8 @@ void DobotQueue::parseNextMoveToArmIfPossible()
 
     if (this->isNextPhysicalMoveToQueueOnArmAvailable())
     {
+        qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): "
+                    "isNextPhysicalMoveToQueueOnArmAvailable = true";
         this->queuePhysicalMoveOnArm(this->getNextPhysicalMoveToQueueOnArm());
         this->removeOldQueuedMovesFromCore();
     }
@@ -41,12 +44,13 @@ bool DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable()
 
     if (!_queuedCmdIDList.isEmpty())
     {
-        QListIterator<DobotMove*> QueuedCmdIDIter(_queuedCmdIDList);
+        QListIterator<DobotMove> QueuedCmdIDIter(_queuedCmdIDList);
         QueuedCmdIDIter.toFront(); //oldest move in list
         if(QueuedCmdIDIter.hasNext())
         {
-            //todo: ten zapis poniżej to jakiś dramat. zadziałą to wogle?
-            _lowestIDMoveInList = QueuedCmdIDIter.peekNext()->ID;
+            //todo: ten zapis poniżej to jakiś dramat. zadziała to wogle? to...
+            //... nie usuwa pobranego wyniku
+            _lowestIDMoveInList = QueuedCmdIDIter.peekNext().ID;
             if(_lowestIDMoveInList - _un64RealTimeDobotActualID < 15)
                 return true;
 
@@ -61,13 +65,15 @@ DobotMove DobotQueue::getNextPhysicalMoveToQueueOnArm()
 {
     if (!_queuedCmdIDList.isEmpty()) //2nd security checks is mandatory
     {
-        QListIterator<DobotMove*> QueuedCmdIDIter(_queuedCmdIDList);
+        QListIterator<DobotMove> QueuedCmdIDIter(_queuedCmdIDList);
         QueuedCmdIDIter.toFront(); //oldest move in list
         if(QueuedCmdIDIter.hasNext())
         {
-            _lowestIDMoveInList = QueuedCmdIDIter.peekNext()->ID;
+            _lowestIDMoveInList = QueuedCmdIDIter.peekNext().ID;
+            qDebug() << "DobotQueue::getNextPhysicalMoveToQueueOnArm(): "
+                        "new _lowestIDMoveInList =" << _lowestIDMoveInList;
             if(_lowestIDMoveInList - _un64RealTimeDobotActualID < 15)
-                return *_queuedCmdIDList.first();
+                return _queuedCmdIDList.first();
         }
     }
 
@@ -79,18 +85,28 @@ DobotMove DobotQueue::getNextPhysicalMoveToQueueOnArm()
 
 void DobotQueue::showLastExecutedArmMoveInUI()
 {
-    if (_un64RealTimeDobotActualID > _un64LastDobotIDShownInUI)
+    if (_un64RealTimeDobotActualID > _un64LastDobotIDShownInUI
+            && _un64LastDobotIDShownInUI > 0)
     {
+        QString QStrMoveID = 0;
+        QString QStrDobotMove = 0;
+
         DobotMove Move = this->getQueuedMoveInCore(_un64RealTimeDobotActualID);
-        emit _pDobot->addTextToLogPTE("Executed move(ID,type): " + QString::number(Move.ID)
-                                      + "," + dobotMoveAsQstr(Move.type), LOG_DOBOT);
-        _un64LastDobotIDShownInUI = _un64RealTimeDobotActualID;
+        QStrMoveID = QString::number(Move.ID);
+        QStrDobotMove = dobotMoveAsQstr(Move.type);
+        emit _pDobot->addTextToLogPTE("Executed move(ID,type): " + QStrMoveID
+                                      + "," + QStrDobotMove, LOG_DOBOT);
     }
+
+    /*qDebug() << "DobotQueue::showLastExecutedArmMoveInUI(): "
+                "_un64LastDobotIDShownInUI =" << _un64LastDobotIDShownInUI
+             << ", _un64RealTimeDobotActualID =" << _un64RealTimeDobotActualID;*/
+    _un64LastDobotIDShownInUI = _un64RealTimeDobotActualID;
 }
 
 void DobotQueue::removeOldQueuedMovesFromCore()
 {
-    /* todo: tu jest błąD
+    /* todo: tu jest błąd
     if (!_queuedCmdIDList.removeOne(this->getQueuedMoveInCore(_un64RealTimeDobotActualID - 1)))
         qDebug() << "ERROR: DobotQueue::removeOldQueuedMovesFromCore(): move in list not found";
     */
@@ -98,10 +114,10 @@ void DobotQueue::removeOldQueuedMovesFromCore()
 
 DobotMove DobotQueue::getQueuedMoveInCore(uint64_t un64ID)
 {
-    Q_FOREACH(DobotMove* Move, _queuedCmdIDList)
+    Q_FOREACH(DobotMove move, _queuedCmdIDList)
     {
-        if (Move->ID == un64ID)
-            return *Move;
+        if (move.ID == un64ID)
+            return move;
     }
 
     DobotMove errorMove;
@@ -181,9 +197,12 @@ void DobotQueue::queuePhysicalMoveOnArm(DobotMove move)
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
-    _un64CoreQueuedCmdID += 1;
+    qDebug() << "DobotQueue::addArmMoveToQueue(): type =" << dobotMoveAsQstr(Type)
+             << ", point =" << point.getAsQStr() << ", _un64CoreQueuedCmdID ="
+             << _un64CoreQueuedCmdID << ", ++ it. add dobot move to queue";
+    _un64CoreQueuedCmdID++;
     DobotMove cmdToQueue(_un64CoreQueuedCmdID, Type, point);
-    _queuedCmdIDList << &cmdToQueue;
+    _queuedCmdIDList << cmdToQueue;
 }
 
 void DobotQueue::saveIDFromConnectedDobot()
@@ -191,6 +210,8 @@ void DobotQueue::saveIDFromConnectedDobot()
    if (Dobot::isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
                                       SHOW_ERRORS))
    {
+       qDebug() << "DobotQueue::saveIDFromConnectedDobot(): "
+                   "coreNextID =" << _lowestIDMoveInList;
        emit _pDobot->queueLabels(_unQueuedCmdLeftSpace, _un64RealTimeDobotActualID,
                               _un64CoreQueuedCmdID, _queuedCmdIDList.size(),
                               _lowestIDMoveInList);

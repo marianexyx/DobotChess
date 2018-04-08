@@ -3,14 +3,6 @@
 Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
                        RealVars gameConfigVars /*= RealVars()*/):
     fMaxPieceHeight(gameConfigVars.fPieceHeight)
-    /*_A1(157.4, 76.3, -22.9),
-    _A8(306.6, 75.0, -19.1),
-    _H1(157.4, -81.9, -23.1),
-    _H8(305.6, -79.2, -19.3),
-    _remWhiteCloserOuter(108.9, 176.0, -21.8),
-    _remWhiteFurtherInner(259.0, 169.3, -19.5), //y is unused
-    _remBlackCloserOuter(115.5, -148.4, -23.2),
-    _remBlackFurtherInner(267.2, 0, -19.4) //y is unused*/
 {
     _BoardType = BoardType;
     _bBoardIsReal = bBoardIsReal;
@@ -101,13 +93,18 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
         for (int row=0; row<=7; row++)
         {
             PosOnBoard pos;
-            pos.Letter = static_cast<LETTER>(column+1);
-            pos.Digit = static_cast<DIGIT>(row+1);
+            pos.Letter = static_cast<LETTER>(row+1);
+            pos.Digit = static_cast<DIGIT>(column+1);
 
             Point3D p3D;
             p3D.x = whiteCloserOuter.x + row*((whiteFutherInner.x - whiteCloserOuter.x)/7.f);
             p3D.y = whiteCloserOuter.y - column * _dSquareWidth;
             p3D.z = whiteCloserOuter.z + row*((whiteFutherInner.z - whiteCloserOuter.z)/7.f);
+
+            /*qDebug() << "Chessboard::calculateFields3DLocationsOnRemovedBoard():"
+                        " assign point =" << p3D.getAsQStr() << "to pos ="
+                     << pos.getAsQStr() << "(nr ="
+                     << _pField[Piece::nr(pos)-1]->getNr() << ")";*/
 
             _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
         }
@@ -118,13 +115,18 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
         for (int row=0; row<=7; row++)
         {
             PosOnBoard pos;
-            pos.Letter = static_cast<LETTER>(column+1);
-            pos.Digit = static_cast<DIGIT>(row+1);
+            pos.Letter = static_cast<LETTER>(row+1);
+            pos.Digit = static_cast<DIGIT>(column+1);
 
             Point3D p3D;
             p3D.x = blackCloserOuter.x + row*((blackFutherInner.x - blackCloserOuter.x)/7.f);
             p3D.y = blackCloserOuter.y + ((column-2)*(-_dSquareWidth));
             p3D.z = blackCloserOuter.z + row*((blackFutherInner.z - blackCloserOuter.z)/7.f);
+
+            /*qDebug() << "Chessboard::calculateFields3DLocationsOnRemovedBoard():"
+                        " assign point =" << p3D.getAsQStr() << "to pos ="
+                     << pos.getAsQStr() << "(nr ="
+                     << _pField[Piece::nr(pos)-1]->getNr() << ")";*/
 
             _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
         }
@@ -138,6 +140,9 @@ void Chessboard::calculateMarginal3DValues()
 
     for (int i=0; i<=63; ++i)
     {
+        if (_BoardType == B_REMOVED && i>=32)
+            break;
+
         if (_pField[i]->getLocation3D().x < _MinBoard.x)
             _MinBoard.x = _pField[i]->getLocation3D().x;
         if (_pField[i]->getLocation3D().y < _MinBoard.y)
@@ -164,8 +169,8 @@ void Chessboard::calculateMiddleAbovePoint()
 void Chessboard::calculateRetreatPoints()
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = _pField[Field::nr(L_D, D_1)-1]->getLocation3D().y;
-    _retreatRight.y = _pField[Field::nr(L_D, D_8)-1]->getLocation3D().y;
+    _retreatLeft.y = _pField[Field::nr(L_A, D_4)-1]->getLocation3D().y;
+    _retreatRight.y = _pField[Field::nr(L_H, D_4)-1]->getLocation3D().y;
     _retreatLeft.z = _retreatRight.z = _MaxBoard.z;
 }
 

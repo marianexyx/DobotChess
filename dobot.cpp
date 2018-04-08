@@ -37,7 +37,7 @@ Dobot::~Dobot()
     delete _pServo;
 }
 
-void Dobot::onPeriodicTaskTimer()
+void Dobot::onPeriodicTaskTimer() //todo zmienić nazwy timerów
 {
     PeriodicTask(); //start arm task loop. non-return funcion
     QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
@@ -142,6 +142,7 @@ void Dobot::onConnectDobot()
         _bConnectedToDobot = true;
         emit this->addTextToLogPTE("Dobot connected \n", LOG_DOBOT);
 
+        //todo: timery w osobnych funkcjach
         //create dobot periodic timer
         QTimer *periodicTaskTimer = new QTimer(this);
         periodicTaskTimer->setObjectName("periodicTaskTimer");
@@ -168,6 +169,8 @@ void Dobot::onConnectDobot()
         _bConnectedToDobot = false;
         DisconnectDobot();
     }
+
+    emit RefreshDobotButtonsStates(_bConnectedToDobot); //todo: nazwa
 }
 
 void Dobot::initDobot()
@@ -298,6 +301,8 @@ void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
 
 void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
+    qDebug() << "Dobot::addArmMoveToQueue(): type =" << dobotMoveAsQstr(Type)
+             << ", point =" << point.getAsQStr();
     _lastGivenPoint = point;
     _pQueue->addArmMoveToQueue(Type, point);
 }

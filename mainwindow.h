@@ -77,7 +77,7 @@ private slots:
     void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft,
                         int CoreNextId);
-    void showActualDobotQueuedCmdIDList(QList<DobotMove*> list);
+    void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
     void showArduinoGripperStateList(QList<ServoArduino> list);
 
     //websocket slots

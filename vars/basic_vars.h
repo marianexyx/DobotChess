@@ -34,13 +34,10 @@ struct Point3D
     double y;
     double z;
 
-    //todo: zrozumieć do końca. operator równości chyba nie działa.
-    Point3D& operator=(Point3D& p) {return p; }
     bool operator==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
 
     Point3D(): x(0.f), y(0.f), z(0.f) {}
     Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}
-    //Point3D(Point3D p3d): x(p3d.x), y(p3d.y), z(p3d.z) {}
 
     void setPoint(double dX, double dY, double dZ) { x = dX; y = dY; z = dZ; }
     void setPoint(Point3D p3d) { x = p3d.x; y = p3d.y; z = p3d.z; }
@@ -49,6 +46,8 @@ struct Point3D
         if (x == 0.f && y == 0.f && z == 0.f) return false;
         else return true;
     }
+    QString getAsQStr() const { return QString::number((int)x) + ", " +
+                QString::number((int)y) + ", " + QString::number((int)z); }
 };
 
 struct RealVars

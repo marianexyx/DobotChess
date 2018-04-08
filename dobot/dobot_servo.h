@@ -35,7 +35,7 @@ public:
     void closeGripper(uint64_t ID);
     void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType);
 
-    bool isServoListEmpty() const { return _arduinoGripperStates.isEmpty() ? true : false; }
+    bool isServoListEmpty() const { return 1 /*_arduinoGripperStates.isEmpty() ? true : false*/; }
 };
 
 #endif // DOBOT_SERVO_H

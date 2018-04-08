@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DobotQueue_t {
     QByteArrayData data[4];
-    char stringdata0[61];
+    char stringdata0[60];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,11 +35,11 @@ static const qt_meta_stringdata_DobotQueue_t qt_meta_stringdata_DobotQueue = {
 QT_MOC_LITERAL(0, 0, 10), // "DobotQueue"
 QT_MOC_LITERAL(1, 11, 30), // "showActualDobotQueuedCmdIDList"
 QT_MOC_LITERAL(2, 42, 0), // ""
-QT_MOC_LITERAL(3, 43, 17) // "QList<DobotMove*>"
+QT_MOC_LITERAL(3, 43, 16) // "QList<DobotMove>"
 
     },
     "DobotQueue\0showActualDobotQueuedCmdIDList\0"
-    "\0QList<DobotMove*>"
+    "\0QList<DobotMove>"
 };
 #undef QT_MOC_LITERAL
 
@@ -71,13 +71,13 @@ void DobotQueue::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         DobotQueue *_t = static_cast<DobotQueue *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->showActualDobotQueuedCmdIDList((*reinterpret_cast< QList<DobotMove*>(*)>(_a[1]))); break;
+        case 0: _t->showActualDobotQueuedCmdIDList((*reinterpret_cast< QList<DobotMove>(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (DobotQueue::*_t)(QList<DobotMove*> );
+            typedef void (DobotQueue::*_t)(QList<DobotMove> );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DobotQueue::showActualDobotQueuedCmdIDList)) {
                 *result = 0;
                 return;
@@ -123,7 +123,7 @@ int DobotQueue::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void DobotQueue::showActualDobotQueuedCmdIDList(QList<DobotMove*> _t1)
+void DobotQueue::showActualDobotQueuedCmdIDList(QList<DobotMove> _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

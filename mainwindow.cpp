@@ -136,10 +136,9 @@ void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
     ui->CoreNextIdLabel->setText(QString::number(CoreNextId));
 }
 
-//future: wszystkie przyciski się włączą, nawet jeżeli otrzymamy od dobota info że się nie udało
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
 {
-    if (bDobotButtonsStates)
+    if (!bDobotButtonsStates)
     {
         ui->connectBtn->setText(tr("Connect"));
         ui->teachMode->setEnabled(false);
@@ -543,14 +542,14 @@ void MainWindow::on_sendTcpBtn_clicked()
     }
 }
 
-void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove*> list)
+void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
 {
     QString QStrQueuedList;
     DobotMove item;
 
     for(int i=0; i<list.count(); ++i)
     {
-       item = *list.at(i);
+       item = list.at(i);
        QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
                + " " + QString::number(item.xyz.x) + " " + QString::number(item.xyz.y)
                + " " + QString::number(item.xyz.z) + "\n";

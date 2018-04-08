@@ -30,7 +30,7 @@ private:
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
     uint _unQueuedCmdLeftSpace;
-    QList<DobotMove*> _queuedCmdIDList;
+    QList<DobotMove> _queuedCmdIDList;
     uint64_t _lowestIDMoveInList;
     uint64_t _un64RetreatID;
     uint64_t _un64LastDobotIDShownInUI;
@@ -62,7 +62,7 @@ public:
     int64_t getRealTimeDobotActualID() const { return _un64RealTimeDobotActualID; }
 
 signals:
-    void showActualDobotQueuedCmdIDList(QList<DobotMove*>);
+    void showActualDobotQueuedCmdIDList(QList<DobotMove>);
 };
 
 #endif // DOBOT_QUEUE_H
