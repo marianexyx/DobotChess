@@ -256,18 +256,32 @@ void Chess::sendMsgToTcp(QString QStrMsg)
 }
 
 void Chess::newClientName(Client& client, clientRequest request)
-{
-    if (!_pClientsList->isClientNameExists(request.param))
+{    
+    QString QStrIncomingClientName = request.param;
+    qDebug() << "Chess::newClientName():" << QStrIncomingClientName;
+
+    if (!_pClientsList->isClientNameExists(QStrIncomingClientName))
     {
-        _pClientsList->setClientName(client, request.param);
+        _pClientsList->setClientName(client, QStrIncomingClientName);
         this->sendDataToClient(this->getTableData(), client);
     }
     else //double login
     {
-        _pClientsList->getClientSocket(request.param)->sendTextMessage("logout:doubleLogin");
-        if (_pClientsList->isClientAPlayer(client))
-            this->restartGame(ET_SOCKET_LOST, client.type);
-        _pClientsList->setClientName(client, request.param);
+        qDebug() << "Chess::newClientName(): logout:doubleLogin";
+
+        Client oldClient = _pClientsList->getClient(QStrIncomingClientName);
+        oldClient.socket->sendTextMessage("logout:doubleLogin");
+
+        if (_pClientsList->isClientAPlayer(oldClient))
+            this->restartGame(ET_SOCKET_LOST, oldClient.type);
+        else if (_pClientsList->isClientInQueue(oldClient))
+        {
+            _pClientsList->removeClientFromQueue(oldClient);
+            _pClientsList->setClientName(oldClient, ""); //clear old client name
+            this->sendDataToAllClients(this->getTableData()); //need to refresh queued clients
+        }
+
+        _pClientsList->setClientName(client, QStrIncomingClientName); //set new client
     }
 }
 
@@ -489,8 +503,8 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
                         " PT_NONE if not disconnected";
             return;
         }
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
         break;
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
@@ -501,9 +515,9 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
             return;
         }
         if (PlayerToClear == PT_WHITE)
-            _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+            _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
         else if (PlayerToClear == PT_BLACK)
-            _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+            _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
         else
         {
             qDebug() << "ERROR: Chess::changePlayersOnChairs(): wrong player type:" << PlayerToClear;
@@ -549,9 +563,9 @@ void Chess::timeOutStart()
     _pClientsList->resetPlayersStartConfirmInfo();
 
     if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
     if (!_pClientsList->isStartClickedByPlayer(PT_BLACK))
-        _pClientsList->cleanChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
 
     if (_pClientsList->isGameTableOccupied())
         _ChessGameStatus = _pTimers->startQueueTimer();

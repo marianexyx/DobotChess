@@ -29,6 +29,8 @@ Websockets::~Websockets()
 
 void Websockets::onNewConnection()
 {
+    qDebug() << "Websockets::onNewConnection()";
+
     QWebSocket* pSocket = _pWebSocketServer->nextPendingConnection();
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);

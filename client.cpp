@@ -3,6 +3,8 @@
 //future: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
 void Clients::newClient(QWebSocket& clientSocket)
 {
+    qDebug() << "Clients::newClient(QWebSocket&)";
+
     Client newClient;
     newClient.ID = this->getNextAvailableClientID();
     newClient.socket = &clientSocket; //future: jeżeli ten parametr jest jako const, to nie...
@@ -296,9 +298,9 @@ void Clients::resetPlayersStartConfirmInfo()
         this->setClientStartConfirmation(PT_BLACK, false);
 }
 
-void Clients::cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
+void Clients::clearChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
 {
-    qDebug() << "Clients::cleanChairAndPutThereNextQueuedClientIfExist()";
+    qDebug() << "Clients::clearChairAndPutThereNextQueuedClientIfExist()";
     this->clearPlayerType(Chair);
 
     if (this->getQueuedClientsList() != QUEUE_EMPTY)
@@ -361,23 +363,28 @@ Client Clients::getClient(int64_t n64ClientID)
     {
         if (cl.ID == n64ClientID)
         {
-            /*qDebug() << "Clients::getClient(int64_t): found client ID. cl basic"
-                        " data: name =" << cl.name
-                     << ", queue =" << QString::number(cl.queue)
-                     << ", ID =" << QString::number(cl.ID);*/
-
             Client& client = cl; //todo: tworzę tu pointer, więc
             //on ginie po wyjściu z funkcji??
-
-            /*qDebug() << "Clients::getClient(int64_t): returning ref to found client. "
-                        "his basic data: name =" << client.name
-                     << ", queue =" << QString::number(client.queue)
-                     << ", ID =" << QString::number(client.ID);*/
 
             return client;
         }
     }
     qDebug() << "ERROR: Clients::getClient(int64_t): client not found. ID =" << n64ClientID;
+    Client client;
+    return client;
+}
+
+Client Clients::getClient(QString QStrName)
+{
+    Q_FOREACH (Client cl, _clients)
+    {
+        if (cl.name == QStrName)
+        {
+            Client& client = cl;
+            return client;
+        }
+    }
+    qDebug() << "ERROR: Clients::getClient(QString): client not found. name =" << QStrName;
     Client client;
     return client;
 }

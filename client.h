@@ -50,12 +50,13 @@ public:
     void removeClientFromList(Client& client);
     void removeClientFromQueue(Client& client);
     void resetPlayersStartConfirmInfo();
-    void cleanChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
+    void clearChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(const Client& client, bool bErrorLog = false);
     Client getClient(QWebSocket* pClientSocket);
     Client getClient(int64_t n64ClientID);
+    Client getClient(QString QStrName);
     Client getPlayer(PLAYER_TYPE Type);
     QWebSocket* getClientSocket(QString QStrPlayerName);
     QString getClientName(const Client& client);
