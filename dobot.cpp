@@ -244,9 +244,10 @@ void Dobot::initDobot()
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
-void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove /*= VM_NONE*/)
+void Dobot::queueMoveSequence(Point3D dest3D, double dJump,
+                              VERTICAL_MOVE VertMove /*= VM_NONE*/)
 {
-    if (this->isPointTotallyDiffrent(dest3D)) return;
+    if (_bConnectedToDobot && this->isPointTotallyDiffrent(dest3D)) return;
 
     if (VertMove == VM_GRAB)
         this->addArmMoveToQueue(DM_OPEN);

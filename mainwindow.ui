@@ -685,21 +685,21 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>DobotIndex</string>
+             <string>DobotID</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>CoreMaxIndex</string>
+             <string>CoreMaxID</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_21">
             <property name="text">
-             <string>DobotLeftIdsSpc</string>
+             <string>DobotLeftIDsSpc</string>
             </property>
            </widget>
           </item>
@@ -720,14 +720,14 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_16">
             <property name="text">
-             <string>CoreIdCounter</string>
+             <string>IDsLeftToSend</string>
             </property>
            </widget>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>CoreNextId</string>
+             <string>CoreNextID</string>
             </property>
            </widget>
           </item>

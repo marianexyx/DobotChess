@@ -23,7 +23,7 @@ public:
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE VertMove = VM_NONE);
     bool isPieceSetOk();
-    bool isPieceStayOnItsStartingField(Piece* pPiece);
+    bool isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog = false);
     Field* searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece);
 
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }

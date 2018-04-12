@@ -17,7 +17,7 @@ PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardMain,
 }
 
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
-                                               VERTICAL_MOVE VertMove)
+                                               VERTICAL_MOVE VertMove/*= VM_NONE*/)
 {
     if (!pRealBoard->isBoardReal(SHOW_ERRORS)) return; //todo: powinno już być chyba na odwrót?
 
@@ -26,9 +26,9 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         if (!this->isPieceSetOk()) return;
         if (pField->getPieceOnField(SHOW_ERRORS) == nullptr) return;
 
-        QString QStrMsg = "Queue: grab piece "
-                + QString::number(pField->getPieceOnField()->getNr())
-                + " on " + boardTypeAsQstr(pRealBoard->getBoardType())
+        QString QStrMsg = "Queue: grab piece '" + pField->getPieceOnField()->getName()
+                + "' (nr =" + QString::number(pField->getPieceOnField()->getNr())
+                + ") on " + boardTypeAsQstr(pRealBoard->getBoardType())
                 + " from field " + pField->getNrAsQStr();
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
@@ -54,7 +54,6 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         if (!this->isPieceSetOk()) return;
     }
 
-    qDebug() << "PieceController::movePieceWithManipulator(): be4 getLocation3D";
     Point3D xyz = pField->getLocation3D();
     _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove);
 }
@@ -84,12 +83,13 @@ bool PieceController::isPieceSetOk()
     return true;
 }
 
-bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece)
+bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog /*= false*/)
 {
     if (pPiece == nullptr)
     {
-        qDebug() << "ERROR: PieceController: Chess::isPieceStayOnItsStartingField(): "
-                    "piece can't be nullptr";
+        if (bErrorLog)
+            qDebug() << "ERROR: PieceController: Chess::isPieceStayOnItsStartingField(): "
+                        "piece can't be nullptr";
         return false;
     }
 

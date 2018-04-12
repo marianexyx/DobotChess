@@ -9,14 +9,6 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
                                                    GAME_STATUS GS)
 {
-    /*QString QStrSenderID = QString::number(pSender->ID);
-    QString QStrSenderName = pSender->name;
-    QString QStrSenderQueue = QString::number(pSender->queue);
-    QString QStrSenderType = playerTypeAsQStr(pSender->type);
-    qDebug() << "ChessConditions::isClientRequestCanBeAccepted(): sender data: "
-                "ID =" << QStrSenderID << ", name =" << QStrSenderName
-             << ", queue =" << QStrSenderQueue << ", type =" << QStrSenderType;*/
-
     clientRequest r;
 
     if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;

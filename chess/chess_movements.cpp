@@ -186,12 +186,15 @@ void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //future
 
 bool ChessMovements::resetPiecePositions()
 {
+    qDebug() << "ChessMovements::resetPiecePositions()";
+
     if (!this->isPieceSetOnStartFields())
     {
         Chessboard tempBoard(B_MAIN, IMAGINARY);
 
         do
         {
+            qDebug() << "be4 ChessMovements::copyPiecesToBoard()";
             this->copyPiecesToBoard(*_pBoardMain, tempBoard); //todo: source = const?
 
             for (short sField=1; sField<=64; ++sField)
@@ -199,32 +202,59 @@ bool ChessMovements::resetPiecePositions()
                 Field* pExaminedField = _pBoardMain->getField(sField);
                 Piece* pPieceOnExaminedField = pExaminedField->getPieceOnField();
 
-                if (pPieceOnExaminedField != nullptr &&
-                        !_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
+                if (!_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
-                    if (pExaminedField->getPieceOnField() == nullptr)
-                    { //if checking field is empty
+                    qDebug() << "ChessMovements::resetPiecePositions(): piece on examined field not on start field:";
+
+                    if (pPieceOnExaminedField == nullptr && (pExaminedField->getNr() <= 16 &&
+                                                             pExaminedField->getNr() > 48))
+                    { //if checking field is empty && it can have a start piece
+
+                        qDebug() << "ChessMovements::resetPiecePositions(): examined field is empty:";
                         Piece* pMissingPiece = _pPieceController->getPiece(pExaminedField->
                                                                  getStartPieceNrOnField());
-                        Field* pMissingPieceActualFieldOnMainBoard =
+                        Field* pMissingPieceActualFieldOnMainBoard;
+                        if (pMissingPiece == nullptr) pMissingPieceActualFieldOnMainBoard = nullptr;
+                        else pMissingPieceActualFieldOnMainBoard =
                                 _pPieceController->searchForPieceActualFieldOnBoard(_pBoardMain,
                                                                                     pMissingPiece);
+
+                        qDebug() << "ChessMovements::resetPiecePositions(): check1: pExaminedField nr ="
+                                 << pExaminedField->getNr() << ", pExaminedField->getStartPieceNrOnField() ="
+                                 << pExaminedField->getStartPieceNrOnField() << ", pMissingPiece nr ="
+                                 << pMissingPiece->getNr() << ", pMissingPieceActualFieldOnMainBoard nr ="
+                                 << (pMissingPieceActualFieldOnMainBoard == nullptr ? 0 : pMissingPieceActualFieldOnMainBoard->getNr());
+
                         if (pMissingPieceActualFieldOnMainBoard != nullptr) //if exists on mainB
+                        {
+                            qDebug() << "ChessMovements::resetPiecePositions(): reset piece pos from main board";
                             this->regularMoveSequence(pMissingPieceActualFieldOnMainBoard,
                                                         pExaminedField);
-                        else this->restoreMoveSequence(pMissingPiece);
+                        }
+                        else
+                        {
+                            qDebug() << "ChessMovements::resetPiecePositions(): reset piece pos from removed board";
+                            this->restoreMoveSequence(pMissingPiece);
+                        }
                     }
-                    else //checking field is occupied
+                    else if (pPieceOnExaminedField != nullptr) //checking field is occupied
                     {
+                        qDebug() << "ChessMovements::resetPiecePositions(): examined field is occupied by diffrent piece:";
                         Field* pFieldToPutAsidePiece =
                                 _pBoardMain->getField(pPieceOnExaminedField->getStartFieldNr());
                         Piece* pPieceOnPutAsideField = pFieldToPutAsidePiece->getPieceOnField();
 
                         if (pPieceOnPutAsideField == nullptr)
+                        {
+                            qDebug() << "ChessMovements::resetPiecePositions(): put bad piece from checking field on its empty start pos";
                             this->regularMoveSequence(pExaminedField, pFieldToPutAsidePiece);
+                        }
                         else if (pExaminedField == _pBoardMain->getField(
                                      pPieceOnPutAsideField->getStartFieldNr()))
+                        {
+                            qDebug() << "ChessMovements::resetPiecePositions(): both pieces crossing thier start fields. put 1 of them on removed board";
                             this->removeMoveSequence(pExaminedField);
+                        }
                         //else: iterate through all fields one more time (pieces pos will change)
                     }
                 }
@@ -235,9 +265,12 @@ bool ChessMovements::resetPiecePositions()
                 qDebug() << "ChessMovements::resetPiecePositions(): boards are identical";
                 break;
             }
+            else qDebug() << "ChessMovements::resetPiecePositions(): boards aren't identical."
+                             "iterate over board again, till its ok";
         }
         while (!this->isPieceSetOnStartFields());
     }
+    qDebug() << "ChessMovements::resetPiecePositions(): reset complieted";
 
     return true;
 }

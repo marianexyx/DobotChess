@@ -1187,13 +1187,13 @@ public:
         sendBtn->setText(QApplication::translate("MainWindow", "Send", nullptr));
         queue->setTitle(QApplication::translate("MainWindow", "Queue", nullptr));
         CoreIndexAmountlabel->setText(QApplication::translate("MainWindow", "-1", nullptr));
-        label_14->setText(QApplication::translate("MainWindow", "DobotIndex", nullptr));
-        label_15->setText(QApplication::translate("MainWindow", "CoreMaxIndex", nullptr));
-        label_21->setText(QApplication::translate("MainWindow", "DobotLeftIdsSpc", nullptr));
+        label_14->setText(QApplication::translate("MainWindow", "DobotID", nullptr));
+        label_15->setText(QApplication::translate("MainWindow", "CoreMaxID", nullptr));
+        label_21->setText(QApplication::translate("MainWindow", "DobotLeftIDsSpc", nullptr));
         DobotQueuedIndexLabel->setText(QApplication::translate("MainWindow", "-1", nullptr));
         DobotQueuedCmdLeftSpaceLabel->setText(QApplication::translate("MainWindow", "-1", nullptr));
-        label_16->setText(QApplication::translate("MainWindow", "CoreIdCounter", nullptr));
-        label_22->setText(QApplication::translate("MainWindow", "CoreNextId", nullptr));
+        label_16->setText(QApplication::translate("MainWindow", "IDsLeftToSend", nullptr));
+        label_22->setText(QApplication::translate("MainWindow", "CoreNextID", nullptr));
         CoreMaxQueuedIndexLabel->setText(QApplication::translate("MainWindow", "-1", nullptr));
         CoreNextIdLabel->setText(QApplication::translate("MainWindow", "-1", nullptr));
         resetDobotIndexBtn->setText(QApplication::translate("MainWindow", "ResDtId", nullptr));

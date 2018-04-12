@@ -30,7 +30,7 @@ private:
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
     uint _unQueuedCmdLeftSpace;
-    QList<DobotMove> _queuedCmdIDList;
+    QList<DobotMove> _queuedCmdIDList; //todo: to nie jest lista IDków
     uint64_t _lowestIDMoveInList;
     uint64_t _un64RetreatID;
     uint64_t _un64LastDobotIDShownInUI;
@@ -40,12 +40,12 @@ public:
 
     void parseNextMoveToArmIfPossible();
     bool isNextPhysicalMoveToQueueOnArmAvailable();
-    DobotMove getNextPhysicalMoveToQueueOnArm();
+    DobotMove getNextMoveToSendToArm();
     void showLastExecutedArmMoveInUI();
     void removeOldQueuedMovesFromCore();
     DobotMove getQueuedMoveInCore(uint64_t un64ID);
     //void retreat();
-    void queuePhysicalMoveOnArm(DobotMove move);
+    void sendMoveToArm(DobotMove move);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void saveIDFromConnectedDobot();
     //bool isDobotCmdsLeftSpaceEmpty();
