@@ -30,7 +30,8 @@ private:
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
     uint _unQueuedCmdLeftSpace;
-    QList<DobotMove> _queuedCmdIDList; //todo: to nie jest lista IDków
+    QList<DobotMove> _queuedArmCmds;
+    QList<DobotMove> _executedArmCmds;
     uint64_t _lowestIDMoveInList;
     uint64_t _un64RetreatID;
     uint64_t _un64LastDobotIDShownInUI;
@@ -43,7 +44,7 @@ public:
     DobotMove getNextMoveToSendToArm();
     void showLastExecutedArmMoveInUI();
     void removeOldQueuedMovesFromCore();
-    DobotMove getQueuedMoveInCore(uint64_t un64ID);
+    DobotMove getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID);
     //void retreat();
     void sendMoveToArm(DobotMove move);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);

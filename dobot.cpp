@@ -50,6 +50,7 @@ void Dobot::onGetPoseTimer()
 
     this->saveActualDobotPosition();
     _pQueue->parseNextMoveToArmIfPossible();
+    _pQueue->showLastExecutedArmMoveInUI();
 
     getPoseTimer->start(); //auto restart timer
 }
@@ -247,7 +248,8 @@ void Dobot::initDobot()
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump,
                               VERTICAL_MOVE VertMove /*= VM_NONE*/)
 {
-    if (_bConnectedToDobot && this->isPointTotallyDiffrent(dest3D)) return;
+    //todo: przywrócić póxniej zabezpiecznie 3 osi
+    //if (_bConnectedToDobot && this->isPointTotallyDiffrent(dest3D)) return;
 
     if (VertMove == VM_GRAB)
         this->addArmMoveToQueue(DM_OPEN);

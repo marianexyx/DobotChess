@@ -20,10 +20,8 @@ private:
     Dobot* _pDobot;
     DobotQueue* _pQueue;
 
-    IOPWM _gripperServo;
     QList<ServoArduino> _arduinoGripperStates;
     const float _fGripOpened, _fGripClosed;
-    WAITCmd _gripperMoveDelay;
 
 public:
     DobotServo(Dobot* pDobot, float fGripperOpened, float fGripperClosed);
@@ -33,7 +31,7 @@ public:
     void moveServoManually();
     void openGripper(uint64_t ID);
     void closeGripper(uint64_t ID);
-    void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType);
+    //void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType); //todo: zbędne(?)
 
     bool isServoListEmpty() const { return 1 /*_arduinoGripperStates.isEmpty() ? true : false*/; }
 };
