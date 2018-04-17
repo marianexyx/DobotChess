@@ -1,11 +1,17 @@
 #include "dobot_servo.h"
 
-DobotServo::DobotServo(Dobot* pDobot, float fGripperOpened, float fGripperClosed):
+DobotServo::DobotServo(/*Dobot* pDobot,*/ float fGripperOpened, float fGripperClosed):
     _fGripOpened(fGripperOpened),
     _fGripClosed(fGripperClosed)
 {
-    _pDobot = pDobot;
-    _pQueue = _pDobot->getQueuePointer();
+    //_pDobot = pDobot; //todo: czy to zbędne? tak
+    //_pQueue = _pDobot->getQueuePointer();
+    qDebug() << "DobotServo::DobotServo(): _fGripOpened =" << _fGripOpened
+             << ", _fGripClosed =" << _fGripClosed;
+
+    _gripper.address = 4;
+    _gripper.dutyCycle = _fGripOpened;
+    _gripper.frequency = 50.f;
 
     this->checkPWMForErrors();
 }
@@ -36,17 +42,13 @@ void DobotServo::checkPWMForErrors()
 
 void DobotServo::changeGripperAngle(float fDutyCycle) //info: powinno działać
 {
-    IOPWM grip;
-    grip.address = 4;
-    grip.frequency = 50.f;
-
     if (fDutyCycle != 0)
-        grip.dutyCycle = fDutyCycle;
-    qDebug() << "grip.dutyCycle = " << fDutyCycle;
-    Dobot::isArmReceivedCorrectCmd(SetIOPWM(&grip, false, NULL), SHOW_ERRORS); //unqueued
+        _gripper.dutyCycle = fDutyCycle;
+    qDebug() << "_gripper.dutyCycle = " << fDutyCycle;
+    isArmReceivedCorrectCmd(SetIOPWM(&_gripper, false, NULL), SHOW_ERRORS); //unqueued
 }
 
-void DobotServo::moveServoManually()
+/*void DobotServo::moveServoManually()
 {
     if (_arduinoGripperStates.first().ID <= _pQueue->getRealTimeDobotActualID())
     {
@@ -60,33 +62,30 @@ void DobotServo::moveServoManually()
     }
 
     _pDobot->showArduinoGripperStateListInUI(_arduinoGripperStates);
-}
+}*/
 
 void DobotServo::openGripper(uint64_t ID)
 {
-    qDebug() << "DobotServo::openGripper(): _fGripOpened =" << _fGripOpened;
-    IOPWM grip;
-    grip.address = 4;
-    //todo: żadne wartości wrzucone przez kontruktor nie trzymają się programu...
-    //...tj, gupią się i pokazują losowe śmieci
-    grip.dutyCycle = _fGripOpened;
-    grip.frequency = 50.f;
-    Dobot::isArmReceivedCorrectCmd(SetIOPWM(&grip, true, &ID), SHOW_ERRORS);
+    qDebug() << "DobotServo::openGripper(): _fGripOpened =" << _fGripOpened
+             << ", pin =" << _gripper.address << ", freq =" << _gripper.frequency;
+    _gripper.dutyCycle = _fGripOpened;
+    isArmReceivedCorrectCmd(SetIOPWM(&_gripper, true, &ID), SHOW_ERRORS);
 }
 
 void DobotServo::closeGripper(uint64_t ID)
 {
-    qDebug() << "DobotServo::closeGripper(): _fGripClosed =" << _fGripClosed;
-    IOPWM grip;
-    grip.address = 4;
-    grip.dutyCycle = _fGripClosed;
-    grip.frequency = 50.f;
-    Dobot::isArmReceivedCorrectCmd(SetIOPWM(&grip, true, &ID), SHOW_ERRORS);
+    qDebug() << "DobotServo::closeGripper(): _fGripClosed =" << _fGripClosed
+             << ", pin =" << _gripper.address << ", freq =" << _gripper.frequency;
+    _gripper.dutyCycle = _fGripClosed;
+    isArmReceivedCorrectCmd(SetIOPWM(&_gripper, true, &ID), SHOW_ERRORS);
+}
 
-    //wait for the servo to be closed //todo: 2 id w 1 ruchu
+void DobotServo::wait(uint64_t ID)
+{
+    //wait for the servo to be closed
     WAITCmd gripperMoveDelay;
     gripperMoveDelay.timeout = 400;
-    Dobot::isArmReceivedCorrectCmd(SetWAITCmd(&gripperMoveDelay, true, &ID), SHOW_ERRORS);
+    isArmReceivedCorrectCmd(SetWAITCmd(&gripperMoveDelay, true, &ID), SHOW_ERRORS);
 }
 
 /*void DobotServo::addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType)

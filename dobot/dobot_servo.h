@@ -2,10 +2,15 @@
 #define DOBOT_SERVO_H
 
 #pragma once
-#include "dobot.h"
+//#include "dobot.h"
+#include <QDebug>
+#include "vars/log.h"
+#include "DobotDll.h"
+#include "DobotType.h"
+#include "dobot/vars/dobot_moves.h"
 
-class Dobot;
-class DobotQueue;
+//class Dobot;
+//class DobotQueue;
 
 struct ServoArduino
 {
@@ -17,20 +22,23 @@ struct ServoArduino
 class DobotServo
 {
 private:
-    Dobot* _pDobot;
-    DobotQueue* _pQueue;
+    //Dobot* _pDobot;
+    //DobotQueue* _pQueue;
 
     QList<ServoArduino> _arduinoGripperStates;
     const float _fGripOpened, _fGripClosed;
+    IOPWM _gripper;
 
 public:
-    DobotServo(Dobot* pDobot, float fGripperOpened, float fGripperClosed);
+    DobotServo(float fGripperOpened, float fGripperClosed);
+    ~DobotServo() { qDebug() << "destroying DobotServo"; }
 
     void checkPWMForErrors();
     void changeGripperAngle(float fDutyCycle); //service usage
-    void moveServoManually();
+    //void moveServoManually();
     void openGripper(uint64_t ID);
     void closeGripper(uint64_t ID);
+    void wait(uint64_t ID);
     //void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType); //todo: zbędne(?)
 
     bool isServoListEmpty() const { return 1 /*_arduinoGripperStates.isEmpty() ? true : false*/; }

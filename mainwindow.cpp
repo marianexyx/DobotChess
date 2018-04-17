@@ -124,7 +124,7 @@ void MainWindow::setAxisLabelText(QString QStrAxisLabelText, char chAxis)
 }
 
 void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
-                                int nCoreIdLeft, int CoreNextId)
+                                int nCoreIdLeft, int nCoreNextId)
 {
     if (nSpaceLeft == 0) nSpaceLeft = 1; //to tylko dla tymczasowego zblokowania...
     //...wyskakującego warninga o unused parameter, póki nie wprowadzę tej funkcji
@@ -133,7 +133,7 @@ void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
-    ui->CoreNextIdLabel->setText(QString::number(CoreNextId));
+    ui->CoreNextIdLabel->setText(QString::number(nCoreNextId));
 }
 
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
@@ -403,7 +403,7 @@ void MainWindow::on_downBtn_clicked()
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
 {
-    if (Dobot::isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
+    if (isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
         this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
 }
 
@@ -481,6 +481,7 @@ void MainWindow::on_openGripperBtn_clicked()
 void MainWindow::on_closeGripperBtn_clicked()
 {
     _pDobot->addArmMoveToQueue(DM_CLOSE);
+    _pDobot->addArmMoveToQueue(DM_WAIT);
 }
 
 void MainWindow::on_middleAboveBtn_clicked()

@@ -76,7 +76,7 @@ private slots:
     void on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged);
     void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft,
-                        int CoreNextId);
+                        int nCoreNextId);
     void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
     void showArduinoGripperStateList(QList<ServoArduino> list);
 

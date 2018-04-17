@@ -20,8 +20,8 @@
 #include "dobot/dobot_servo.h"
 #include "dobot/dobot_queue.h"
 
-class DobotQueue;
-struct ServoArduino;
+//class DobotQueue;
+//struct ServoArduino;
 
 class Dobot: public QObject
 {
@@ -47,8 +47,6 @@ private:
 public:
     Dobot(ArduinoUsb* pUsb, RealVars gameConfigVars);
     ~Dobot();
-
-    static bool isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false);
 
     void saveActualDobotPosition();
     void initDobot();
@@ -79,9 +77,13 @@ public:
     { emit this->showArduinoGripperStateList(list); }
 
 public slots:
+    void sendMoveToArm(DobotMove move);
     void onConnectDobot();
     void onPeriodicTaskTimer();
     void onGetPoseTimer();
+    void showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
+                             int nCoreIdLeft, int nCoreNextId);  //todo: to wcale nie są inty
+    void addTextToLogPTEInUI(QString QStrTxt, LOG log);
 
 signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);
@@ -90,7 +92,7 @@ signals: //GUI mainWindow
     void RefreshDobotButtonsStates(bool bDobotButtonsStates);
     void deviceLabels(QString QStrDeviceSN, QString QStrDeviceName, QString QStrDeviceVersion);
     void DobotErrorMsgBox();
-    void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int CoreNextId);
+    void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int nCoreNextId);
     void showArduinoGripperStateList(QList<ServoArduino>);
 };
 

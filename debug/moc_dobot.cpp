@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Dobot_t {
-    QByteArrayData data[28];
-    char stringdata0[384];
+    QByteArrayData data[35];
+    char stringdata0[466];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -54,12 +54,19 @@ QT_MOC_LITERAL(18, 236, 6), // "nSpace"
 QT_MOC_LITERAL(19, 243, 8), // "nDobotId"
 QT_MOC_LITERAL(20, 252, 10), // "nCoreMaxId"
 QT_MOC_LITERAL(21, 263, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(22, 275, 10), // "CoreNextId"
-QT_MOC_LITERAL(23, 286, 27), // "showArduinoGripperStateList"
-QT_MOC_LITERAL(24, 314, 19), // "QList<ServoArduino>"
-QT_MOC_LITERAL(25, 334, 14), // "onConnectDobot"
-QT_MOC_LITERAL(26, 349, 19), // "onPeriodicTaskTimer"
-QT_MOC_LITERAL(27, 369, 14) // "onGetPoseTimer"
+QT_MOC_LITERAL(22, 275, 11), // "nCoreNextId"
+QT_MOC_LITERAL(23, 287, 27), // "showArduinoGripperStateList"
+QT_MOC_LITERAL(24, 315, 19), // "QList<ServoArduino>"
+QT_MOC_LITERAL(25, 335, 13), // "sendMoveToArm"
+QT_MOC_LITERAL(26, 349, 9), // "DobotMove"
+QT_MOC_LITERAL(27, 359, 4), // "move"
+QT_MOC_LITERAL(28, 364, 14), // "onConnectDobot"
+QT_MOC_LITERAL(29, 379, 19), // "onPeriodicTaskTimer"
+QT_MOC_LITERAL(30, 399, 14), // "onGetPoseTimer"
+QT_MOC_LITERAL(31, 414, 19), // "showQueueLabelsInUI"
+QT_MOC_LITERAL(32, 434, 19), // "addTextToLogPTEInUI"
+QT_MOC_LITERAL(33, 454, 7), // "QStrTxt"
+QT_MOC_LITERAL(34, 462, 3) // "log"
 
     },
     "Dobot\0addTextToLogPTE\0\0LOG\0JointLabelText\0"
@@ -69,10 +76,13 @@ QT_MOC_LITERAL(27, 369, 14) // "onGetPoseTimer"
     "deviceLabels\0QStrDeviceSN\0QStrDeviceName\0"
     "QStrDeviceVersion\0DobotErrorMsgBox\0"
     "queueLabels\0nSpace\0nDobotId\0nCoreMaxId\0"
-    "nCoreIdLeft\0CoreNextId\0"
+    "nCoreIdLeft\0nCoreNextId\0"
     "showArduinoGripperStateList\0"
-    "QList<ServoArduino>\0onConnectDobot\0"
-    "onPeriodicTaskTimer\0onGetPoseTimer"
+    "QList<ServoArduino>\0sendMoveToArm\0"
+    "DobotMove\0move\0onConnectDobot\0"
+    "onPeriodicTaskTimer\0onGetPoseTimer\0"
+    "showQueueLabelsInUI\0addTextToLogPTEInUI\0"
+    "QStrTxt\0log"
 };
 #undef QT_MOC_LITERAL
 
@@ -82,7 +92,7 @@ static const uint qt_meta_data_Dobot[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -90,19 +100,22 @@ static const uint qt_meta_data_Dobot[] = {
        8,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    2,   69,    2, 0x06 /* Public */,
-       4,    2,   74,    2, 0x06 /* Public */,
-       7,    2,   79,    2, 0x06 /* Public */,
-      10,    1,   84,    2, 0x06 /* Public */,
-      12,    3,   87,    2, 0x06 /* Public */,
-      16,    0,   94,    2, 0x06 /* Public */,
-      17,    5,   95,    2, 0x06 /* Public */,
-      23,    1,  106,    2, 0x06 /* Public */,
+       1,    2,   84,    2, 0x06 /* Public */,
+       4,    2,   89,    2, 0x06 /* Public */,
+       7,    2,   94,    2, 0x06 /* Public */,
+      10,    1,   99,    2, 0x06 /* Public */,
+      12,    3,  102,    2, 0x06 /* Public */,
+      16,    0,  109,    2, 0x06 /* Public */,
+      17,    5,  110,    2, 0x06 /* Public */,
+      23,    1,  121,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-      25,    0,  109,    2, 0x0a /* Public */,
-      26,    0,  110,    2, 0x0a /* Public */,
-      27,    0,  111,    2, 0x0a /* Public */,
+      25,    1,  124,    2, 0x0a /* Public */,
+      28,    0,  127,    2, 0x0a /* Public */,
+      29,    0,  128,    2, 0x0a /* Public */,
+      30,    0,  129,    2, 0x0a /* Public */,
+      31,    5,  130,    2, 0x0a /* Public */,
+      32,    2,  141,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -115,9 +128,12 @@ static const uint qt_meta_data_Dobot[] = {
     QMetaType::Void, 0x80000000 | 24,    2,
 
  // slots: parameters
+    QMetaType::Void, 0x80000000 | 26,   27,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   18,   19,   20,   21,   22,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 3,   33,   34,
 
        0        // eod
 };
@@ -136,9 +152,12 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 5: _t->DobotErrorMsgBox(); break;
         case 6: _t->queueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
         case 7: _t->showArduinoGripperStateList((*reinterpret_cast< QList<ServoArduino>(*)>(_a[1]))); break;
-        case 8: _t->onConnectDobot(); break;
-        case 9: _t->onPeriodicTaskTimer(); break;
-        case 10: _t->onGetPoseTimer(); break;
+        case 8: _t->sendMoveToArm((*reinterpret_cast< DobotMove(*)>(_a[1]))); break;
+        case 9: _t->onConnectDobot(); break;
+        case 10: _t->onPeriodicTaskTimer(); break;
+        case 11: _t->onGetPoseTimer(); break;
+        case 12: _t->showQueueLabelsInUI((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
+        case 13: _t->addTextToLogPTEInUI((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -227,13 +246,13 @@ int Dobot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 14)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 11;
+        _id -= 14;
     }
     return _id;
 }

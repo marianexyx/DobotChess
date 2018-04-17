@@ -9,8 +9,8 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars):
 {
     _pUsb = pUsb;
 
-    _pQueue = new DobotQueue(this);
-    _pServo = new DobotServo(this, gameConfigVars.fGripperOpened,
+    _pQueue = new DobotQueue(/*this*/);
+    _pServo = new DobotServo(/*this,*/ gameConfigVars.fGripperOpened,
                              gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
@@ -29,6 +29,13 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars):
     _Home.r = 0;
 
     _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
+
+    connect(_pQueue, SIGNAL(sendMoveToArm(DobotMove)),
+            this, SLOT(sendMoveToArm(DobotMove)));
+    connect(_pQueue, SIGNAL(showQueueLabelsInUI(int, int, int, int, int)),
+            this, SLOT(showQueueLabelsInUI(int, int, int, int, int)));
+    connect(_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
+            this, SLOT(addTextToLogPTEInUI(QString, LOG)));
 }
 
 Dobot::~Dobot()
@@ -55,24 +62,15 @@ void Dobot::onGetPoseTimer()
     getPoseTimer->start(); //auto restart timer
 }
 
-/*static*/ bool Dobot::isArmReceivedCorrectCmd(int nResult, bool bErrorLog /*= false*/)
+void Dobot::showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
+                                int nCoreIdLeft, int nCoreNextId)
 {
-    if (nResult == DobotCommunicate_NoError)
-        return true;
-    else
-    {
-        if (bErrorLog)
-        {
-            if (nResult == DobotCommunicate_BufferFull)
-                qDebug() << "ERROR: Dobot::isArmReceivedCorrectCmd(): dobot buffer is full";
-            else if (nResult == DobotCommunicate_Timeout)
-                qDebug() << "ERROR: Dobot::isArmReceivedCorrectCmd(): cmd timeout";
-            else
-                qDebug() << "ERROR: Dobot::isArmReceivedCorrectCmd(): unknown error:" << nResult;
-        }
+    emit this->queueLabels(nSpace, nDobotId, nCoreMaxId, nCoreIdLeft, nCoreNextId);
+}
 
-        return false;
-    }
+void Dobot::addTextToLogPTEInUI(QString QStrTxt, LOG log)
+{
+    emit this->addTextToLogPTE(QStrTxt, log);
 }
 
 void Dobot::saveActualDobotPosition()
@@ -245,6 +243,54 @@ void Dobot::initDobot()
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
 }
 
+void Dobot::sendMoveToArm(DobotMove move)
+{
+    qDebug() << "Dobot::sendMoveToArm(): move type =" << dobotMoveAsQstr(move.type)
+             << ", ID =" << move.ID;
+
+    switch(move.type)
+    {
+    case DM_TO_POINT:
+    case DM_UP: //todo: up/down tutaj ok?
+    case DM_DOWN:
+    {
+        //todo: zabronić oś z jezeli jest zbyt nisko
+        PTPCmd moveAsPtpCmd;
+        moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //ruch typu kartezjański liniowy
+        //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
+        moveAsPtpCmd.x = move.xyz.x;
+        moveAsPtpCmd.y = move.xyz.y;
+        moveAsPtpCmd.z = move.xyz.z;
+        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
+        break;
+    }
+    case DM_OPEN:
+        _pServo->openGripper(move.ID);
+        break;
+    case DM_CLOSE:
+        _pServo->closeGripper(move.ID);
+        break;
+    case DM_WAIT:
+        _pServo->wait(move.ID);
+        break;
+    case DM_CALIBRATE:
+    {
+        emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
+
+        HOMECmd HOME;
+        HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
+        isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
+    }
+        break;
+        //_pServo->addServoMoveToGripperStatesList(move.type); //todo: ????
+        //break;
+    default:
+        qDebug() << "ERROR: Dobot::sendMoveToArm(): wrong move type:" << move.type;
+    }
+
+    qDebug() << "end of Dobot::sendMoveToArm()";
+}
+
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump,
                               VERTICAL_MOVE VertMove /*= VM_NONE*/)
 {
@@ -265,7 +311,10 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump,
     if (VertMove == VM_PUT)
         this->addArmMoveToQueue(DM_OPEN);
     else if (VertMove == VM_GRAB)
+    {
         this->addArmMoveToQueue(DM_CLOSE);
+        this->addArmMoveToQueue(DM_WAIT);
+    }
 
     this->armUpDown(DM_UP, dest3D.z);
 }

@@ -1,9 +1,9 @@
 #include "dobot_queue.h"
 
-DobotQueue::DobotQueue(Dobot *pDobot)
+DobotQueue::DobotQueue(/*Dobot *pDobot*/)
 {
-    _pDobot = pDobot;
-    _pServo = pDobot->getServoPointer();
+    //_pDobot = pDobot; //todo: używm tylko do emitowaia sygnału
+    //_pServo = pDobot->getServoPointer();
 
     _un64CoreQueuedCmdID = 1; //set 1st ID
     _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max(); //future
@@ -16,18 +16,18 @@ DobotQueue::DobotQueue(Dobot *pDobot)
 void DobotQueue::parseNextMoveToArmIfPossible()
 {
     //if (this->isDobotCmdsLeftSpaceEmpty()) return; //future
-    Dobot::isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
-                                   SHOW_ERRORS);
+    isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
+                            SHOW_ERRORS);
 
-    if (!_pServo->isServoListEmpty())
-        _pServo->moveServoManually();
+    /*if (!_pServo->isServoListEmpty())
+        _pServo->moveServoManually();*/
 
     if (this->isNextPhysicalMoveToQueueOnArmAvailable())
     {
         qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): "
                     "isNextPhysicalMoveToQueueOnArmAvailable = true. proceed to "
                     "sendMoveToArm(getNextMoveToSendToArm())";
-        this->sendMoveToArm(this->getNextMoveToSendToArm());
+        emit this->sendMoveToArm(this->getNextMoveToSendToArm());
         qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): "
                     "proceed to removeOldQueuedMovesFromCore()";
         this->removeOldQueuedMovesFromCore();
@@ -40,9 +40,9 @@ void DobotQueue::parseNextMoveToArmIfPossible()
 
 bool DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable()
 {
-    emit _pDobot->queueLabels(_unQueuedCmdLeftSpace, _un64RealTimeDobotActualID,
-                           _un64CoreQueuedCmdID, _queuedArmCmds.size(),
-                           _lowestIDMoveInList);
+    emit this->showQueueLabelsInUI(_unQueuedCmdLeftSpace, _un64RealTimeDobotActualID,
+                                   _un64CoreQueuedCmdID, _queuedArmCmds.size(),
+                                   _lowestIDMoveInList);
 
     if (!_queuedArmCmds.isEmpty())
     {
@@ -133,8 +133,8 @@ void DobotQueue::showLastExecutedArmMoveInUI()
         DobotMove Move = this->getQueuedMove(_executedArmCmds, _un64RealTimeDobotActualID);
         QStrMoveID = QString::number(Move.ID);
         QStrDobotMove = dobotMoveAsQstr(Move.type);
-        emit _pDobot->addTextToLogPTE("Executed move ID = " + QStrMoveID +
-                                      " type = " + QStrDobotMove + "\n", LOG_DOBOT);
+        emit this->addTextToLogPTEInUI("Executed move ID = " + QStrMoveID +
+                                       " type = " + QStrDobotMove + "\n", LOG_DOBOT);
 
         qDebug() << "DobotQueue::showLastExecutedArmMoveInUI(): enf of if statement";
     }
@@ -198,12 +198,12 @@ DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)
     GetQueuedCmdLeftSpace(&_unQueuedCmdLeftSpace);
     if (_unQueuedCmdLeftSpace <= 0)
     {
-        emit _pDobot->addTextToLogPTE("ERROR: Dobot queue memory full. Stop arm.\n", LOG_DOBOT);
+        emit showQueueLabelsInUI->addTextToLogPTE("ERROR: Dobot queue memory full. Stop arm.\n", LOG_DOBOT);
         SetQueuedCmdForceStopExec(); //stop arm
     }
 }*/
 
-void DobotQueue::sendMoveToArm(DobotMove move)
+/*void DobotQueue::sendMoveToArm(DobotMove move)
 {
     qDebug() << "DobotQueue::sendMoveToArm(): move type =" << dobotMoveAsQstr(move.type)
              << ", ID =" << move.ID;
@@ -221,7 +221,7 @@ void DobotQueue::sendMoveToArm(DobotMove move)
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
-        Dobot::isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
+        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
         break;
     }
     case DM_OPEN:
@@ -230,13 +230,16 @@ void DobotQueue::sendMoveToArm(DobotMove move)
     case DM_CLOSE:
         _pServo->closeGripper(move.ID);
         break;
+    case DM_WAIT:
+        _pServo->wait(move.ID);
+        break;
     case DM_CALIBRATE:
     {
-        emit _pDobot->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
+        emit showQueueLabelsInUI->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
         HOMECmd HOME;
         HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
-        Dobot::isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
+        isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
     }
         break;
         //_pServo->addServoMoveToGripperStatesList(move.type); //todo: ????
@@ -246,7 +249,7 @@ void DobotQueue::sendMoveToArm(DobotMove move)
     }
 
     qDebug() << "end of DobotQueue::sendMoveToArm()";
-}
+}*/
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
@@ -260,14 +263,14 @@ void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 
 void DobotQueue::saveIDFromConnectedDobot()
 {
-   if (Dobot::isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
-                                      SHOW_ERRORS))
+    if (isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
+                                SHOW_ERRORS))
    {
        qDebug() << "DobotQueue::saveIDFromConnectedDobot(): "
                    "coreNextID =" << _lowestIDMoveInList;
-       emit _pDobot->queueLabels(_unQueuedCmdLeftSpace, _un64RealTimeDobotActualID,
-                              _un64CoreQueuedCmdID, _queuedArmCmds.size(),
-                              _lowestIDMoveInList);
+       emit this->showQueueLabelsInUI(_unQueuedCmdLeftSpace, _un64RealTimeDobotActualID,
+                                      _un64CoreQueuedCmdID, _queuedArmCmds.size(),
+                                      _lowestIDMoveInList);
    }
 
     _un64CoreQueuedCmdID = _un64RealTimeDobotActualID;

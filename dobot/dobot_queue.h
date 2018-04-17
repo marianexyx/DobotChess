@@ -2,30 +2,23 @@
 #define DOBOT_QUEUE_H
 
 #pragma once
-#include "dobot.h"
+//#include "dobot.h"
+#include <QDebug>
+#include "vars/log.h"
 #include "DobotDll.h"
 #include "DobotType.h"
+#include "dobot/vars/dobot_moves.h"
 
-class Dobot;
-class DobotServo;
-
-struct DobotMove
-{
-    uint64_t ID;
-    DOBOT_MOVE_TYPE type;
-    Point3D xyz;
-
-    DobotMove() :ID(0), type(DM_NONE), xyz(0,0,0) {}
-    DobotMove(uint64_t id, DOBOT_MOVE_TYPE MT, Point3D p): ID(id), type(MT), xyz(p) {}
-};
+//class Dobot;
+//class DobotServo;
 
 class DobotQueue: public QObject
 {
     Q_OBJECT
 
 private:
-    Dobot* _pDobot;
-    DobotServo* _pServo;
+    //Dobot* _pDobot;
+    //DobotServo* _pServo;
 
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
@@ -37,7 +30,7 @@ private:
     uint64_t _un64LastDobotIDShownInUI;
 
 public:
-    DobotQueue(Dobot* pDobot);
+    DobotQueue(/*Dobot* pDobot*/);
 
     void parseNextMoveToArmIfPossible();
     bool isNextPhysicalMoveToQueueOnArmAvailable();
@@ -46,7 +39,8 @@ public:
     void removeOldQueuedMovesFromCore();
     DobotMove getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID);
     //void retreat();
-    void sendMoveToArm(DobotMove move);
+    //void sendMoveToArm(DobotMove move); //todo: to powinno być w dobocie,...
+    //...realizowane przez emit?
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void saveIDFromConnectedDobot();
     //bool isDobotCmdsLeftSpaceEmpty();
@@ -64,6 +58,9 @@ public:
 
 signals:
     void showActualDobotQueuedCmdIDList(QList<DobotMove>);
+    void sendMoveToArm(DobotMove);
+    void showQueueLabelsInUI(int, int, int, int, int);
+    void addTextToLogPTEInUI(QString, LOG);
 };
 
 #endif // DOBOT_QUEUE_H
