@@ -97,7 +97,7 @@ Piece::Piece(short sPieceID)
     return PieceType;
 }
 
-/*static*/ QString Piece::name(short sPieceNr)
+/*static*/ QString Piece::name(short sPieceNr) //todo: źle zwraca nazwę
 {
     QString QStrName = QChar::fromLatin1(Piece::Type(sPieceNr));
     PLAYER_TYPE PieceColor = Piece::Color(sPieceNr);

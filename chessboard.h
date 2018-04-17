@@ -54,7 +54,7 @@ public:
     Field* getField(short sFieldNr) const { return _pField[sFieldNr-1]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)-1]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);
-    void clearField(Field* pField);    
+    void clearField(Field* pField, bool bErrorLog = false);
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);

@@ -27,7 +27,7 @@ public:
 
     void setField3DLocation(Point3D point);
     void setPieceOnField(Piece* pPiece);
-    void clearField();
+    void clearField(bool bErrorLog = false);
 
     Point3D getLocation3D();
     bool isFieldOccupied(bool bErrorLog = false);

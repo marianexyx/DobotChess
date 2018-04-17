@@ -19,8 +19,9 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
             _H1 = gameConfigVars.H1;
             _H8 = gameConfigVars.H8;
 
+            _dSquareWidth = ((_A1.y - _H1.y)/7 + (_A8.x - _H1.x)/7)/2;
+
             this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
-            _dSquareWidth = ((_A8.x - _A1.x)/7 + (_A8.y - _A1.y)/7)/2;
         }
         else if (BoardType == B_REMOVED)
         {
@@ -29,9 +30,11 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
             _remBlackCloserOuter = gameConfigVars.remBlackCloserOuter;
             _remBlackFurtherInner = gameConfigVars.remBlackFurtherInner;
 
+            _dSquareWidth = (((_remWhiteFurtherInner.x + _remBlackFurtherInner.x)/2.f) -
+                    ((_remWhiteCloserOuter.x + _remBlackCloserOuter.x)/2.f))/7.f;
+
             this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
                   _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
-            _dSquareWidth = qFabs(_remWhiteCloserOuter.y - _remWhiteFurtherInner.y);
         }
 
         this->calculateMarginal3DValues();
@@ -101,11 +104,6 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
             p3D.y = whiteCloserOuter.y - column * _dSquareWidth;
             p3D.z = whiteCloserOuter.z + row*((whiteFutherInner.z - whiteCloserOuter.z)/7.f);
 
-            /*qDebug() << "Chessboard::calculateFields3DLocationsOnRemovedBoard():"
-                        " assign point =" << p3D.getAsQStr() << "to pos ="
-                     << pos.getAsQStr() << "(nr ="
-                     << _pField[Piece::nr(pos)-1]->getNr() << ")";*/
-
             _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
         }
     }
@@ -123,11 +121,6 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
             p3D.y = blackCloserOuter.y + ((column-2)*(-_dSquareWidth));
             p3D.z = blackCloserOuter.z + row*((blackFutherInner.z - blackCloserOuter.z)/7.f);
 
-            /*qDebug() << "Chessboard::calculateFields3DLocationsOnRemovedBoard():"
-                        " assign point =" << p3D.getAsQStr() << "to pos ="
-                     << pos.getAsQStr() << "(nr ="
-                     << _pField[Piece::nr(pos)-1]->getNr() << ")";*/
-
             _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
         }
     }
@@ -136,7 +129,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 void Chessboard::calculateMarginal3DValues()
 {
     _MinBoard.x = _MinBoard.y = _MinBoard.z = std::numeric_limits<double>::max();
-    _MaxBoard.x = _MaxBoard.y = _MaxBoard.z = std::numeric_limits<double>::min();
+    _MaxBoard.x = _MaxBoard.y = _MaxBoard.z = -1000; //big int to start comparing
 
     for (int i=0; i<=63; ++i)
     {
@@ -155,15 +148,20 @@ void Chessboard::calculateMarginal3DValues()
         if (_pField[i]->getLocation3D().y > _MaxBoard.y)
             _MaxBoard.y = _pField[i]->getLocation3D().y;
         if (_pField[i]->getLocation3D().z > _MaxBoard.z) //fMaxPieceHeight się skraca
-            _MaxBoard.z = _pField[i]->getLocation3D().z + (double)fMaxPieceHeight;
+            _MaxBoard.z = _pField[i]->getLocation3D().z;
     }
+    _MaxBoard.z += (double)fMaxPieceHeight;
 }
 
 void Chessboard::calculateMiddleAbovePoint()
 {
-    _middleAbove.x =  (_MinBoard.x = _MaxBoard.x)/2;
-    _middleAbove.y =  (_MinBoard.y = _MaxBoard.y)/2;
-    _middleAbove.z =  _MaxBoard.z;
+    _middleAbove.x = (_MinBoard.x + _MaxBoard.x)/2;
+    _middleAbove.y = (_MinBoard.y + _MaxBoard.y)/2;
+    _middleAbove.z = _MaxBoard.z;
+
+    qDebug() << "Chessboard::calculateMiddleAbovePoint(): board ="
+             << boardTypeAsQstr(_BoardType) << ", _middleAbove ="
+             << _middleAbove.getAsQStr();
 }
 
 void Chessboard::calculateRetreatPoints()
@@ -188,14 +186,16 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
                  << "on fieldNr =" << pField->getNrAsQStr();
 }
 
-void Chessboard::clearField(Field *pField)
+void Chessboard::clearField(Field* pField, bool bErrorLog /*= false*/)
 {
+    qDebug() << "inside Chessboard::clearField()";
     short sPieceNr = (pField->getPieceOnField() == nullptr ?
                           0 : pField->getPieceOnField()->getNr());
     qDebug() << "Chessboard::clearField(): clearing field nr ="
-             << pField->getNrAsQStr() << ". Old piece =" << Piece::name(sPieceNr)
-             << "(nr =" << sPieceNr << "), now it will be == 0";
-    pField->clearField();
+             << pField->getNrAsQStr() << ". Old piece nr ="
+             << (sPieceNr == 0 ? "0" : Piece::name(sPieceNr))
+             << "(nr =" << (sPieceNr == 0 ? "0" : QString::number(sPieceNr)) << ")";
+    pField->clearField(bErrorLog);
 }
 
 bool Chessboard::isPointInLocationLimits(Point3D point)

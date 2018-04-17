@@ -204,13 +204,16 @@ bool ChessMovements::resetPiecePositions()
 
                 if (!_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
-                    qDebug() << "ChessMovements::resetPiecePositions(): piece on examined field not on start field:";
+                    qDebug() << "ChessMovements::resetPiecePositions(): piece"
+                             << (pPieceOnExaminedField == nullptr ? "0" : QString::number(pPieceOnExaminedField->getNr()))
+                             << "(nr=" << (pPieceOnExaminedField == nullptr ? "0" : pPieceOnExaminedField->getName())
+                             << ") on examined field nr =" << sField << "not on start field >>";
 
                     if (pPieceOnExaminedField == nullptr && (pExaminedField->getNr() <= 16 &&
                                                              pExaminedField->getNr() > 48))
                     { //if checking field is empty && it can have a start piece
 
-                        qDebug() << "ChessMovements::resetPiecePositions(): examined field is empty:";
+                        qDebug() << "ChessMovements::resetPiecePositions(): examined field is empty >>";
                         Piece* pMissingPiece = _pPieceController->getPiece(pExaminedField->
                                                                  getStartPieceNrOnField());
                         Field* pMissingPieceActualFieldOnMainBoard;
@@ -239,7 +242,7 @@ bool ChessMovements::resetPiecePositions()
                     }
                     else if (pPieceOnExaminedField != nullptr) //checking field is occupied
                     {
-                        qDebug() << "ChessMovements::resetPiecePositions(): examined field is occupied by diffrent piece:";
+                        qDebug() << "ChessMovements::resetPiecePositions(): examined field is occupied by diffrent piece >>";
                         Field* pFieldToPutAsidePiece =
                                 _pBoardMain->getField(pPieceOnExaminedField->getStartFieldNr());
                         Piece* pPieceOnPutAsideField = pFieldToPutAsidePiece->getPieceOnField();
@@ -266,7 +269,7 @@ bool ChessMovements::resetPiecePositions()
                 break;
             }
             else qDebug() << "ChessMovements::resetPiecePositions(): boards aren't identical."
-                             "iterate over board again, till its ok";
+                             " iterate over board again, till its ok";
         }
         while (!this->isPieceSetOnStartFields());
     }
@@ -281,8 +284,18 @@ void ChessMovements::copyPiecesToBoard(Chessboard& source, Chessboard& target)
     {
         Piece* pPieceOnSourceField = source.getField(sField)->getPieceOnField();
         if (pPieceOnSourceField != nullptr)
-            target.setPieceOnField(pPieceOnSourceField, target.getField(sField));
+        {
+            Field* targetsField = target.getField(sField);
+            qDebug() << "ChessMovements::copyPiecesToBoard(): targetsField nr ="
+                     << (targetsField == nullptr ?
+                             "ERROR: 0" : QString::number(targetsField->getNr()));
+            qDebug() << "ChessMovements::copyPiecesToBoard(): be4 clearField()";
+            target.clearField(targetsField);
+            qDebug() << "ChessMovements::copyPiecesToBoard(): be4 setPieceOnField()";
+            target.setPieceOnField(pPieceOnSourceField, targetsField);
+        }
     }
+    qDebug() << "end of ChessMovements::copyPiecesToBoard()";
 }
 
 bool ChessMovements::isPieceSetOnStartFields()

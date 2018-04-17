@@ -33,7 +33,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
         _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
-        pRealBoard->clearField(pField);
+        pRealBoard->clearField(pField, SHOW_ERRORS);
 
         if (!this->isPieceSetOk()) return;
     }

@@ -97,11 +97,11 @@ void Field::setPieceOnField(Piece *pPiece)
     else _pPieceOnField = pPiece;
 }
 
-void Field::clearField()
+void Field::clearField(bool bErrorLog /*= false*/)
 {
-    if (_pPieceOnField == nullptr)
-        qDebug() << "ERROR: Field::clearField(): field is already clear. field ="
-                 << Field::nrAsQStr(_sNr) << ", piece nr on it =" << _pPieceOnField->getNr();
+    if (bErrorLog && _pPieceOnField == nullptr)
+        qDebug() << "ERROR: Field::clearField(): field is already clear (=0)."
+                    " field =" << Field::nrAsQStr(_sNr);
     _pPieceOnField = nullptr;
 }
 
