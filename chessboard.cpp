@@ -180,7 +180,7 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
 
     pField->setPieceOnField(pPiece);
 
-    //if (bDebugLog)
+    if (bDebugLog)
         qDebug() << "Chessboard::setPieceOnField(): new pieceNr ="
                  << (pPiece == nullptr ? 0 : pPiece->getNr())
                  << "on fieldNr =" << pField->getNrAsQStr();
@@ -188,13 +188,12 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
 
 void Chessboard::clearField(Field* pField, bool bErrorLog /*= false*/)
 {
-    qDebug() << "inside Chessboard::clearField()";
-    short sPieceNr = (pField->getPieceOnField() == nullptr ?
+    /*short sPieceNr = (pField->getPieceOnField() == nullptr ?
                           0 : pField->getPieceOnField()->getNr());
     qDebug() << "Chessboard::clearField(): clearing field nr ="
              << pField->getNrAsQStr() << ". Old piece nr ="
              << (sPieceNr == 0 ? "0" : Piece::name(sPieceNr))
-             << "(nr =" << (sPieceNr == 0 ? "0" : QString::number(sPieceNr)) << ")";
+             << "(nr =" << (sPieceNr == 0 ? "0" : QString::number(sPieceNr)) << ")";*/
     pField->clearField(bErrorLog);
 }
 
@@ -256,8 +255,9 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog 
    /* qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): pieceNr ="
              << (pPiece == nullptr ? 0 : pPiece->getNr());*/
 
+    qDebug() << "Chessboard::getFieldWithGivenPieceIfExists()";
     //no need for checking board, if piece isn't on it anyway
-    if (pPiece != nullptr &&this->isPieceAlreadyExistsOnBoard(pPiece)) //don't SHOW_ERRORS
+    if (pPiece != nullptr && this->isPieceAlreadyExistsOnBoard(pPiece)) //don't SHOW_ERRORS
     {
         for (int i=0; i<=63; ++i)
         {

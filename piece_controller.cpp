@@ -29,7 +29,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         QString QStrMsg = "Queue: grab piece '" + pField->getPieceOnField()->getName()
                 + "' (nr =" + QString::number(pField->getPieceOnField()->getNr())
                 + ") on " + boardTypeAsQstr(pRealBoard->getBoardType())
-                + " from field " + pField->getNrAsQStr();
+                + " from field " + pField->getNrAsQStr() + "\n";
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
         _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
@@ -44,7 +44,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         QString QStrMsg = "Queue: put piece "
                 + _pPieceSet->getPiece(_pDobot->getItemInGripper())->getName()
                 + " on " + boardTypeAsQstr(pRealBoard->getBoardType())
-                + " on field " + pField->getNrAsQStr();
+                + " on field " + pField->getNrAsQStr() + "\n";
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
         pRealBoard->setPieceOnField(_pPieceSet->getPiece(_pDobot->getItemInGripper()),

@@ -4,7 +4,7 @@
 		<param ID="0" name="height" val="50.0"/>
 	</piece>
 	<points>
-		<point ID="0" name="mainFieldA1" x="157.4" y="76.3" z="-22.9"/>
+		<point ID="0" name="mainFieldA1" x="170.8" y="84.0" z="-24.3"/>
 		<point ID="1" name="mainFieldA8" x="306.6" y="75.0" z="-19.1"/>
 		<point ID="2" name="mainFieldH1" x="157.4" y="-81.9" z="-23.1"/>
 		<point ID="3" name="mainFieldH8" x="305.6" y="-79.2" z="-19.3"/>
@@ -16,7 +16,7 @@
 		<point ID="9" name="homeToMiddleAbove" x="140.0" y="-103.0" z="10.0"/>
 	</points>
 	<gripper>
-		<state ID="0" name="open" pwm="6.9"/>
-		<state ID="1" name="close" pwm="7.55"/>
+		<state ID="0" name="open" pwm="4.5"/>
+		<state ID="1" name="close" pwm="3.5"/>
 	</gripper>
 </data>

@@ -241,6 +241,13 @@ void Dobot::initDobot()
     SetPTPJumpParams(&ptpJumpParams, false, NULL);
     
     SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
+
+    IOMultiplexing iom;
+    iom.address = 4;
+    iom.multiplex = IOFunctionPWM;
+    int iomResult = SetIOMultiplexing(&iom, false, NULL);
+    if (iomResult != DobotCommunicate_NoError)
+        qDebug() << "SetIOMultiplexing error";
 }
 
 void Dobot::sendMoveToArm(DobotMove move)
