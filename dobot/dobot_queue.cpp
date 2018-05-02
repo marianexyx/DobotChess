@@ -203,59 +203,12 @@ DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)
     }
 }*/
 
-/*void DobotQueue::sendMoveToArm(DobotMove move)
-{
-    qDebug() << "DobotQueue::sendMoveToArm(): move type =" << dobotMoveAsQstr(move.type)
-             << ", ID =" << move.ID;
-
-    switch(move.type)
-    {
-    case DM_TO_POINT:
-    case DM_UP: //todo: up/down tutaj ok?
-    case DM_DOWN:
-    {
-        //todo: zabronić oś z jezeli jest zbyt nisko
-        PTPCmd moveAsPtpCmd;
-        moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //ruch typu kartezjański liniowy
-        //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
-        moveAsPtpCmd.x = move.xyz.x;
-        moveAsPtpCmd.y = move.xyz.y;
-        moveAsPtpCmd.z = move.xyz.z;
-        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
-        break;
-    }
-    case DM_OPEN:
-        _pServo->openGripper(move.ID);
-        break;
-    case DM_CLOSE:
-        _pServo->closeGripper(move.ID);
-        break;
-    case DM_WAIT:
-        _pServo->wait(move.ID);
-        break;
-    case DM_CALIBRATE:
-    {
-        emit showQueueLabelsInUI->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
-
-        HOMECmd HOME;
-        HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
-        isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
-    }
-        break;
-        //_pServo->addServoMoveToGripperStatesList(move.type); //todo: ????
-        //break;
-    default:
-        qDebug() << "ERROR: Dobot::sendMoveToArm(): wrong move type:" << move.type;
-    }
-
-    qDebug() << "end of DobotQueue::sendMoveToArm()";
-}*/
-
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
     qDebug() << "DobotQueue::addArmMoveToQueue(): type =" << dobotMoveAsQstr(Type)
              << ", point =" << point.getAsQStr() << ", _un64CoreQueuedCmdID ="
              << _un64CoreQueuedCmdID + 1 << ". add dobot move to queue";
+    if (!isPointInLimits(point)) return;
     _un64CoreQueuedCmdID++;
     DobotMove cmdToQueue(_un64CoreQueuedCmdID, Type, point);
     _queuedArmCmds << cmdToQueue;

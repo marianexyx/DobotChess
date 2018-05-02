@@ -16,6 +16,7 @@ private:
     PieceSet* _pPieceSet;
     Chessboard* _pBoardMain;
     Chessboard* _pBoardRemoved;
+    PosOnBoard _lastPos;
 
 public:
     PieceController(Dobot* pDobot, Chessboard* pBoardMain, Chessboard* pBoardRemoved);
@@ -24,8 +25,11 @@ public:
                                   VERTICAL_MOVE VertMove = VM_NONE);
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog = false);
+    bool isMoveSet();
     Field* searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece);
 
+    void clearLastPos() { _lastPos.Letter = L_X; _lastPos.Digit = D_X; }
+    PosOnBoard getLastPos() const { return _lastPos; }
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
 
 signals:

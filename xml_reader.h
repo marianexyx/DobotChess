@@ -24,7 +24,6 @@ private:
     void readGripper(QDomNodeList gripper);
 
     bool isPieceHeightInLimits(float fPieceHeight);
-    bool isPointInLimits(Point3D point);
     bool isGripperParamInLimits(float fGripperPar);
 
 public:

@@ -45,7 +45,6 @@ public:
     const float fMaxPieceHeight;
 
     bool isBoardReal(bool bErrorLog = false);
-    bool isPointInLocationLimits(Point3D point);
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     //todo: friend dla chwytaka?
     void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);

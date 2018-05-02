@@ -70,9 +70,6 @@ void ChessMovements::goToSafeRemovedFieldIfNeeded(Field* pFieldDest)
 
 void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
 {
-    qDebug() << "ChessMovements::doMoveSequence(): PosMove =" << PosMove.asQStr()
-             << ", type =" << sequenceTypeAsQstr(Type);
-
     Field* pFieldFrom = _pBoardMain->getField(PosMove.from);
     Field* pFieldTo = _pBoardMain->getField(PosMove.to);
 
@@ -83,8 +80,6 @@ void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
         return;
     }
 
-    qDebug() << "ChessMovements::doMoveSequence(): switch: case:"
-           << sequenceTypeAsQstr(Type);
     switch(Type)
     {
     case ST_REGULAR: this->regularMoveSequence(pFieldFrom, pFieldTo); break;

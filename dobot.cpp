@@ -191,12 +191,9 @@ void Dobot::initDobot()
                       QString::number(minorVersion) + "." +
                       QString::number(revision));
     
-    //todo: ustawić servo tutej
-    //set the end effector parameters
     EndEffectorParams endEffectorParams;
     memset(&endEffectorParams, 0, sizeof(endEffectorParams));
-    endEffectorParams.xBias = 71.6f; //59.7f; TODO: wcześniej była ta wartość. co...
-    //...ona oznacza w praktyce?
+    endEffectorParams.xBias = 40.f; //determined experimentally for gripper
     SetEndEffectorParams(&endEffectorParams, false, NULL);
     
     JOGJointParams jogJointParams;

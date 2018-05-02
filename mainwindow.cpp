@@ -238,6 +238,7 @@ void MainWindow::on_sendBtn_clicked()
     point.y = bConversionYOk ? yPTE : _pDobot->getLastGivenPoint().y;
     point.z = bConversionZOk ? zPTE : _pDobot->getLastGivenPoint().z;
 
+    _pPieceController->clearLastPos();
     _pDobot->addArmMoveToQueue(DM_TO_POINT, point);
 
     //servo
@@ -336,14 +337,18 @@ void MainWindow::onChangedMode()
     }
 }
 
-void MainWindow::onJOGCtrlBtnPressed(int nID) {
+void MainWindow::onJOGCtrlBtnPressed(int nID)
+{
+    _pPieceController->clearLastPos();
+
     JOGCmd jogCmd;
     jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
     jogCmd.cmd = nID + 1;
     SetJOGCmd(&jogCmd, false, NULL);
 }
 
-void MainWindow::onJOGCtrlBtnReleased() {
+void MainWindow::onJOGCtrlBtnReleased()
+{
     JOGCmd jogCmd;
     jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
     jogCmd.cmd = JogIdle;
@@ -355,14 +360,33 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
     {
         QString QStrServiceMove = ui->emulatePlayerMsgLineEdit->text();
-        if (QStrServiceMove.left(5) != "move ")
-            QStrServiceMove = "move " + QStrServiceMove;
-
         qDebug() << "MainWindow::on_sendSimulatedMsgBtn_clicked(): "
                     "QStrServiceMove =" << QStrServiceMove;
 
-        qDebug() << "WARNING: unfinished MainWindow::on_sendSimulatedMsgBtn_clicked() method";
-        //_pChess->checkMsgFromWebsockets(QStrServiceMove, ); //future
+        if (QStrServiceMove.length() == 2)
+        {
+            QStrServiceMove += "a1";
+            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
+            {
+                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
+                Field* pFieldFrom = _pBoardMain->getField(fromTo.from);
+                _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldFrom);
+            }
+        }
+        else if (QStrServiceMove.length() == 4) //todo: nie zadziałało chyba to
+        {
+            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
+            {
+                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
+                Field* pFieldFrom = _pBoardMain->getField(fromTo.from);
+                Field* pFieldTo = _pBoardMain->getField(fromTo.to);
+                _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldFrom, VM_GRAB);
+                _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldTo, VM_PUT);
+            }
+
+        }
+        else qDebug() << "ERROR: MainWindow::on_sendSimulatedMsgBtn_clicked(): wrong"
+                         " QStrServiceMove lenght =" << QStrServiceMove.length();
     }
 
     ui->emulatePlayerMsgLineEdit->clear();
@@ -374,29 +398,42 @@ void MainWindow::on_calibrateBtn_clicked()
             ui->yLabel->text().toInt() == (int)_pDobot->getHomePos().y &&
             ui->zLabel->text().toInt() == (int)_pDobot->getHomePos().z)
     {
+        _pPieceController->clearLastPos();
         _pDobot->addArmMoveToQueue(DM_CALIBRATE);
     }
     else
-        qDebug() << "ERROR: MainWindow::on_calibrateBtn_clicked(): Dobot not in home positions";
+        qDebug() << "ERROR: MainWindow::on_calibrateBtn_clicked(): "
+                    "Dobot not in home positions";
 }
 
 void MainWindow::on_homeBtn_clicked()
 {
+    _pPieceController->clearLastPos();
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
 }
 
 void MainWindow::on_upBtn_clicked()
 {
-    if (_pChess->getStatusPointer()->isMoveSet())
-        _pDobot->addArmMoveToQueue(DM_UP);
+    if (_pPieceController->isMoveSet())
+    {
+        double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
+                ->getLocation3D().z + (double)_pBoardMain->fMaxPieceHeight;
+        qDebug() << "MainWindow::on_upBtn_clicked(): dZAxisVal =" << dZAxisVal;
+        _pDobot->armUpDown(DM_DOWN, dZAxisVal);
+    }
     else
         qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
 }
 
 void MainWindow::on_downBtn_clicked()
 {
-    if (_pChess->getStatusPointer()->isMoveSet())
-        _pDobot->addArmMoveToQueue(DM_DOWN);
+    if (_pPieceController->isMoveSet())
+    {
+        double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
+                ->getLocation3D().z;
+        qDebug() << "MainWindow::on_downBtn_clicked(): dZAxisVal =" << dZAxisVal;
+        _pDobot->armUpDown(DM_DOWN, dZAxisVal);
+    }
     else
         qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
 }
@@ -477,7 +514,6 @@ void MainWindow::on_openGripperBtn_clicked()
     _pDobot->addArmMoveToQueue(DM_OPEN);
 }
 
-
 void MainWindow::on_closeGripperBtn_clicked()
 {
     _pDobot->addArmMoveToQueue(DM_CLOSE);
@@ -486,17 +522,19 @@ void MainWindow::on_closeGripperBtn_clicked()
 
 void MainWindow::on_middleAboveBtn_clicked()
 {
-    Point3D mid; //todo: obliczac z innych punktow
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, mid);
+    _pPieceController->clearLastPos();
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
 }
 
 void MainWindow::on_startGmPosBtn_clicked()
 {
-    //future: bezsensowny zawijaniec przez klasy:
-    if (ui->xLabel->text().toInt() == (int)_pDobot->getHomePos().x &&
-            ui->yLabel->text().toInt() == (int)_pDobot->getHomePos().y &&
-            ui->zLabel->text().toInt() == (int)_pDobot->getHomePos().z)
-    {
+    if (qAbs(qAbs(ui->xLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().x)) < 3 &&
+            qAbs(qAbs(ui->yLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().y)) < 3 &&
+            qAbs(qAbs(ui->zLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().z)) < 3)
+    { //if actual point is +/-3 near home point
+        _pPieceController->clearLastPos();
+
+            //future: nieładny zawijaniec przez klasy:
         this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
@@ -511,6 +549,8 @@ void MainWindow::on_startGmPosBtn_clicked()
 
 void MainWindow::on_startDtPosBtn_clicked()
 {
+    _pPieceController->clearLastPos();
+
     this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
 
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));

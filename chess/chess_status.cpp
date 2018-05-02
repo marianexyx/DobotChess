@@ -111,14 +111,6 @@ bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
         return false;
 }
 
-bool ChessStatus::isMoveSet()
-{
-    if (_PosMove.from.Letter == L_X || _PosMove.from.Digit == D_X ||
-            _PosMove.to.Letter == L_X || _PosMove.to.Digit == D_X)
-        return false;
-    else return true;
-}
-
 void ChessStatus::saveStatusData(QString QStrStatus)
 {
     QStringList QStrFENRecord = QStrStatus.split(QRegExp("\\s+"));

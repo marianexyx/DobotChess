@@ -197,26 +197,6 @@ void Chessboard::clearField(Field* pField, bool bErrorLog /*= false*/)
     pField->clearField(bErrorLog);
 }
 
-bool Chessboard::isPointInLocationLimits(Point3D point)
-{
-    if (!_bBoardIsReal)
-    {
-        qDebug() << "ERROR: Chessboard::isPointInLocationLimits(): board isn't real";
-        return false;
-    }
-
-    if (point.x >= _MinBoard.x && point.y >= _MinBoard.y && point.z >= _MinBoard.z &&
-            point.x <= _MaxBoard.x && point.y <= _MaxBoard.y && point.z <= _MaxBoard.z
-            + (double)fMaxPieceHeight)
-        return true;
-    else
-    {
-        qDebug() << "ERROR: Chessboard::isPointInLocationLimits(): point out of sight. x,y,z="
-                 << point.x << point.y << point.z;
-        return false;
-    }
-}
-
 bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
 {
     for (int i=0; i<=63; ++i)

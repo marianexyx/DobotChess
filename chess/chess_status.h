@@ -64,7 +64,6 @@ public:
     bool isMoveRemoving(QString QStrMoveToTest);
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);
-    bool isMoveSet();
 
     END_TYPE getFENGameState() const { return _FENGameState; }
     WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }

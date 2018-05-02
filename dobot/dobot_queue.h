@@ -2,8 +2,8 @@
 #define DOBOT_QUEUE_H
 
 #pragma once
-//#include "dobot.h"
 #include <QDebug>
+#include "vars/basic_vars.h"
 #include "vars/log.h"
 #include "DobotDll.h"
 #include "DobotType.h"

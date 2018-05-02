@@ -19,7 +19,7 @@ PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardMain,
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
                                                VERTICAL_MOVE VertMove/*= VM_NONE*/)
 {
-    if (!pRealBoard->isBoardReal(SHOW_ERRORS)) return; //todo: powinno już być chyba na odwrót?
+    if (!pRealBoard->isBoardReal(SHOW_ERRORS)) return;
 
     if (VertMove == VM_GRAB)
     {
@@ -54,6 +54,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         if (!this->isPieceSetOk()) return;
     }
 
+    _lastPos = pField->getPos();
     Point3D xyz = pField->getLocation3D();
     _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove);
 }
@@ -88,7 +89,7 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLo
     if (pPiece == nullptr)
     {
         if (bErrorLog)
-            qDebug() << "ERROR: PieceController: Chess::isPieceStayOnItsStartingField(): "
+            qDebug() << "ERROR: PieceController::isPieceStayOnItsStartingField(): "
                         "piece can't be nullptr";
         return false;
     }
@@ -97,6 +98,13 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLo
     if (pActualFieldOfGIvenPiece == nullptr) return false;
     if (pPiece->getStartFieldNr() == pActualFieldOfGIvenPiece->getNr()) return true;
     else return false;
+}
+
+bool PieceController::isMoveSet()
+{
+    if (_lastPos.Letter == L_X || _lastPos.Digit == D_X)
+        return false;
+    else return true;
 }
 
 Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece)

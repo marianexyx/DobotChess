@@ -74,4 +74,21 @@ inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
     }
 }
 
+inline bool isPointInLimits(Point3D point)
+{
+    Point3D minErrorCorner(100.f, -180.f, -25.f);
+    Point3D maxErrorCorner(340.f, 180.f, 50.f);
+
+    if (point.x > minErrorCorner.x && point.x < maxErrorCorner.x &&
+            point.y > minErrorCorner.y && point.y < maxErrorCorner.y &&
+            point.z > minErrorCorner.z && point.z < maxErrorCorner.z)
+        return true;
+    else
+    {
+        qDebug() << "ERROR: isPointInLimits(): one of the points vals is out of"
+                    " scope range. point =" << point.x << point.y << point.z;
+        return false;
+    }
+}
+
 #endif // BASIC_VARS_H

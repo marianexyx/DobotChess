@@ -75,8 +75,6 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         return;
     }
 
-    qDebug() << "Chess::checkMsgFromWebsockets(): switch: case:"
-             << requestTypeAsQStr(_request.type);
     switch(_request.type)
     {
     case RT_NEW_GAME:
