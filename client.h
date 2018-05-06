@@ -36,23 +36,22 @@ public:
     Clients(): _clients() {}
 
     void newClient(QWebSocket& clientSocket);
-    //todo: czy nie powienen był używać samych wskaźników do clientów? sprawdzić w...
-    //...działaniu i pozamieniać wtedy nazwy na pClient
-    //raczej wszystki wxkaźniki typu klient powinny być referencjai. inne typy...
-    //...mogą być gwiazdkami
-    //todo: sprobowac wszedzi dac const
     void setClientName(const Client& client, QString QStrName);
-    void setPlayerType(Client& client, PLAYER_TYPE Type);
+    void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
-    void setClientStartConfirmation(Client& client, bool bState);
+    void setClientStartConfirmation(const Client& client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
-    void addClientToQueue(Client& client);
-    void removeClientFromList(Client& client);
-    void removeClientFromQueue(Client& client);
+    void addClientToQueue(const Client& client);
+    void removeClientFromList(const Client& client);
+    void removeClientFromQueue(const Client& client);
     void resetPlayersStartConfirmInfo();
     void clearChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
-    QList<Client> getClientsList() const { return _clients; }
+    QList<Client> getClientsList() const
+    {
+        qDebug() << "Clients::getClientsList()";
+        return _clients;
+    }
     bool isClientInList(const Client& client, bool bErrorLog = false);
     Client getClient(QWebSocket* pClientSocket);
     Client getClient(int64_t n64ClientID);
@@ -64,18 +63,18 @@ public:
     QString getQueuedClientsList();
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
     bool isGameTableOccupied();
-    int64_t getClientPosInQueue(Client& client);
+    int64_t getClientPosInQueue(const Client& client);
     QWebSocket* getPlayerSocket(PLAYER_TYPE Type);
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
     bool isStartClickedByBothPlayers();
     QString getPlayerName(PLAYER_TYPE Type);
-    bool isClientLoggedIn(Client& client);
-    bool isClientInQueue(Client& client);
+    bool isClientLoggedIn(const Client& client);
+    bool isClientInQueue(const Client& client);
     bool isClientNameExists(QString QStrName, bool bErrorLog = false);
     int getAmountOfQueuedClients();
-    bool isClientAPlayer(Client& client, bool bErrorLog = false);
+    bool isClientAPlayer(const Client& client, bool bErrorLog = false);
     bool isClientIDExists(int64_t n64ID);
-    int64_t getClientID(Client& client);
+    int64_t getClientID(const Client& client);
     int64_t getNextAvailableClientID();
 
     //void testQueuedClients(); //test jednostkowy

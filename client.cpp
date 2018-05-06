@@ -3,8 +3,6 @@
 //future: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
 void Clients::newClient(QWebSocket& clientSocket)
 {
-    qDebug() << "Clients::newClient(QWebSocket&)";
-
     Client newClient;
     newClient.ID = this->getNextAvailableClientID();
     newClient.socket = &clientSocket; //future: jeżeli ten parametr jest jako const, to nie...
@@ -52,7 +50,7 @@ void Clients::setClientName(const Client& client, QString QStrName)
     qDebug() << "ERROR: Clients::setClientName(): client not found";
 }
 
-void Clients::setPlayerType(Client& client, PLAYER_TYPE Type)
+void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -121,7 +119,7 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
     else qDebug() << "WARNING: Clients::clearPlayerType(): already clear";
 }
 
-void Clients::setClientStartConfirmation(Client& client, bool bState)
+void Clients::setClientStartConfirmation(const Client& client, bool bState)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -181,7 +179,7 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
     qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
 }
 
-void Clients::addClientToQueue(Client& client)
+void Clients::addClientToQueue(const Client& client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -235,7 +233,7 @@ void Clients::addClientToQueue(Client& client)
                                  BDL_QUEUE_PLAYERS);
 }
 
-void Clients::removeClientFromList(Client& client)
+void Clients::removeClientFromList(const Client& client)
 {
     qDebug() << "Clients::removeClientFromList()";
     Q_FOREACH (Client cl, _clients)
@@ -265,7 +263,7 @@ void Clients::removeClientFromList(Client& client)
     qDebug() << "ERROR: Clients::removeClientFromList(): client not found";
 }
 
-void Clients::removeClientFromQueue(Client &client)
+void Clients::removeClientFromQueue(const Client &client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -426,7 +424,7 @@ QString Clients::getClientName(const Client& client)
     return "";
 }
 
-bool Clients::isClientLoggedIn(Client& client)
+bool Clients::isClientLoggedIn(const Client &client)
 {
     if (!this->getClientName(client).isEmpty()) return true;
     else return false;
@@ -553,7 +551,7 @@ bool Clients::isGameTableOccupied()
     else return true;
 }
 
-int64_t Clients::getClientPosInQueue(Client& client)
+int64_t Clients::getClientPosInQueue(const Client &client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -629,7 +627,7 @@ QString Clients::getPlayerName(PLAYER_TYPE Type)
     }
 }
 
-bool Clients::isClientInQueue(Client& client)
+bool Clients::isClientInQueue(const Client &client)
 {
     Q_FOREACH (Client cl, _clients)
     {
@@ -683,7 +681,7 @@ int Clients::getAmountOfQueuedClients()
     else return 0;
 }
 
-bool Clients::isClientAPlayer(Client& client, bool bErrorLog /*= false*/)
+bool Clients::isClientAPlayer(const Client &client, bool bErrorLog /*= false*/)
 {
     if (client.type == PT_WHITE || client.type  == PT_BLACK )
         return true;
@@ -706,7 +704,7 @@ bool Clients::isClientIDExists(int64_t n64ID)
     return false;
 }
 
-int64_t Clients::getClientID(Client& client)
+int64_t Clients::getClientID(const Client &client)
 {
     Q_FOREACH (Client cl, _clients)
     {

@@ -1,32 +1,26 @@
 #include "dobot.h"
 
-//TODO: wyciagac wartosci do zewnetrznego xmla aby nie commitowac ciagle zmian...
-//...tylko kalibracyjnych
-
 Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars):
-    _ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
-    _ARM_MAX_ACCELERATION(300)
+    m_ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
+    m_ARM_MAX_ACCELERATION(300)
 {
     _pUsb = pUsb;
 
-    _pQueue = new DobotQueue(/*this*/);
-    _pServo = new DobotServo(/*this,*/ gameConfigVars.fGripperOpened,
+    _pQueue = new DobotQueue();
+    _pServo = new DobotServo( gameConfigVars.fGripperOpened,
                              gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
     
     _bConnectedToDobot = false;
 
-    Point3D fakeMid(200,0,25); //todo: liczyć
+    Point3D fakeMid(200,0,25); //todo: liczyć (dlaczego to trzeba było wogle robić?)
     _lastGivenPoint = fakeMid; //todo: pierwszy punkt jako middle above
 
-    /*_Home.x = 140;
-    _Home.y = 0;
-    _Home.z = 10;*/
-    _Home.x = gameConfigVars.home.x;
-    _Home.y = gameConfigVars.home.y;
-    _Home.z = gameConfigVars.home.z;
-    _Home.r = 0;
+    _home.x = gameConfigVars.home.x;
+    _home.y = gameConfigVars.home.y;
+    _home.z = gameConfigVars.home.z;
+    _home.r = 0;
 
     _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
 
@@ -96,9 +90,7 @@ void Dobot::saveActualDobotPosition()
 bool Dobot::bIsMoveInAxisRange(Point3D point)
 {
     if (point.x > 300) qDebug() << "todo: ogarnac blokady";
-    //todo: zrobic jeszcze prewencyjnie wewnetrzny kod blokad
-    //...max ciągnąć z xml
-    //...i pouswstawiać to tam gdzie trzeba
+    //todo: ciągnąć z xml i pouswstawiać to tam gdzie trzeba
     return true;
 }
 
@@ -125,9 +117,9 @@ void Dobot::clearGripper()
     _sItemIDInGripper = 0;
 }
 
-Point3D Dobot::getHomePos() //todo:
+Point3D Dobot::getHomePos()
 {
-    Point3D home(_Home.x, _Home.y, _Home.z);
+    Point3D home(_home.x, _home.y, _home.z);
     return home;
 }
 
@@ -199,37 +191,37 @@ void Dobot::initDobot()
     JOGJointParams jogJointParams;
     for (int i=0; i<4; ++i)
     {
-        jogJointParams.velocity[i] = _ARM_MAX_VELOCITY;
-        jogJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
+        jogJointParams.velocity[i] = m_ARM_MAX_VELOCITY;
+        jogJointParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
     }
     SetJOGJointParams(&jogJointParams, false, NULL);
     
     JOGCoordinateParams jogCoordinateParams;
     for (int i=0; i<4; ++i)
     {
-        jogCoordinateParams.velocity[i] = _ARM_MAX_VELOCITY;
-        jogCoordinateParams.acceleration[i] = _ARM_MAX_ACCELERATION;
+        jogCoordinateParams.velocity[i] = m_ARM_MAX_VELOCITY;
+        jogCoordinateParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
     }
     SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
     
     JOGCommonParams jogCommonParams;
-    jogCommonParams.velocityRatio = _ARM_MAX_VELOCITY;
-    jogCommonParams.accelerationRatio = _ARM_MAX_ACCELERATION;
+    jogCommonParams.velocityRatio = m_ARM_MAX_VELOCITY;
+    jogCommonParams.accelerationRatio = m_ARM_MAX_ACCELERATION;
     SetJOGCommonParams(&jogCommonParams, false, NULL);
     
     PTPJointParams ptpJointParams;
     for (int i=0; i<4; ++i)
     {
-        ptpJointParams.velocity[i] = _ARM_MAX_VELOCITY;
-        ptpJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
+        ptpJointParams.velocity[i] = m_ARM_MAX_VELOCITY;
+        ptpJointParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
     }
     SetPTPJointParams(&ptpJointParams, false, NULL);
     
     PTPCoordinateParams ptpCoordinateParams;
-    ptpCoordinateParams.xyzVelocity = _ARM_MAX_VELOCITY;
-    ptpCoordinateParams.xyzAcceleration = _ARM_MAX_ACCELERATION;
-    ptpCoordinateParams.rVelocity = _ARM_MAX_VELOCITY;
-    ptpCoordinateParams.rAcceleration = _ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.xyzVelocity = m_ARM_MAX_VELOCITY;
+    ptpCoordinateParams.xyzAcceleration = m_ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.rVelocity = m_ARM_MAX_VELOCITY;
+    ptpCoordinateParams.rAcceleration = m_ARM_MAX_ACCELERATION;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
     
     PTPJumpParams ptpJumpParams;
@@ -237,7 +229,7 @@ void Dobot::initDobot()
     ptpJumpParams.zLimit = 150;
     SetPTPJumpParams(&ptpJumpParams, false, NULL);
     
-    SetHOMEParams(&_Home, false, NULL); //todo: NULL- pewnie dlatego mi się wykrzacza ID
+    SetHOMEParams(&_home, false, NULL); //todo: NULL??
 
     IOMultiplexing iom;
     iom.address = 4;
@@ -255,7 +247,7 @@ void Dobot::sendMoveToArm(DobotMove move)
     switch(move.type)
     {
     case DM_TO_POINT:
-    case DM_UP: //todo: up/down tutaj ok?
+    case DM_UP:
     case DM_DOWN:
     {
         //todo: zabronić oś z jezeli jest zbyt nisko

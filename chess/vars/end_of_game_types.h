@@ -18,10 +18,11 @@ enum END_TYPE
 
 inline QString endTypeAsQstr(END_TYPE ET)
 {
+    //future: to muszą być liczby dla strony
     switch(ET)
     {
-    case ET_WHIE_WON: return "whiteWon";
-    case ET_BLACK_WON: return "blackWon";
+    case ET_WHIE_WON: return "wWon";
+    case ET_BLACK_WON: return "bWon";
     case ET_DRAW: return "draw";
     case ET_GIVE_UP: return "giveUp";
     case ET_SOCKET_LOST: return "socketLost";

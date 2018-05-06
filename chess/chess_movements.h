@@ -24,9 +24,7 @@ public:
                    Chessboard* pBoardRemoved);
     ~ChessMovements() {}
 
-    Field* findKingFieldInCastling(Field* pField);
-    Field* findRookFieldInCastling(Field* pField);
-    void goToSafeRemovedFieldIfNeeded(Field* pFieldDest);
+    Field* findRookFieldInCastling(Field* pField, VERTICAL_MOVE MoveStage);
     void doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type);
     void regularMoveSequence(Field* pFrom, Field* pTo);
     void removeMoveSequence(Field* pFieldWithPieceToRemove);

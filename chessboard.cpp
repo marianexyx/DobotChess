@@ -4,7 +4,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
                        RealVars gameConfigVars /*= RealVars()*/):
     fMaxPieceHeight(gameConfigVars.fPieceHeight)
 {
-    _BoardType = BoardType;
+    _boardType = BoardType;
     _bBoardIsReal = bBoardIsReal;
 
     for (int i=0; i<=63; ++i)
@@ -14,14 +14,14 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
     {
         if (BoardType == B_MAIN)
         {
-            _A1 = gameConfigVars.A1;
-            _A8 = gameConfigVars.A8;
-            _H1 = gameConfigVars.H1;
-            _H8 = gameConfigVars.H8;
+            _a1 = gameConfigVars.A1;
+            _a8 = gameConfigVars.A8;
+            _h1 = gameConfigVars.H1;
+            _h8 = gameConfigVars.H8;
 
-            _dSquareWidth = ((_A1.y - _H1.y)/7 + (_A8.x - _H1.x)/7)/2;
+            _dSquareWidth = ((_a1.y - _h1.y)/7 + (_a8.x - _h1.x)/7)/2;
 
-            this->calculateFields3DLocationsOnMainBoard(_A1, _A8, _H1, _H8);
+            this->calculateFields3DLocationsOnMainBoard(_a1, _a8, _h1, _h8);
         }
         else if (BoardType == B_REMOVED)
         {
@@ -45,7 +45,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
 
 Chessboard::~Chessboard()
 {
-    qDebug() << "destroying board =" << boardTypeAsQstr(_BoardType)
+    qDebug() << "destroying board =" << boardTypeAsQstr(_boardType)
              << ", _bBoardIsReal =" << _bBoardIsReal;
 
     for (int i=0; i<=63; ++i)
@@ -101,7 +101,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 
             Point3D p3D;
             p3D.x = whiteCloserOuter.x + row*((whiteFutherInner.x - whiteCloserOuter.x)/7.f);
-            p3D.y = whiteCloserOuter.y - column * _dSquareWidth;
+            p3D.y = whiteCloserOuter.y - (column * _dSquareWidth);
             p3D.z = whiteCloserOuter.z + row*((whiteFutherInner.z - whiteCloserOuter.z)/7.f);
 
             _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
@@ -118,7 +118,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 
             Point3D p3D;
             p3D.x = blackCloserOuter.x + row*((blackFutherInner.x - blackCloserOuter.x)/7.f);
-            p3D.y = blackCloserOuter.y + ((column-2)*(-_dSquareWidth));
+            p3D.y = blackCloserOuter.y + ((column-2) * _dSquareWidth);
             p3D.z = blackCloserOuter.z + row*((blackFutherInner.z - blackCloserOuter.z)/7.f);
 
             _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
@@ -128,40 +128,36 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 
 void Chessboard::calculateMarginal3DValues()
 {
-    _MinBoard.x = _MinBoard.y = _MinBoard.z = std::numeric_limits<double>::max();
-    _MaxBoard.x = _MaxBoard.y = _MaxBoard.z = -1000; //big int to start comparing
+    _minBoard.x = _minBoard.y = _minBoard.z = std::numeric_limits<double>::max();
+    _maxBoard.x = _maxBoard.y = _maxBoard.z = -1000; //big int to start comparing
 
     for (int i=0; i<=63; ++i)
     {
-        if (_BoardType == B_REMOVED && i>=32)
+        if (_boardType == B_REMOVED && i>=32)
             break;
 
-        if (_pField[i]->getLocation3D().x < _MinBoard.x)
-            _MinBoard.x = _pField[i]->getLocation3D().x;
-        if (_pField[i]->getLocation3D().y < _MinBoard.y)
-            _MinBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z < _MinBoard.z)
-            _MinBoard.z = _pField[i]->getLocation3D().z;
+        if (_pField[i]->getLocation3D().x < _minBoard.x)
+            _minBoard.x = _pField[i]->getLocation3D().x;
+        if (_pField[i]->getLocation3D().y < _minBoard.y)
+            _minBoard.y = _pField[i]->getLocation3D().y;
+        if (_pField[i]->getLocation3D().z < _minBoard.z)
+            _minBoard.z = _pField[i]->getLocation3D().z;
 
-        if (_pField[i]->getLocation3D().x > _MaxBoard.x)
-            _MaxBoard.x = _pField[i]->getLocation3D().x;
-        if (_pField[i]->getLocation3D().y > _MaxBoard.y)
-            _MaxBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z > _MaxBoard.z) //fMaxPieceHeight się skraca
-            _MaxBoard.z = _pField[i]->getLocation3D().z;
+        if (_pField[i]->getLocation3D().x > _maxBoard.x)
+            _maxBoard.x = _pField[i]->getLocation3D().x;
+        if (_pField[i]->getLocation3D().y > _maxBoard.y)
+            _maxBoard.y = _pField[i]->getLocation3D().y;
+        if (_pField[i]->getLocation3D().z > _maxBoard.z) //fMaxPieceHeight się skraca
+            _maxBoard.z = _pField[i]->getLocation3D().z;
     }
-    _MaxBoard.z += (double)fMaxPieceHeight;
+    _maxBoard.z += (double)fMaxPieceHeight;
 }
 
 void Chessboard::calculateMiddleAbovePoint()
 {
-    _middleAbove.x = (_MinBoard.x + _MaxBoard.x)/2;
-    _middleAbove.y = (_MinBoard.y + _MaxBoard.y)/2;
-    _middleAbove.z = _MaxBoard.z;
-
-    qDebug() << "Chessboard::calculateMiddleAbovePoint(): board ="
-             << boardTypeAsQstr(_BoardType) << ", _middleAbove ="
-             << _middleAbove.getAsQStr();
+    _middleAbove.x = (_minBoard.x + _maxBoard.x)/2;
+    _middleAbove.y = (_minBoard.y + _maxBoard.y)/2;
+    _middleAbove.z = _maxBoard.z;
 }
 
 void Chessboard::calculateRetreatPoints()
@@ -169,7 +165,7 @@ void Chessboard::calculateRetreatPoints()
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
     _retreatLeft.y = _pField[Field::nr(L_A, D_4)-1]->getLocation3D().y;
     _retreatRight.y = _pField[Field::nr(L_H, D_4)-1]->getLocation3D().y;
-    _retreatLeft.z = _retreatRight.z = _MaxBoard.z;
+    _retreatLeft.z = _retreatRight.z = _maxBoard.z;
 }
 
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*= false*/)
@@ -232,10 +228,6 @@ bool Chessboard::isBoardReal(bool bErrorLog /*= false*/)
 
 Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog /*= false*/)
 {
-   /* qDebug() << "Chessboard::getFieldWithGivenPieceIfExists(): pieceNr ="
-             << (pPiece == nullptr ? 0 : pPiece->getNr());*/
-
-    qDebug() << "Chessboard::getFieldWithGivenPieceIfExists()";
     //no need for checking board, if piece isn't on it anyway
     if (pPiece != nullptr && this->isPieceAlreadyExistsOnBoard(pPiece)) //don't SHOW_ERRORS
     {
@@ -265,8 +257,8 @@ Point3D Chessboard::getBoardPoint3D(BOARD_POINTS BP) const
 {
     switch(BP)
     {
-    case BP_MIN: return _MinBoard; break;
-    case BP_MAX: return _MaxBoard; break;
+    case BP_MIN: return _minBoard; break;
+    case BP_MAX: return _maxBoard; break;
     case BP_MIDDLE: return _middleAbove; break;
     case BP_RETREAT_LEFT: return _retreatLeft; break;
     case BP_RETREAT_RIGHT: return _retreatRight; break;

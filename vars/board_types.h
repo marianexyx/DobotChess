@@ -4,8 +4,11 @@
 #pragma once
 #include <QString>
 
-enum BOARD { B_MAIN,
-             B_REMOVED };
+enum BOARD
+{
+    B_MAIN,
+    B_REMOVED
+};
 
 inline QString boardTypeAsQstr(BOARD Board)
 {

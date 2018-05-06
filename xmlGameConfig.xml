@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <data>
 	<piece>
-		<param ID="0" name="height" val="52.0"/>
+		<param ID="0" name="height" val="50.0"/>
 	</piece>
 	<points>
 		<point ID="0" name="mainFieldA1" x="148.1" y="71.9" z="-24.0"/>

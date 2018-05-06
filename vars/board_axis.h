@@ -53,7 +53,7 @@ inline QString pieceLetterPosAsQStr(LETTER Letter)
 {
     switch(Letter)
     {
-    case L_X: return "-1";
+    case L_X: return "0";
     case L_A: return "a";
     case L_B: return "b";
     case L_C: return "c";

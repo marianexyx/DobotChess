@@ -84,7 +84,7 @@ void DobotServo::wait(uint64_t ID)
 {
     //wait for the servo to be closed
     WAITCmd gripperMoveDelay;
-    gripperMoveDelay.timeout = 400;
+    gripperMoveDelay.timeout = 300;
     isArmReceivedCorrectCmd(SetWAITCmd(&gripperMoveDelay, true, &ID), SHOW_ERRORS);
 }
 

@@ -27,9 +27,9 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         if (pField->getPieceOnField(SHOW_ERRORS) == nullptr) return;
 
         QString QStrMsg = "Queue: grab piece '" + pField->getPieceOnField()->getName()
-                + "' (nr =" + QString::number(pField->getPieceOnField()->getNr())
-                + ") on " + boardTypeAsQstr(pRealBoard->getBoardType())
-                + " from field " + pField->getNrAsQStr() + "\n";
+                + "' (nr =" + QString::number(pField->getPieceOnField()->getNr()) + ") on "
+                + boardTypeAsQstr(pRealBoard->getBoardType()) + " from field nr " +
+                QString::number(pField->getNr()) + "(" + pField->getNrAsQStr() + ")\n";
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
         _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
@@ -76,8 +76,8 @@ bool PieceController::isPieceSetOk()
         }
         if (!bPieceExists)
         {
-            qDebug() << "ERROR: PieceController::isPieceSetOk(): it isn't, "
-                        "missing piece nr:" << sPiece;
+            qDebug() << "ERROR: PieceController::isPieceSetOk(): it isn't, missing piece nr:"
+                     << sPiece << ". item (piece) nr in gripper =" << _pDobot->getItemInGripper();
             return false;
         }
     }

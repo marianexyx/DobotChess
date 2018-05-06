@@ -22,8 +22,8 @@ class Piece
 {
 private:
     short _sPieceID;
-    PIECE_TYPE _PieceType;
-    PLAYER_TYPE _PieceColor;
+    PIECE_TYPE _pieceType;
+    PLAYER_TYPE _pieceColor;
     short _sStartFieldID;
 
 public:
@@ -31,8 +31,6 @@ public:
     ~Piece() { qDebug() << "destroying piece nr =" << _sPieceID; }
 
     bool operator ==(const class Piece& p) { return _sPieceID == p.getNr(); }
-
-    //static constexpr float fMaxPieceHeight = 50.f;
 
     static bool isInRange(short sPieceNr);
     static PLAYER_TYPE Color(char chFENSign);
@@ -45,8 +43,8 @@ public:
     static PosOnBoard startFieldPos(short sPieceNr);
 
     short getNr() const { return _sPieceID; }
-    PIECE_TYPE getType() const { return _PieceType; }
-    PLAYER_TYPE getColor() const { return _PieceColor; }
+    PIECE_TYPE getType() const { return _pieceType; }
+    PLAYER_TYPE getColor() const { return _pieceColor; }
     QString getName() const { return Piece::name(_sPieceID); }
     short getStartFieldNr() const { return _sStartFieldID; }
     PosOnBoard getStartFieldPos() const { return Piece::startFieldPos(_sPieceID); }

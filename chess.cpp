@@ -349,11 +349,12 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
     case ET_DRAW:
         QStrMove = _pStatus->getMove().asQStr();
         //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
-        //future: na przyszłość komunikat o ostatnim ruchu można wyjebać, jako że informacje...
-        //...o ruchach będą wyciągane z "history"
+        //future: komunikat o ostatnim ruchu można wyjebać, jako że informacje...
+        //...o ruchach mogą być wyciągane z "history"
 
-        QStrReturnMsg = "moveOk " + QStrMove + " nt " + endTypeAsQstr(WhoWon)
-                + " " + QStrTableData;
+        qDebug() << "Chess::getEndGameMsg(): move =" << QStrMove;
+        QStrReturnMsg = "moveOk " + QStrMove + " " + turnTypeAsBriefQstr(NO_TURN) + " "
+                + endTypeAsQstr(WhoWon) + " " + QStrTableData;
         return QStrReturnMsg;
     case ET_TIMEOUT_GAME:
     case ET_GIVE_UP:
@@ -435,8 +436,9 @@ void Chess::continueGameplay()
         _pTimers->switchPlayersTimers(_pStatus->getWhoseTurn());
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
+        //future: cont(inue) jako liczba dla strony, zamiast stringów
         this->sendDataToAllClients("moveOk " + _pStatus->getMove().asQStr() + " " +
-                                   turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) + " continue");
+                                   turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) + " cont");
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -471,11 +473,14 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
     //reset data
     _pClientsList->resetPlayersStartConfirmInfo();
     _pTimers->resetGameTimers();
-    _pStatus->clearMove();
+    //_pStatus->clearMove(); //future: czyszczenie ruchu musi być po jego wysłaniu, póki...
+    //...nie będę czytał tego ruchu z historii
     _pStatus->resetStatusData();
 
     this->changePlayersOnChairs(WhoWon, PlayerToClear);
-    this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData()));
+    this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData(), PlayerToClear));
+    _pStatus->clearMove();
+
     //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
     //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
     //dowiedzą że nastąpił koniec gry

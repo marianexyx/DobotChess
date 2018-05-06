@@ -6,7 +6,7 @@
 #include "QObject"
 #include <vector>
 #include <typeinfo>
-#include <limits>
+#include <climits>
 #include "field.h"
 #include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
@@ -21,13 +21,13 @@ class Chessboard: public QObject
     Q_OBJECT
 
 private:
-    BOARD _BoardType;
+    BOARD _boardType;
     bool _bBoardIsReal;
     Field* _pField[64];
-    Point3D  _A1, _A8, _H1, _H8;
+    Point3D  _a1, _a8, _h1, _h8;
     Point3D _remWhiteCloserOuter, _remWhiteFurtherInner;
     Point3D _remBlackCloserOuter, _remBlackFurtherInner;
-    Point3D _MinBoard, _MaxBoard, _middleAbove, _retreatLeft, _retreatRight;
+    Point3D _minBoard, _maxBoard, _middleAbove, _retreatLeft, _retreatRight;
     double _dSquareWidth;
 
     void calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8, Point3D H1, Point3D H8);
@@ -48,7 +48,7 @@ public:
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
     //todo: friend dla chwytaka?
     void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
-    BOARD getBoardType() const { return _BoardType; }
+    BOARD getBoardType() const { return _boardType; }
     Point3D getBoardPoint3D(BOARD_POINTS BP) const;
     Field* getField(short sFieldNr) const { return _pField[sFieldNr-1]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)-1]; }

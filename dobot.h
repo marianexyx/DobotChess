@@ -33,13 +33,14 @@ private:
     DobotServo* _pServo;
     DobotQueue* _pQueue;
 
-    const int _ARM_MAX_VELOCITY, _ARM_MAX_ACCELERATION;
+    //can't start var name witn "_" + "uppercase letter" in c++
+    const int m_ARM_MAX_VELOCITY, m_ARM_MAX_ACCELERATION;
 
     short _sItemIDInGripper;
 
     bool _bConnectedToDobot;
 
-    HOMEParams _Home;
+    HOMEParams _home;
     Point3D _homeToMiddleAbove;
     Point3D _realTimePoint;
     Point3D _lastGivenPoint;

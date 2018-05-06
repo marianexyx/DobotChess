@@ -62,7 +62,8 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
     }
     else
     {
-        qDebug() << "ERROR: ChessStatus::findMoveType(): move is illegal:" << QStrMove;
+        qDebug() << "ChessStatus::findMoveType(): move is illegal (bad move):"
+                 << QStrMove;
         return ST_NONE;
     }
 }

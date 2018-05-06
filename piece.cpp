@@ -3,11 +3,11 @@
 Piece::Piece(short sPieceID)
 {
     if (Piece::isInRange(sPieceID))
-        _PieceType = Piece::Type(sPieceID);
+        _pieceType = Piece::Type(sPieceID);
     else return;
 
     _sPieceID = sPieceID;
-    _PieceColor = Piece::Color(sPieceID);
+    _pieceColor = Piece::Color(sPieceID);
     _sStartFieldID = Piece::startFieldNr(sPieceID);
 }
 
@@ -15,7 +15,7 @@ Piece::Piece(short sPieceID)
 {
     if (sPieceNr < 1 || sPieceNr > 32)
     {
-        qDebug() << "ERROR: Piece: pieceNr out of range 1-32:" << sPieceNr;
+        qDebug() << "ERROR: Piece::isInRange(): pieceNr out of range 1-32:" << sPieceNr;
         return false;
     }
     else return true;
@@ -143,26 +143,20 @@ Piece::Piece(short sPieceID)
 /*static*/ PosOnBoard Piece::startFieldPos(short sPieceNr)
 {
     PosOnBoard PieceLines;
-    if (!Piece::isInRange(sPieceNr))
-    {
-        qDebug() << "ERROR: Piece::startFieldPos:";
-        return PieceLines;
-    }
+    if (!Piece::isInRange(sPieceNr)) return PieceLines;
 
     if (sPieceNr % 8 != 0)
     {
+        PieceLines.Letter = static_cast<LETTER>(sPieceNr % 8);
         PieceLines.Digit = static_cast<DIGIT>((sPieceNr / 8) + 1);
-        PieceLines.Letter  = static_cast<LETTER>(sPieceNr - (PieceLines.Digit * 8));
     }
     else
     {
+        PieceLines.Letter = L_H;
         PieceLines.Digit = static_cast<DIGIT>((sPieceNr / 8));
-        PieceLines.Letter = static_cast<LETTER>(8);
     }
-
-    if (!Piece::isInRange(Piece::nr(PieceLines)))
-        qDebug() << "ERROR: Piece::startFieldPos(): piece isn't "
-                    "in range after conversation";
+    if ((int)PieceLines.Digit > 2)
+        PieceLines.Digit = static_cast<DIGIT>((short)PieceLines.Digit + 4);
 
     return PieceLines;
 }

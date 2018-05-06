@@ -68,8 +68,7 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
     switch(request.type)
     {
     case RT_MOVE:
-        if (_pStatus->findMoveType(request.param) == ST_NONE ||
-                _pStatus->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
+        if (_pStatus->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
             bReturn = false;
         else bReturn = true;
         break;

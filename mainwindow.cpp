@@ -90,6 +90,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
     //future: narobić tych tooltipów
     ui->directTcpMsgCheckBox->setToolTip("//todo:");
     ui->emulatePlayerMsgLineEdit->setToolTip("send msg to Websockets::receivedMsg");
+    ui->sendSimulatedMsgBtn->setToolTip("f.e.: 'e2' or 'e2r' or 'e2e4");
 }
 
 MainWindow::~MainWindow()
@@ -365,12 +366,28 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
         if (QStrServiceMove.length() == 2)
         {
-            QStrServiceMove += "a1";
+            QStrServiceMove += "a1"; //walkaround
             if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
             {
                 PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
                 Field* pFieldFrom = _pBoardMain->getField(fromTo.from);
                 _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldFrom);
+            }
+        }
+        else if (QStrServiceMove.length() == 3 && QStrServiceMove.right(1) == "r")
+        {
+            QStrServiceMove = QStrServiceMove.left(2) + "a1"; //walkaround
+            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
+            {
+                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
+                Field* pFieldFrom = _pBoardRemoved->getField(fromTo.from);
+                if ((int)fromTo.from.Digit > 4)
+                {
+                    qDebug() << "WARNING: MainWindow::on_sendSimulatedMsgBtn_clicked(): "
+                                "fromTo.from.Digit > 4";
+                    return;
+                }
+                _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldFrom);
             }
         }
         else if (QStrServiceMove.length() == 4) //todo: nie zadziałało chyba to
@@ -386,7 +403,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
         }
         else qDebug() << "ERROR: MainWindow::on_sendSimulatedMsgBtn_clicked(): wrong"
-                         " QStrServiceMove lenght =" << QStrServiceMove.length();
+                         " QStrServiceMove msg =" << QStrServiceMove;
     }
 
     ui->emulatePlayerMsgLineEdit->clear();
@@ -523,7 +540,7 @@ void MainWindow::on_closeGripperBtn_clicked()
 void MainWindow::on_middleAboveBtn_clicked()
 {
     _pPieceController->clearLastPos();
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
 }
 
 void MainWindow::on_startGmPosBtn_clicked()

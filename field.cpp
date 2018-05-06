@@ -14,7 +14,10 @@ Field::Field(short sFieldNr)
 /*static*/ bool Field::isInRange(short sFieldNr)
 {
     if (sFieldNr < 1 || sFieldNr > 64)
+    {
+        qDebug() << "ERROR: Field::isInRange(): out of range. nr =" << sFieldNr;
         return false;
+    }
     else return true;
 }
 
@@ -25,13 +28,13 @@ Field::Field(short sFieldNr)
 
     if (sFieldNr % 8 != 0)
     {
+        FieldLines.Letter  = static_cast<LETTER>(sFieldNr % 8);
         FieldLines.Digit = static_cast<DIGIT>((sFieldNr / 8) + 1);
-        FieldLines.Letter  = static_cast<LETTER>(sFieldNr - ((FieldLines.Digit - 1) * 8));
     }
     else
     {
+        FieldLines.Letter = L_H;
         FieldLines.Digit = static_cast<DIGIT>((sFieldNr / 8));
-        FieldLines.Letter = static_cast<LETTER>(8);
     }
 
     if (!Field::isInRange(Field::nr(FieldLines)))
@@ -61,6 +64,7 @@ Field::Field(short sFieldNr)
     PosOnBoard PosOnBoard = Field::Pos(sFieldNr);
     QString PosAsQstr = pieceLetterPosAsQStr(PosOnBoard.Letter) +
             QString::number(PosOnBoard.Digit);
+
     return PosAsQstr;
 }
 
