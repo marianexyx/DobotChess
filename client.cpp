@@ -361,8 +361,7 @@ Client Clients::getClient(int64_t n64ClientID)
     {
         if (cl.ID == n64ClientID)
         {
-            Client& client = cl; //todo: tworzę tu pointer, więc
-            //on ginie po wyjściu z funkcji??
+            Client& client = cl;
 
             return client;
         }

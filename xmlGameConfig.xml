@@ -16,7 +16,7 @@
 		<point ID="9" name="homeToMiddleAbove" x="112.0" y="-103.0" z="5.0"/>
 	</points>
 	<gripper>
-		<state ID="0" name="open" pwm="4.5"/>
+		<state ID="0" name="open" pwm="4.4"/>
 		<state ID="1" name="close" pwm="3.55"/>
 	</gripper>
 </data>

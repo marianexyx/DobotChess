@@ -258,13 +258,16 @@ void MainWindow::showDobotErrorMsgBox()
 void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
 {
     if(QStrMsg.isEmpty()) return;
+
     if(QStrMsg == "/clear")
     {
         ui->logPTE->clear();
         return;
     }
+
     QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " +
             logAsQstr(TypeOfMsg) + QStrMsg;
+
     ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
     qDebug() << QStrMsg;
 
@@ -273,9 +276,8 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     scroll_logPTE->setValue(scroll_logPTE->maximum());
 
     //prevent big string data
-    int nMaximum = 10 * 1000;
-    while (ui->logPTE->toPlainText().length() > nMaximum)
-        ui->logPTE->textCursor().deletePreviousChar();
+    int nMaximum = 20 * 100;
+    ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
 
     //future: wszystkie debugi i logi zapisywać do plików txt
 }
