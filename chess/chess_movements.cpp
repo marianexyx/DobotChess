@@ -120,7 +120,9 @@ void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
         return;
     }
 
-    Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
+    this->removeMoveSequence(_pBoardMain->getField(PosOfPieceToRemoveInEnpassant));
+
+    /*Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
     Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField(SHOW_ERRORS);
 
     _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
@@ -128,7 +130,7 @@ void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
     Field* pFieldForPieceToRemove =
             _pBoardRemoved->getField(pPieceToRemoveInEnpassant->getStartFieldPos());
 
-    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove, VM_PUT);
+    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove, VM_PUT);*/
 }
 
 void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //future

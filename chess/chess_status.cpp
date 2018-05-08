@@ -39,7 +39,8 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
 
 /*static*/ bool ChessStatus::isMoveInProperFormat(QString QStrMove, bool bErrorLog /*= false*/)
 {
-    if (PosFromTo::isMoveInProperFormat(QStrMove) || ChessStatus::isMovePromotion(QStrMove))
+    if (PosFromTo::isMoveInProperFormat(QStrMove.left(4))
+            || ChessStatus::isMovePromotion(QStrMove))
         return true;
     else
     {
@@ -51,10 +52,10 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
 
 SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 {
-    if (this->isMoveLegal(QStrMove))
+    if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promo autotest
+    else if (this->isMoveLegal(QStrMove))
     {
-        if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promo autotest
-        else if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
+        if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
         else if (this->isMoveRemoving(QStrMove)) return ST_REMOVING;
         else if (this->isMovePromotion(QStrMove)) return ST_PROMOTION;
@@ -70,6 +71,9 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 
 bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
 {
+    //todo: a co jeśli zbijanie będzie się odbywać razem z promocją?
+    if (QStrMoveToTest.length() != 4) return false;
+
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
     if (_pBoardMain->getField(move.to)->getPieceOnField() != nullptr)
         return true;
@@ -78,6 +82,8 @@ bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
 
 bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 {
+    if (QStrMoveToTest.length() != 4) return false;
+
     PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
     PosOnBoard BlackKingStartFieldPos(L_E, D_8);
 
@@ -99,6 +105,8 @@ bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
 
 bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
+    if (QStrMoveToTest.length() != 4) return false;
+
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
     Piece* piece = _pBoardMain->getField(move.from)->getPieceOnField();
 
@@ -160,9 +168,11 @@ void ChessStatus::resetStatusData()
 void ChessStatus::setMove(QString QStrMove)
 {
     _MoveType = this->findMoveType(QStrMove);
+    qDebug() << "ChessStatus::setMove(): found move type ="
+             << sequenceTypeAsQstr(_MoveType);
+    if (_MoveType == ST_PROMOTION) QStrMove = QStrMove.left(4);
     _PosMove = PosFromTo::fromQStr(QStrMove);
 }
-
 
 void ChessStatus::setLegalMoves(QString QStrMsg)
 {

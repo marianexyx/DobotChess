@@ -59,8 +59,7 @@ public:
 
     SEQUENCE_TYPE findMoveType(QString QStrMove);
     bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
-    bool isMoveARequestForPromotion(QString QStrMove){
-        return _legalMoves.contains(QStrMove + "q")? true : false; }
+    bool isMoveARequestForPromotion(QString QStrMove) { return _legalMoves.contains(QStrMove + "q")? true : false; }
     bool isMoveRemoving(QString QStrMoveToTest);
     bool isMoveCastling(QString QStrMoveToTest);
     bool isMoveEnpassant(QString QStrMoveToTest);

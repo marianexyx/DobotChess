@@ -52,9 +52,6 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
                  << Letter << ", Digit =" << Digit;
 }
 
-
-
-
 //PosFromTo:
 PosFromTo::PosFromTo()
 {
@@ -79,7 +76,9 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
     from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt());
     to.Letter = pieceLetterPos(QStrMoveFromTo.mid(2,1));
-    to.Digit = static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
+    to.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(3,1).toInt());
+    //QString::right(1) function will crash if move is promotion (last 5th...
+    //...char != int
 }
 
 /*static*/ bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
@@ -131,7 +130,9 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     move.from.Letter = pieceLetterPos(QStrMoveFromTo.left(1));
     move.from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt());
     move.to.Letter = pieceLetterPos(QStrMoveFromTo.mid(2,1));
-    move.to.Digit = static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt());
+    move.to.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(3,1).toInt());
+    //QString::right(1) function will crash if move is promotion (last 5th...
+    //...char != int
 
     return move;
 }

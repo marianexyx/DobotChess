@@ -283,8 +283,6 @@ void Dobot::sendMoveToArm(DobotMove move)
     default:
         qDebug() << "ERROR: Dobot::sendMoveToArm(): wrong move type:" << move.type;
     }
-
-    qDebug() << "end of Dobot::sendMoveToArm()";
 }
 
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump,

@@ -87,6 +87,8 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         break;
     case RT_PROMOTE_TO:
         _request.param = _pStatus->getMove().asQStr() + _request.param; // w/o break
+                qDebug() << "Chess::checkMsgFromWebsockets(): case RT_PROMOTE_TO: "
+                            "_request.param =" << _request.param;
     case RT_MOVE:
         this->manageMoveRequest(_request);
         break;
@@ -420,7 +422,9 @@ void Chess::manageMoveRequest(clientRequest request)
                                    _pStatus->getActivePlayerType()));
     }
     else if (!_pStatus->isMoveLegal(request.param))
+    {
         this->tellPlayerThatHeGaveBadMove(request.param);
+    }
     else
     {
         _pStatus->setMove(request.param); //no need for earlier clear

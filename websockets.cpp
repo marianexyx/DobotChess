@@ -84,20 +84,10 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
     QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
-    //todo: na to wychodzi że gra się zacina na addTextToLogPTE()
     emit this->addTextToLogPTE("send to all: " + QStrLog + "\n", LOG_WEBSOCKET);
-    qDebug() << "Websockets::sendMsgToAllClients(): sent to all";
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())
-    {
-        qDebug() << "Websockets::sendMsgToAllClients(): "
-                    "be4 client.socket->sendTextMessage";
         client.socket->sendTextMessage(QStrMsg);
-        qDebug() << "Websockets::sendMsgToAllClients(): "
-                    "after client.socket->sendTextMessage";
-    }
-
-    qDebug() << "end of Websockets::sendMsgToAllClients()";
 }
 
 void Websockets::socketDisconnected()

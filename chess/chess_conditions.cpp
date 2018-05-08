@@ -68,9 +68,9 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
     switch(request.type)
     {
     case RT_MOVE:
-        if (_pStatus->findMoveType(request.param) == ST_PROMOTE_TO_WHAT)
-            bReturn = false;
-        else bReturn = true;
+        if (ChessStatus::isMoveInProperFormat(request.param, SHOW_ERRORS))
+            bReturn = true;
+        else bReturn = false;
         break;
     case RT_SIT_ON:
         if (playerTypeFromQStr(request.param) != PT_WHITE &&
@@ -85,13 +85,12 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
         break;
     case RT_PROMOTE_TO:
         if (ChessStatus::isSignProperPromotionType(request.param))
-            bReturn = false;
-        else bReturn = true;
+            bReturn = true;
+        else bReturn = false;
         break;
     default:
         qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): unknown "
                     "request.type:" << requestTypeAsQStr(request.type);
-        bReturn = true;
     }
 
     if (!bReturn)

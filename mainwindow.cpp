@@ -276,7 +276,7 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     scroll_logPTE->setValue(scroll_logPTE->maximum());
 
     //prevent big string data
-    int nMaximum = 20 * 100;
+    int nMaximum = 20 * 1000;
     ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
 
     //future: wszystkie debugi i logi zapisywać do plików txt
