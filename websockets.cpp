@@ -74,8 +74,8 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
     else
     {
         Client receiver = _pClientsList->getClient(n64ReceiverID);
-        QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
-        emit this->addTextToLogPTE("send to: " + receiver.name + " : " + QStrLog + "\n",
+        //QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
+        emit this->addTextToLogPTE("send to: " + receiver.name + " : " + QStrMsg + "\n",
                                     LOG_WEBSOCKET);
         receiver.socket->sendTextMessage(QStrMsg);
     }
@@ -83,8 +83,8 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 
 void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
-    QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
-    emit this->addTextToLogPTE("send to all: " + QStrLog + "\n", LOG_WEBSOCKET);
+    //QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
+    emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())
         client.socket->sendTextMessage(QStrMsg);

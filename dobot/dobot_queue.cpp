@@ -1,21 +1,21 @@
 #include "dobot_queue.h"
 
-DobotQueue::DobotQueue(/*Dobot *pDobot*/)
+DobotQueue::DobotQueue(Point3D retreatLeft, Point3D retreatRight)
 {
-    //_pDobot = pDobot; //todo: używm tylko do emitowaia sygnału
-    //_pServo = pDobot->getServoPointer();
-
     _un64CoreQueuedCmdID = 1; //set 1st ID
-    _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max(); //future
+    _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max(); //future:
     _un64RealTimeDobotActualID = 0;
     _un64RetreatID = 0;
     _un64LastDobotIDShownInUI = 0;
     _lowestIDMoveInList = 0;
+    _retreatLeft = retreatLeft;
+    _retreatRight = retreatRight;
+    _bRetreat = false;
 }
 
 void DobotQueue::parseNextMoveToArmIfPossible()
 {
-    //if (this->isDobotCmdsLeftSpaceEmpty()) return; //future
+    //if (this->isDobotCmdsLeftSpaceEmpty()) return; //future:
     isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
                             SHOW_ERRORS);
 
@@ -24,9 +24,6 @@ void DobotQueue::parseNextMoveToArmIfPossible()
         emit this->sendMoveToArm(this->getNextMoveToSendToArm());
         this->removeOldQueuedMovesFromCore();
     }
-
-    //if (!this->isRetreatLastExecutedArmMoveType)
-    //  this->retreat(); //todo: zrobić to po udanych ruchach dobota
 }
 
 bool DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable()
@@ -68,11 +65,20 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
         if(QueuedCmdIDIter.hasNext())
         {
             _lowestIDMoveInList = QueuedCmdIDIter.peekNext().ID;
+            //future: why those 2 qdebugs below must be here for funtion to work?
+            ///WARNING!!! WITHOUT THIS QDEBUG ARM WILL NOT WORK PROPERLY (DUNNO WHY)
+            qDebug() << "DobotQueue::getNextMoveToSendToArm(): "
+                        "new _lowestIDMoveInList =" << _lowestIDMoveInList;
 
             if (_lowestIDMoveInList >= _un64RealTimeDobotActualID)
             {
                 if(_lowestIDMoveInList - _un64RealTimeDobotActualID < 15)
                 {
+                    ///WARNING!!! WITHOUT THIS QDEBUG ARM WILL NOT WORK PROPERLY (DUNNO WHY)
+                    qDebug() << "DobotQueue: return next queued move. type ="
+                             << dobotMoveAsQstr(_queuedArmCmds.first().type) << ", ID ="
+                             << _queuedArmCmds.first().ID << ", point ="
+                             << _queuedArmCmds.first().xyz.getAsQStr();
                     _executedArmCmds << _queuedArmCmds.first();
                     return _queuedArmCmds.takeFirst();
                 }
@@ -92,8 +98,7 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
 
 void DobotQueue::showLastExecutedArmMoveInUI()
 {
-    if (_un64RealTimeDobotActualID > _un64LastDobotIDShownInUI
-            && _un64LastDobotIDShownInUI > 0)
+    if (_un64RealTimeDobotActualID > _un64LastDobotIDShownInUI && _un64LastDobotIDShownInUI > 0)
     {
         QString QStrMoveID = "";
         QString QStrDobotMove = "";
@@ -128,23 +133,31 @@ DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)
     return errorMove;
 }
 
-/*bool DobotQueue::isRetreatLastExecutedArmMoveType()
+bool DobotQueue::isArmCoveringGame()
 {
-    if (this->getQueuedMove(_un64CoreQueuedCmdID).type == )
-        //future: jednak wprowadzam pojęcie "retreat" do klasy dobota
-}*/
-
-//todo: if retreat is set from xml
-/*void DobotQueue::retreat() //todo
-{
-    if (_un64CoreQueuedCmdID <= _un64RealTimeDobotActualID)
+    if (_bRetreat && _un64RealTimeDobotActualID > _un64RetreatID &&
+            _un64RealTimeDobotActualID >= _un64CoreQueuedCmdID && _queuedArmCmds.isEmpty())
     {
-        qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): retreat";
-        PtpCmdActualVal retreatId;
-        retreatId = (_pose.y >= middleAboveBoard.y) ?  retreatYPlus : retreatYMinus;
-        addArmMoveToQueue(DM_TO_POINT, retreatId.x, retreatId.y, retreatId.z);
+        return true;
     }
-}*/
+    else
+    {
+        return false;
+    }
+}
+
+void DobotQueue::retreat(Point3D lastPoint)
+{
+    qDebug() << "DobotQueue::parseNextMoveToArmIfPossible(): retreat";
+
+    if (qAbs(lastPoint.y - _retreatLeft.y) > qAbs(lastPoint.y - _retreatRight.y))
+        this->addArmMoveToQueue(DM_TO_POINT, _retreatRight);
+    else this->addArmMoveToQueue(DM_TO_POINT, _retreatLeft);
+
+    qDebug() << "DobotQueue::retreat(): assign new _un64RetreatID =" << _un64RetreatID;
+    _un64RetreatID = _un64CoreQueuedCmdID;
+    _bRetreat = false; //prevent unwanted retreats
+}
 
 //future: póki co nie ma w dobocie (w dll) tej funkcji. Może z czasem dodadzą.
 /*bool DobotQueue::isDobotCmdsLeftSpaceEmpty()
@@ -159,9 +172,6 @@ DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
-    qDebug() << "DobotQueue::addArmMoveToQueue(): type =" << dobotMoveAsQstr(Type)
-             << ", point =" << point.getAsQStr() << ", ID =" << _un64CoreQueuedCmdID + 1;
-
     if (!isPointInLimits(point)) return;
     _un64CoreQueuedCmdID++;
     DobotMove cmdToQueue(_un64CoreQueuedCmdID, Type, point);
@@ -178,5 +188,8 @@ void DobotQueue::saveIDFromConnectedDobot()
                                       _lowestIDMoveInList);
    }
 
-    _un64CoreQueuedCmdID = _un64RealTimeDobotActualID;
+    _un64RetreatID = _un64CoreQueuedCmdID = _un64RealTimeDobotActualID;
+    qDebug() << "DobotQueue::saveIDFromConnectedDobot(): assign new _un64RetreatID ="
+             << _un64RetreatID << ", new _un64CoreQueuedCmdID =" << _un64CoreQueuedCmdID
+             << ", readed _un64RealTimeDobotActualID =" << _un64RealTimeDobotActualID;
 }

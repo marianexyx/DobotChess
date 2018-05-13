@@ -271,13 +271,13 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
     qDebug() << QStrMsg;
 
-    //auto scroll
-    QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
-    scroll_logPTE->setValue(scroll_logPTE->maximum());
-
     //prevent big string data
     int nMaximum = 20 * 1000;
     ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
+
+    //auto scroll
+    QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
+    scroll_logPTE->setValue(scroll_logPTE->maximum());
 
     //future: wszystkie debugi i logi zapisywać do plików txt
 }
@@ -488,7 +488,7 @@ void MainWindow::on_AIEnemySendBtn_clicked()
     _pChess->getBotPointer()->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
 
     qDebug() << "WARNING: unfinished MainWindow::on_sendSimulatedMsgBtn_clicked() method";
-    //_pChess->checkMsgFromWebsockets(QStrServiceMove, ); //future
+    //_pChess->checkMsgFromWebsockets(QStrServiceMove, ); //future:
 }
 
 void MainWindow::updatePortsComboBox(int nUsbPorst)

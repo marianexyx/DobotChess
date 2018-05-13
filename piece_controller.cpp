@@ -17,7 +17,8 @@ PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardMain,
 }
 
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
-                                               VERTICAL_MOVE VertMove/*= VM_NONE*/)
+                                               VERTICAL_MOVE VertMove /*= VM_NONE*/,
+                                               bool bRetreat /*= false*/)
 {
     if (!pRealBoard->isBoardReal(SHOW_ERRORS)) return;
 
@@ -56,7 +57,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
 
     _lastPos = pField->getPos();
     Point3D xyz = pField->getLocation3D();
-    _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove);
+    _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove, bRetreat);
 }
 
 bool PieceController::isPieceSetOk()

@@ -62,8 +62,8 @@ void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
 
 void ChessMovements::regularMoveSequence(Field* pFrom, Field* pTo)
 {
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB);
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB, true);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT, true);
 }
 
 void ChessMovements::removeMoveSequence(Field* pFieldWithPieceToRemove)
@@ -72,12 +72,14 @@ void ChessMovements::removeMoveSequence(Field* pFieldWithPieceToRemove)
     Piece* pPieceToRemove = pFieldWithPieceToRemove->getPieceOnField(SHOW_ERRORS);
     if (pPieceToRemove == nullptr) return;
 
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove,
+                                                VM_GRAB, true);
 
     //removed field nr is equal to it's piece nr
     Field* pFieldForPieceToRemove = _pBoardRemoved->getField(pPieceToRemove->getNr());
 
-    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove, VM_PUT);
+    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove,
+                                                VM_PUT, true);
 }
 
 void ChessMovements::restoreMoveSequence(Piece* pPieceToRestore)
@@ -86,26 +88,28 @@ void ChessMovements::restoreMoveSequence(Piece* pPieceToRestore)
     //removed field nr is equal to it's piece nr
     Field* pFieldOnBoardRemoved = _pBoardRemoved->getField(pPieceToRestore->getNr());
 
-    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldOnBoardRemoved, VM_GRAB);
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldOnBoardMain, VM_PUT);
+    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldOnBoardRemoved,
+                                                VM_GRAB, true);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldOnBoardMain,
+                                                VM_PUT, true);
 }
 
 void ChessMovements::castlingMoveSequence(Field* pFrom, Field* pTo)
 {
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB);
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB, true);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT, true);
     _pPieceController->movePieceWithManipulator(_pBoardMain,
                                                 this->findRookFieldInCastling(pTo, VM_GRAB),
-                                                VM_GRAB);
+                                                VM_GRAB, true);
     _pPieceController->movePieceWithManipulator(_pBoardMain,
                                                 this->findRookFieldInCastling(pTo, VM_PUT),
-                                                VM_PUT);
+                                                VM_PUT, true);
 }
 
 void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
 {
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB);
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pFrom, VM_GRAB, true);
+    _pPieceController->movePieceWithManipulator(_pBoardMain, pTo, VM_PUT, true);
 
     PosOnBoard PosOfPieceToRemoveInEnpassant = pTo->getPos();
     short nDigitOfPieceToRemove = static_cast<int>(PosOfPieceToRemoveInEnpassant.Digit);
@@ -121,23 +125,16 @@ void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
     }
 
     this->removeMoveSequence(_pBoardMain->getField(PosOfPieceToRemoveInEnpassant));
-
-    /*Field* pFieldWithPieceToRemove = _pBoardMain->getField(PosOfPieceToRemoveInEnpassant);
-    Piece* pPieceToRemoveInEnpassant = pFieldWithPieceToRemove->getPieceOnField(SHOW_ERRORS);
-
-    _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldWithPieceToRemove, VM_GRAB);
-
-    Field* pFieldForPieceToRemove =
-            _pBoardRemoved->getField(pPieceToRemoveInEnpassant->getStartFieldPos());
-
-    _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldForPieceToRemove, VM_PUT);*/
 }
 
-void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo) //future
+//future:
+void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo)
 {
     this->regularMoveSequence(pFrom, pTo);
 }
 
+//future: podzielić tą funkcję
+//future: mimo iż wszystko działa, to pojawiły mi się errory (bodajże przy
 bool ChessMovements::resetPiecePositions()
 {
     qDebug() << "ChessMovements::resetPiecePositions()";

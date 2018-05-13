@@ -33,8 +33,7 @@ private:
     DobotServo* _pServo;
     DobotQueue* _pQueue;
 
-    //can't start var name witn "_" + "uppercase letter" in c++
-    const int m_ARM_MAX_VELOCITY, m_ARM_MAX_ACCELERATION;
+    const int _ARM_MAX_VELOCITY, _ARM_MAX_ACCELERATION;
 
     short _sItemIDInGripper;
 
@@ -46,14 +45,16 @@ private:
     Point3D _lastGivenPoint;
 
 public:
-    Dobot(ArduinoUsb* pUsb, RealVars gameConfigVars);
+    Dobot(ArduinoUsb* pUsb, RealVars gameConfigVars, Point3D retreatLeft,
+          Point3D retreatRight);
     ~Dobot();
 
     void saveActualDobotPosition();
     void initDobot();
     void onPTPsendBtnClicked();
 
-    void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove = VM_NONE);
+    void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove =
+            VM_NONE, bool bRetreat = false);
     bool isPointTotallyDiffrent(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);

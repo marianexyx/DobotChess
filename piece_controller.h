@@ -22,7 +22,8 @@ public:
     PieceController(Dobot* pDobot, Chessboard* pBoardMain, Chessboard* pBoardRemoved);
 
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
-                                  VERTICAL_MOVE VertMove = VM_NONE);
+                                  VERTICAL_MOVE VertMove = VM_NONE,
+                                  bool bRetreat = false);
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog = false);
     bool isMoveSet();

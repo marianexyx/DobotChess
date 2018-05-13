@@ -306,9 +306,9 @@ void Chess::removeClientFromList(Client& client)
 
 void Chess::sendDataToClient(QString QStrMsg, Client client /* = Client */)
 {
-    QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
+    //QString QStrMsg = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
     emit this->addTextToLogPTE("Sending msg to " + communicationTypeAsQStr(_PlayerSource)
-                                + ": " + QStrLog + "\n", LOG_CORE);
+                                + ": " + QStrMsg + "\n", LOG_CORE);
 
     if (_PlayerSource == WEBSITE)
     {

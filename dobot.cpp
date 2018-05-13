@@ -1,14 +1,14 @@
 #include "dobot.h"
 
-Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars):
-    m_ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
-    m_ARM_MAX_ACCELERATION(300)
+Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
+             Point3D retreatLeft, Point3D retreatRight):
+    _ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
+    _ARM_MAX_ACCELERATION(300)
 {
     _pUsb = pUsb;
 
-    _pQueue = new DobotQueue();
-    _pServo = new DobotServo( gameConfigVars.fGripperOpened,
-                             gameConfigVars.fGripperClosed);
+    _pQueue = new DobotQueue(retreatLeft, retreatRight);
+    _pServo = new DobotServo(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
     
@@ -49,9 +49,13 @@ void Dobot::onGetPoseTimer()
 {
     QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer"); //find timer by name
 
-    this->saveActualDobotPosition();
-    _pQueue->parseNextMoveToArmIfPossible();
-    _pQueue->showLastExecutedArmMoveInUI();
+    if (_bConnectedToDobot)
+    {
+        this->saveActualDobotPosition();
+        _pQueue->parseNextMoveToArmIfPossible();
+        _pQueue->showLastExecutedArmMoveInUI();
+        if (_pQueue->isArmCoveringGame()) _pQueue->retreat(_lastGivenPoint);
+    }
 
     getPoseTimer->start(); //auto restart timer
 }
@@ -130,7 +134,6 @@ void Dobot::onConnectDobot()
         if (ConnectDobot(0, 115200) != DobotConnect_NoError)
             emit DobotErrorMsgBox();
 
-        _bConnectedToDobot = true;
         emit this->addTextToLogPTE("Dobot connected \n", LOG_DOBOT);
 
         //todo: timery w osobnych funkcjach
@@ -152,6 +155,8 @@ void Dobot::onConnectDobot()
 
         this->initDobot();
         _pQueue->saveIDFromConnectedDobot(); //1st check
+
+        _bConnectedToDobot = true;
     }
     else
     {
@@ -191,37 +196,37 @@ void Dobot::initDobot()
     JOGJointParams jogJointParams;
     for (int i=0; i<4; ++i)
     {
-        jogJointParams.velocity[i] = m_ARM_MAX_VELOCITY;
-        jogJointParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
+        jogJointParams.velocity[i] = _ARM_MAX_VELOCITY;
+        jogJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
     }
     SetJOGJointParams(&jogJointParams, false, NULL);
     
     JOGCoordinateParams jogCoordinateParams;
     for (int i=0; i<4; ++i)
     {
-        jogCoordinateParams.velocity[i] = m_ARM_MAX_VELOCITY;
-        jogCoordinateParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
+        jogCoordinateParams.velocity[i] = _ARM_MAX_VELOCITY;
+        jogCoordinateParams.acceleration[i] = _ARM_MAX_ACCELERATION;
     }
     SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
     
     JOGCommonParams jogCommonParams;
-    jogCommonParams.velocityRatio = m_ARM_MAX_VELOCITY;
-    jogCommonParams.accelerationRatio = m_ARM_MAX_ACCELERATION;
+    jogCommonParams.velocityRatio = _ARM_MAX_VELOCITY;
+    jogCommonParams.accelerationRatio = _ARM_MAX_ACCELERATION;
     SetJOGCommonParams(&jogCommonParams, false, NULL);
     
     PTPJointParams ptpJointParams;
     for (int i=0; i<4; ++i)
     {
-        ptpJointParams.velocity[i] = m_ARM_MAX_VELOCITY;
-        ptpJointParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
+        ptpJointParams.velocity[i] = _ARM_MAX_VELOCITY;
+        ptpJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
     }
     SetPTPJointParams(&ptpJointParams, false, NULL);
     
     PTPCoordinateParams ptpCoordinateParams;
-    ptpCoordinateParams.xyzVelocity = m_ARM_MAX_VELOCITY;
-    ptpCoordinateParams.xyzAcceleration = m_ARM_MAX_ACCELERATION;
-    ptpCoordinateParams.rVelocity = m_ARM_MAX_VELOCITY;
-    ptpCoordinateParams.rAcceleration = m_ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.xyzVelocity = _ARM_MAX_VELOCITY;
+    ptpCoordinateParams.xyzAcceleration = _ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.rVelocity = _ARM_MAX_VELOCITY;
+    ptpCoordinateParams.rAcceleration = _ARM_MAX_ACCELERATION;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
     
     PTPJumpParams ptpJumpParams;
@@ -285,10 +290,10 @@ void Dobot::sendMoveToArm(DobotMove move)
     }
 }
 
-void Dobot::queueMoveSequence(Point3D dest3D, double dJump,
-                              VERTICAL_MOVE VertMove /*= VM_NONE*/)
+void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
+                              /*= VM_NONE*/, bool bRetreat /*= false*/)
 {
-    //todo: przywrócić póxniej zabezpiecznie 3 osi
+    //todo: przywrócić później zabezpiecznie 3 osi
     //if (_bConnectedToDobot && this->isPointTotallyDiffrent(dest3D)) return;
 
     if (VertMove == VM_GRAB)
@@ -296,6 +301,8 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump,
 
     dest3D.z += dJump;
     this->addArmMoveToQueue(DM_TO_POINT, dest3D);
+
+    _pQueue->setRetreat(bRetreat);
 
     if (VertMove == VM_NONE) return;
 

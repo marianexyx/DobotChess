@@ -148,8 +148,8 @@ void ChessStatus::saveStatusData(QString QStrStatus)
         qDebug() << "ChessStatus::saveStatusData(): QStrEnpassant =" << _QStrEnpassant;
         emit this->setBoardDataLabel(_QStrEnpassant, BDL_ENPASSANT);
 
-        QString QStrHalfMoveClock = QStrFENRecord.at(5); //future
-        QString QStrFullMoveNr = QStrFENRecord.at(6); //future
+        QString QStrHalfMoveClock = QStrFENRecord.at(5); //future:
+        QString QStrFullMoveNr = QStrFENRecord.at(6); //future:
         emit this->setBoardDataLabel(QStrHalfMoveClock + "/" + QStrFullMoveNr, BDL_MOVES);
     }
     else

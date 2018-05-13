@@ -14,7 +14,9 @@ int main(int argc, char *argv[])
     Chessboard BoardChenard001(B_MAIN, IMAGINARY);
     Chessboard BoardMain001(B_MAIN, REAL, gameConfigVars001);
     Chessboard BoardRemoved001(B_REMOVED, REAL, gameConfigVars001);
-    Dobot DobotArm001(&USB001, gameConfigVars001);
+    Dobot DobotArm001(&USB001, gameConfigVars001,
+                      BoardMain001.getBoardPoint3D(BP_RETREAT_LEFT),
+                      BoardMain001.getBoardPoint3D(BP_RETREAT_RIGHT));
     PieceController PieceController001(&DobotArm001, &BoardMain001, &BoardRemoved001);
     Websockets Websockety(&ClientsList, 1234);
     //TODO: odpalać server websocket po konstruktorze mainwindow

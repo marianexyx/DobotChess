@@ -4,7 +4,6 @@
 #pragma once
 #include <QScrollBar>
 #include <QRegularExpression>
-#include "dobot.h"
 #include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
 #include "vars/board_types.h"
@@ -19,7 +18,9 @@
 #include "chess/chess_bot.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_timers.h"
-#include "chess/chess_conditions.h" //must be last. chess_status.h included here
+#include "chess/chess_conditions.h" //must be as last chess...
+//...part. chess_status.h included here
+#include "dobot.h"
 
 class Chess: public QObject
 {
