@@ -21,7 +21,8 @@ void Clients::setClientName(const Client& client, QString QStrName)
     {
         if (cl.name == QStrName && !cl.name.isEmpty())
         {
-            qDebug() << "ERROR: Clients::setClientName(): name" << QStrName << "already exists.";
+            qDebug() << "ERROR: Clients::setClientName(): name"
+                     << QStrName << "already exists.";
             return;
         }
     }
@@ -502,7 +503,6 @@ QString Clients::getQueuedClientsList()
     else //remove last comma
         QStrQueuedClients = QStrQueuedClients.left(QStrQueuedClients.length() - 1);
 
-    qDebug() << "Clients::getQueuedClientsList(): 1 line list =" << QStrQueuedClients;
     return QStrQueuedClients;
 }
 

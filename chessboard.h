@@ -49,6 +49,7 @@ public:
     void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
     BOARD getBoardType() const { return _boardType; }
     Point3D getBoardPoint3D(BOARD_POINTS BP) const;
+    //todo: dodać sprawdzenia do getFieldów przeciwko nullptr: isPosSet
     Field* getField(short sFieldNr) const { return _pField[sFieldNr-1]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)-1]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);

@@ -27,10 +27,13 @@ public:
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog = false);
     bool isMoveSet();
+    bool isAnyPawnPromoted();
     Field* searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece);
 
     void clearLastPos() { _lastPos.Letter = L_X; _lastPos.Digit = D_X; }
+    void clearPawnsPromotions();
     PosOnBoard getLastPos() const { return _lastPos; }
+    QString getPromotedPawnsPositions();
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
 
 signals:

@@ -108,6 +108,19 @@ bool PieceController::isMoveSet()
     else return true;
 }
 
+bool PieceController::isAnyPawnPromoted()
+{
+    for (short sPiece=1; sPiece<=32; ++sPiece)
+    {
+        Piece* pPiece = this->getPiece(sPiece);
+        Field* pField = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+        if (pPiece->getType() == P_PAWN && pPiece->getPromotedType() != P_ERROR &&
+                 pField != nullptr)
+            return true;
+    }
+    return false;
+}
+
 Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece)
 {
     if (pPiece == nullptr)
@@ -125,4 +138,32 @@ Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Pie
     }
 
     return nullptr;
+}
+
+void PieceController::clearPawnsPromotions()
+{
+    for (short sPiece=1; sPiece<=32; ++sPiece)
+        this->getPiece(sPiece)->clearPromotedType();
+}
+
+QString PieceController::getPromotedPawnsPositions()
+{
+    QString QStrPromotedPawnsPositions;
+    for (short sPiece=1; sPiece<=32; ++sPiece)
+    {
+        Piece* pPiece = this->getPiece(sPiece);
+        Field* pField = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+        if (pPiece->getType() == P_PAWN && pPiece->getPromotedType() != P_ERROR &&
+                 pField != nullptr)
+        {
+            QStrPromotedPawnsPositions = pField->getNrAsQStr() + ":" +
+                    Piece::FENSign(sPiece) + " ";
+        }
+    }
+
+    if (!QStrPromotedPawnsPositions.isEmpty())
+        QStrPromotedPawnsPositions = QStrPromotedPawnsPositions.left(
+                    QStrPromotedPawnsPositions.length() - 1); //delete last spacebar
+
+    return QStrPromotedPawnsPositions;
 }

@@ -25,6 +25,7 @@ private:
     PIECE_TYPE _pieceType;
     PLAYER_TYPE _pieceColor;
     short _sStartFieldID;
+    PIECE_TYPE _promotedType;
 
 public:
     Piece(short sPieceID);
@@ -36,11 +37,16 @@ public:
     static PLAYER_TYPE Color(char chFENSign);
     static PLAYER_TYPE Color(short sPieceNr);
     static PIECE_TYPE Type(char chFENSign);
+    static PIECE_TYPE Type(QString QStrFENSign);
     static PIECE_TYPE Type(short sPieceNr);
+    static QString FENSign(short sPieceNr);
     static QString name(short sPieceNr);
     static short nr(PosOnBoard pieceLines);
     static short startFieldNr(short sPieceNr);
     static PosOnBoard startFieldPos(short sPieceNr);
+
+    void setPromotedType(PIECE_TYPE promotedType);
+    void clearPromotedType() { _promotedType = P_ERROR; }
 
     short getNr() const { return _sPieceID; }
     PIECE_TYPE getType() const { return _pieceType; }
@@ -48,6 +54,7 @@ public:
     QString getName() const { return Piece::name(_sPieceID); }
     short getStartFieldNr() const { return _sStartFieldID; }
     PosOnBoard getStartFieldPos() const { return Piece::startFieldPos(_sPieceID); }
+    PIECE_TYPE getPromotedType() const { return _promotedType; }
 };
 
 #endif // PIECE_H

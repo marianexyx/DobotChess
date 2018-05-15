@@ -61,6 +61,7 @@ public:
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
     bool bIsMoveInAxisRange(Point3D point);
+    bool bIsArmConnected() const { return _bConnectedToDobot; }
 
     void setItemInGripper(short sGrippersItemID);
     void clearGripper();

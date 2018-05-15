@@ -162,7 +162,23 @@ void ChessStatus::resetStatusData()
     this->setWhoseTurn(NO_TURN);
     this->clearLegalMoves();
     this->clearHistoryMoves();
+    _pPieceController->clearPawnsPromotions();
     emit _pBoardMain->clearBoardInUI();
+}
+
+void ChessStatus::promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType)
+{
+    if (!posOfPawnToPromote.isPosSet(SHOW_ERRORS)) return;
+    Field* pFieldWithPawnToPromote = _pBoardMain->getField(posOfPawnToPromote);
+    Piece* pPawnToPromote = pFieldWithPawnToPromote->getPieceOnField(SHOW_ERRORS);
+    if (pPawnToPromote == nullptr)
+    {
+        qDebug() << "ERROR: ChessStatus::promotePawn(): field " <<
+                 pFieldWithPawnToPromote->getNrAsQStr() << "is empty";
+        return;
+    }
+    if (!ChessStatus::isSignProperPromotionType(QStrPromoType, SHOW_ERRORS)) return;
+    else pPawnToPromote->setPromotedType(Piece::Type(QStrPromoType));
 }
 
 void ChessStatus::setMove(QString QStrMove)

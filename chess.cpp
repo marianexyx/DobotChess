@@ -87,8 +87,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         break;
     case RT_PROMOTE_TO:
         _request.param = _pStatus->getMove().asQStr() + _request.param; // w/o break
-                qDebug() << "Chess::checkMsgFromWebsockets(): case RT_PROMOTE_TO: "
-                            "_request.param =" << _request.param;
+        _pStatus->promotePawn(_pStatus->getMove().from, _request.param.right(1));
     case RT_MOVE:
         this->manageMoveRequest(_request);
         break;
@@ -270,17 +269,18 @@ void Chess::newClientName(Client& client, clientRequest request)
         qDebug() << "Chess::newClientName(): logout:doubleLogin";
 
         Client oldClient = _pClientsList->getClient(QStrIncomingClientName);
-        oldClient.socket->sendTextMessage("logout:doubleLogin");
 
         if (_pClientsList->isClientAPlayer(oldClient))
             this->restartGame(ET_SOCKET_LOST, oldClient.type);
         else if (_pClientsList->isClientInQueue(oldClient))
         {
             _pClientsList->removeClientFromQueue(oldClient);
-            _pClientsList->setClientName(oldClient, ""); //clear old client name
             this->sendDataToAllClients(this->getTableData()); //need to refresh queued clients
         }
+        else this->sendDataToClient(this->getTableData());
 
+        _pClientsList->setClientName(oldClient, ""); //clear old client name
+        oldClient.socket->sendTextMessage("logout:doubleLogin");
         _pClientsList->setClientName(client, QStrIncomingClientName); //set new client
     }
 }
@@ -380,8 +380,8 @@ void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
             _ChessGameStatus = _pTimers->startQueueTimer();
         else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
-        this->sendDataToAllClients("resetComplited"); //don't add tableData- only chess data...
-        //...has changed during reset
+        this->sendDataToAllClients("resetComplited"); //don't add tableData- only
+        //...chess data has changed during reset
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -389,8 +389,8 @@ void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
         this->sendMsgToTcp("new");
     }
     else
-        qDebug() << "ERROR: Chess::coreIsReadyForNewGame(): unknown _PlayerSource val ="
-                  << communicationTypeAsQStr(_PlayerSource);
+        qDebug() << "ERROR: Chess::coreIsReadyForNewGame(): unknown _PlayerSource"
+                    " val =" << communicationTypeAsQStr(_PlayerSource);
 }
 
 void Chess::startNewGameInCore()
@@ -485,11 +485,6 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
     this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData(), PlayerToClear));
     _pStatus->clearMove();
 
-    //todo: wygląda na to że funkcja resetPiecePositions załącza się jeszcze zanim odpowiedź
-    //poleci na. stronę, przez co trzeba czekać aż resetowanie się zakończy zanim gracze się
-    //dowiedzą że nastąpił koniec gry
-
-    //todo: tu się zacina cały program przy resetowaniu?
     if(_pMovements->resetPiecePositions())
         this->coreIsReadyForNewGame();
 
@@ -558,6 +553,10 @@ QString Chess::getTableData()
 
     if (!_pStatus->getHistoryMoves().isEmpty())
         QStrTableData += "\",\"history\":\"" + _pStatus->getHistoryMovesAsQStr();
+
+    if (_pPieceController->isAnyPawnPromoted())
+        QStrTableData += "\",\"promoted\":\""  +
+                _pPieceController->getPromotedPawnsPositions();
 
     QStrTableData += "\"}";
 

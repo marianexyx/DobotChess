@@ -38,6 +38,7 @@ public:
     void saveStatusData(QString QStrStatus);
     void resetStatusData();
 
+    void promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType);
     //todo: settery jako friend dla chess? sprawdzić czy większośc metod dostepowych nie jest...
     //...używanych tylko w tej klasie
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
@@ -53,9 +54,9 @@ public:
     void clearLegalMoves();
     void clearHistoryMoves();
 
-    static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
     static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
+    static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
 
     SEQUENCE_TYPE findMoveType(QString QStrMove);
     bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }

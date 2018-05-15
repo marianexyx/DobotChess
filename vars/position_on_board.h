@@ -20,6 +20,15 @@ struct PosOnBoard
     static QString posAsQStr(PosOnBoard Pos)
     { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit); }
 
+    bool isPosSet(bool bErrorLog = false)
+    {
+        if (Letter != L_X && Digit != D_X) return true;
+        else
+        {
+            if (bErrorLog) qDebug() << "ERROR: PosOnBoard::isPosSet(): false";
+            return false;
+        }
+    }
     void setLetterFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
     QString getAsQStr() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit); }
 };

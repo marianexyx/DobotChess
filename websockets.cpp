@@ -68,7 +68,8 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 
     if (n64ReceiverID < 1)
     {
-        qDebug() << "ERROR: Websockets::sendMsgToClient(): receiver ID < 1";
+        qDebug() << "ERROR: Websockets::sendMsgToClient(): receiver ID < 1. "
+                    "it's =" << n64ReceiverID;
         return;
     }
     else

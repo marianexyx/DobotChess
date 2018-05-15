@@ -41,7 +41,8 @@ Dobot::~Dobot()
 void Dobot::onPeriodicTaskTimer() //todo zmienić nazwy timerów
 {
     PeriodicTask(); //start arm task loop. non-return funcion
-    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
+    //find timer by name:
+    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer");
     periodicTaskTimer->start(); //auto restart timer
 }
 

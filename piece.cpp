@@ -9,6 +9,7 @@ Piece::Piece(short sPieceID)
     _sPieceID = sPieceID;
     _pieceColor = Piece::Color(sPieceID);
     _sStartFieldID = Piece::startFieldNr(sPieceID);
+    _promotedType = P_ERROR;
 }
 
 /*static*/ bool Piece::isInRange(short sPieceNr)
@@ -68,6 +69,32 @@ Piece::Piece(short sPieceID)
     return Type;
 }
 
+/*static*/ PIECE_TYPE Piece::Type(QString QStrFENSign)
+{
+    if (QStrFENSign.length() != 1)
+    {
+        qDebug() << "ERROR: PIECE_TYPE Type(QString): QStrFENSign.length != 1. "
+                    "QStrFENSign =" << QStrFENSign;
+        return P_ERROR;
+    }
+
+    PIECE_TYPE Type;
+    if (QStrFENSign == "p" || QStrFENSign == "P") Type = P_PAWN;
+    else if (QStrFENSign == "r" || QStrFENSign == "R") Type = P_ROOK;
+    else if (QStrFENSign == "n" || QStrFENSign == "N")  Type = P_KNIGHT;
+    else if (QStrFENSign == "b" || QStrFENSign == "B")  Type = P_BISHOP;
+    else if (QStrFENSign == "k" || QStrFENSign == "K")  Type = P_KING;
+    else if (QStrFENSign == "q" || QStrFENSign == "Q")  Type = P_QUEEN;
+    else
+    {
+        qDebug() << "ERROR: PIECE_TYPE Type(QString): unknown QStrFENSign ="
+                 << QStrFENSign;
+        Type = P_ERROR;
+    }
+
+    return Type;
+}
+
 /*static*/ PIECE_TYPE Piece::Type(short sPieceNr)
 {
     if (!Piece::isInRange(sPieceNr))
@@ -97,12 +124,18 @@ Piece::Piece(short sPieceID)
     return PieceType;
 }
 
-/*static*/ QString Piece::name(short sPieceNr) //todo: źle zwraca nazwę
+/*static*/ QString Piece::FENSign(short sPieceNr)
 {
-    QString QStrName = QChar::fromLatin1(Piece::Type(sPieceNr));
+    QString QStrFENSign = QChar::fromLatin1(Piece::Type(sPieceNr));
     PLAYER_TYPE PieceColor = Piece::Color(sPieceNr);
+    if (PieceColor == PT_WHITE) QStrFENSign.toUpper();
+    return QStrFENSign;
+}
 
-    if (PieceColor == PT_WHITE) QStrName.toUpper();
+/*static*/ QString Piece::name(short sPieceNr) //todo: źle zwraca nazwę
+{  
+    PLAYER_TYPE PieceColor = Piece::Color(sPieceNr);
+    QString QStrName = Piece::FENSign(sPieceNr);
 
     switch(sPieceNr)
     {
@@ -159,4 +192,20 @@ Piece::Piece(short sPieceID)
         PieceLines.Digit = static_cast<DIGIT>((short)PieceLines.Digit + 4);
 
     return PieceLines;
+}
+
+void Piece::setPromotedType(PIECE_TYPE promotedType)
+{
+    if (_pieceType != P_PAWN)
+    {
+        qDebug() << "ERROR: Piece::setPromotedType(): only pawn can be promoted"
+                    " . (this is '" <<  (char)_pieceType << "' piece char type)";
+        return;
+    }
+
+    if (promotedType == P_QUEEN || promotedType == P_KNIGHT ||
+            promotedType == P_ROOK || promotedType == P_BISHOP)
+        _promotedType = promotedType;
+    else qDebug() << "ERROR: Piece::setPromotedType(): wrong promotion type:"
+                  << (char)promotedType;
 }
