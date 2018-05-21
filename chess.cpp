@@ -169,7 +169,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
     case CMT_HISTORY:
         _pStatus->setHistoryMoves(QStrTcpRespond);
         //todo: typy odpowiedzi na WWW też jako enumy zrobić z parametrami
-        this->sendDataToAllClients("history " + _pStatus->getHistoryMovesAsQStr());
+        this->sendDataToAllClients(this->getTableData());
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
     case CMT_MOVE:
@@ -532,6 +532,9 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
     }
 }
 
+// TABLE_DATA{\"wplr\":\"marianexyx\",\"bplr\":\"test\",\"turn\":\"bt\",\"wtime\":
+// 1713531,\"btime\":879094,\"queue\":\"queueEmpty\",\"history\":\"b4 b5 Nc3 Nc6
+// Nxb5 Na5 bxa5 Rb8 a6 Rb7 axb7 a6 b8=Q \",\"promoted\":\"b8:p\"}\n"
 QString Chess::getTableData()
 {
     QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +

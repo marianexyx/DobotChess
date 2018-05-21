@@ -740,11 +740,22 @@ void MainWindow::showBoardInUI(QString QStrBoard, BOARD BoardType)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
 
+    QString QStrBoardPTE;
     switch(BoardType)
     {
     case B_MAIN:
         ui->boardPTE->clear();
-        ui->boardPTE->setPlainText(QStrBoard);
+
+        for (int i=0; i<=7; ++i)
+            {
+                for (int j=0; j<=7; ++j)
+                {
+                    QStrBoardPTE += QStrBoardArray[i][j] + " ";
+                }
+                QStrBoardPTE += "\n";
+            }
+
+        ui->boardPTE->setPlainText(QStrBoardPTE);
         break;
     case B_REMOVED:
         break;

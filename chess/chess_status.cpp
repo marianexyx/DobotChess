@@ -13,8 +13,8 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
 /*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign,
                                                       bool bErrorLog /*= false*/)
 {
-    if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "k" ||
-            QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "K")
+    if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "n" ||
+            QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "N")
         return true;
     else
     {

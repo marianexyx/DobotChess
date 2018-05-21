@@ -124,32 +124,6 @@ Piece::Piece(short sPieceID)
     return PieceType;
 }
 
-/*static*/ QString Piece::FENSign(short sPieceNr)
-{
-    QString QStrFENSign = QChar::fromLatin1(Piece::Type(sPieceNr));
-    PLAYER_TYPE PieceColor = Piece::Color(sPieceNr);
-    if (PieceColor == PT_WHITE) QStrFENSign.toUpper();
-    return QStrFENSign;
-}
-
-/*static*/ QString Piece::name(short sPieceNr) //todo: źle zwraca nazwę
-{  
-    PLAYER_TYPE PieceColor = Piece::Color(sPieceNr);
-    QString QStrName = Piece::FENSign(sPieceNr);
-
-    switch(sPieceNr)
-    {
-    case 1: case 2: case 3: case 25: case 26: case 27:
-        QStrName += "1"; break;
-    case 6: case 7: case 8: case 30: case 31: case 32:
-        QStrName += "2"; break;
-    default:
-        QStrName += QString::number(sPieceNr - static_cast<int>(PieceColor)*8);
-    }
-
-    return QStrName;
-}
-
 /*static*/ short Piece::nr(PosOnBoard pieceLines)
 {
     short sPieceNr = static_cast<short>(pieceLines.Letter) +
@@ -208,4 +182,34 @@ void Piece::setPromotedType(PIECE_TYPE promotedType)
         _promotedType = promotedType;
     else qDebug() << "ERROR: Piece::setPromotedType(): wrong promotion type:"
                   << (char)promotedType;
+}
+
+QString Piece::getAsFENSign()
+{
+    QString QStrFENSign = _promotedType == P_ERROR
+            ? QChar::fromLatin1(_pieceType) : QChar::fromLatin1(_promotedType);
+
+    if (_pieceColor == PT_WHITE)
+        QStrFENSign = QStrFENSign.toUpper();
+
+    return QStrFENSign;
+}
+
+QString Piece::getName() //todo: źle zwraca nazwę
+{
+    QString QStrName = this->getAsFENSign();
+
+    switch(_sPieceID)
+    {
+    case 1: case 2: case 3: case 25: case 26: case 27:
+        QStrName += "1"; break;
+    case 6: case 7: case 8: case 30: case 31: case 32:
+        QStrName += "2"; break;
+    case 4: case 5: case 28: case 29:
+        break;
+    default:
+        QStrName += QString::number(_sPieceID - static_cast<int>(_pieceColor)*8);
+    }
+
+    return QStrName;
 }

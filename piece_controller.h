@@ -6,6 +6,7 @@
 #include "dobot.h"
 #include "piece_set.h"
 #include "chessboard.h"
+#include "ctype.h"
 
 class PieceController: public QObject
 {

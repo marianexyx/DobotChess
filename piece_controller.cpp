@@ -156,14 +156,16 @@ QString PieceController::getPromotedPawnsPositions()
         if (pPiece->getType() == P_PAWN && pPiece->getPromotedType() != P_ERROR &&
                  pField != nullptr)
         {
-            QStrPromotedPawnsPositions = pField->getNrAsQStr() + ":" +
-                    Piece::FENSign(sPiece) + " ";
+            QString QStrNext = pField->getNrAsQStr() + ":" + pPiece->getAsFENSign();
+            QStrPromotedPawnsPositions += QStrNext + " ";
         }
     }
 
     if (!QStrPromotedPawnsPositions.isEmpty())
+    {
         QStrPromotedPawnsPositions = QStrPromotedPawnsPositions.left(
                     QStrPromotedPawnsPositions.length() - 1); //delete last spacebar
+    }
 
-    return QStrPromotedPawnsPositions;
+    return QStrPromotedPawnsPositions; //"b2:Q c7:q g5:K"
 }
