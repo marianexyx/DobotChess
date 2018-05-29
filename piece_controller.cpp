@@ -58,6 +58,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
     _lastPos = pField->getPos();
     Point3D xyz = pField->getLocation3D();
     _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove, bRetreat);
+    emit this->showRealBoardInUI();
 }
 
 bool PieceController::isPieceSetOk()

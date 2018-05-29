@@ -57,7 +57,7 @@ public:
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
-    void showBoardInUI(QString, BOARD);
+    void showBoardInUI(QString);
     void clearBoardInUI();
 };
 

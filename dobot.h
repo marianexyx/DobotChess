@@ -78,6 +78,10 @@ public:
 
     void showArduinoGripperStateListInUI(QList<ServoArduino> list)
     { emit this->showArduinoGripperStateList(list); }
+    void showActualDobotQueuedCmdIDListPTE(QList<DobotMove> list)
+    { emit this->showActualDobotQueuedCmdIDList(list); }
+    void showOnDobotQueuedCmdsListPTE(QList<DobotMove> list)
+    { emit this->showOnDobotQueuedCmdsList(list); }
 
 public slots:
     void sendMoveToArm(DobotMove move);
@@ -97,6 +101,8 @@ signals: //GUI mainWindow
     void DobotErrorMsgBox();
     void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int nCoreNextId);
     void showArduinoGripperStateList(QList<ServoArduino>);
+    void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
+    void showOnDobotQueuedCmdsList(QList<DobotMove> list);
 };
 
 #endif // DOBOT_H

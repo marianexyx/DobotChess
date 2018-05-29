@@ -40,13 +40,11 @@ public:
     QGridLayout *gridLayout_8;
     QPushButton *resetAllDataBtn;
     QGroupBox *groupBox_3;
-    QGridLayout *gridLayout_17;
-    QGroupBox *groupBox_4;
     QGridLayout *gridLayout_14;
-    QPlainTextEdit *boardPTE;
-    QGroupBox *groupBox_13;
-    QGridLayout *gridLayout_23;
-    QPlainTextEdit *plainTextEdit;
+    QLabel *label_34;
+    QLabel *label_35;
+    QPlainTextEdit *realBoardPTE;
+    QPlainTextEdit *chenardBoardPTE;
     QGroupBox *groupBox_2;
     QGridLayout *gridLayout_9;
     QLabel *gameStatusLbl;
@@ -75,18 +73,14 @@ public:
     QLabel *queueTimeLbl;
     QGroupBox *groupBox_9;
     QGridLayout *gridLayout_19;
-    QGroupBox *groupBox_8;
-    QGridLayout *gridLayout_16;
+    QLabel *label_37;
+    QLabel *label_39;
     QPlainTextEdit *historyPTE;
-    QGroupBox *groupBox_7;
-    QGridLayout *gridLayout_15;
-    QPlainTextEdit *legalPTE;
-    QGroupBox *groupBox_14;
-    QGridLayout *gridLayout_24;
+    QLabel *label_36;
+    QPlainTextEdit *queuedOnCore;
     QPlainTextEdit *queuedOnDobot;
-    QGroupBox *groupBox_10;
-    QGridLayout *gridLayout_20;
-    QPlainTextEdit *queuedPTE;
+    QPlainTextEdit *legalPTE;
+    QLabel *label_38;
     QGroupBox *log;
     QGridLayout *gridLayout_18;
     QPlainTextEdit *logPTE;
@@ -230,47 +224,45 @@ public:
 
         groupBox_3 = new QGroupBox(groupBox);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        gridLayout_17 = new QGridLayout(groupBox_3);
-        gridLayout_17->setSpacing(6);
-        gridLayout_17->setContentsMargins(11, 11, 11, 11);
-        gridLayout_17->setObjectName(QStringLiteral("gridLayout_17"));
-        groupBox_4 = new QGroupBox(groupBox_3);
-        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
-        gridLayout_14 = new QGridLayout(groupBox_4);
+        gridLayout_14 = new QGridLayout(groupBox_3);
         gridLayout_14->setSpacing(6);
         gridLayout_14->setContentsMargins(11, 11, 11, 11);
         gridLayout_14->setObjectName(QStringLiteral("gridLayout_14"));
-        boardPTE = new QPlainTextEdit(groupBox_4);
-        boardPTE->setObjectName(QStringLiteral("boardPTE"));
+        label_34 = new QLabel(groupBox_3);
+        label_34->setObjectName(QStringLiteral("label_34"));
+
+        gridLayout_14->addWidget(label_34, 0, 0, 1, 1);
+
+        label_35 = new QLabel(groupBox_3);
+        label_35->setObjectName(QStringLiteral("label_35"));
+
+        gridLayout_14->addWidget(label_35, 0, 1, 1, 1);
+
+        realBoardPTE = new QPlainTextEdit(groupBox_3);
+        realBoardPTE->setObjectName(QStringLiteral("realBoardPTE"));
         QSizePolicy sizePolicy1(QSizePolicy::Maximum, QSizePolicy::Maximum);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(boardPTE->sizePolicy().hasHeightForWidth());
-        boardPTE->setSizePolicy(sizePolicy1);
-        boardPTE->setMinimumSize(QSize(180, 150));
-        boardPTE->setMaximumSize(QSize(180, 150));
+        sizePolicy1.setHeightForWidth(realBoardPTE->sizePolicy().hasHeightForWidth());
+        realBoardPTE->setSizePolicy(sizePolicy1);
+        realBoardPTE->setMinimumSize(QSize(0, 125));
+        realBoardPTE->setMaximumSize(QSize(16777215, 125));
         QFont font;
         font.setFamily(QStringLiteral("Courier New"));
-        boardPTE->setFont(font);
+        font.setPointSize(8);
+        realBoardPTE->setFont(font);
 
-        gridLayout_14->addWidget(boardPTE, 1, 0, 1, 1);
+        gridLayout_14->addWidget(realBoardPTE, 1, 0, 1, 1);
 
+        chenardBoardPTE = new QPlainTextEdit(groupBox_3);
+        chenardBoardPTE->setObjectName(QStringLiteral("chenardBoardPTE"));
+        chenardBoardPTE->setMinimumSize(QSize(125, 125));
+        chenardBoardPTE->setMaximumSize(QSize(125, 125));
+        QFont font1;
+        font1.setFamily(QStringLiteral("Courier New"));
+        chenardBoardPTE->setFont(font1);
 
-        gridLayout_17->addWidget(groupBox_4, 0, 0, 1, 1);
-
-        groupBox_13 = new QGroupBox(groupBox_3);
-        groupBox_13->setObjectName(QStringLiteral("groupBox_13"));
-        gridLayout_23 = new QGridLayout(groupBox_13);
-        gridLayout_23->setSpacing(6);
-        gridLayout_23->setContentsMargins(11, 11, 11, 11);
-        gridLayout_23->setObjectName(QStringLiteral("gridLayout_23"));
-        plainTextEdit = new QPlainTextEdit(groupBox_13);
-        plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
-
-        gridLayout_23->addWidget(plainTextEdit, 0, 0, 1, 1);
-
-
-        gridLayout_17->addWidget(groupBox_13, 0, 1, 1, 1);
+        gridLayout_14->addWidget(chenardBoardPTE, 1, 1, 1, 1);
 
 
         gridLayout_8->addWidget(groupBox_3, 1, 0, 1, 1);
@@ -434,64 +426,50 @@ public:
         gridLayout_19->setSpacing(6);
         gridLayout_19->setContentsMargins(11, 11, 11, 11);
         gridLayout_19->setObjectName(QStringLiteral("gridLayout_19"));
-        groupBox_8 = new QGroupBox(groupBox_9);
-        groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
-        gridLayout_16 = new QGridLayout(groupBox_8);
-        gridLayout_16->setSpacing(6);
-        gridLayout_16->setContentsMargins(11, 11, 11, 11);
-        gridLayout_16->setObjectName(QStringLiteral("gridLayout_16"));
-        historyPTE = new QPlainTextEdit(groupBox_8);
+        label_37 = new QLabel(groupBox_9);
+        label_37->setObjectName(QStringLiteral("label_37"));
+
+        gridLayout_19->addWidget(label_37, 0, 2, 1, 1);
+
+        label_39 = new QLabel(groupBox_9);
+        label_39->setObjectName(QStringLiteral("label_39"));
+
+        gridLayout_19->addWidget(label_39, 2, 2, 1, 1);
+
+        historyPTE = new QPlainTextEdit(groupBox_9);
         historyPTE->setObjectName(QStringLiteral("historyPTE"));
-        historyPTE->setFont(font);
+        historyPTE->setMaximumSize(QSize(16777215, 120));
+        historyPTE->setFont(font1);
 
-        gridLayout_16->addWidget(historyPTE, 1, 0, 1, 1);
+        gridLayout_19->addWidget(historyPTE, 3, 1, 1, 1);
 
+        label_36 = new QLabel(groupBox_9);
+        label_36->setObjectName(QStringLiteral("label_36"));
 
-        gridLayout_19->addWidget(groupBox_8, 1, 1, 1, 1);
+        gridLayout_19->addWidget(label_36, 0, 1, 1, 1);
 
-        groupBox_7 = new QGroupBox(groupBox_9);
-        groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
-        gridLayout_15 = new QGridLayout(groupBox_7);
-        gridLayout_15->setSpacing(6);
-        gridLayout_15->setContentsMargins(11, 11, 11, 11);
-        gridLayout_15->setObjectName(QStringLiteral("gridLayout_15"));
-        legalPTE = new QPlainTextEdit(groupBox_7);
-        legalPTE->setObjectName(QStringLiteral("legalPTE"));
-        legalPTE->setMinimumSize(QSize(125, 0));
-        legalPTE->setFont(font);
+        queuedOnCore = new QPlainTextEdit(groupBox_9);
+        queuedOnCore->setObjectName(QStringLiteral("queuedOnCore"));
 
-        gridLayout_15->addWidget(legalPTE, 0, 0, 1, 1);
+        gridLayout_19->addWidget(queuedOnCore, 1, 2, 1, 1);
 
-
-        gridLayout_19->addWidget(groupBox_7, 1, 2, 1, 1);
-
-        groupBox_14 = new QGroupBox(groupBox_9);
-        groupBox_14->setObjectName(QStringLiteral("groupBox_14"));
-        gridLayout_24 = new QGridLayout(groupBox_14);
-        gridLayout_24->setSpacing(6);
-        gridLayout_24->setContentsMargins(11, 11, 11, 11);
-        gridLayout_24->setObjectName(QStringLiteral("gridLayout_24"));
-        queuedOnDobot = new QPlainTextEdit(groupBox_14);
+        queuedOnDobot = new QPlainTextEdit(groupBox_9);
         queuedOnDobot->setObjectName(QStringLiteral("queuedOnDobot"));
 
-        gridLayout_24->addWidget(queuedOnDobot, 0, 0, 1, 1);
+        gridLayout_19->addWidget(queuedOnDobot, 1, 1, 1, 1);
 
+        legalPTE = new QPlainTextEdit(groupBox_9);
+        legalPTE->setObjectName(QStringLiteral("legalPTE"));
+        legalPTE->setMinimumSize(QSize(150, 120));
+        legalPTE->setMaximumSize(QSize(16777215, 120));
+        legalPTE->setFont(font1);
 
-        gridLayout_19->addWidget(groupBox_14, 0, 1, 1, 1);
+        gridLayout_19->addWidget(legalPTE, 3, 2, 1, 1);
 
-        groupBox_10 = new QGroupBox(groupBox_9);
-        groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
-        gridLayout_20 = new QGridLayout(groupBox_10);
-        gridLayout_20->setSpacing(6);
-        gridLayout_20->setContentsMargins(11, 11, 11, 11);
-        gridLayout_20->setObjectName(QStringLiteral("gridLayout_20"));
-        queuedPTE = new QPlainTextEdit(groupBox_10);
-        queuedPTE->setObjectName(QStringLiteral("queuedPTE"));
+        label_38 = new QLabel(groupBox_9);
+        label_38->setObjectName(QStringLiteral("label_38"));
 
-        gridLayout_20->addWidget(queuedPTE, 0, 0, 1, 1);
-
-
-        gridLayout_19->addWidget(groupBox_10, 0, 2, 1, 1);
+        gridLayout_19->addWidget(label_38, 2, 1, 1, 1);
 
 
         gridLayout_8->addWidget(groupBox_9, 2, 0, 1, 1);
@@ -1130,9 +1108,9 @@ public:
         groupBox->setTitle(QApplication::translate("MainWindow", "Board data", nullptr));
         resetAllDataBtn->setText(QApplication::translate("MainWindow", "Reset all data", nullptr));
         groupBox_3->setTitle(QApplication::translate("MainWindow", "Board", nullptr));
-        groupBox_4->setTitle(QApplication::translate("MainWindow", "Main + removed", nullptr));
-        boardPTE->setPlainText(QString());
-        groupBox_13->setTitle(QApplication::translate("MainWindow", "Chenard", nullptr));
+        label_34->setText(QApplication::translate("MainWindow", "Main + removed", nullptr));
+        label_35->setText(QApplication::translate("MainWindow", "Chenard", nullptr));
+        realBoardPTE->setPlainText(QString());
         groupBox_2->setTitle(QApplication::translate("MainWindow", "Game", nullptr));
         gameStatusLbl->setText(QApplication::translate("MainWindow", "-1", nullptr));
         whiteNameLbl->setText(QApplication::translate("MainWindow", "WHITE", nullptr));
@@ -1159,10 +1137,10 @@ public:
         label_33->setText(QApplication::translate("MainWindow", "Queue timer", nullptr));
         queueTimeLbl->setText(QApplication::translate("MainWindow", "2:00", nullptr));
         groupBox_9->setTitle(QApplication::translate("MainWindow", "Moves", nullptr));
-        groupBox_8->setTitle(QApplication::translate("MainWindow", "History", nullptr));
-        groupBox_7->setTitle(QApplication::translate("MainWindow", "Legal", nullptr));
-        groupBox_14->setTitle(QApplication::translate("MainWindow", "Queued on Dobot", nullptr));
-        groupBox_10->setTitle(QApplication::translate("MainWindow", "Queued on core", nullptr));
+        label_37->setText(QApplication::translate("MainWindow", "Queued on core", nullptr));
+        label_39->setText(QApplication::translate("MainWindow", "Legal", nullptr));
+        label_36->setText(QApplication::translate("MainWindow", "Queued on Dobot", nullptr));
+        label_38->setText(QApplication::translate("MainWindow", "History", nullptr));
         log->setTitle(QApplication::translate("MainWindow", "Log", nullptr));
         groupBox_5->setTitle(QApplication::translate("MainWindow", "Dobot Arm", nullptr));
         chenardAI->setTitle(QApplication::translate("MainWindow", "Arduino Igor", nullptr));

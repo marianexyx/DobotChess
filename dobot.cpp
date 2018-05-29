@@ -30,6 +30,10 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
             this, SLOT(showQueueLabelsInUI(int, int, int, int, int)));
     connect(_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
             this, SLOT(addTextToLogPTEInUI(QString, LOG)));
+    connect(_pQueue, SIGNAL(showActualDobotQueuedCmdIDList(QList<DobotMove>)),
+            this, SLOT(showActualDobotQueuedCmdIDListPTE(QList<DobotMove>)));
+    connect(_pQueue, SIGNAL(showOnDobotQueuedCmdsList(QList<DobotMove>)),
+            this, SLOT(showOnDobotQueuedCmdsListPTE(QList<DobotMove>)));
 }
 
 Dobot::~Dobot()

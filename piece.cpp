@@ -195,7 +195,7 @@ QString Piece::getAsFENSign()
     return QStrFENSign;
 }
 
-QString Piece::getName() //todo: źle zwraca nazwę
+QString Piece::getName()
 {
     QString QStrName = this->getAsFENSign();
 

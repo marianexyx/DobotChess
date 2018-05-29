@@ -56,12 +56,12 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed
             this, SLOT(clearBoardInUI()));
-    connect(_pBoardMain, SIGNAL(showBoardInUI(QString, BOARD)),
-            this, SLOT(showBoardInUI(QString, BOARD)));
-    connect(_pBoardRemoved, SIGNAL(showBoardInUI(QString, BOARD)),
-            this, SLOT(showBoardInUI(QString, BOARD)));
-    connect(_pBoardChenard, SIGNAL(showBoardInUI(QString, BOARD)),
-            this, SLOT(showBoardInUI(QString, BOARD)));
+    connect(_pBoardMain, SIGNAL(showBoardInUI(QString)),
+            this, SLOT(showBoardInUI(QString)));
+    connect(_pBoardRemoved, SIGNAL(showBoardInUI(QString)),
+            this, SLOT(showBoardInUI(QString)));
+    connect(_pBoardChenard, SIGNAL(showBoardInUI(QString)), //todo: zbędny board
+            this, SLOT(showBoardInUI(QString)));
     connect(_pChess, SIGNAL(showLegalMovesInUI(QStringList)),
             this, SLOT(showLegalMovesInUI(QStringList)));
     connect(_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
@@ -84,6 +84,12 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
             this, SLOT(updatePortsComboBox(int)));
     connect(_pDobot, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
             this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
+    connect(_pPieceController, SIGNAL(showRealBoardInUI()),
+            this, SLOT(showRealBoardInUI()));
+    connect(_pDobot, SIGNAL(showActualDobotQueuedCmdIDList(QList<DobotMove>)),
+            this, SLOT(showActualDobotQueuedCmdIDList(QList<DobotMove>)));
+    connect(_pDobot, SIGNAL(showOnDobotQueuedCmdsList(QList<DobotMove>)),
+            this, SLOT(showOnDobotQueuedCmdsList(QList<DobotMove>)));
 
     this->initControl(); //init dobot JOG control
 
@@ -602,7 +608,7 @@ void MainWindow::on_sendTcpBtn_clicked()
     }
 }
 
-void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
+void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list) //todo: "for dobot/to send"
 {
     QString QStrQueuedList;
     DobotMove item;
@@ -614,8 +620,24 @@ void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list)
                + " " + QString::number(item.xyz.x) + " " + QString::number(item.xyz.y)
                + " " + QString::number(item.xyz.z) + "\n";
     }
-    ui->queuedPTE->clear();
-    ui->queuedPTE->setPlainText(QStrQueuedList);
+    ui->queuedOnCore->clear();
+    ui->queuedOnCore->setPlainText(QStrQueuedList);
+}
+
+void MainWindow::showOnDobotQueuedCmdsList(QList<DobotMove> list)
+{
+    QString QStrQueuedList;
+    DobotMove item;
+
+    for(int i=0; i<list.count(); ++i)
+    {
+       item = list.at(i);
+       QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
+               + " " + QString::number(item.xyz.x) + " " + QString::number(item.xyz.y)
+               + " " + QString::number(item.xyz.z) + "\n";
+    }
+    ui->queuedOnDobot->clear();
+    ui->queuedOnDobot->setPlainText(QStrQueuedList);
 }
 
 void MainWindow::showArduinoGripperStateList(QList<ServoArduino> list)
@@ -687,10 +709,10 @@ void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType
 
 void MainWindow::clearBoardInUI()
 {
-    ui->boardPTE->clear();
+    ui->chenardBoardPTE->clear();
 }
 
-void MainWindow::showBoardInUI(QString QStrBoard, BOARD BoardType)
+void MainWindow::showBoardInUI(QString QStrBoard) //todo: chenard
 {
     QString QStrBoardArray[8][8];
 
@@ -741,26 +763,76 @@ void MainWindow::showBoardInUI(QString QStrBoard, BOARD BoardType)
     }
 
     QString QStrBoardPTE;
-    switch(BoardType)
+    for (int i=0; i<=7; ++i)
     {
-    case B_MAIN:
-        ui->boardPTE->clear();
-
-        for (int i=0; i<=7; ++i)
-            {
-                for (int j=0; j<=7; ++j)
-                {
-                    QStrBoardPTE += QStrBoardArray[i][j] + " ";
-                }
-                QStrBoardPTE += "\n";
-            }
-
-        ui->boardPTE->setPlainText(QStrBoardPTE);
-        break;
-    case B_REMOVED:
-        break;
-    default: qDebug() << "ERROR: MainWindow::showBoardInUI(): unknown BoardType:" << BoardType;
+        for (int j=0; j<=7; ++j)
+        {
+            QStrBoardPTE += QStrBoardArray[i][j] + " ";
+        }
+        QStrBoardPTE += "\n";
     }
+    while (QStrBoardPTE.right(1) == "\n")
+        QStrBoardPTE.remove(QStrBoardPTE.length()-1,1);
+
+    ui->chenardBoardPTE->clear();
+    ui->chenardBoardPTE->setPlainText(QStrBoardPTE);
+}
+
+void MainWindow::showRealBoardInUI()
+{   
+    QString QStrRealBoards, QStrRemovedTop, QStrRemovedBot, QStrMain;
+    for (int i=1; i<=16; i+=2)
+    {
+        QString QStrPieceSignTop, QStrPieceLine;
+        Field* pFieldTop = _pChess->getBoardRemovedPointer()->getField(i);
+        Piece* pPieceTop = pFieldTop->getPieceOnField();
+        if (pPieceTop == nullptr) QStrPieceSignTop = ".";
+        else QStrPieceSignTop = pPieceTop->getAsFENSign();
+        QStrPieceLine = "\n" + QStrPieceSignTop + " ";
+        pFieldTop = _pChess->getBoardRemovedPointer()->getField(i+1);
+        pPieceTop = pFieldTop->getPieceOnField();
+        if (pPieceTop == nullptr) QStrPieceSignTop = ".";
+        else QStrPieceSignTop = pPieceTop->getAsFENSign();
+        QStrPieceLine += QStrPieceSignTop;
+        QStrRemovedTop = QStrPieceLine + QStrRemovedTop;
+
+        QString QStrPieceSignBot;
+        Field* pFieldBot = _pChess->getBoardRemovedPointer()->getField(i+16);
+        Piece* pPieceBot = pFieldBot->getPieceOnField();
+        if (pPieceBot == nullptr) QStrPieceSignBot = ".";
+        else QStrPieceSignBot = pPieceBot->getAsFENSign();
+        QStrPieceLine = "\n" + QStrPieceSignBot + " ";
+        pFieldBot = _pChess->getBoardRemovedPointer()->getField(i+17);
+        pPieceBot = pFieldBot->getPieceOnField();
+        if (pPieceBot == nullptr) QStrPieceSignBot = ".";
+        else QStrPieceSignBot = pPieceBot->getAsFENSign();
+        QStrPieceLine += QStrPieceSignBot;
+        QStrRemovedBot = QStrPieceLine + QStrRemovedBot;
+    }
+    QString QStrRemovedLines[2][8];
+    QStringList QStrQStrRemovedTopRows = QStrRemovedTop.split(QRegExp("\n"));
+    QStringList QStrQStrRemovedBotRows = QStrRemovedBot.split(QRegExp("\n"));
+    for (int i=1; i<=8; ++i)
+    {
+        qDebug() << "MainWindow::showRealBoardInUI(): i index =" << i;
+        QStrRemovedLines[0][i-1] =
+                QStrQStrRemovedTopRows.at(i);
+        QStrRemovedLines[1][i-1] =
+                QStrQStrRemovedBotRows.at(i);
+    }
+    for (int i=1; i<=64; ++i)
+    {        
+        Field* pField = _pChess->getBoardMainPointer()->getField(i);
+        Piece* pPiece = pField->getPieceOnField();
+        QString QStrPieceSign;
+        if (pPiece == nullptr) QStrPieceSign = ".";
+        else QStrPieceSign = pPiece->getAsFENSign();
+        QStrMain += QStrPieceSign + " ";
+        if (i % 8 == 1) QStrRemovedLines[0][(i/8)+1] + QStrMain;
+        else if (i % 8 == 0) QStrMain += QStrRemovedLines[1][(i/8)+1] + "\n";
+    }
+    ui->realBoardPTE->clear();
+    ui->realBoardPTE->setPlainText(QStrRealBoards);
 }
 
 void MainWindow::showLegalMovesInUI(QStringList legalMoves)
@@ -773,7 +845,7 @@ void MainWindow::showLegalMovesInUI(QStringList legalMoves)
 
 void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
 {
-    QString history = "";
+    QString history;
     ui->historyPTE->clear();
     if (!historyMoves.isEmpty())
     {

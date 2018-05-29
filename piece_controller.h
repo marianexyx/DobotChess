@@ -39,6 +39,7 @@ public:
 
 signals:
     void addTextToLogPTE(QString, LOG);
+    void showRealBoardInUI();
 };
 
 #endif // PIECE_CONTROLLER_H

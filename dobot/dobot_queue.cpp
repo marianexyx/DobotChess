@@ -80,6 +80,7 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
                              << _queuedArmCmds.first().ID << ", point ="
                              << _queuedArmCmds.first().xyz.getAsQStr();
                     _executedArmCmds << _queuedArmCmds.first();
+                    emit this->showOnDobotQueuedCmdsList(_executedArmCmds);
                     return _queuedArmCmds.takeFirst();
                 }
             }
@@ -111,12 +112,18 @@ void DobotQueue::showLastExecutedArmMoveInUI()
     }
 
     _un64LastDobotIDShownInUI = _un64RealTimeDobotActualID;
+
+    emit this->showOnDobotQueuedCmdsList(_executedArmCmds);
 }
 
 void DobotQueue::removeOldQueuedMovesFromCore()
 {
     if (!_executedArmCmds.empty() && _un64RealTimeDobotActualID > _executedArmCmds.first().ID)
+    {
         _executedArmCmds.removeFirst();
+        emit this->showOnDobotQueuedCmdsList(_executedArmCmds); //todo: automatycznie niech..
+        //...wkleja tutaj listę, by nie trzeba było zawsze wpisywać parametru
+    }
 }
 
 DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)

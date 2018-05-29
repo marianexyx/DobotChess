@@ -60,7 +60,8 @@ private slots:
     //sloty do używania GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
-    void showBoardInUI(QString QStrBoard, BOARD BoardType);
+    void showBoardInUI(QString QStrBoard);
+    void showRealBoardInUI();
     void clearBoardInUI();
     void showLegalMovesInUI(QStringList legalMoves);
     void showHistoryMovesInUI(QStringList historyMoves);
@@ -78,6 +79,7 @@ private slots:
     void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft,
                         int nCoreNextId);
     void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
+    void showOnDobotQueuedCmdsList(QList<DobotMove> list);
     void showArduinoGripperStateList(QList<ServoArduino> list);
 
     //websocket slots

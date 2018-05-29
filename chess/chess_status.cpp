@@ -133,7 +133,7 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "ChessStatus::saveStatusData(): QStrFENBoard =" << QStrFENBoard;
-        emit _pBoardMain->showBoardInUI(QStrFENBoard, _pBoardMain->getBoardType());
+        emit _pBoardMain->showBoardInUI(QStrFENBoard);
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
@@ -232,7 +232,7 @@ void ChessStatus::setHistoryMoves(QString QStrMsg)
 void ChessStatus::setHistoryMoves(QStringList moves)
 {
     _historyMoves = moves;
-    emit this->showHistoryMoves(_legalMoves);
+    emit this->showHistoryMoves(_historyMoves);
 }
 
 WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
