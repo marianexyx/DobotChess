@@ -163,8 +163,8 @@ void Chessboard::calculateMiddleAbovePoint()
 void Chessboard::calculateRetreatPoints()
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = _pField[Field::nr(L_A, D_4)-1]->getLocation3D().y;
-    _retreatRight.y = _pField[Field::nr(L_H, D_4)-1]->getLocation3D().y;
+    _retreatLeft.y = -90; //future: ciągnąć z zewnątrz lub obliczać
+    _retreatRight.y = 90;
     _retreatLeft.z = _retreatRight.z = _maxBoard.z;
 }
 

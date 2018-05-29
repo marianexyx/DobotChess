@@ -23,6 +23,8 @@ void DobotQueue::parseNextMoveToArmIfPossible()
     {
         emit this->sendMoveToArm(this->getNextMoveToSendToArm());
         this->removeOldQueuedMovesFromCore();
+        emit this->showActualDobotQueuedCmdIDList(_queuedArmCmds);
+        emit this->showOnDobotQueuedCmdsList(_executedArmCmds);
     }
 }
 
@@ -48,8 +50,6 @@ bool DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable()
             else qDebug() << "ERROR: DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable(): "
                              "_lowestIDMoveInList < _un64RealTimeDobotActualID ("
                           << _lowestIDMoveInList << "<" << _un64RealTimeDobotActualID << ")";
-
-            emit this->showActualDobotQueuedCmdIDList(_queuedArmCmds);
         }
     }
 
@@ -80,7 +80,6 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
                              << _queuedArmCmds.first().ID << ", point ="
                              << _queuedArmCmds.first().xyz.getAsQStr();
                     _executedArmCmds << _queuedArmCmds.first();
-                    emit this->showOnDobotQueuedCmdsList(_executedArmCmds);
                     return _queuedArmCmds.takeFirst();
                 }
             }
@@ -109,11 +108,10 @@ void DobotQueue::showLastExecutedArmMoveInUI()
         QStrDobotMove = dobotMoveAsQstr(Move.type);
         emit this->addTextToLogPTEInUI("Executed move ID = " + QStrMoveID +
                                        " type = " + QStrDobotMove + "\n", LOG_DOBOT);
+        emit this->showOnDobotQueuedCmdsList(_executedArmCmds);
     }
 
     _un64LastDobotIDShownInUI = _un64RealTimeDobotActualID;
-
-    emit this->showOnDobotQueuedCmdsList(_executedArmCmds);
 }
 
 void DobotQueue::removeOldQueuedMovesFromCore()
@@ -183,6 +181,7 @@ void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
     _un64CoreQueuedCmdID++;
     DobotMove cmdToQueue(_un64CoreQueuedCmdID, Type, point);
     _queuedArmCmds << cmdToQueue;
+    emit this->showActualDobotQueuedCmdIDList(_queuedArmCmds);
 }
 
 void DobotQueue::saveIDFromConnectedDobot()

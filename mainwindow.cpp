@@ -278,7 +278,7 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     qDebug() << QStrMsg;
 
     //prevent big string data
-    int nMaximum = 20 * 1000;
+    int nMaximum = 30 * 1000;
     ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
 
     //auto scroll
@@ -610,6 +610,7 @@ void MainWindow::on_sendTcpBtn_clicked()
 
 void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list) //todo: "for dobot/to send"
 {
+    qDebug() << "MainWindow::showActualDobotQueuedCmdIDList()";
     QString QStrQueuedList;
     DobotMove item;
 
@@ -617,25 +618,28 @@ void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list) //todo: "
     {
        item = list.at(i);
        QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
-               + " " + QString::number(item.xyz.x) + " " + QString::number(item.xyz.y)
-               + " " + QString::number(item.xyz.z) + "\n";
+               + ": " + item.xyz.getAsQStr() + "\n";
     }
+
     ui->queuedOnCore->clear();
     ui->queuedOnCore->setPlainText(QStrQueuedList);
 }
 
 void MainWindow::showOnDobotQueuedCmdsList(QList<DobotMove> list)
 {
+    qDebug() << "MainWindow::showOnDobotQueuedCmdsList()";
     QString QStrQueuedList;
     DobotMove item;
 
     for(int i=0; i<list.count(); ++i)
     {
        item = list.at(i);
+       if (ui->DobotQueuedIndexLabel->text().toUInt() == item.ID)
+           QStrQueuedList += ">";
        QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
-               + " " + QString::number(item.xyz.x) + " " + QString::number(item.xyz.y)
-               + " " + QString::number(item.xyz.z) + "\n";
+               + ": " + item.xyz.getAsQStr() + "\n";
     }
+
     ui->queuedOnDobot->clear();
     ui->queuedOnDobot->setPlainText(QStrQueuedList);
 }
@@ -780,57 +784,36 @@ void MainWindow::showBoardInUI(QString QStrBoard) //todo: chenard
 
 void MainWindow::showRealBoardInUI()
 {   
-    QString QStrRealBoards, QStrRemovedTop, QStrRemovedBot, QStrMain;
-    for (int i=1; i<=16; i+=2)
-    {
-        QString QStrPieceSignTop, QStrPieceLine;
-        Field* pFieldTop = _pChess->getBoardRemovedPointer()->getField(i);
-        Piece* pPieceTop = pFieldTop->getPieceOnField();
-        if (pPieceTop == nullptr) QStrPieceSignTop = ".";
-        else QStrPieceSignTop = pPieceTop->getAsFENSign();
-        QStrPieceLine = "\n" + QStrPieceSignTop + " ";
-        pFieldTop = _pChess->getBoardRemovedPointer()->getField(i+1);
-        pPieceTop = pFieldTop->getPieceOnField();
-        if (pPieceTop == nullptr) QStrPieceSignTop = ".";
-        else QStrPieceSignTop = pPieceTop->getAsFENSign();
-        QStrPieceLine += QStrPieceSignTop;
-        QStrRemovedTop = QStrPieceLine + QStrRemovedTop;
-
-        QString QStrPieceSignBot;
-        Field* pFieldBot = _pChess->getBoardRemovedPointer()->getField(i+16);
-        Piece* pPieceBot = pFieldBot->getPieceOnField();
-        if (pPieceBot == nullptr) QStrPieceSignBot = ".";
-        else QStrPieceSignBot = pPieceBot->getAsFENSign();
-        QStrPieceLine = "\n" + QStrPieceSignBot + " ";
-        pFieldBot = _pChess->getBoardRemovedPointer()->getField(i+17);
-        pPieceBot = pFieldBot->getPieceOnField();
-        if (pPieceBot == nullptr) QStrPieceSignBot = ".";
-        else QStrPieceSignBot = pPieceBot->getAsFENSign();
-        QStrPieceLine += QStrPieceSignBot;
-        QStrRemovedBot = QStrPieceLine + QStrRemovedBot;
-    }
-    QString QStrRemovedLines[2][8];
-    QStringList QStrQStrRemovedTopRows = QStrRemovedTop.split(QRegExp("\n"));
-    QStringList QStrQStrRemovedBotRows = QStrRemovedBot.split(QRegExp("\n"));
-    for (int i=1; i<=8; ++i)
-    {
-        qDebug() << "MainWindow::showRealBoardInUI(): i index =" << i;
-        QStrRemovedLines[0][i-1] =
-                QStrQStrRemovedTopRows.at(i);
-        QStrRemovedLines[1][i-1] =
-                QStrQStrRemovedBotRows.at(i);
-    }
+    QString QStrRealBoards;
     for (int i=1; i<=64; ++i)
-    {        
+    {
+        if (i % 8 == 1)
+        {
+            Field* pRemField1 = _pChess->getBoardRemovedPointer()->getField((i/4)+1);
+            Piece* pRemPiece1 = pRemField1->getPieceOnField();
+            Field* pRemField2 = _pChess->getBoardRemovedPointer()->getField((i/4)+2);
+            Piece* pRemPiece2 = pRemField2->getPieceOnField();
+            QStrRealBoards += (pRemPiece1 == nullptr ? "." : pRemPiece1->getAsFENSign())
+                    + " " + (pRemPiece2 == nullptr ? "." : pRemPiece2->getAsFENSign()) + "   ";
+        }
+
         Field* pField = _pChess->getBoardMainPointer()->getField(i);
         Piece* pPiece = pField->getPieceOnField();
-        QString QStrPieceSign;
-        if (pPiece == nullptr) QStrPieceSign = ".";
-        else QStrPieceSign = pPiece->getAsFENSign();
-        QStrMain += QStrPieceSign + " ";
-        if (i % 8 == 1) QStrRemovedLines[0][(i/8)+1] + QStrMain;
-        else if (i % 8 == 0) QStrMain += QStrRemovedLines[1][(i/8)+1] + "\n";
+        QStrRealBoards += (pPiece == nullptr ? "." : pPiece->getAsFENSign()) + " ";
+
+        if (i % 8 == 0)
+        {
+            Field* pRemField1 = _pChess->getBoardRemovedPointer()->getField((i/4)+15);
+            Piece* pRemPiece1 = pRemField1->getPieceOnField();
+            Field* pRemField2 = _pChess->getBoardRemovedPointer()->getField((i/4)+16);
+            Piece* pRemPiece2 = pRemField2->getPieceOnField();
+            QStrRealBoards += "  " + (pRemPiece1 == nullptr ? "." : pRemPiece1->getAsFENSign())
+                    + " " + (pRemPiece2 == nullptr ? "." : pRemPiece2->getAsFENSign()) + "\n";
+        }
     }
+    while (QStrRealBoards.right(1) == "\n")
+        QStrRealBoards.remove(QStrRealBoards.length()-1,1);
+
     ui->realBoardPTE->clear();
     ui->realBoardPTE->setPlainText(QStrRealBoards);
 }

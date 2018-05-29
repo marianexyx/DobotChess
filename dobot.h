@@ -78,10 +78,6 @@ public:
 
     void showArduinoGripperStateListInUI(QList<ServoArduino> list)
     { emit this->showArduinoGripperStateList(list); }
-    void showActualDobotQueuedCmdIDListPTE(QList<DobotMove> list)
-    { emit this->showActualDobotQueuedCmdIDList(list); }
-    void showOnDobotQueuedCmdsListPTE(QList<DobotMove> list)
-    { emit this->showOnDobotQueuedCmdsList(list); }
 
 public slots:
     void sendMoveToArm(DobotMove move);
@@ -91,6 +87,10 @@ public slots:
     void showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
                              int nCoreIdLeft, int nCoreNextId);  //todo: to wcale nie są inty
     void addTextToLogPTEInUI(QString QStrTxt, LOG log);
+    void showActualDobotQueuedCmdIDListPTE(QList<DobotMove> list)
+    { emit this->showActualDobotQueuedCmdIDList(list); }
+    void showOnDobotQueuedCmdsListPTE(QList<DobotMove> list)
+    { emit this->showOnDobotQueuedCmdsList(list); }
 
 signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);

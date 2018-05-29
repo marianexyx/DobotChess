@@ -252,7 +252,7 @@ void Dobot::initDobot()
 void Dobot::sendMoveToArm(DobotMove move)
 {
     qDebug() << "Dobot::sendMoveToArm(): move type =" << dobotMoveAsQstr(move.type)
-             << ", ID =" << move.ID;
+             << ", ID =" << move.ID << ", xyz =" << move.xyz.getAsQStr();
 
     switch(move.type)
     {
@@ -263,7 +263,7 @@ void Dobot::sendMoveToArm(DobotMove move)
         //todo: zabronić oś z jezeli jest zbyt nisko
         PTPCmd moveAsPtpCmd;
         moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //ruch typu kartezjański liniowy
-        //TODO: w dobocie była taka opcja po patchu: CPAbsoluteMode
+        //future: w dobocie była taka opcja po patchu: CPAbsoluteMode
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
@@ -279,7 +279,7 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_WAIT:
         _pServo->wait(move.ID);
         break;
-    case DM_CALIBRATE:
+    case DM_CALIBRATE: //future: albo to jest home, albo calibrate
     {
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
@@ -288,8 +288,6 @@ void Dobot::sendMoveToArm(DobotMove move)
         isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
     }
         break;
-        //_pServo->addServoMoveToGripperStatesList(move.type); //todo: ????
-        //break;
     default:
         qDebug() << "ERROR: Dobot::sendMoveToArm(): wrong move type:" << move.type;
     }

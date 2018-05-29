@@ -26,7 +26,7 @@ private:
     //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
     //...na którego odpowiedź(przetworzenie) z TCP czekamy
     int64_t _n64CmdID;
-    void doTcpConnect();
+    void doTcpConnect(); //todo: program czeka aż połączenie się wykona- zwątkować to
 
 private slots:
     void displayError(QAbstractSocket::SocketError socketError);
