@@ -55,7 +55,7 @@ Chess::~Chess()
 
 void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
 {
-    //future: używać wszędzie ID
+    //future: use ID everywhere
     Client client = _pClientsList->getClient(n64SenderID);
 
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
@@ -156,9 +156,8 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         if (_pStatus->getFENGameState() == ET_NONE)
         {
             this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_HISTORY));
-            this->continueGameplay(); //future: zrobić to kiedyś tak by dopiero w...
-            //...odpowiedzi na legal core wysyłał na stronę potwiedzenie wykonania...
-            //...ruchu (tj. zdjął blokadę przed kojenym ruchem)- stary koment?
+            this->continueGameplay(); //future: send move confirmation to web after...
+            //..."legal" response (i.e. realise blockade before next move)- is this old comment?
         }
         else //ET_WHIE_WON, ET_BLACK_WON, ET_DRAW
             this->restartGame(_pStatus->getFENGameState());
@@ -168,7 +167,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         break;
     case CMT_HISTORY:
         _pStatus->setHistoryMoves(QStrTcpRespond);
-        //todo: typy odpowiedzi na WWW też jako enumy zrobić z parametrami
+        //todo: change site responses for endian node with parameters, instead strings
         this->sendDataToAllClients(this->getTableData());
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
@@ -316,8 +315,8 @@ void Chess::sendDataToClient(QString QStrMsg, Client client /* = Client */)
     }
     else if (_PlayerSource == ARDUINO)
     {
-        //future: nieujednolicone typy komunikatów web z arduino są, przez co...
-        //...takie dziwne zmiany w locie (wynika to z virtualow i dziedziwczenia)
+        //future: non-harmonized types of communicates between site and arduino, so...
+        //...communications got to be changed in a fly
         if (QStrMsg.contains("promote")) QStrMsg = "promote";
         else if (QStrMsg.contains("newOk")) QStrMsg = "started";
         else if (QStrMsg.contains("badMove")) QStrMsg = "BAD_MOVE";
@@ -350,9 +349,8 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
     case ET_BLACK_WON:
     case ET_DRAW:
         QStrMove = _pStatus->getMove().asQStr();
-        //future: jak wysyłam table data, to nie ma potrzeby wysyłać "nt"
-        //future: komunikat o ostatnim ruchu można wyjebać, jako że informacje...
-        //...o ruchach mogą być wyciągane z "history"
+        //future: if TABLE_DATA is sent, then there is no need for sending "nt"
+        //future: last move communicate can be wiped, cuz info about it can be found in "history"
 
         qDebug() << "Chess::getEndGameMsg(): move =" << QStrMove;
         QStrReturnMsg = "moveOk " + QStrMove + " " + turnTypeAsBriefQstr(NO_TURN) + " "
@@ -370,7 +368,7 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
     }
 }
 
-void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
+void Chess::coreIsReadyForNewGame() //future: not best name?
 {
     qDebug() << "Chess::coreIsReadyForNewGame()";
 
@@ -385,7 +383,7 @@ void Chess::coreIsReadyForNewGame() //future: taka sobie ta nazwa?
     }
     else if (_PlayerSource == ARDUINO)
     {
-        //future: nie startować automatycznie nowej gry? lepiej wymagać od gracza potwierdzenia
+        //future: don't start automaticly new game? require it from players?
         this->sendMsgToTcp("new");
     }
     else
@@ -399,7 +397,7 @@ void Chess::startNewGameInCore()
 
     _ChessGameStatus = GS_TURN_WHITE_FIRST_TURN;
 
-    //pierwszy legal i status wyglądają zawsze tak samo:
+    //first legal and status always looks the same:
     _pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
     _pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 "
                             "d2d4 e2e3 e2e4 f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
@@ -440,7 +438,7 @@ void Chess::continueGameplay()
         _pTimers->switchPlayersTimers(_pStatus->getWhoseTurn());
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
-        //future: cont(inue) jako liczba dla strony, zamiast stringów
+        //future: enums, not strings
         this->sendDataToAllClients("moveOk " + _pStatus->getMove().asQStr() + " " +
                                    turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) + " cont");
     }
@@ -477,8 +475,8 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
     //reset data
     _pClientsList->resetPlayersStartConfirmInfo();
     _pTimers->resetGameTimers();
-    //_pStatus->clearMove(); //future: czyszczenie ruchu musi być po jego wysłaniu, póki...
-    //...nie będę czytał tego ruchu z historii
+    //_pStatus->clearMove(); //future: move clearing must be after sending it, unless it will...
+    //...be read from "history"
     _pStatus->resetStatusData();
 
     this->changePlayersOnChairs(WhoWon, PlayerToClear);
@@ -532,7 +530,7 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
     }
 }
 
-// TABLE_DATA{\"wplr\":\"marianexyx\",\"bplr\":\"test\",\"turn\":\"bt\",\"wtime\":
+//example: "TABLE_DATA{\"wplr\":\"marianexyx\",\"bplr\":\"test\",\"turn\":\"bt\",\"wtime\":
 // 1713531,\"btime\":879094,\"queue\":\"queueEmpty\",\"history\":\"b4 b5 Nc3 Nc6
 // Nxb5 Na5 bxa5 Rb8 a6 Rb7 axb7 a6 b8=Q \",\"promoted\":\"b8:p\"}\n"
 QString Chess::getTableData()

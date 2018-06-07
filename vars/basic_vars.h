@@ -4,8 +4,7 @@
 #pragma once
 #include <QString>
 
-//future: w zasadzie folder vars/ mógłby nie istnieć, jeżeli każda większa klasa miała by...
-//...swój folder podklas
+//future: this dir may not exists, if every class would have its own dir
 
 const bool SHOW_ERRORS = true;
 const bool PRINT_DEBUG = true;

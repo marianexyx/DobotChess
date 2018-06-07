@@ -26,16 +26,16 @@ public:
     void searchDevices();
 
 private:
-    QByteArray QByteA_data; //tablica niezorganizowanych danych przypływających z usb
+    QByteArray QByteA_data; //array for packets received from usb
 
-    void receive(); //odbieranie wiadomości z usb
+    void receive();
 
 public slots:
-   void portIndexChanged(int nIndex); //zmiana/wybór portu
+   void portIndexChanged(int nIndex);
 
 private slots:
-    //void portIndexChanged(int index); //zmiana/wybór portu
-    void readUsbData(); //zczytywanie danych lecących asynchronicznie z usb
+    //void portIndexChanged(int index);
+    void readUsbData();
 
 signals:
     void addTextToLogPTE(QString, LOG);

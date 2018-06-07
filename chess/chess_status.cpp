@@ -71,7 +71,7 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 
 bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
 {
-    //todo: a co jeśli zbijanie będzie się odbywać razem z promocją?
+    //todo: and what if move contains remove, and promotion?
     if (QStrMoveToTest.length() != 4) return false;
 
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);

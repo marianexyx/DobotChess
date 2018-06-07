@@ -45,7 +45,7 @@ private:
     ChessConditions* _pConditions;
     ChessMovements* _pMovements;
 
-    GAME_STATUS _ChessGameStatus; //todo: wyświetlać w pętli w tytule okna stan gry
+    GAME_STATUS _ChessGameStatus; //todo: print in loop game status in form title
     clientRequest _request;
 
     //communication methods
@@ -75,9 +75,8 @@ public:
 
     void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }
 
-    //todo: friends to rest of ingredients. jeżeli cała klasa to friend, to nie potrzebuje...
-    //...poniższych funkcji
-
+    //todo: friends to rest of ingredients. if whole class is friend, then getters...
+    //...below are useless
     GAME_STATUS getGameStatus() const { return _ChessGameStatus; }
     clientRequest getLastRequest() const { return _request; }
 

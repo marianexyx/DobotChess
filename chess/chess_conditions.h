@@ -7,8 +7,7 @@
 #include "client.h"
 #include "chess/chess_status.h"
 
-//future: wszystkie errory zapisywać w plikach z logami, z oznaczeniami kto, co, kiedy...
-//...wysyłał i w jakich okolicznościach
+//future: save all errors in log file with all necessary data
 
 class ChessConditions
 {
@@ -25,8 +24,8 @@ private:
     bool isSenderAppropriate(Client *pSender, REQUEST_TYPE Type);
     bool isThereAnySpecialConditionBeenMet(Client *pSender, clientRequest request);
 
-    //todo: jak publiczność jest załatwiana pomiędzy klasami chess? tak jak tu wszędzie? wydaje...
-    //...się ttuaj że to działa
+    //todo: how publicity is taking care of between classes? just like here? looks...
+    //...like it works here
 //public:
     ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 

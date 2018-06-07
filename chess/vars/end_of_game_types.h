@@ -18,7 +18,7 @@ enum END_TYPE
 
 inline QString endTypeAsQstr(END_TYPE ET)
 {
-    //future: to muszą być liczby dla strony
+    //future: change strings for endian node for cumminicating with site
     switch(ET)
     {
     case ET_WHIE_WON: return "wWon";

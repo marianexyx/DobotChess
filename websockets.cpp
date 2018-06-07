@@ -23,7 +23,7 @@ Websockets::~Websockets()
 {
     _pWebSocketServer->close();
 
-    //future: póki mam jednen obiekt/ramię to nie jest mi to potrzebne
+    //future: not needed for just one instance of class
     //qDeleteAll(_pClientsList.begin(), _pClientsList.end());
 }
 
@@ -40,11 +40,11 @@ void Websockets::onNewConnection()
     _pClientsList->showClientsInUI();
 }
 
-//future: Q_FOREACH (QWebSocket *pNextClient, _pClientsList) ma być depreciated
-//na korzyść: "for (QWebSocket *pClient : qAsConst(_pClientsList))"
-//póki nie zmieniam wersji to może tak zostać
+//future: Q_FOREACH (QWebSocket *pNextClient, _pClientsList) will be depreciated...
+//...to: "for (QWebSocket *pClient : qAsConst(_pClientsList))".
+//it can be this way in old QT
 
-//TODO: obsuga komend serwisowych przez websockety
+//TODO: let websockets service the service messages
 
 void Websockets::receivedMsg(QString QStrMsg)
 {    

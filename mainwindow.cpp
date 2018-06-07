@@ -60,7 +60,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
             this, SLOT(showBoardInUI(QString)));
     connect(_pBoardRemoved, SIGNAL(showBoardInUI(QString)),
             this, SLOT(showBoardInUI(QString)));
-    connect(_pBoardChenard, SIGNAL(showBoardInUI(QString)), //todo: zbędny board
+    connect(_pBoardChenard, SIGNAL(showBoardInUI(QString)), //todo: useless board
             this, SLOT(showBoardInUI(QString)));
     connect(_pChess, SIGNAL(showLegalMovesInUI(QStringList)),
             this, SLOT(showLegalMovesInUI(QStringList)));
@@ -93,7 +93,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
 
     this->initControl(); //init dobot JOG control
 
-    //future: narobić tych tooltipów
+    //future: make many tooltips
     ui->directTcpMsgCheckBox->setToolTip("//todo:");
     ui->emulatePlayerMsgLineEdit->setToolTip("send msg to Websockets::receivedMsg");
     ui->sendSimulatedMsgBtn->setToolTip("f.e.: 'e2' or 'e2r' or 'e2e4");
@@ -133,10 +133,10 @@ void MainWindow::setAxisLabelText(QString QStrAxisLabelText, char chAxis)
 void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
                                 int nCoreIdLeft, int nCoreNextId)
 {
-    if (nSpaceLeft == 0) nSpaceLeft = 1; //to tylko dla tymczasowego zblokowania...
-    //...wyskakującego warninga o unused parameter, póki nie wprowadzę tej funkcji
+    if (nSpaceLeft == 0) nSpaceLeft = 1;  //future: it's only for temporary block...
+    //...warning about unused parameter, till i will not check this function
     //ui->DobotQueuedCmdLeftSpaceLabel->
-    //setText(QString::number(nSpace)); //future: spróbować samemu albo czekać na update
+    //setText(QString::number(nSpace)); //future: make it by myself, or wait for update
     ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
     ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
@@ -285,7 +285,7 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
     scroll_logPTE->setValue(scroll_logPTE->maximum());
 
-    //future: wszystkie debugi i logi zapisywać do plików txt
+    //future: all logs and debugs write to txt files (am i sure about this?)
 }
 
 void MainWindow::initControl() {
@@ -398,7 +398,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldFrom);
             }
         }
-        else if (QStrServiceMove.length() == 4) //todo: nie zadziałało chyba to
+        else if (QStrServiceMove.length() == 4) //todo: propably this didn't work well
         {
             if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
             {
@@ -559,7 +559,7 @@ void MainWindow::on_startGmPosBtn_clicked()
     { //if actual point is +/-3 near home point
         _pPieceController->clearLastPos();
 
-            //future: nieładny zawijaniec przez klasy:
+        //future: not cool code below
         this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());

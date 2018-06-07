@@ -22,11 +22,10 @@ private:
     QTcpSocket* socket;
     QList<TcpMsgMetadata> TCPMsgsList;
 
-    bool _bWaitingForReadyRead; //flaga dzięki której zablokujemy możliwość wykonywania od razu...
-    //...zapytania z kolejki zapytań do TCP jeżeli aktualnie jest przetwarzane jakieś zapytanie...
-    //...na którego odpowiedź(przetworzenie) z TCP czekamy
+    bool _bWaitingForReadyRead;  //this flag blocks sending next msg to tcp from...
+    //...queue, if previous msg hasn't been processed
     int64_t _n64CmdID;
-    void doTcpConnect(); //todo: program czeka aż połączenie się wykona- zwątkować to
+    void doTcpConnect();
 
 private slots:
     void displayError(QAbstractSocket::SocketError socketError);
@@ -39,7 +38,7 @@ public:
     TCPMsgs();
 
 public slots:
-    void queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd);
+    void queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd); //todo: thread this
 
 signals:
     void addTextToLogPTE(QString, LOG);

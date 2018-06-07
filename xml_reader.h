@@ -11,7 +11,7 @@
 
 //https://www.youtube.com/watch?v=NzQwJdcdRKE&index=95&list=PL2D1942A4688E9D63
 
-//todo: nic nie testowane
+//todo: it hasn't been really tested
 class XmlReader
 {
 private:

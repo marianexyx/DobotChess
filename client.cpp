@@ -1,14 +1,14 @@
 #include "client.h"
 
-//future: jak bardzo zachcę, to mogę zagęścić kod większości metod, bo to zgrubsza to samo
+//future: class can be shortened highly, cuz most of funtions are pretty the same
 void Clients::newClient(QWebSocket& clientSocket)
 {
     Client newClient;
     newClient.ID = this->getNextAvailableClientID();
-    newClient.socket = &clientSocket; //future: jeżeli ten parametr jest jako const, to nie...
-    //...zadziała. dlaczego? przecież tylko przypisuje, a nie zmieniam
+    newClient.socket = &clientSocket; //future: if this param is const, then...
+    //...this won't work? why?
     newClient.name.clear();
-    newClient.queue = 0; //todo: wcześniej było -1. będzie ok?
+    newClient.queue = 0; //todo: earlier -1 was here. will be good now?
     newClient.isStartClickedByPlayer = false;
     newClient.type = PT_NONE;
 
@@ -241,8 +241,7 @@ void Clients::removeClientFromList(const Client& client)
     {
         if (cl == client)
         {
-            cl.socket->deleteLater(); //todo: jest sens to usuwać skoro to nie jest...
-            //...wskaźnik? a może to musi być wskaźnik by dało się to wogle usunąć?
+            cl.socket->deleteLater();
 
             if(!_clients.removeOne(cl))
                 qDebug() << "ERROR: Clients::removeClientFromList(): "
@@ -252,7 +251,7 @@ void Clients::removeClientFromList(const Client& client)
 
             //info: erlier working code in chess class:
             /*for(int i = 0; i < _pClientsList->getClientsList().count(); ++i)
-            { //nie męczyć się teraz z obsługą removeAll na structurach
+            { //don't bother yourself with trying to removeAll on structs
               if(_pClientsList->getClientsList().at(i).socket == pClient->socket)
               {
                 _pClientsList->getClientsList().removeAt(i);

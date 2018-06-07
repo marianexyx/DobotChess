@@ -14,7 +14,7 @@
 
 enum BOARD_POINTS { BP_MIN, BP_MAX, BP_MIDDLE, BP_RETREAT_LEFT, BP_RETREAT_RIGHT };
 
-//future: ta klasa może mieć swój podfolder razem z klasami piece, field i enumami
+//future: this class can have its own dir amongfull classes like piece, field; also enums
 class Chessboard: public QObject
 {
     Q_OBJECT
@@ -38,18 +38,18 @@ private:
 
 public:
     Chessboard(BOARD BoardType, bool bBoardIsReal = true,
-               RealVars gameConfigVars = RealVars());  //todo: friend dla chess
+               RealVars gameConfigVars = RealVars());  //todo: friend for chess
     ~Chessboard();
 
     const float fMaxPieceHeight;
 
     bool isBoardReal(bool bErrorLog = false);
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
-    //todo: friend dla chwytaka?
+    //todo: friend for gripper?
     void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
     BOARD getBoardType() const { return _boardType; }
     Point3D getBoardPoint3D(BOARD_POINTS BP) const;
-    //todo: dodać sprawdzenia do getFieldów przeciwko nullptr: isPosSet
+    //todo: add checks for getFields against nullptrs: isPosSet
     Field* getField(short sFieldNr) const { return _pField[sFieldNr-1]; }
     Field* getField(PosOnBoard Pos) const { return _pField[Field::nr(Pos)-1]; }
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);

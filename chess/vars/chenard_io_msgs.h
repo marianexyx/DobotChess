@@ -51,7 +51,6 @@ inline QString chenardMsgTypeAsQStr(CHENARD_MSG_TYPE CMT)
     }
 }
 
-//todo: zrozumieć dlaczego w tych miejscach używam inline
 inline bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bool bErrorLog = false)
 {
     bool bReturn;

@@ -5,8 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    //todo: niektóre obiekty są pośrednie i mogę być tworzone wewnątrz innych, a potem...
-    //...przekazywane dalej
+    //todo: some classes are intermediate, and can be created inside others, then parsed futher
     XmlReader xmlReader001("C:/DobotChess/xmlGameConfig.xml");
     RealVars gameConfigVars001 = xmlReader001.getRealVars();
     Clients ClientsList;
@@ -19,9 +18,9 @@ int main(int argc, char *argv[])
                       BoardMain001.getBoardPoint3D(BP_RETREAT_RIGHT));
     PieceController PieceController001(&DobotArm001, &BoardMain001, &BoardRemoved001);
     Websockets Websockety(&ClientsList, 1234);
-    //TODO: odpalać server websocket po konstruktorze mainwindow
+    //TODO: turn on websocket server after mainwindow contructor
     TCPMsgs TCPMsgs001;
-    //todo: jak wrzucam poniżej PieceController001, to masę wskaźników mogę z niego wyciągać
+    //todo: if i parse PieceController001, then many pointers can be parsed futher automatically
     Chess Chess001(&ClientsList, &DobotArm001, &PieceController001, &BoardMain001,
                    &BoardRemoved001, &BoardChenard001, &Websockety, &TCPMsgs001, WEBSITE);
     MainWindow mainwindow(&Websockety, &PieceController001, &BoardMain001, &BoardRemoved001,

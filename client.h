@@ -77,7 +77,7 @@ public:
     int64_t getClientID(const Client& client);
     int64_t getNextAvailableClientID();
 
-    //void testQueuedClients(); //test jednostkowy
+    //void testQueuedClients(); //unit test
 
 public slots:
     void showClientsInUI();

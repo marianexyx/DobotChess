@@ -4,7 +4,7 @@ DobotServo::DobotServo(/*Dobot* pDobot,*/ float fGripperOpened, float fGripperCl
     _fGripOpened(fGripperOpened),
     _fGripClosed(fGripperClosed)
 {
-    //_pDobot = pDobot; //todo: czy to zbędne? tak
+    //_pDobot = pDobot; //todo: is this useless? yep
     //_pQueue = _pDobot->getQueuePointer();
     qDebug() << "DobotServo::DobotServo(): _fGripOpened =" << _fGripOpened
              << ", _fGripClosed =" << _fGripClosed;
@@ -40,7 +40,7 @@ void DobotServo::checkPWMForErrors()
     }
 }
 
-void DobotServo::changeGripperAngle(float fDutyCycle) //info: powinno działać
+void DobotServo::changeGripperAngle(float fDutyCycle) //info: that should work
 {
     if (fDutyCycle != 0)
         _gripper.dutyCycle = fDutyCycle;

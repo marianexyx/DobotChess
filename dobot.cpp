@@ -14,8 +14,8 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
     
     _bConnectedToDobot = false;
 
-    Point3D fakeMid(200,0,25); //todo: liczyć (dlaczego to trzeba było wogle robić?)
-    _lastGivenPoint = fakeMid; //todo: pierwszy punkt jako middle above
+    Point3D fakeMid(200,0,25); //todo: its old? useless?
+    _lastGivenPoint = fakeMid; //todo: make first point as a middle above
 
     _home.x = gameConfigVars.home.x;
     _home.y = gameConfigVars.home.y;
@@ -42,7 +42,7 @@ Dobot::~Dobot()
     delete _pServo;
 }
 
-void Dobot::onPeriodicTaskTimer() //todo zmienić nazwy timerów
+void Dobot::onPeriodicTaskTimer() //todo: change timers names
 {
     PeriodicTask(); //start arm task loop. non-return funcion
     //find timer by name:
@@ -98,8 +98,8 @@ void Dobot::saveActualDobotPosition()
 
 bool Dobot::bIsMoveInAxisRange(Point3D point)
 {
-    if (point.x > 300) qDebug() << "todo: ogarnac blokady";
-    //todo: ciągnąć z xml i pouswstawiać to tam gdzie trzeba
+    if (point.x > 300) qDebug() << "todo: comprehend locks";
+    //todo: get them from xml
     return true;
 }
 
@@ -141,15 +141,15 @@ void Dobot::onConnectDobot()
 
         emit this->addTextToLogPTE("Dobot connected \n", LOG_DOBOT);
 
-        //todo: timery w osobnych funkcjach
+        //todo: make timers in seperate functions
         //create dobot periodic timer
         QTimer *periodicTaskTimer = new QTimer(this);
         periodicTaskTimer->setObjectName("periodicTaskTimer");
         connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
         periodicTaskTimer->setSingleShot(true);
         periodicTaskTimer->start(5);
-        //future: ciągle dostaję błąd: "QObject::startTimer: Timers can only...
-        //...be used with threads started with QThread", jednak ciągle to działa.
+        //future: i'm still getting warning in debug: "QObject::startTimer: Timers...
+        //...can onlybe used with threads started with QThread", yet it still works
 
         //create dobot pose timer
         QTimer *getPoseTimer = new QTimer(this);
@@ -171,7 +171,7 @@ void Dobot::onConnectDobot()
         DisconnectDobot();
     }
 
-    emit RefreshDobotButtonsStates(_bConnectedToDobot); //todo: nazwa
+    emit RefreshDobotButtonsStates(_bConnectedToDobot); //todo: change name
 }
 
 void Dobot::initDobot()
@@ -262,8 +262,8 @@ void Dobot::sendMoveToArm(DobotMove move)
     {
         //todo: zabronić oś z jezeli jest zbyt nisko
         PTPCmd moveAsPtpCmd;
-        moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //ruch typu kartezjański liniowy
-        //future: w dobocie była taka opcja po patchu: CPAbsoluteMode
+        moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian linear
+        //future: dobot may have better way of movemenst. maybe CPAbsoluteMode?
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
@@ -279,12 +279,12 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_WAIT:
         _pServo->wait(move.ID);
         break;
-    case DM_CALIBRATE: //future: albo to jest home, albo calibrate
+    case DM_CALIBRATE: //future: this is home or calibrate? mess name
     {
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
         HOMECmd HOME;
-        HOME.reserved = 1; //todo: o co tutaj dokładnie chodzi z tym indexem?
+        HOME.reserved = 1; //todo: i dont get this "1" ID. seen somewhere propably
         isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
     }
         break;
@@ -296,7 +296,7 @@ void Dobot::sendMoveToArm(DobotMove move)
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
                               /*= VM_NONE*/, bool bRetreat /*= false*/)
 {
-    //todo: przywrócić później zabezpiecznie 3 osi
+    //todo: set back 3rd axis secure
     //if (_bConnectedToDobot && this->isPointTotallyDiffrent(dest3D)) return;
 
     if (VertMove == VM_GRAB)

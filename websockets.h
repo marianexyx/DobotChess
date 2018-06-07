@@ -24,14 +24,14 @@ private:
     QWebSocketServer* _pWebSocketServer;
     Clients* _pClientsList;
 
-private Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
+private Q_SLOTS: //Q_SLOTS is for 3rd party mechanisms, that want use slots
     void socketDisconnected();
 
 public:
     Websockets(Clients* pClientsList, quint16 port, QObject* parent = Q_NULLPTR);
     ~Websockets();
 
-public Q_SLOTS: //Q_SLOTS jest dla mechanizmow "3rd party", ktore chca uzywac slotow
+public Q_SLOTS:
     void receivedMsg(QString QStrMsg);
     void onNewConnection();
 

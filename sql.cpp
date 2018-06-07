@@ -17,7 +17,7 @@ void sql::test()
     //https://www.youtube.com/watch?v=LiHHm7cd5Bs&list=PL2D1942A4688E9D63&t=26
 
     /*if(!db.open())
-        qDebug() << "Nieudane polaczenie z baza danychn";
+        qDebug() << "Failed to connect with SQL database";
     else
     {
         QStringList tables = db.tables();
@@ -25,13 +25,13 @@ void sql::test()
             qDebug() << tables.at(i);
 
         QSqlQuery pobieranie;
-        if(!pobieranie.exec("SELECT * FROM Stats")) //exec wykonuje zapytanie do bazy
-            qDebug() << "Brak rekordów w tabeli Stats";
+        if(!pobieranie.exec("SELECT * FROM Stats")) //exec is making query for database
+            qDebug() << "No records in Stats table";
 
         while(pobieranie.next())
         {
-            int d = pobieranie.value("Deaths").toInt(); //nazwa kolumny
-            int k = pobieranie.value(2).toInt(); //nr kolumny licząc od 0
+            int d = pobieranie.value("Deaths").toInt(); //name of the column
+            int k = pobieranie.value(2).toInt(); //nr of the column (from 0)
 
             qDebug() << k << " / " << d;
         }

@@ -119,8 +119,8 @@ void DobotQueue::removeOldQueuedMovesFromCore()
     if (!_executedArmCmds.empty() && _un64RealTimeDobotActualID > _executedArmCmds.first().ID)
     {
         _executedArmCmds.removeFirst();
-        emit this->showOnDobotQueuedCmdsList(_executedArmCmds); //todo: automatycznie niech..
-        //...wkleja tutaj listę, by nie trzeba było zawsze wpisywać parametru
+        emit this->showOnDobotQueuedCmdsList(_executedArmCmds); //todo: let this parameter...
+        //...be using inside the function, without passing it every time
     }
 }
 
@@ -164,7 +164,7 @@ void DobotQueue::retreat(Point3D lastPoint)
     _bRetreat = false; //prevent unwanted retreats
 }
 
-//future: póki co nie ma w dobocie (w dll) tej funkcji. Może z czasem dodadzą.
+//future: dobot wanted to introduce this function in dll, but till now it isn't
 /*bool DobotQueue::isDobotCmdsLeftSpaceEmpty()
 {
     GetQueuedCmdLeftSpace(&_unQueuedCmdLeftSpace);

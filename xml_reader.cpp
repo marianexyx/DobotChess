@@ -134,7 +134,7 @@ void XmlReader::readGripper(QDomNodeList gripper)
 
 bool XmlReader::isVarsStructInLimits()
 {
-    //todo: wprowdzić kilka dodatkowych warunków sprawdzających
+    //todo: add few more tests and locks
     if (this->isPieceHeightInLimits(_vars.fPieceHeight) &&
             isPointInLimits(_vars.home) &&
             isPointInLimits(_vars.homeToMiddleAbove) &&

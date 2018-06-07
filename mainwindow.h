@@ -57,7 +57,7 @@ private slots:
     void onJOGCtrlBtnPressed(int nID);
     void onJOGCtrlBtnReleased();
 
-    //sloty do używania GUI MainWindow
+    //slots for GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showBoardInUI(QString QStrBoard);

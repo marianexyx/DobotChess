@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <QString>
 
-//todo: zastanowić sę gdzie umieścić tą klasęm zanim na dobre zakotwiczę ją w programie
+//todo: think where to put this class before i will anchor this in program
 
 class sql
 {

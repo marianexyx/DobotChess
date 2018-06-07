@@ -18,7 +18,8 @@ struct ServoArduino
     bool isGripperOpen;
 };
 
-//future: czy servo (nazwę) traktować jako po prostu gripper?
+//future: change class name for "gripper"? it's not just servo anymore
+
 class DobotServo
 {
 private:
@@ -39,7 +40,7 @@ public:
     void openGripper(uint64_t ID);
     void closeGripper(uint64_t ID);
     void wait(uint64_t ID);
-    //void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType); //todo: zbędne(?)
+    //void addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType); //todo: useless(?)
 
     bool isServoListEmpty() const { return 1 /*_arduinoGripperStates.isEmpty() ? true : false*/; }
 };

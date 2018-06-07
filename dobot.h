@@ -85,7 +85,7 @@ public slots:
     void onPeriodicTaskTimer();
     void onGetPoseTimer();
     void showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
-                             int nCoreIdLeft, int nCoreNextId);  //todo: to wcale nie są inty
+                             int nCoreIdLeft, int nCoreNextId);  //todo: those aren't ints
     void addTextToLogPTEInUI(QString QStrTxt, LOG log);
     void showActualDobotQueuedCmdIDListPTE(QList<DobotMove> list)
     { emit this->showActualDobotQueuedCmdIDList(list); }

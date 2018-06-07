@@ -39,8 +39,7 @@ public:
     void resetStatusData();
 
     void promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType);
-    //todo: settery jako friend dla chess? sprawdzić czy większośc metod dostepowych nie jest...
-    //...używanych tylko w tej klasie
+    //todo: make setters as "friend" for chess class? check for this
     void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
     void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
     void setMove(QString QStrMove);

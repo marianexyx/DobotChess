@@ -147,7 +147,8 @@ void Chessboard::calculateMarginal3DValues()
             _maxBoard.x = _pField[i]->getLocation3D().x;
         if (_pField[i]->getLocation3D().y > _maxBoard.y)
             _maxBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z > _maxBoard.z) //fMaxPieceHeight się skraca
+        //fMaxPieceHeight on two sides of the equation is shortened:
+        if (_pField[i]->getLocation3D().z > _maxBoard.z)
             _maxBoard.z = _pField[i]->getLocation3D().z;
     }
     _maxBoard.z += (double)fMaxPieceHeight;
@@ -163,7 +164,7 @@ void Chessboard::calculateMiddleAbovePoint()
 void Chessboard::calculateRetreatPoints()
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = -90; //future: ciągnąć z zewnątrz lub obliczać
+    _retreatLeft.y = -90; //future: get those vals from xml, or calculate it
     _retreatRight.y = 90;
     _retreatLeft.z = _retreatRight.z = _maxBoard.z;
 }
