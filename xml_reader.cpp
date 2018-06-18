@@ -114,7 +114,6 @@ void XmlReader::readPoints(QDomNodeList points)
 
 void XmlReader::readGripper(QDomNodeList gripper)
 {
-    //qDebug() << "gripper amount =" << gripper.count();
     for(int i=0; i<gripper.count(); i++)
     {
         QDomNode stateNode = gripper.at(i);

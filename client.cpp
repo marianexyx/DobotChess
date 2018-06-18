@@ -296,10 +296,14 @@ void Clients::resetPlayersStartConfirmInfo()
         this->setClientStartConfirmation(PT_BLACK, false);
 }
 
-void Clients::clearChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair)
+void Clients::putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair)
 {
-    qDebug() << "Clients::clearChairAndPutThereNextQueuedClientIfExist()";
-    this->clearPlayerType(Chair);
+    if (!this->isPlayerChairEmpty(Chair))
+    {
+        qDebug() << "ERROR: Clients::PutOnChairNextQueuedClientIfExist():"
+                 << playerTypeAsQStr(Chair) << "chair isn't empty";
+        return;
+    }
 
     if (this->getQueuedClientsList() != QUEUE_EMPTY)
     {
@@ -469,24 +473,37 @@ QString Clients::getQueuedClientsList()
     {
         do
         {
+            //find biggest queued nr, but smaller then last one
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl.queue > maxQueue && cl.queue < lastBiggestQueue)
+                {
+                    qDebug() << "Clients::getQueuedClientsList(): cl.queue > maxQueue"
+                                " && cl.queue < lastBiggestQueue." << cl.queue
+                             << ">" << maxQueue << "&&" << cl.queue  << "<" <<
+                                lastBiggestQueue;
                     maxQueue = cl.queue;
+                    qDebug() << "Clients::getQueuedClientsList(): new max queue ="
+                             << maxQueue;
+                }
             }
 
+            //remember last biggest client for next iteration
             lastBiggestQueue = maxQueue;
 
+            //add last biggest found queued client name to string for return
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl.queue == maxQueue)
                 {
                     qDebug() << "Clients::getQueuedClientsList(): next queued "
-                                "client =" << cl.name;
+                                "client =" << cl.name << ", his queue nr ="
+                             << cl.queue;
                     QStrQueuedClients = cl.name + "," + QStrQueuedClients;
-                    maxQueue = 0;
                 }
             }
+            maxQueue = 0; //clear for next iteration
+
             if (nLoopBreakingCounter > nNumberOFClients + 1)
             {
                 qDebug() << "ERROR: Clients::getQueuedClientsList(): incorrect loop "
@@ -495,6 +512,7 @@ QString Clients::getQueuedClientsList()
                 break;
             }
             nLoopBreakingCounter++;
+
         } while (lastBiggestQueue != minQueue);
     }
     if (QStrQueuedClients.isEmpty())
@@ -502,6 +520,7 @@ QString Clients::getQueuedClientsList()
     else //remove last comma
         QStrQueuedClients = QStrQueuedClients.left(QStrQueuedClients.length() - 1);
 
+    qDebug() << "Clients::getQueuedClientsList(): QStrQueuedClients =" << QStrQueuedClients;
     return QStrQueuedClients;
 }
 
@@ -542,7 +561,9 @@ bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
     return true;
 }
 
-bool Clients::isGameTableOccupied()
+bool Clients::isGameTableOccupied() //todo: occupied is when 1 or 2 players are on chairs?..
+//... change funtion logic for checking for free/empty table
+//...or make 2 functions: "isEmpty", and "fullyOccupied"
 {
     if (this->isPlayerChairEmpty(PT_WHITE) || this->isPlayerChairEmpty(PT_BLACK))
         return false;

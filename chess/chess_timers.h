@@ -28,8 +28,8 @@ private:
     void stopBoardTimers();
 
 private slots:
-    void whiteTimeOut() {emit this->timeOutPlayer(PT_WHITE); }
-    void blackTimeOut() {emit this->timeOutPlayer(PT_BLACK); }
+    void whiteTimeOut() { emit this->timeOutPlayer(PT_WHITE); }
+    void blackTimeOut() { emit this->timeOutPlayer(PT_BLACK); }
     void updateTimeLabels();
     void startTimeOut();
 

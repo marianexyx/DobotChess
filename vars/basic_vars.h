@@ -73,7 +73,7 @@ inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
     }
 }
 
-inline bool isPointInLimits(Point3D point)
+inline bool isPointInLimits(Point3D point) //todo: xml
 {
     Point3D minErrorCorner(100.f, -180.f, -25.f);
     Point3D maxErrorCorner(340.f, 180.f, 50.f);

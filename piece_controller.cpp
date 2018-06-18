@@ -168,5 +168,5 @@ QString PieceController::getPromotedPawnsPositions()
                     QStrPromotedPawnsPositions.length() - 1); //delete last spacebar
     }
 
-    return QStrPromotedPawnsPositions; //"b2:Q c7:q g5:K"
+    return QStrPromotedPawnsPositions; //f.e.: "b2:Q c7:q g5:N e1:R d4:b"
 }

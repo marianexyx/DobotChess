@@ -26,7 +26,7 @@ inline QString endTypeAsQstr(END_TYPE ET)
     case ET_DRAW: return "draw";
     case ET_GIVE_UP: return "giveUp";
     case ET_SOCKET_LOST: return "socketLost";
-    case ET_TIMEOUT_GAME: return "timeOutGame";
+    case ET_TIMEOUT_GAME: return "timeOut";
     default:
         qDebug() << "ERROR: endTypeAsQstr(): wrong arg =" << ET;
         return "";

@@ -45,7 +45,7 @@ public:
     void removeClientFromList(const Client& client);
     void removeClientFromQueue(const Client& client);
     void resetPlayersStartConfirmInfo();
-    void clearChairAndPutThereNextQueuedClientIfExist(PLAYER_TYPE Chair);
+    void putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
     QList<Client> getClientsList() const
     {

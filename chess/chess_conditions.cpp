@@ -116,6 +116,7 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
     case RT_PROMOTE_TO:
         if (Status == GS_TURN_WHITE_PROMOTE || Status == GS_TURN_BLACK_PROMOTE) return true;
         else return false;
+    //todo: let clients to be queued, while game is off, but waiting for players to start game
     case RT_QUEUE_ME: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
     default: return true;
     }

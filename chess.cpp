@@ -491,6 +491,9 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
 
 void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
 {
+    _pClientsList->clearPlayerType(PT_WHITE);
+    _pClientsList->clearPlayerType(PT_BLACK);
+
     switch(WhoWon)
     {
     case ET_WHIE_WON:
@@ -503,8 +506,8 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
                         " PT_NONE if not disconnected";
             return;
         }
-        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
-        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+        _pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE);
+        _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
         break;
     case ET_GIVE_UP:
     case ET_SOCKET_LOST:
@@ -515,9 +518,9 @@ void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
             return;
         }
         if (PlayerToClear == PT_WHITE)
-            _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+            _pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE);
         else if (PlayerToClear == PT_BLACK)
-            _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+            _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
         else
         {
             qDebug() << "ERROR: Chess::changePlayersOnChairs(): wrong player type:" << PlayerToClear;
@@ -558,6 +561,7 @@ QString Chess::getTableData()
     if (_pPieceController->isAnyPawnPromoted())
         QStrTableData += "\",\"promoted\":\""  +
                 _pPieceController->getPromotedPawnsPositions();
+    //QStrTableData += "\",\"promoted\":\"b2:Q c7:q g5:N b2:Q c7:q g5:N"; //tests
 
     QStrTableData += "\"}";
 
@@ -565,14 +569,20 @@ QString Chess::getTableData()
     return QStrTableData;
 }
 
-void Chess::timeOutStart()
+void Chess::timeOutStart() //todo: at the end maybe it can be part of Chess::restartGame func?
 {
     _pClientsList->resetPlayersStartConfirmInfo();
 
     if (!_pClientsList->isStartClickedByPlayer(PT_WHITE))
-        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_WHITE);
+    {
+        _pClientsList->clearPlayerType(PT_WHITE);
+        _pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE);
+    }
     if (!_pClientsList->isStartClickedByPlayer(PT_BLACK))
-        _pClientsList->clearChairAndPutThereNextQueuedClientIfExist(PT_BLACK);
+    {
+        _pClientsList->clearPlayerType(PT_BLACK);
+        _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
+    }
 
     if (_pClientsList->isGameTableOccupied())
         _ChessGameStatus = _pTimers->startQueueTimer();
