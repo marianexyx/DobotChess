@@ -9,6 +9,7 @@
 #include <QScrollBar>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include <QTimer>
 #include "DobotDll.h"
 #include "DobotType.h"
 #include "xml_reader.h"
@@ -50,6 +51,8 @@ private:
     Clients* _pClientsList;
     Chess* _pChess;
 
+    QTimer* _titleFormTitle;
+
     void initControl();
 
 private slots:
@@ -65,6 +68,7 @@ private slots:
     void clearBoardInUI();
     void showLegalMovesInUI(QStringList legalMoves);
     void showHistoryMovesInUI(QStringList historyMoves);
+    void changeWindowTitle();
 
     //dobot slots
     void setDobotPTEValidatorsInUI();
@@ -111,6 +115,8 @@ private slots:
     void on_xPTPEdit_textChanged(const QString& QStrTextChanged);
     void on_yPTPEdit_textChanged(const QString& QStrTextChanged);
     void on_zPTPEdit_textChanged(const QString& QStrTextChanged);
+    void on_retreatLeftBtn_clicked();
+    void on_retreatRightBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

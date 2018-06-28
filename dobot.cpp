@@ -328,10 +328,9 @@ bool Dobot::isPointTotallyDiffrent(Point3D point)
     if (point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y
             && point.z != _lastGivenPoint.z)
     {
-        qDebug() << "ERROR: Dobot::isPointTotallyDiffrent(): moves in 3 axis at once "
-                    "are forbidden. point =" << point.x << point.y << point.z
-                 << "_lastGivenPoint =" << _lastGivenPoint.x << _lastGivenPoint.y
-                 << _lastGivenPoint.z;
+        qDebug() << "ERROR: Dobot::isPointTotallyDiffrent(): moves in 3 axis "
+                    "at once are forbidden. point =" << point.getAsQStr()
+                 << "_lastGivenPoint =" << _lastGivenPoint.getAsQStr();
         return true;
     }
     else return false;

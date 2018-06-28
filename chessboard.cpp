@@ -164,8 +164,8 @@ void Chessboard::calculateMiddleAbovePoint()
 void Chessboard::calculateRetreatPoints()
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = -90; //future: get those vals from xml, or calculate it
-    _retreatRight.y = 90;
+    _retreatLeft.y = -100; //future: get those vals from xml, or calculate it
+    _retreatRight.y = 100;
     _retreatLeft.z = _retreatRight.z = _maxBoard.z;
 }
 
@@ -185,12 +185,6 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
 
 void Chessboard::clearField(Field* pField, bool bErrorLog /*= false*/)
 {
-    /*short sPieceNr = (pField->getPieceOnField() == nullptr ?
-                          0 : pField->getPieceOnField()->getNr());
-    qDebug() << "Chessboard::clearField(): clearing field nr ="
-             << pField->getNrAsQStr() << ". Old piece nr ="
-             << (sPieceNr == 0 ? "0" : Piece::name(sPieceNr))
-             << "(nr =" << (sPieceNr == 0 ? "0" : QString::number(sPieceNr)) << ")";*/
     pField->clearField(bErrorLog);
 }
 
@@ -264,4 +258,16 @@ Point3D Chessboard::getBoardPoint3D(BOARD_POINTS BP) const
     default: qDebug() << "ERROR: Chessboard::getBoardPoint3D(): unknown bp:" << BP;
         return _middleAbove;
     }
+}
+
+Field* Chessboard::getField(short sFieldNr) const
+{
+    if (Field::isInRange(sFieldNr)) return _pField[sFieldNr-1];
+    else return nullptr;
+}
+
+Field* Chessboard::getField(PosOnBoard Pos) const
+{
+    if (Pos.isPosSet(SHOW_ERRORS)) return _pField[Field::nr(Pos)-1];
+    else return nullptr;
 }

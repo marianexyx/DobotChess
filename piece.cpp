@@ -133,8 +133,6 @@ Piece::Piece(short sPieceID)
     else return -1;
 }
 
-/*static*/ PosOnBoard Pos(short sPieceNr); //todo: co to??
-
 /*static*/ short Piece::startFieldNr(short sPieceNr)
 {
     if (!Piece::isInRange(sPieceNr))

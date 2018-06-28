@@ -110,14 +110,14 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
         return false;
     case RT_NEW_GAME: return Status == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS ? true : false;
     case RT_MOVE: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
-    case RT_GIVE_UP: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
     case RT_SIT_ON: return Status == GS_TURN_NONE_WAITING_FOR_PLAYERS ? true : false;
-    case RT_STAND_UP: return whoseTurnFromGameStatus(Status) == NO_TURN ? true : false;
     case RT_PROMOTE_TO:
         if (Status == GS_TURN_WHITE_PROMOTE || Status == GS_TURN_BLACK_PROMOTE) return true;
         else return false;
-    //todo: let clients to be queued, while game is off, but waiting for players to start game
-    case RT_QUEUE_ME: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
+    case RT_QUEUE_ME:
+        if (whoseTurnFromGameStatus(Status) != NO_TURN ||
+                Status == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS) return true;
+        else return false;
     default: return true;
     }
 }
@@ -139,7 +139,6 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
         break;
     case RT_NEW_GAME:
     case RT_MOVE:
-    case RT_GIVE_UP:
     case RT_STAND_UP:
     case RT_PROMOTE_TO:
         if (bSittingOnChair && !bInQueue) bSuccess = true;

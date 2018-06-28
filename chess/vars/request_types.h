@@ -11,7 +11,6 @@ enum REQUEST_TYPE
     RT_NEW_GAME,
     RT_MOVE,
     RT_GET_TABLE_DATA,
-    RT_GIVE_UP,
     RT_SIT_ON,
     RT_STAND_UP,
     RT_IM,
@@ -36,7 +35,6 @@ inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = fa
     if (QStrRequest == "newGame") return RT_NEW_GAME;
     else if (QStrRequest.left(4) == "move") return RT_MOVE;
     else if (QStrRequest == "getTableDataAsJSON") return RT_GET_TABLE_DATA;
-    else if (QStrRequest == "giveUp") return RT_GIVE_UP;
     else if (QStrRequest.left(5) == "sitOn") return RT_SIT_ON;
     else if (QStrRequest.left(7) == "standUp") return RT_STAND_UP;
     else if (QStrRequest.left(2) == "im") return RT_IM;
@@ -60,7 +58,6 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     case RT_NEW_GAME: return "newGame";
     case RT_MOVE: return "move";
     case RT_GET_TABLE_DATA: return "getTableDataAsJSON";
-    case RT_GIVE_UP: return "giveUp";
     case RT_SIT_ON: return "sitOn";
     case RT_STAND_UP: return"standUp";
     case RT_IM: return "im";

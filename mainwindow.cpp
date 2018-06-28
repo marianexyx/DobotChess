@@ -11,7 +11,6 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle(gameStatusAsQStr(GS_TURN_NONE_WAITING_FOR_PLAYERS));
 
     _pDobot = pDobot;
     _pWebSockets = pWebSockets;
@@ -23,6 +22,12 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
     _pUsb = pUsb;
     _pClientsList = pClientsList;
     _pChess = pChess;
+
+    _titleFormTitle = new QTimer();
+    _titleFormTitle->setInterval(200);
+    _titleFormTitle->setSingleShot(false);
+    connect(_titleFormTitle, SIGNAL(timeout()), this, SLOT(changeWindowTitle()));
+    _titleFormTitle->start();
 
     //ui signals to classes
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
@@ -182,6 +187,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->directTcpMsgCheckBox->setEnabled(false);
         ui->moveRestrictionsCheckBox->setEnabled(false);
         ui->middleAboveBtn->setEnabled(false);
+        ui->retreatLeftBtn->setEnabled(false);
+        ui->retreatRightBtn->setEnabled(false);
     }
     else
     {
@@ -217,6 +224,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->directTcpMsgCheckBox->setEnabled(true);
         ui->moveRestrictionsCheckBox->setEnabled(true);
         ui->middleAboveBtn->setEnabled(true);
+        ui->retreatLeftBtn->setEnabled(true);
+        ui->retreatRightBtn->setEnabled(true);
     }
 }
 
@@ -890,4 +899,20 @@ void MainWindow::on_zPTPEdit_textChanged(const QString& QStrTextChanged)
     if (ui->xPTPEdit->text() != NULL || ui->yPTPEdit->text() != NULL  || QStrTextChanged != NULL)
         ui->sendBtn->setEnabled(true);
     else ui->sendBtn->setEnabled(false);
+}
+
+void MainWindow::on_retreatLeftBtn_clicked()
+{
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_RETREAT_LEFT));
+}
+
+void MainWindow::on_retreatRightBtn_clicked()
+{
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_RETREAT_RIGHT));
+}
+
+
+void MainWindow::changeWindowTitle()
+{
+    this->setWindowTitle(gameStatusAsQStr(_pChess->getGameStatus()));
 }

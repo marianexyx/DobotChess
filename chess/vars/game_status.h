@@ -25,11 +25,11 @@ inline QString gameStatusAsQStr(GAME_STATUS GS)
     case GS_TURN_NONE_WAITING_FOR_PLAYERS: return "noTurn_waitingForPlayers";
     case GS_TURN_NONE_WAITING_FOR_START_CONFIRMS: return "noTurn_waitingStartConfirms";
     case GS_TURN_NONE_RESETING: return "noTurn_reseting";
-    case GS_TURN_WHITE: return "noTurn_white";
-    case GS_TURN_WHITE_FIRST_TURN: return "noTurn_white_firtsTurn";
-    case GS_TURN_WHITE_PROMOTE: return "noTurn_white_promote";
-    case GS_TURN_BLACK: return "noTurn_black";
-    case GS_TURN_BLACK_PROMOTE: return "noTurn_black_promote";
+    case GS_TURN_WHITE: return "whiteTurn";
+    case GS_TURN_WHITE_FIRST_TURN: return "whiteTurn_first";
+    case GS_TURN_WHITE_PROMOTE: return "whiteTurn_promote";
+    case GS_TURN_BLACK: return "blackTurn";
+    case GS_TURN_BLACK_PROMOTE: return "blackTurn_promote";
     case GS_ERROR:
     default:
         qDebug() << "ERROR: gameStatusAsQStr(): wrong param:" << GS;

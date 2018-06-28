@@ -45,7 +45,7 @@ private:
     ChessConditions* _pConditions;
     ChessMovements* _pMovements;
 
-    GAME_STATUS _ChessGameStatus; //todo: print in loop game status in form title
+    GAME_STATUS _ChessGameStatus;
     clientRequest _request;
 
     //communication methods
@@ -65,7 +65,7 @@ private:
     void manageMoveRequest(clientRequest request);
     void continueGameplay();
     void restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear = PT_NONE);
-    void changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear);
+    void changePlayersOnChairs();
 
 public:
     Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,

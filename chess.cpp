@@ -94,9 +94,6 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
     case RT_GET_TABLE_DATA:
         this->sendDataToClient(this->getTableData(), client);
         break;
-    case RT_GIVE_UP:
-        this->restartGame(ET_GIVE_UP, client.type);
-        break;
     case RT_SIT_ON:
         _pClientsList->setPlayerType(client, playerTypeFromQStr(_request.param));
         if (_pClientsList->isGameTableOccupied())
@@ -104,10 +101,14 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_STAND_UP:
-        _pClientsList->clearPlayerType(client.type);
-        _pTimers->stopQueueTimer();
-        _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
-        this->sendDataToAllClients(this->getTableData());
+        if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
+        {
+            _pClientsList->clearPlayerType(client.type);
+            _pTimers->stopQueueTimer();
+            _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
+            this->sendDataToAllClients(this->getTableData());
+        }
+        else this->restartGame(ET_GIVE_UP, client.type);
         break;
     case RT_IM:
         this->newClientName(client, _request);
@@ -479,7 +480,7 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
     //...be read from "history"
     _pStatus->resetStatusData();
 
-    this->changePlayersOnChairs(WhoWon, PlayerToClear);
+    this->changePlayersOnChairs();
     this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData(), PlayerToClear));
     _pStatus->clearMove();
 
@@ -489,48 +490,13 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
     this->sendDataToAllClients(this->getTableData());
 }
 
-void Chess::changePlayersOnChairs(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear)
+void Chess::changePlayersOnChairs()
 {
     _pClientsList->clearPlayerType(PT_WHITE);
     _pClientsList->clearPlayerType(PT_BLACK);
 
-    switch(WhoWon)
-    {
-    case ET_WHIE_WON:
-    case ET_BLACK_WON:
-    case ET_DRAW:
-    case ET_TIMEOUT_GAME:
-        if (PlayerToClear != PT_NONE)
-        {
-            qDebug() << "ERROR: Chess::changePlayersOnChairs(): player must be"
-                        " PT_NONE if not disconnected";
-            return;
-        }
-        _pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE);
-        _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
-        break;
-    case ET_GIVE_UP:
-    case ET_SOCKET_LOST:
-        if (PlayerToClear == PT_NONE)
-        {
-            qDebug() << "ERROR: Chess::changePlayersOnChairs(): player can't be"
-                        " PT_NONE if diconnected";
-            return;
-        }
-        if (PlayerToClear == PT_WHITE)
-            _pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE);
-        else if (PlayerToClear == PT_BLACK)
-            _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
-        else
-        {
-            qDebug() << "ERROR: Chess::changePlayersOnChairs(): wrong player type:" << PlayerToClear;
-            return;
-        }
-        break;
-    default:
-        qDebug() << "ERROR: Chess::changePlayersOnChairs(): unknown ETWhoWon val=" << WhoWon;
-        return;
-    }
+    _pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE);
+    _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
 }
 
 //example: "TABLE_DATA{\"wplr\":\"marianexyx\",\"bplr\":\"test\",\"turn\":\"bt\",\"wtime\":
@@ -569,7 +535,7 @@ QString Chess::getTableData()
     return QStrTableData;
 }
 
-void Chess::timeOutStart() //todo: at the end maybe it can be part of Chess::restartGame func?
+void Chess::timeOutStart()
 {
     _pClientsList->resetPlayersStartConfirmInfo();
 

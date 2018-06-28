@@ -8,7 +8,7 @@ void Clients::newClient(QWebSocket& clientSocket)
     newClient.socket = &clientSocket; //future: if this param is const, then...
     //...this won't work? why?
     newClient.name.clear();
-    newClient.queue = 0; //todo: earlier -1 was here. will be good now?
+    newClient.queue = 0;
     newClient.isStartClickedByPlayer = false;
     newClient.type = PT_NONE;
 
@@ -38,7 +38,7 @@ void Clients::setClientName(const Client& client, QString QStrName)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setClientName: new name ="
+                qDebug() << "Clients::setClientName(): new name ="
                          << _clients.at(nClientPos).name;
             }
             else qDebug() << "ERROR: Clients::setClientName(): iteration error. iter val ="
@@ -274,7 +274,9 @@ void Clients::removeClientFromQueue(const Client &client)
 
             int nClientPos = _clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < _clients.size())
+            {
                 _clients.replace(nClientPos, changedClient);
+            }
             else qDebug() << "ERROR: Clients::removeClientFromQueue(): iteration error. "
                              "iter val =" << nClientPos;
 
@@ -289,7 +291,6 @@ void Clients::removeClientFromQueue(const Client &client)
 
 void Clients::resetPlayersStartConfirmInfo()
 {
-    qDebug() << "Clients::resetPlayersStartConfirmInfo()";
     if (this->isStartClickedByPlayer(PT_WHITE))
            this->setClientStartConfirmation(PT_WHITE, false);
     if (this->isStartClickedByPlayer(PT_BLACK))
@@ -307,14 +308,12 @@ void Clients::putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair)
 
     if (this->getQueuedClientsList() != QUEUE_EMPTY)
     {
-        Client nextQueuedClient;
-        if (this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS))
-            nextQueuedClient = this->getNextQueuedClient();
-        else return;
+        if (!this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS)) return;
 
-        this->removeClientFromQueue(nextQueuedClient);
-        this->setPlayerType(nextQueuedClient, Chair);
-        this->setClientStartConfirmation(nextQueuedClient, false);
+        int64_t nextQueuedClientID = this->getNextQueuedClient().ID;
+        this->removeClientFromQueue(this->getClient(nextQueuedClientID));
+        this->setPlayerType(this->getClient(nextQueuedClientID), Chair);
+        this->setClientStartConfirmation(this->getClient(nextQueuedClientID), false);
 
         emit this->setBoardDataLabel(this->getPlayerName(Chair),
                                       Chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
@@ -478,13 +477,7 @@ QString Clients::getQueuedClientsList()
             {
                 if (cl.queue > maxQueue && cl.queue < lastBiggestQueue)
                 {
-                    qDebug() << "Clients::getQueuedClientsList(): cl.queue > maxQueue"
-                                " && cl.queue < lastBiggestQueue." << cl.queue
-                             << ">" << maxQueue << "&&" << cl.queue  << "<" <<
-                                lastBiggestQueue;
                     maxQueue = cl.queue;
-                    qDebug() << "Clients::getQueuedClientsList(): new max queue ="
-                             << maxQueue;
                 }
             }
 
@@ -496,9 +489,6 @@ QString Clients::getQueuedClientsList()
             {
                 if (cl.queue == maxQueue)
                 {
-                    qDebug() << "Clients::getQueuedClientsList(): next queued "
-                                "client =" << cl.name << ", his queue nr ="
-                             << cl.queue;
                     QStrQueuedClients = cl.name + "," + QStrQueuedClients;
                 }
             }
@@ -520,7 +510,6 @@ QString Clients::getQueuedClientsList()
     else //remove last comma
         QStrQueuedClients = QStrQueuedClients.left(QStrQueuedClients.length() - 1);
 
-    qDebug() << "Clients::getQueuedClientsList(): QStrQueuedClients =" << QStrQueuedClients;
     return QStrQueuedClients;
 }
 
