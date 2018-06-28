@@ -10,8 +10,8 @@
 #include <QTcpSocket>
 #include <QAbstractSocket>
 #include <QTimer>
-#include "DobotDll.h"
-#include "DobotType.h"
+#include "DobotDll/DobotDll.h"
+#include "DobotDll/DobotType.h"
 #include "xml_reader.h"
 #include "websockets.h"
 #include "dobot.h"
@@ -29,11 +29,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(Websockets* pWebSockets, PieceController* pPieceController,
-                        Chessboard* pBoardMain, Chessboard* pBoardRemoved,
-                        Chessboard *pBoardChenard, TCPMsgs* pTCPMsg, ArduinoUsb* pUsb,
-                        Dobot* pDobot, Chess* pChess, Clients* pClientsList,
-                        QWidget* parent = 0);
+    explicit MainWindow(Chess* pChess, QWidget* parent = 0);
 
     virtual ~MainWindow();
 

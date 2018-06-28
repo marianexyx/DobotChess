@@ -10,8 +10,8 @@
 #include <QValidator>
 #include <QList>
 #include <limits>
-#include "DobotDll.h"
-#include "DobotType.h"
+#include "DobotDll/DobotDll.h"
+#include "DobotDll/DobotType.h"
 #include "arduinousb.h"
 #include "vars/log.h"
 #include "vars/basic_vars.h"
@@ -38,11 +38,15 @@ private:
     short _sItemIDInGripper;
 
     bool _bConnectedToDobot;
+    bool _bFirstMoveIsDone;
 
     HOMEParams _home;
     Point3D _homeToMiddleAbove;
     Point3D _realTimePoint;
     Point3D _lastGivenPoint;
+
+    void createAndStartPeriodicTimer();
+    void createAndStartPoseTimer();
 
 public:
     Dobot(ArduinoUsb* pUsb, RealVars gameConfigVars, Point3D retreatLeft,
@@ -55,7 +59,7 @@ public:
 
     void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove =
             VM_NONE, bool bRetreat = false);
-    bool isPointTotallyDiffrent(Point3D point);
+    bool isPointTotallyDiffrentFromLast(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
@@ -71,7 +75,7 @@ public:
     Point3D getHomePos();
     Point3D getHomeToMiddleAbovePoint() const { return _homeToMiddleAbove; }
     Point3D getLastGivenPoint() const { return _lastGivenPoint; }
-    //todo: poniższe: friends
+    //todo: below: friends
     DobotServo* getServoPointer() const { return _pServo; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
     ArduinoUsb* getArduinoPointer() const { return _pUsb; }
@@ -96,7 +100,7 @@ signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);
     void JointLabelText(QString QStrLabelText, short sJoint);
     void AxisLabelText(QString QStrAxisLabelText, char chAxis);
-    void RefreshDobotButtonsStates(bool bDobotButtonsStates);
+    void setDobotButtonsStates(bool bDobotButtonsStates);
     void deviceLabels(QString QStrDeviceSN, QString QStrDeviceName, QString QStrDeviceVersion);
     void DobotErrorMsgBox();
     void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int nCoreNextId);

@@ -20,7 +20,7 @@ private:
     PosOnBoard _lastPos;
 
 public:
-    PieceController(Dobot* pDobot, Chessboard* pBoardMain, Chessboard* pBoardRemoved);
+    PieceController(Dobot* pDobot, Chessboard *pBoardMain, Chessboard *pBoardRemoved);
 
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
                                   VERTICAL_MOVE VertMove = VM_NONE,
@@ -36,6 +36,11 @@ public:
     PosOnBoard getLastPos() const { return _lastPos; }
     QString getPromotedPawnsPositions();
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
+
+    Dobot* getDobotPointer() const { return _pDobot; }
+    Chessboard* getBoardMainPointer() const { return _pBoardMain; }
+    Chessboard* getBoardRemovedPointer() const { return _pBoardRemoved; }
+
 
 signals:
     void addTextToLogPTE(QString, LOG);

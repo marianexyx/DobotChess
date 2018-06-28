@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Dobot_t {
     QByteArrayData data[41];
-    char stringdata0[608];
+    char stringdata0[604];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -42,44 +42,44 @@ QT_MOC_LITERAL(6, 56, 6), // "sJoint"
 QT_MOC_LITERAL(7, 63, 13), // "AxisLabelText"
 QT_MOC_LITERAL(8, 77, 17), // "QStrAxisLabelText"
 QT_MOC_LITERAL(9, 95, 6), // "chAxis"
-QT_MOC_LITERAL(10, 102, 25), // "RefreshDobotButtonsStates"
-QT_MOC_LITERAL(11, 128, 19), // "bDobotButtonsStates"
-QT_MOC_LITERAL(12, 148, 12), // "deviceLabels"
-QT_MOC_LITERAL(13, 161, 12), // "QStrDeviceSN"
-QT_MOC_LITERAL(14, 174, 14), // "QStrDeviceName"
-QT_MOC_LITERAL(15, 189, 17), // "QStrDeviceVersion"
-QT_MOC_LITERAL(16, 207, 16), // "DobotErrorMsgBox"
-QT_MOC_LITERAL(17, 224, 11), // "queueLabels"
-QT_MOC_LITERAL(18, 236, 6), // "nSpace"
-QT_MOC_LITERAL(19, 243, 8), // "nDobotId"
-QT_MOC_LITERAL(20, 252, 10), // "nCoreMaxId"
-QT_MOC_LITERAL(21, 263, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(22, 275, 11), // "nCoreNextId"
-QT_MOC_LITERAL(23, 287, 27), // "showArduinoGripperStateList"
-QT_MOC_LITERAL(24, 315, 19), // "QList<ServoArduino>"
-QT_MOC_LITERAL(25, 335, 30), // "showActualDobotQueuedCmdIDList"
-QT_MOC_LITERAL(26, 366, 16), // "QList<DobotMove>"
-QT_MOC_LITERAL(27, 383, 4), // "list"
-QT_MOC_LITERAL(28, 388, 25), // "showOnDobotQueuedCmdsList"
-QT_MOC_LITERAL(29, 414, 13), // "sendMoveToArm"
-QT_MOC_LITERAL(30, 428, 9), // "DobotMove"
-QT_MOC_LITERAL(31, 438, 4), // "move"
-QT_MOC_LITERAL(32, 443, 14), // "onConnectDobot"
-QT_MOC_LITERAL(33, 458, 19), // "onPeriodicTaskTimer"
-QT_MOC_LITERAL(34, 478, 14), // "onGetPoseTimer"
-QT_MOC_LITERAL(35, 493, 19), // "showQueueLabelsInUI"
-QT_MOC_LITERAL(36, 513, 19), // "addTextToLogPTEInUI"
-QT_MOC_LITERAL(37, 533, 7), // "QStrTxt"
-QT_MOC_LITERAL(38, 541, 3), // "log"
-QT_MOC_LITERAL(39, 545, 33), // "showActualDobotQueuedCmdIDLis..."
-QT_MOC_LITERAL(40, 579, 28) // "showOnDobotQueuedCmdsListPTE"
+QT_MOC_LITERAL(10, 102, 21), // "setDobotButtonsStates"
+QT_MOC_LITERAL(11, 124, 19), // "bDobotButtonsStates"
+QT_MOC_LITERAL(12, 144, 12), // "deviceLabels"
+QT_MOC_LITERAL(13, 157, 12), // "QStrDeviceSN"
+QT_MOC_LITERAL(14, 170, 14), // "QStrDeviceName"
+QT_MOC_LITERAL(15, 185, 17), // "QStrDeviceVersion"
+QT_MOC_LITERAL(16, 203, 16), // "DobotErrorMsgBox"
+QT_MOC_LITERAL(17, 220, 11), // "queueLabels"
+QT_MOC_LITERAL(18, 232, 6), // "nSpace"
+QT_MOC_LITERAL(19, 239, 8), // "nDobotId"
+QT_MOC_LITERAL(20, 248, 10), // "nCoreMaxId"
+QT_MOC_LITERAL(21, 259, 11), // "nCoreIdLeft"
+QT_MOC_LITERAL(22, 271, 11), // "nCoreNextId"
+QT_MOC_LITERAL(23, 283, 27), // "showArduinoGripperStateList"
+QT_MOC_LITERAL(24, 311, 19), // "QList<ServoArduino>"
+QT_MOC_LITERAL(25, 331, 30), // "showActualDobotQueuedCmdIDList"
+QT_MOC_LITERAL(26, 362, 16), // "QList<DobotMove>"
+QT_MOC_LITERAL(27, 379, 4), // "list"
+QT_MOC_LITERAL(28, 384, 25), // "showOnDobotQueuedCmdsList"
+QT_MOC_LITERAL(29, 410, 13), // "sendMoveToArm"
+QT_MOC_LITERAL(30, 424, 9), // "DobotMove"
+QT_MOC_LITERAL(31, 434, 4), // "move"
+QT_MOC_LITERAL(32, 439, 14), // "onConnectDobot"
+QT_MOC_LITERAL(33, 454, 19), // "onPeriodicTaskTimer"
+QT_MOC_LITERAL(34, 474, 14), // "onGetPoseTimer"
+QT_MOC_LITERAL(35, 489, 19), // "showQueueLabelsInUI"
+QT_MOC_LITERAL(36, 509, 19), // "addTextToLogPTEInUI"
+QT_MOC_LITERAL(37, 529, 7), // "QStrTxt"
+QT_MOC_LITERAL(38, 537, 3), // "log"
+QT_MOC_LITERAL(39, 541, 33), // "showActualDobotQueuedCmdIDLis..."
+QT_MOC_LITERAL(40, 575, 28) // "showOnDobotQueuedCmdsListPTE"
 
     },
     "Dobot\0addTextToLogPTE\0\0LOG\0JointLabelText\0"
     "QStrLabelText\0sJoint\0AxisLabelText\0"
-    "QStrAxisLabelText\0chAxis\0"
-    "RefreshDobotButtonsStates\0bDobotButtonsStates\0"
-    "deviceLabels\0QStrDeviceSN\0QStrDeviceName\0"
+    "QStrAxisLabelText\0chAxis\0setDobotButtonsStates\0"
+    "bDobotButtonsStates\0deviceLabels\0"
+    "QStrDeviceSN\0QStrDeviceName\0"
     "QStrDeviceVersion\0DobotErrorMsgBox\0"
     "queueLabels\0nSpace\0nDobotId\0nCoreMaxId\0"
     "nCoreIdLeft\0nCoreNextId\0"
@@ -164,7 +164,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         case 0: _t->addTextToLogPTE((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         case 1: _t->JointLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< short(*)>(_a[2]))); break;
         case 2: _t->AxisLabelText((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< char(*)>(_a[2]))); break;
-        case 3: _t->RefreshDobotButtonsStates((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 3: _t->setDobotButtonsStates((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 4: _t->deviceLabels((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3]))); break;
         case 5: _t->DobotErrorMsgBox(); break;
         case 6: _t->queueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
@@ -206,7 +206,7 @@ void Dobot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         }
         {
             typedef void (Dobot::*_t)(bool );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::RefreshDobotButtonsStates)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Dobot::setDobotButtonsStates)) {
                 *result = 3;
                 return;
             }
@@ -314,7 +314,7 @@ void Dobot::AxisLabelText(QString _t1, char _t2)
 }
 
 // SIGNAL 3
-void Dobot::RefreshDobotButtonsStates(bool _t1)
+void Dobot::setDobotButtonsStates(bool _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);

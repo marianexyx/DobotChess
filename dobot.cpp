@@ -13,9 +13,7 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
     _sItemIDInGripper = 0;
     
     _bConnectedToDobot = false;
-
-    Point3D fakeMid(200,0,25); //todo: its old? useless?
-    _lastGivenPoint = fakeMid; //todo: make first point as a middle above
+    _bFirstMoveIsDone = false;
 
     _home.x = gameConfigVars.home.x;
     _home.y = gameConfigVars.home.y;
@@ -42,7 +40,7 @@ Dobot::~Dobot()
     delete _pServo;
 }
 
-void Dobot::onPeriodicTaskTimer() //todo: change timers names
+void Dobot::onPeriodicTaskTimer()
 {
     PeriodicTask(); //start arm task loop. non-return funcion
     //find timer by name:
@@ -59,7 +57,8 @@ void Dobot::onGetPoseTimer()
         this->saveActualDobotPosition();
         _pQueue->parseNextMoveToArmIfPossible();
         _pQueue->showLastExecutedArmMoveInUI();
-        if (_pQueue->isArmCoveringGame()) _pQueue->retreat(_lastGivenPoint);
+        if (_pQueue->isArmCoveringGame() && _bFirstMoveIsDone)
+            _pQueue->retreat(_lastGivenPoint);
     }
 
     getPoseTimer->start(); //auto restart timer
@@ -141,23 +140,8 @@ void Dobot::onConnectDobot()
 
         emit this->addTextToLogPTE("Dobot connected \n", LOG_DOBOT);
 
-        //todo: make timers in seperate functions
-        //create dobot periodic timer
-        QTimer *periodicTaskTimer = new QTimer(this);
-        periodicTaskTimer->setObjectName("periodicTaskTimer");
-        connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
-        periodicTaskTimer->setSingleShot(true);
-        periodicTaskTimer->start(5);
-        //future: i'm still getting warning in debug: "QObject::startTimer: Timers...
-        //...can onlybe used with threads started with QThread", yet it still works
-
-        //create dobot pose timer
-        QTimer *getPoseTimer = new QTimer(this);
-        getPoseTimer->setObjectName("getPoseTimer");
-        connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
-        getPoseTimer->setSingleShot(true);
-        getPoseTimer->start(200);
-
+        this->createAndStartPeriodicTimer();
+        this->createAndStartPoseTimer();
         this->initDobot();
         _pQueue->saveIDFromConnectedDobot(); //1st check
 
@@ -171,7 +155,29 @@ void Dobot::onConnectDobot()
         DisconnectDobot();
     }
 
-    emit RefreshDobotButtonsStates(_bConnectedToDobot); //todo: change name
+    emit setDobotButtonsStates(_bConnectedToDobot);
+}
+
+void Dobot::createAndStartPeriodicTimer()
+{
+    //create dobot periodic timer
+    QTimer *periodicTaskTimer = new QTimer(this);
+    periodicTaskTimer->setObjectName("periodicTaskTimer");
+    connect(periodicTaskTimer, SIGNAL(timeout()), this, SLOT(onPeriodicTaskTimer()));
+    periodicTaskTimer->setSingleShot(true);
+    periodicTaskTimer->start(5);
+    //future: i'm still getting warning in debug: "QObject::startTimer: Timers...
+    //...can onlybe used with threads started with QThread", yet it still works
+
+}
+
+void Dobot::createAndStartPoseTimer()
+{
+    QTimer *getPoseTimer = new QTimer(this);
+    getPoseTimer->setObjectName("getPoseTimer");
+    connect(getPoseTimer, SIGNAL(timeout()), this, SLOT(onGetPoseTimer()));
+    getPoseTimer->setSingleShot(true);
+    getPoseTimer->start(200);
 }
 
 void Dobot::initDobot()
@@ -239,7 +245,7 @@ void Dobot::initDobot()
     ptpJumpParams.zLimit = 150;
     SetPTPJumpParams(&ptpJumpParams, false, NULL);
     
-    SetHOMEParams(&_home, false, NULL); //todo: NULL??
+    SetHOMEParams(&_home, false, NULL);
 
     IOMultiplexing iom;
     iom.address = 4;
@@ -260,7 +266,7 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_UP:
     case DM_DOWN:
     {
-        //todo: zabronić oś z jezeli jest zbyt nisko
+        //todo: block "Z" axis, if it is too low
         PTPCmd moveAsPtpCmd;
         moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian linear
         //future: dobot may have better way of movemenst. maybe CPAbsoluteMode?
@@ -284,7 +290,7 @@ void Dobot::sendMoveToArm(DobotMove move)
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
         HOMECmd HOME;
-        HOME.reserved = 1; //todo: i dont get this "1" ID. seen somewhere propably
+        HOME.reserved = 1; //todo: i dont get this "1" ID. seen somewhere propably. ask of forum
         isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
     }
         break;
@@ -296,8 +302,8 @@ void Dobot::sendMoveToArm(DobotMove move)
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
                               /*= VM_NONE*/, bool bRetreat /*= false*/)
 {
-    //todo: set back 3rd axis secure
-    //if (_bConnectedToDobot && this->isPointTotallyDiffrent(dest3D)) return;
+    if (_bConnectedToDobot && _bFirstMoveIsDone &&
+            this->isPointTotallyDiffrentFromLast(dest3D)) return;
 
     if (VertMove == VM_GRAB)
         this->addArmMoveToQueue(DM_OPEN);
@@ -323,12 +329,12 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
     this->armUpDown(DM_UP, dest3D.z);
 }
 
-bool Dobot::isPointTotallyDiffrent(Point3D point)
+bool Dobot::isPointTotallyDiffrentFromLast(Point3D point)
 {
     if (point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y
             && point.z != _lastGivenPoint.z)
     {
-        qDebug() << "ERROR: Dobot::isPointTotallyDiffrent(): moves in 3 axis "
+        qDebug() << "ERROR: Dobot::isPointTotallyDiffrentFromLast(): moves in 3 axis "
                     "at once are forbidden. point =" << point.getAsQStr()
                  << "_lastGivenPoint =" << _lastGivenPoint.getAsQStr();
         return true;
@@ -350,20 +356,33 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
 
 void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
 {
+    if (!_bFirstMoveIsDone && (Type == DM_TO_POINT || Type == DM_UP ||
+                               Type == DM_DOWN))
+    {
+        qDebug() << "WARNING: Dobot::addArmMoveToQueue(): move type =" <<
+                    dobotMoveAsQstr(Type) << "cannot be the first arm move";
+        return;
+    }
+
     Point3D point = _lastGivenPoint;
     _pQueue->addArmMoveToQueue(Type, point);
 }
 
 void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
-    qDebug() << "Dobot::addArmMoveToQueue(): type =" << dobotMoveAsQstr(Type)
-             << ", point =" << point.getAsQStr();
+    if (!_bFirstMoveIsDone) _bFirstMoveIsDone = true;
     _lastGivenPoint = point;
     _pQueue->addArmMoveToQueue(Type, point);
 }
 
 void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
 {
+    if (!_bFirstMoveIsDone)
+    {
+        qDebug() << "WARNING: Dobot::armUpDown(): first move cannot be up/down type";
+        return;
+    }
+
     if (ArmDestination != DM_UP && ArmDestination != DM_DOWN)
     {
         qDebug() << "ERROR: Dobot::armUpDown(): wrong armDestination val ="

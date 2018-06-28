@@ -4,8 +4,8 @@
 #pragma once
 #include <QString>
 #include "vars/basic_vars.h"
-#include "DobotDll.h"
-#include "DobotType.h"
+#include "DobotDll/DobotDll.h"
+#include "DobotDll/DobotType.h"
 
 enum DOBOT_MOVE_TYPE
 {
@@ -43,16 +43,14 @@ struct DobotMove
     Point3D xyz;
 
     DobotMove(): ID(0), type(DM_NONE), xyz(0,0,0) {}
-    DobotMove(uint64_t id, DOBOT_MOVE_TYPE MT, Point3D p): ID(id), type(MT), xyz(p) {}
+    DobotMove(uint64_t id, DOBOT_MOVE_TYPE MT, Point3D p):
+        ID(id), type(MT), xyz(p) {}
 };
 
 inline bool isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false)
 {
     if (nResult == DobotCommunicate_NoError)
-    {
-        //qDebug() << "isArmReceivedCorrectCmd(): nResult == DobotCommunicate_NoError";
         return true;
-    }
     else
     {
         if (bErrorLog)

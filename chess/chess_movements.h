@@ -15,7 +15,7 @@ private:
     Chessboard* _pBoardRemoved;
     PieceController* _pPieceController;
 
-    void copyPiecesToBoard(Chessboard& source, Chessboard& target);
+    void copyPiecesToBoard(const Chessboard &source, Chessboard& target);
     bool isPieceSetOnStartFields(); //todo: move this do chessboard class somehow?
     bool isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2);
 

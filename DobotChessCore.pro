@@ -82,23 +82,17 @@ HEADERS  +=  \
 
 FORMS    += mainwindow.ui
 
-DESTDIR = ./DobotDll
+DESTDIR = ./
 
-INCLUDEPATH += $$DESTDIR
+INCLUDEPATH += ./DobotDll
 
 CONFIG(debug, debug | release) {
-    LIBS += -L$$DESTDIR/ -lDobotDll
+    LIBS += -L$$INCLUDEPATH/ -lDobotDll
 } else {
-    LIBS += -L$$DESTDIR/ -lDobotDll
+    LIBS += -L$$INCLUDEPATH/ -lDobotDll
 }
 
 DISTFILES += \
     DobotDll/DobotDll.lib \
     DobotDll/DobotDemoForQt.exe \
-    DobotDll/DobotDll.dll \
-    DobotDll/msvcp120.dll \
-    DobotDll/msvcr120.dll \
-    DobotDll/Qt5Core.dll \
-    DobotDll/Qt5Network.dll \
-    DobotDll/Qt5SerialPort.dll
-
+    DobotDll/DobotDll.dll

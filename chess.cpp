@@ -1,16 +1,15 @@
 #include "chess.h"
 
-Chess::Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,
-             Chessboard* pBoardMain, Chessboard* pBoardRemoved, Chessboard* pBoardChenard,
+Chess::Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
              Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
-    _pClientsList = pClientsList;
-    _pDobot = pDobot;
     _pPieceController = pPieceController;
-    _pBoardMain = pBoardMain;
-    _pBoardRemoved = pBoardRemoved;
+    _pDobot = _pPieceController->getDobotPointer();
+    _pBoardMain = _pPieceController->getBoardMainPointer();
+    _pBoardRemoved = _pPieceController->getBoardRemovedPointer();
     _pBoardChenard = pBoardChenard;
     _pWebsockets = pWebsockets;
+    _pClientsList = _pWebsockets->getClientsListPointer();
     _pTCPMsgs = pTCPMsgs;
     _pUsb = _pDobot->getArduinoPointer();
 

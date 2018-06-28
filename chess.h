@@ -68,8 +68,7 @@ private:
     void changePlayersOnChairs();
 
 public:
-    Chess(Clients* pClientsList, Dobot* pDobot, PieceController* pPieceController,
-          Chessboard* pBoardMain, Chessboard* pBoardRemoved, Chessboard* pBoardChenard,
+    Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
           Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 
@@ -80,15 +79,20 @@ public:
     GAME_STATUS getGameStatus() const { return _ChessGameStatus; }
     clientRequest getLastRequest() const { return _request; }
 
-    Clients* getClientsPointer() { return _pClientsList; }
-    Chessboard* getBoardMainPointer() { return _pBoardMain; }
-    Chessboard* getBoardRemovedPointer() { return _pBoardRemoved; }
+    Clients* getClientsPointer() const { return _pClientsList; }
+    Dobot* getDobotPointer() const { return _pDobot; }
+    Chessboard* getBoardMainPointer() const { return _pBoardMain; }
+    Chessboard* getBoardRemovedPointer() const { return _pBoardRemoved; }
+    Chessboard* getBoardChenardPointer() const { return _pBoardChenard; }
+    Websockets* getWebsocketsPointer() const { return _pWebsockets; }
+    PieceController* getPieceControllerPointer() const { return _pPieceController; }
+    TCPMsgs* getTCPMsgsPointer() const { return _pTCPMsgs; }
 
-    ChessTimers* getTimersPointer() { return _pTimers; }
-    ChessMovements* getMovementsPointer() { return _pMovements; }
-    ChessBot* getBotPointer() { return _pBot; }
-    ChessStatus* getStatusPointer() { return _pStatus; }
-    ChessConditions* getConditionsPointer() { return _pConditions; }
+    ChessTimers* getTimersPointer() const { return _pTimers; }
+    ChessMovements* getMovementsPointer() const { return _pMovements; }
+    ChessBot* getBotPointer() const { return _pBot; }
+    ChessStatus* getStatusPointer() const { return _pStatus; }
+    ChessConditions* getConditionsPointer() const { return _pConditions; }
 
 public slots:
     void checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID);

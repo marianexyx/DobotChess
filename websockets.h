@@ -31,6 +31,8 @@ public:
     Websockets(Clients* pClientsList, quint16 port, QObject* parent = Q_NULLPTR);
     ~Websockets();
 
+    Clients* getClientsListPointer() const { return _pClientsList; }
+
 public Q_SLOTS:
     void receivedMsg(QString QStrMsg);
     void onNewConnection();

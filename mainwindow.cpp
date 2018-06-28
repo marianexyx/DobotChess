@@ -3,25 +3,23 @@
 
 QT_USE_NAMESPACE
 
-MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceController, Chessboard* pBoardMain,
-                       Chessboard* pBoardRemoved, Chessboard *pBoardChenard, TCPMsgs* pTCPMsg,
-                       ArduinoUsb* pUsb, Dobot* pDobot, Chess* pChess, Clients* pClientsList,
-                       QWidget* parent):
+MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    _pDobot = pDobot;
-    _pWebSockets = pWebSockets;
-    _pPieceController = pPieceController;
-    _pBoardMain = pBoardMain;
-    _pBoardRemoved = pBoardRemoved;
-    _pBoardChenard = pBoardChenard;
-    _pTCPMsg = pTCPMsg;
-    _pUsb = pUsb;
-    _pClientsList = pClientsList;
     _pChess = pChess;
+    _pDobot = _pChess->getDobotPointer();
+    _pWebSockets = _pChess->getWebsocketsPointer();
+    _pPieceController = _pChess->getPieceControllerPointer();
+    _pBoardMain = _pChess->getBoardMainPointer();
+    _pBoardRemoved = _pChess->getBoardRemovedPointer();
+    _pBoardChenard = _pChess->getBoardChenardPointer();
+    _pTCPMsg = _pChess->getTCPMsgsPointer();
+    _pClientsList = _pChess->getClientsPointer();
+    _pUsb = _pChess->getDobotPointer()->getArduinoPointer();
+
 
     _titleFormTitle = new QTimer();
     _titleFormTitle->setInterval(200);
@@ -79,7 +77,7 @@ MainWindow::MainWindow(Websockets* pWebSockets, PieceController* pPieceControlle
             this, SLOT(setAxisLabelText(QString, char)));
     connect(_pDobot, SIGNAL(deviceLabels(QString, QString, QString)),
             this, SLOT(setDeviceLabels(QString, QString, QString)));
-    connect(_pDobot, SIGNAL(RefreshDobotButtonsStates(bool)),
+    connect(_pDobot, SIGNAL(setDobotButtonsStates(bool)),
             this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobot, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));

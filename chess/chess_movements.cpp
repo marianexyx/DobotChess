@@ -145,7 +145,7 @@ bool ChessMovements::resetPiecePositions()
 
         do
         {
-            this->copyPiecesToBoard(*_pBoardMain, tempBoard); //todo: source = const?
+            this->copyPiecesToBoard(*_pBoardMain, tempBoard);
 
             for (short sField=1; sField<=64; ++sField)
             {
@@ -154,11 +154,10 @@ bool ChessMovements::resetPiecePositions()
 
                 if (!_pPieceController->isPieceStayOnItsStartingField(pPieceOnExaminedField))
                 {
-
+                    //if checking field is empty && it can have a start piece
                     if (pPieceOnExaminedField == nullptr && (pExaminedField->getNr() <= 16 ||
                                                              pExaminedField->getNr() > 48))
-                    { //if checking field is empty && it can have a start piece
-
+                    {
                         Piece* pMissingPiece = _pPieceController->getPiece(pExaminedField->
                                                                  getStartPieceNrOnField());
                         Field* pMissingPieceActualFieldOnMainBoard;
@@ -203,7 +202,7 @@ bool ChessMovements::resetPiecePositions()
     return true;
 }
 
-void ChessMovements::copyPiecesToBoard(Chessboard& source, Chessboard& target)
+void ChessMovements::copyPiecesToBoard(const Chessboard& source, Chessboard& target)
 {
     for (short sField=1; sField<=64; ++sField)
     {

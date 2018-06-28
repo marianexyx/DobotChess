@@ -5,8 +5,8 @@
 //#include "dobot.h"
 #include <QDebug>
 #include "vars/log.h"
-#include "DobotDll.h"
-#include "DobotType.h"
+#include "DobotDll/DobotDll.h"
+#include "DobotDll/DobotType.h"
 #include "dobot/vars/dobot_moves.h"
 
 //class Dobot;
