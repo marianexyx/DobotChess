@@ -91,10 +91,8 @@ public slots:
     void showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
                              int nCoreIdLeft, int nCoreNextId);  //todo: those aren't ints
     void addTextToLogPTEInUI(QString QStrTxt, LOG log);
-    void showActualDobotQueuedCmdIDListPTE(QList<DobotMove> list)
-    { emit this->showActualDobotQueuedCmdIDList(list); }
-    void showOnDobotQueuedCmdsListPTE(QList<DobotMove> list)
-    { emit this->showOnDobotQueuedCmdsList(list); }
+    void showQueuedArmCmdsOnCorePTE() { emit this->showQueuedArmCmdsOnCore(); }
+    void showSentArmCmdsToDobotPTE() { emit this->showSentArmCmdsToDobot(); }
 
 signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);
@@ -105,8 +103,8 @@ signals: //GUI mainWindow
     void DobotErrorMsgBox();
     void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int nCoreNextId);
     void showArduinoGripperStateList(QList<ServoArduino>);
-    void showActualDobotQueuedCmdIDList(QList<DobotMove> list);
-    void showOnDobotQueuedCmdsList(QList<DobotMove> list);
+    void showQueuedArmCmdsOnCore();
+    void showSentArmCmdsToDobot();
 };
 
 #endif // DOBOT_H

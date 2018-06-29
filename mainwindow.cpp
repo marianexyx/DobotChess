@@ -57,7 +57,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pClientsList, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed
+    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed board
             this, SLOT(clearBoardInUI()));
     connect(_pBoardMain, SIGNAL(showBoardInUI(QString)),
             this, SLOT(showBoardInUI(QString)));
@@ -85,14 +85,12 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
             this, SLOT(setQueueLabels(int, int, int, int, int)));
     connect(_pUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
-    connect(_pDobot, SIGNAL(showArduinoGripperStateList(QList<ServoArduino>)),
-            this, SLOT(showArduinoGripperStateList(QList<ServoArduino>)));
     connect(_pPieceController, SIGNAL(showRealBoardInUI()),
             this, SLOT(showRealBoardInUI()));
-    connect(_pDobot, SIGNAL(showActualDobotQueuedCmdIDList(QList<DobotMove>)),
-            this, SLOT(showActualDobotQueuedCmdIDList(QList<DobotMove>)));
-    connect(_pDobot, SIGNAL(showOnDobotQueuedCmdsList(QList<DobotMove>)),
-            this, SLOT(showOnDobotQueuedCmdsList(QList<DobotMove>)));
+    connect(_pDobot, SIGNAL(showQueuedArmCmdsOnCore()),
+            this, SLOT(showQueuedArmCmdsOnCore()));
+    connect(_pDobot, SIGNAL(showSentArmCmdsToDobot()),
+            this, SLOT(showSentArmCmdsToDobot()));
 
     this->initControl(); //init dobot JOG control
 
@@ -615,11 +613,11 @@ void MainWindow::on_sendTcpBtn_clicked()
     }
 }
 
-void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list) //todo: "for dobot/to send"
+void MainWindow::showQueuedArmCmdsOnCore()
 {
-    qDebug() << "MainWindow::showActualDobotQueuedCmdIDList()";
     QString QStrQueuedList;
     DobotMove item;
+    QList<DobotMove> list = _pDobot->getQueuePointer()->getQueuedArmCmds();
 
     for(int i=0; i<list.count(); ++i)
     {
@@ -632,11 +630,11 @@ void MainWindow::showActualDobotQueuedCmdIDList(QList<DobotMove> list) //todo: "
     ui->queuedOnCore->setPlainText(QStrQueuedList);
 }
 
-void MainWindow::showOnDobotQueuedCmdsList(QList<DobotMove> list)
+void MainWindow::showSentArmCmdsToDobot()
 {
-    qDebug() << "MainWindow::showOnDobotQueuedCmdsList()";
     QString QStrQueuedList;
     DobotMove item;
+    QList<DobotMove> list = _pDobot->getQueuePointer()->getSentArmCmds();
 
     for(int i=0; i<list.count(); ++i)
     {
@@ -649,22 +647,6 @@ void MainWindow::showOnDobotQueuedCmdsList(QList<DobotMove> list)
 
     ui->queuedOnDobot->clear();
     ui->queuedOnDobot->setPlainText(QStrQueuedList);
-}
-
-void MainWindow::showArduinoGripperStateList(QList<ServoArduino> list)
-{
-    QString QStrQueuedList;
-    ServoArduino item;
-
-    for(int i=0; i<list.count(); ++i)
-    {
-       item = list.at(i);
-       QString QStrState = item.isGripperOpen ? "open" : "close";
-       QStrQueuedList += QString::number(item.ID) + ". " + QStrState + "\n";
-    }
-    /*ui->servoQueuePTE->clear();
-    ui->servoQueuePTE->setPlainText(QStrQueuedList);*/
-    qDebug() << "WARNING: MainWindow::showArduinoGripperStateList(): servoQueuePTE is removed";
 }
 
 void MainWindow::showClientsList(QList<Client> list)

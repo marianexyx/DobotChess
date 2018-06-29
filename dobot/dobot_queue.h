@@ -17,8 +17,8 @@ private:
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
     uint _unQueuedCmdLeftSpace;
-    QList<DobotMove> _queuedArmCmds;
-    QList<DobotMove> _executedArmCmds; //todo: zła nazwa
+    QList<DobotMove> _queuedArmCmdsOnCore;
+    QList<DobotMove> _sentArmCmdsToDobot;
     uint64_t _lowestIDMoveInList;
     uint64_t _un64LastDobotIDShownInUI;
     uint64_t _un64RetreatID;
@@ -36,8 +36,6 @@ public:
     DobotMove getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID);
     bool isArmCoveringGame();
     void retreat(Point3D lastPoint);
-    //void sendMoveToArm(DobotMove move); //todo: this should be in dobot...
-    //...class? executed with emit?
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void saveIDFromConnectedDobot();
     //bool isDobotCmdsLeftSpaceEmpty();
@@ -52,10 +50,12 @@ public:
     int64_t getDobotQueuedCmdID() const { return _un64RealTimeDobotActualID; }
     uint getQueuedCmdLeftSpace() const { return _unQueuedCmdLeftSpace; }
     int64_t getRealTimeDobotActualID() const { return _un64RealTimeDobotActualID; }
+    QList<DobotMove> getQueuedArmCmds () const { return _queuedArmCmdsOnCore; }
+    QList<DobotMove> getSentArmCmds () const { return _sentArmCmdsToDobot; }
 
 signals:
-    void showActualDobotQueuedCmdIDList(QList<DobotMove>); //todo: change name like below
-    void showOnDobotQueuedCmdsList(QList<DobotMove>);
+    void showQueuedArmCmdsOnCore();
+    void showSentArmCmdsToDobot();
     void sendMoveToArm(DobotMove);
     void showQueueLabelsInUI(int, int, int, int, int);
     void addTextToLogPTEInUI(QString, LOG);

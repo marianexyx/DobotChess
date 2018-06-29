@@ -28,10 +28,10 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
             this, SLOT(showQueueLabelsInUI(int, int, int, int, int)));
     connect(_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
             this, SLOT(addTextToLogPTEInUI(QString, LOG)));
-    connect(_pQueue, SIGNAL(showActualDobotQueuedCmdIDList(QList<DobotMove>)),
-            this, SLOT(showActualDobotQueuedCmdIDListPTE(QList<DobotMove>)));
-    connect(_pQueue, SIGNAL(showOnDobotQueuedCmdsList(QList<DobotMove>)),
-            this, SLOT(showOnDobotQueuedCmdsListPTE(QList<DobotMove>)));
+    connect(_pQueue, SIGNAL(showQueuedArmCmdsOnCore()),
+            this, SLOT(showQueuedArmCmdsOnCorePTE()));
+    connect(_pQueue, SIGNAL(showSentArmCmdsToDobot()),
+            this, SLOT(showSentArmCmdsToDobotPTE()));
 }
 
 Dobot::~Dobot()
@@ -285,7 +285,7 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_WAIT:
         _pServo->wait(move.ID);
         break;
-    case DM_CALIBRATE: //future: this is home or calibrate? mess name
+    case DM_CALIBRATE: //todo: this is home or calibrate? mess name
     {
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
