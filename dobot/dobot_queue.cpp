@@ -107,7 +107,7 @@ void DobotQueue::showLastExecutedArmMoveInUI()
         QStrMoveID = QString::number(Move.ID);
         QStrDobotMove = dobotMoveAsQstr(Move.type);
         emit this->addTextToLogPTEInUI("Executed move ID = " + QStrMoveID +
-                                       " type = " + QStrDobotMove + "\n", LOG_DOBOT);
+                                       ", type = " + QStrDobotMove + "\n", LOG_DOBOT);
         emit this->showSentArmCmdsToDobot();
     }
 
@@ -166,14 +166,21 @@ void DobotQueue::retreat(Point3D lastPoint)
     GetQueuedCmdLeftSpace(&_unQueuedCmdLeftSpace);
     if (_unQueuedCmdLeftSpace <= 0)
     {
-        emit showQueueLabelsInUI->addTextToLogPTE("ERROR: Dobot queue memory full. Stop arm.\n", LOG_DOBOT);
+        emit showQueueLabelsInUI->addTextToLogPTE("ERROR: Dobot queue memory full. "
+            "Stop arm.\n", LOG_DOBOT);
         SetQueuedCmdForceStopExec(); //stop arm
     }
 }*/
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
-{
-    if (!isPointInLimits(point)) return;
+{    
+    if (Type != DM_OPEN && Type != DM_CLOSE && !isPointInLimits(point))
+    {
+        qDebug() << "ERROR: DobotQueue::addArmMoveToQueue(): isPointInLimits == "
+                    "false. move type =" << dobotMoveAsQstr(Type);
+        return;
+    }
+
     _un64CoreQueuedCmdID++;
     DobotMove cmdToQueue(_un64CoreQueuedCmdID, Type, point);
     _queuedArmCmdsOnCore << cmdToQueue;

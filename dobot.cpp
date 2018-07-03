@@ -22,10 +22,16 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
 
     _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
 
+    //future: this below shows that we r using chessboard. it may be wiped, only if...
+    //...it's passed, but it's not efficient. better wasy might be passing whole object.
+    _dSafeAxisZ = qMin(qMin(gameConfigVars.A1.z, gameConfigVars.A8.z),
+                       qMin(gameConfigVars.H1.z, gameConfigVars.H8.z)) +
+            gameConfigVars.fPieceHeight;
+
     connect(_pQueue, SIGNAL(sendMoveToArm(DobotMove)),
             this, SLOT(sendMoveToArm(DobotMove)));
-    connect(_pQueue, SIGNAL(showQueueLabelsInUI(int, int, int, int, int)),
-            this, SLOT(showQueueLabelsInUI(int, int, int, int, int)));
+    connect(_pQueue, SIGNAL(showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t)),
+            this, SLOT(showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t)));
     connect(_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
             this, SLOT(addTextToLogPTEInUI(QString, LOG)));
     connect(_pQueue, SIGNAL(showQueuedArmCmdsOnCore()),
@@ -64,10 +70,10 @@ void Dobot::onGetPoseTimer()
     getPoseTimer->start(); //auto restart timer
 }
 
-void Dobot::showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
-                                int nCoreIdLeft, int nCoreNextId)
+void Dobot::showQueueLabelsInUI(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                                int nCoreIdLeft, uint64_t un64CoreNextId)
 {
-    emit this->queueLabels(nSpace, nDobotId, nCoreMaxId, nCoreIdLeft, nCoreNextId);
+    emit this->queueLabels(unSpace, un64DobotId, un64CoreMaxId, nCoreIdLeft, un64CoreNextId);
 }
 
 void Dobot::addTextToLogPTEInUI(QString QStrTxt, LOG log)
@@ -302,8 +308,11 @@ void Dobot::sendMoveToArm(DobotMove move)
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
                               /*= VM_NONE*/, bool bRetreat /*= false*/)
 {
-    if (_bConnectedToDobot && _bFirstMoveIsDone &&
-            this->isPointTotallyDiffrentFromLast(dest3D)) return;
+    if (!_bConnectedToDobot)
+    {
+        qDebug() << "ERROR: Dobot::queueMoveSequence(): dobot not connected";
+        return;
+    }
 
     if (VertMove == VM_GRAB)
         this->addArmMoveToQueue(DM_OPEN);
@@ -329,17 +338,17 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
     this->armUpDown(DM_UP, dest3D.z);
 }
 
-bool Dobot::isPointTotallyDiffrentFromLast(Point3D point)
+bool Dobot::isMoveSafe(Point3D point)
 {
-    if (point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y
-            && point.z != _lastGivenPoint.z)
+    if (point.z <= _dSafeAxisZ && point.x != _lastGivenPoint.x &&
+            point.y != _lastGivenPoint.y)
     {
-        qDebug() << "ERROR: Dobot::isPointTotallyDiffrentFromLast(): moves in 3 axis "
-                    "at once are forbidden. point =" << point.getAsQStr()
-                 << "_lastGivenPoint =" << _lastGivenPoint.getAsQStr();
-        return true;
+        qDebug() << "ERROR: Dobot::isMoveSafe(): it's not. given point =" <<
+                    point.getAsQStr() << ", _lastGivenPoint =" <<
+                    _lastGivenPoint.getAsQStr() << ", _dSafeAxisZ =" << _dSafeAxisZ;
+        return false;
     }
-    else return false;
+    else return true;
 }
 
 bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
@@ -356,8 +365,7 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
 
 void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
 {
-    if (!_bFirstMoveIsDone && (Type == DM_TO_POINT || Type == DM_UP ||
-                               Type == DM_DOWN))
+    if (!_bFirstMoveIsDone && (Type == DM_TO_POINT || Type == DM_UP || Type == DM_DOWN))
     {
         qDebug() << "WARNING: Dobot::addArmMoveToQueue(): move type =" <<
                     dobotMoveAsQstr(Type) << "cannot be the first arm move";
@@ -370,7 +378,10 @@ void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
 
 void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {
+    if (!this->isMoveSafe(point)) return;
+
     if (!_bFirstMoveIsDone) _bFirstMoveIsDone = true;
+
     _lastGivenPoint = point;
     _pQueue->addArmMoveToQueue(Type, point);
 }

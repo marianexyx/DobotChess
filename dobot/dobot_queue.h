@@ -7,7 +7,7 @@
 #include "vars/log.h"
 #include "DobotDll/DobotDll.h"
 #include "DobotDll/DobotType.h"
-#include "dobot/vars/dobot_moves.h"
+#include "dobot/vars/dobot_move_types.h"
 
 class DobotQueue: public QObject
 {
@@ -57,7 +57,7 @@ signals:
     void showQueuedArmCmdsOnCore();
     void showSentArmCmdsToDobot();
     void sendMoveToArm(DobotMove);
-    void showQueueLabelsInUI(int, int, int, int, int);
+    void showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t);
     void addTextToLogPTEInUI(QString, LOG);
 };
 

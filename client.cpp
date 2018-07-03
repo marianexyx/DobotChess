@@ -324,12 +324,6 @@ void Clients::putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair)
 
 bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
 {
-    /*qDebug() << "Clients::isClientInList(): client basic data: ID ="
-             << QString::number(client.ID) << ", name =" << client.name
-             << ", queue =" << QString::number(client.queue);*/
-
-    //todo:     if (_clients.contains())
-
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.ID == client.ID)
@@ -394,10 +388,7 @@ Client Clients::getPlayer(PLAYER_TYPE Type)
     Q_FOREACH (Client cl, _clients)
     {
         if (cl.type == Type)
-        {
             return cl;
-            //return _clients.at(_clients.indexOf(cl)); //todo: at/value?
-        }
     }
 
     qDebug() << "ERROR: Clients::getPlayer(PLAYER_TYPE): client not found";
@@ -550,13 +541,18 @@ bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
     return true;
 }
 
-bool Clients::isGameTableOccupied() //todo: occupied is when 1 or 2 players are on chairs?..
-//... change funtion logic for checking for free/empty table
-//...or make 2 functions: "isEmpty", and "fullyOccupied"
+bool Clients::isWholeGameTableEmpty()
 {
-    if (this->isPlayerChairEmpty(PT_WHITE) || this->isPlayerChairEmpty(PT_BLACK))
+    if (this->isPlayerChairEmpty(PT_WHITE) && this->isPlayerChairEmpty(PT_BLACK))
         return false;
     else return true;
+}
+
+bool Clients::isWholeGameTableOccupied()
+{
+    if (!this->isPlayerChairEmpty(PT_WHITE) && !this->isPlayerChairEmpty(PT_BLACK))
+        return true;
+    else return false;
 }
 
 int64_t Clients::getClientPosInQueue(const Client &client)
@@ -737,7 +733,7 @@ int64_t Clients::getNextAvailableClientID()
 
 void Clients::showClientsInUI()
 {
-    emit this->showClientsList(_clients);
+    emit this->showClientsListInUI(_clients);
     emit this->setBoardDataLabel(std::to_string(_clients.size()).c_str(),
                                  BDL_SOCKETS_ONLINE);
 }

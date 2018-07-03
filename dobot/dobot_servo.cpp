@@ -1,11 +1,9 @@
 #include "dobot_servo.h"
 
-DobotServo::DobotServo(/*Dobot* pDobot,*/ float fGripperOpened, float fGripperClosed):
+DobotServo::DobotServo(float fGripperOpened, float fGripperClosed):
     _fGripOpened(fGripperOpened),
     _fGripClosed(fGripperClosed)
 {
-    //_pDobot = pDobot; //todo: is this useless? yep
-    //_pQueue = _pDobot->getQueuePointer();
     qDebug() << "DobotServo::DobotServo(): _fGripOpened =" << _fGripOpened
              << ", _fGripClosed =" << _fGripClosed;
 
@@ -48,22 +46,6 @@ void DobotServo::changeGripperAngle(float fDutyCycle) //info: that should work
     isArmReceivedCorrectCmd(SetIOPWM(&_gripper, false, NULL), SHOW_ERRORS); //unqueued
 }
 
-/*void DobotServo::moveServoManually()
-{
-    if (_arduinoGripperStates.first().ID <= _pQueue->getRealTimeDobotActualID())
-    {
-        QString QStrServoState =
-                _arduinoGripperStates.first().isGripperOpen ? "Open" : "Close";
-        qDebug() << "servo" << QStrServoState << ", servoListLastIndex ="
-                 << _arduinoGripperStates.first().ID << ", dobotActualIndex ="
-                 << _pDobot->getQueuePointer()->getRealTimeDobotActualID();
-        _pDobot->getArduinoPointer()->sendDataToUsb("servo" + QStrServoState);
-        _arduinoGripperStates.removeFirst();
-    }
-
-    _pDobot->showArduinoGripperStateListInUI(_arduinoGripperStates);
-}*/
-
 void DobotServo::openGripper(uint64_t ID)
 {
     qDebug() << "DobotServo::openGripper(): _fGripOpened =" << _fGripOpened
@@ -87,20 +69,3 @@ void DobotServo::wait(uint64_t ID)
     gripperMoveDelay.timeout = 300;
     isArmReceivedCorrectCmd(SetWAITCmd(&gripperMoveDelay, true, &ID), SHOW_ERRORS);
 }
-
-/*void DobotServo::addServoMoveToGripperStatesList(DOBOT_MOVE_TYPE MoveType)
-{
-    if (MoveType != DM_UP && MoveType != DM_DOWN)
-    {
-        qDebug() << "ERROR: DobotServo::addServoMoveToGripperStatesList(): wrong "
-                    "MoveType =" << MoveType;
-        return;
-    }
-
-    ServoArduino servoState;
-    servoState.ID = _pQueue->getCoreQueuedCmdID();
-    servoState.isGripperOpen = (MoveType == DM_OPEN) ? true : false;
-    qDebug() << "DobotQueue::addArmMoveToQueue():" << dobotMoveAsQstr(MoveType);
-
-    _arduinoGripperStates << servoState;
-}*/

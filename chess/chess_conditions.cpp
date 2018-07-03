@@ -159,15 +159,16 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
         bSuccess = true;
         break;
     default:
-        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): unknown REQUEST TYPE =" << Type;
+        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): unknown REQUEST TYPE ="
+                 << Type;
         bSuccess = false;
     }
 
     if (!bSuccess)
     {
-        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = " << requestTypeAsQStr(Type)
-                 << ". bLogged =" << bLogged << ", bSittingOnChair =" << bSittingOnChair
-                 << ", bInQueue =" << bInQueue;
+        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = " <<
+                    requestTypeAsQStr(Type) << ". bLogged =" << bLogged <<
+                    ", bSittingOnChair =" << bSittingOnChair << ", bInQueue =" << bInQueue;
     }
 
     return bSuccess;
@@ -200,7 +201,7 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
             return true;
         else return false;
     case RT_QUEUE_ME:
-        if (_pClientsList->isGameTableOccupied())
+        if (_pClientsList->isWholeGameTableOccupied())
             return true;
         else return false;
     case RT_LEAVE_QUEUE:

@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[79];
-    char stringdata0[1466];
+    QByteArrayData data[80];
+    char stringdata0[1485];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -73,44 +73,45 @@ QT_MOC_LITERAL(37, 539, 39), // "on_emulatePlayerMsgLineEdit_t..."
 QT_MOC_LITERAL(38, 579, 15), // "QStrTextChanged"
 QT_MOC_LITERAL(39, 595, 30), // "on_sendSimulatedMsgBtn_clicked"
 QT_MOC_LITERAL(40, 626, 14), // "setQueueLabels"
-QT_MOC_LITERAL(41, 641, 10), // "nSpaceLeft"
-QT_MOC_LITERAL(42, 652, 8), // "nDobotId"
-QT_MOC_LITERAL(43, 661, 10), // "nCoreMaxId"
-QT_MOC_LITERAL(44, 672, 11), // "nCoreIdLeft"
-QT_MOC_LITERAL(45, 684, 11), // "nCoreNextId"
-QT_MOC_LITERAL(46, 696, 23), // "showQueuedArmCmdsOnCore"
-QT_MOC_LITERAL(47, 720, 22), // "showSentArmCmdsToDobot"
-QT_MOC_LITERAL(48, 743, 23), // "on_calibrateBtn_clicked"
-QT_MOC_LITERAL(49, 767, 16), // "on_upBtn_clicked"
-QT_MOC_LITERAL(50, 784, 18), // "on_downBtn_clicked"
-QT_MOC_LITERAL(51, 803, 29), // "on_resetDobotIndexBtn_clicked"
-QT_MOC_LITERAL(52, 833, 16), // "on_AIBtn_clicked"
-QT_MOC_LITERAL(53, 850, 25), // "on_AIEnemySendBtn_clicked"
-QT_MOC_LITERAL(54, 876, 15), // "showClientsList"
-QT_MOC_LITERAL(55, 892, 13), // "QList<Client>"
-QT_MOC_LITERAL(56, 906, 4), // "list"
-QT_MOC_LITERAL(57, 911, 19), // "updatePortsComboBox"
-QT_MOC_LITERAL(58, 931, 9), // "nUsbPorst"
-QT_MOC_LITERAL(59, 941, 36), // "on_portsComboBox_currentIndex..."
-QT_MOC_LITERAL(60, 978, 25), // "on_reloadPortsBtn_clicked"
-QT_MOC_LITERAL(61, 1004, 21), // "on_sendUsbBtn_clicked"
-QT_MOC_LITERAL(62, 1026, 25), // "on_openGripperBtn_clicked"
-QT_MOC_LITERAL(63, 1052, 26), // "on_closeGripperBtn_clicked"
-QT_MOC_LITERAL(64, 1079, 24), // "on_startGmPosBtn_clicked"
-QT_MOC_LITERAL(65, 1104, 24), // "on_startDtPosBtn_clicked"
-QT_MOC_LITERAL(66, 1129, 29), // "on_SimulateFromUsbBtn_clicked"
-QT_MOC_LITERAL(67, 1159, 21), // "on_sendTcpBtn_clicked"
-QT_MOC_LITERAL(68, 1181, 30), // "on_sendTcpLineEdit_textChanged"
-QT_MOC_LITERAL(69, 1212, 38), // "on_SimulateFromUsbLineEdit_te..."
-QT_MOC_LITERAL(70, 1251, 18), // "on_homeBtn_clicked"
-QT_MOC_LITERAL(71, 1270, 25), // "on_usbCmdLine_textChanged"
-QT_MOC_LITERAL(72, 1296, 25), // "on_middleAboveBtn_clicked"
-QT_MOC_LITERAL(73, 1322, 18), // "on_sendBtn_clicked"
-QT_MOC_LITERAL(74, 1341, 23), // "on_xPTPEdit_textChanged"
-QT_MOC_LITERAL(75, 1365, 23), // "on_yPTPEdit_textChanged"
-QT_MOC_LITERAL(76, 1389, 23), // "on_zPTPEdit_textChanged"
-QT_MOC_LITERAL(77, 1413, 25), // "on_retreatLeftBtn_clicked"
-QT_MOC_LITERAL(78, 1439, 26) // "on_retreatRightBtn_clicked"
+QT_MOC_LITERAL(41, 641, 7), // "unSpace"
+QT_MOC_LITERAL(42, 649, 8), // "uint64_t"
+QT_MOC_LITERAL(43, 658, 11), // "un64DobotId"
+QT_MOC_LITERAL(44, 670, 13), // "un64CoreMaxId"
+QT_MOC_LITERAL(45, 684, 11), // "nCoreIdLeft"
+QT_MOC_LITERAL(46, 696, 14), // "un64CoreNextId"
+QT_MOC_LITERAL(47, 711, 23), // "showQueuedArmCmdsOnCore"
+QT_MOC_LITERAL(48, 735, 22), // "showSentArmCmdsToDobot"
+QT_MOC_LITERAL(49, 758, 23), // "on_calibrateBtn_clicked"
+QT_MOC_LITERAL(50, 782, 16), // "on_upBtn_clicked"
+QT_MOC_LITERAL(51, 799, 18), // "on_downBtn_clicked"
+QT_MOC_LITERAL(52, 818, 29), // "on_resetDobotIndexBtn_clicked"
+QT_MOC_LITERAL(53, 848, 16), // "on_AIBtn_clicked"
+QT_MOC_LITERAL(54, 865, 25), // "on_AIEnemySendBtn_clicked"
+QT_MOC_LITERAL(55, 891, 19), // "showClientsListInUI"
+QT_MOC_LITERAL(56, 911, 13), // "QList<Client>"
+QT_MOC_LITERAL(57, 925, 4), // "list"
+QT_MOC_LITERAL(58, 930, 19), // "updatePortsComboBox"
+QT_MOC_LITERAL(59, 950, 9), // "nUsbPorst"
+QT_MOC_LITERAL(60, 960, 36), // "on_portsComboBox_currentIndex..."
+QT_MOC_LITERAL(61, 997, 25), // "on_reloadPortsBtn_clicked"
+QT_MOC_LITERAL(62, 1023, 21), // "on_sendUsbBtn_clicked"
+QT_MOC_LITERAL(63, 1045, 25), // "on_openGripperBtn_clicked"
+QT_MOC_LITERAL(64, 1071, 26), // "on_closeGripperBtn_clicked"
+QT_MOC_LITERAL(65, 1098, 24), // "on_startGmPosBtn_clicked"
+QT_MOC_LITERAL(66, 1123, 24), // "on_startDtPosBtn_clicked"
+QT_MOC_LITERAL(67, 1148, 29), // "on_SimulateFromUsbBtn_clicked"
+QT_MOC_LITERAL(68, 1178, 21), // "on_sendTcpBtn_clicked"
+QT_MOC_LITERAL(69, 1200, 30), // "on_sendTcpLineEdit_textChanged"
+QT_MOC_LITERAL(70, 1231, 38), // "on_SimulateFromUsbLineEdit_te..."
+QT_MOC_LITERAL(71, 1270, 18), // "on_homeBtn_clicked"
+QT_MOC_LITERAL(72, 1289, 25), // "on_usbCmdLine_textChanged"
+QT_MOC_LITERAL(73, 1315, 25), // "on_middleAboveBtn_clicked"
+QT_MOC_LITERAL(74, 1341, 18), // "on_sendBtn_clicked"
+QT_MOC_LITERAL(75, 1360, 23), // "on_xPTPEdit_textChanged"
+QT_MOC_LITERAL(76, 1384, 23), // "on_yPTPEdit_textChanged"
+QT_MOC_LITERAL(77, 1408, 23), // "on_zPTPEdit_textChanged"
+QT_MOC_LITERAL(78, 1432, 25), // "on_retreatLeftBtn_clicked"
+QT_MOC_LITERAL(79, 1458, 26) // "on_retreatRightBtn_clicked"
 
     },
     "MainWindow\0onChangedMode\0\0onJOGCtrlBtnPressed\0"
@@ -129,14 +130,15 @@ QT_MOC_LITERAL(78, 1439, 26) // "on_retreatRightBtn_clicked"
     "QStrDeviceVersion\0showDobotErrorMsgBox\0"
     "on_emulatePlayerMsgLineEdit_textChanged\0"
     "QStrTextChanged\0on_sendSimulatedMsgBtn_clicked\0"
-    "setQueueLabels\0nSpaceLeft\0nDobotId\0"
-    "nCoreMaxId\0nCoreIdLeft\0nCoreNextId\0"
-    "showQueuedArmCmdsOnCore\0showSentArmCmdsToDobot\0"
-    "on_calibrateBtn_clicked\0on_upBtn_clicked\0"
-    "on_downBtn_clicked\0on_resetDobotIndexBtn_clicked\0"
+    "setQueueLabels\0unSpace\0uint64_t\0"
+    "un64DobotId\0un64CoreMaxId\0nCoreIdLeft\0"
+    "un64CoreNextId\0showQueuedArmCmdsOnCore\0"
+    "showSentArmCmdsToDobot\0on_calibrateBtn_clicked\0"
+    "on_upBtn_clicked\0on_downBtn_clicked\0"
+    "on_resetDobotIndexBtn_clicked\0"
     "on_AIBtn_clicked\0on_AIEnemySendBtn_clicked\0"
-    "showClientsList\0QList<Client>\0list\0"
-    "updatePortsComboBox\0nUsbPorst\0"
+    "showClientsListInUI\0QList<Client>\0"
+    "list\0updatePortsComboBox\0nUsbPorst\0"
     "on_portsComboBox_currentIndexChanged\0"
     "on_reloadPortsBtn_clicked\0"
     "on_sendUsbBtn_clicked\0on_openGripperBtn_clicked\0"
@@ -190,36 +192,36 @@ static const uint qt_meta_data_MainWindow[] = {
       37,    1,  313,    2, 0x08 /* Private */,
       39,    0,  316,    2, 0x08 /* Private */,
       40,    5,  317,    2, 0x08 /* Private */,
-      46,    0,  328,    2, 0x08 /* Private */,
-      47,    0,  329,    2, 0x08 /* Private */,
-      48,    0,  330,    2, 0x08 /* Private */,
-      49,    0,  331,    2, 0x08 /* Private */,
-      50,    0,  332,    2, 0x08 /* Private */,
-      51,    0,  333,    2, 0x08 /* Private */,
-      52,    0,  334,    2, 0x08 /* Private */,
-      53,    0,  335,    2, 0x08 /* Private */,
-      54,    1,  336,    2, 0x08 /* Private */,
-      57,    1,  339,    2, 0x08 /* Private */,
-      59,    1,  342,    2, 0x08 /* Private */,
-      60,    0,  345,    2, 0x08 /* Private */,
-      61,    0,  346,    2, 0x08 /* Private */,
-      62,    0,  347,    2, 0x08 /* Private */,
-      63,    0,  348,    2, 0x08 /* Private */,
-      64,    0,  349,    2, 0x08 /* Private */,
-      65,    0,  350,    2, 0x08 /* Private */,
-      66,    0,  351,    2, 0x08 /* Private */,
-      67,    0,  352,    2, 0x08 /* Private */,
-      68,    1,  353,    2, 0x08 /* Private */,
-      69,    1,  356,    2, 0x08 /* Private */,
-      70,    0,  359,    2, 0x08 /* Private */,
-      71,    1,  360,    2, 0x08 /* Private */,
-      72,    0,  363,    2, 0x08 /* Private */,
-      73,    0,  364,    2, 0x08 /* Private */,
-      74,    1,  365,    2, 0x08 /* Private */,
-      75,    1,  368,    2, 0x08 /* Private */,
-      76,    1,  371,    2, 0x08 /* Private */,
-      77,    0,  374,    2, 0x08 /* Private */,
-      78,    0,  375,    2, 0x08 /* Private */,
+      47,    0,  328,    2, 0x08 /* Private */,
+      48,    0,  329,    2, 0x08 /* Private */,
+      49,    0,  330,    2, 0x08 /* Private */,
+      50,    0,  331,    2, 0x08 /* Private */,
+      51,    0,  332,    2, 0x08 /* Private */,
+      52,    0,  333,    2, 0x08 /* Private */,
+      53,    0,  334,    2, 0x08 /* Private */,
+      54,    0,  335,    2, 0x08 /* Private */,
+      55,    1,  336,    2, 0x08 /* Private */,
+      58,    1,  339,    2, 0x08 /* Private */,
+      60,    1,  342,    2, 0x08 /* Private */,
+      61,    0,  345,    2, 0x08 /* Private */,
+      62,    0,  346,    2, 0x08 /* Private */,
+      63,    0,  347,    2, 0x08 /* Private */,
+      64,    0,  348,    2, 0x08 /* Private */,
+      65,    0,  349,    2, 0x08 /* Private */,
+      66,    0,  350,    2, 0x08 /* Private */,
+      67,    0,  351,    2, 0x08 /* Private */,
+      68,    0,  352,    2, 0x08 /* Private */,
+      69,    1,  353,    2, 0x08 /* Private */,
+      70,    1,  356,    2, 0x08 /* Private */,
+      71,    0,  359,    2, 0x08 /* Private */,
+      72,    1,  360,    2, 0x08 /* Private */,
+      73,    0,  363,    2, 0x08 /* Private */,
+      74,    0,  364,    2, 0x08 /* Private */,
+      75,    1,  365,    2, 0x08 /* Private */,
+      76,    1,  368,    2, 0x08 /* Private */,
+      77,    1,  371,    2, 0x08 /* Private */,
+      78,    0,  374,    2, 0x08 /* Private */,
+      79,    0,  375,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -241,7 +243,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,   38,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,   41,   42,   43,   44,   45,
+    QMetaType::Void, QMetaType::UInt, 0x80000000 | 42, 0x80000000 | 42, QMetaType::Int, 0x80000000 | 42,   41,   43,   44,   45,   46,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -250,8 +252,8 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 55,   56,
-    QMetaType::Void, QMetaType::Int,   58,
+    QMetaType::Void, 0x80000000 | 56,   57,
+    QMetaType::Void, QMetaType::Int,   59,
     QMetaType::Void, QMetaType::Int,    4,
     QMetaType::Void,
     QMetaType::Void,
@@ -301,7 +303,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 16: _t->showDobotErrorMsgBox(); break;
         case 17: _t->on_emulatePlayerMsgLineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 18: _t->on_sendSimulatedMsgBtn_clicked(); break;
-        case 19: _t->setQueueLabels((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
+        case 19: _t->setQueueLabels((*reinterpret_cast< uint(*)>(_a[1])),(*reinterpret_cast< uint64_t(*)>(_a[2])),(*reinterpret_cast< uint64_t(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< uint64_t(*)>(_a[5]))); break;
         case 20: _t->showQueuedArmCmdsOnCore(); break;
         case 21: _t->showSentArmCmdsToDobot(); break;
         case 22: _t->on_calibrateBtn_clicked(); break;
@@ -310,7 +312,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 25: _t->on_resetDobotIndexBtn_clicked(); break;
         case 26: _t->on_AIBtn_clicked(); break;
         case 27: _t->on_AIEnemySendBtn_clicked(); break;
-        case 28: _t->showClientsList((*reinterpret_cast< QList<Client>(*)>(_a[1]))); break;
+        case 28: _t->showClientsListInUI((*reinterpret_cast< QList<Client>(*)>(_a[1]))); break;
         case 29: _t->updatePortsComboBox((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 30: _t->on_portsComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 31: _t->on_reloadPortsBtn_clicked(); break;

@@ -47,7 +47,7 @@ private:
     Clients* _pClientsList;
     Chess* _pChess;
 
-    QTimer* _titleFormTitle;
+    QTimer* _titleFormTimer;
 
     void initControl();
 
@@ -76,8 +76,8 @@ private slots:
     void showDobotErrorMsgBox();
     void on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged);
     void on_sendSimulatedMsgBtn_clicked();
-    void setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId, int nCoreIdLeft,
-                        int nCoreNextId);
+    void setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                        int nCoreIdLeft, uint64_t un64CoreNextId);
     void showQueuedArmCmdsOnCore();
     void showSentArmCmdsToDobot();
 
@@ -88,7 +88,7 @@ private slots:
     void on_resetDobotIndexBtn_clicked();
     void on_AIBtn_clicked();
     void on_AIEnemySendBtn_clicked();
-    void showClientsList(QList<Client> list);
+    void showClientsListInUI(QList<Client> list);
 
     //arduino usb slots
     void updatePortsComboBox(int nUsbPorst);

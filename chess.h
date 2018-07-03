@@ -53,11 +53,12 @@ private:
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     void sendMsgToTcp(QString QStrMsg);
     void newClientName(Client& client, clientRequest request);
-    void removeClientFromList(Client& client);
+    void restorateGameIfDisconnectedClientAffectIt(Client& client);
     void sendDataToClient(QString QStrMsg, Client client = Client());
     void sendDataToAllClients(QString QStrMsg);
     QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
                           PLAYER_TYPE PlayerToClear = PT_NONE);
+    void updateClientsInUI();
 
     //gameplay methods
     void coreIsReadyForNewGame();
@@ -66,6 +67,7 @@ private:
     void continueGameplay();
     void restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear = PT_NONE);
     void changePlayersOnChairs();
+    void resetTableData();
 
 public:
     Chess(PieceController* pPieceController, Chessboard* pBoardChenard,

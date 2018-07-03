@@ -114,7 +114,7 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     else
     {
         qDebug() << "ERROR: PosFromTo::isMoveInProperFormat(): wrong length:"
-                 << QStrMoveFromTo.length();
+                 << QStrMoveFromTo.length() << ". full string =" << QStrMoveFromTo;
         return false;
     }
 

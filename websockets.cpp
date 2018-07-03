@@ -1,11 +1,22 @@
 #include "websockets.h"
 
-Websockets::Websockets(Clients* pClientsList, quint16 port, QObject* parent):
+Websockets::Websockets(Clients* pClientsList,  QObject* parent):
     QObject(parent),
     _pClientsList()
 {
     _pClientsList = pClientsList;
+}
 
+Websockets::~Websockets()
+{
+    _pWebSocketServer->close();
+
+    //future: not needed for just one instance of class
+    //qDeleteAll(_pClientsList.begin(), _pClientsList.end());
+}
+
+void Websockets::listenOnPort(quint16 port)
+{
     _pWebSocketServer = new QWebSocketServer(QStringLiteral("Chat Server"),
                                               QWebSocketServer::NonSecureMode, this);
     if (_pWebSocketServer->listen(QHostAddress::Any, port))
@@ -15,16 +26,9 @@ Websockets::Websockets(Clients* pClientsList, quint16 port, QObject* parent):
         connect(_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
 
-        emit this->addTextToLogPTE("WebSocket server listening on port" + port, LOG_WEBSOCKET);
+        emit this->addTextToLogPTE("Server listening on port " +
+                                   QString::number(port) + "\n", LOG_WEBSOCKET);
     }
-}
-
-Websockets::~Websockets()
-{
-    _pWebSocketServer->close();
-
-    //future: not needed for just one instance of class
-    //qDeleteAll(_pClientsList.begin(), _pClientsList.end());
 }
 
 void Websockets::onNewConnection()
@@ -75,7 +79,6 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
     else
     {
         Client receiver = _pClientsList->getClient(n64ReceiverID);
-        //QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
         emit this->addTextToLogPTE("send to: " + receiver.name + " : " + QStrMsg + "\n",
                                     LOG_WEBSOCKET);
         receiver.socket->sendTextMessage(QStrMsg);
@@ -84,7 +87,6 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 
 void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
-    //QString QStrLog = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
     emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())

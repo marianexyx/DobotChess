@@ -68,7 +68,8 @@ void XmlReader::readPiece(QDomNodeList piece)
 
             if (param.attribute("name") == "height")
                 _vars.fPieceHeight = param.attribute("val").toFloat();
-            else qDebug() << "ERROR: XmlReader::readPiece(): param name != height";
+            else qDebug() << "ERROR: XmlReader::readPiece(): param name != "
+                             "height. it's =" << param.attribute("name");
         }
     }
 }

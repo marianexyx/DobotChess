@@ -32,6 +32,7 @@ public:
     void castlingMoveSequence(Field* pFrom, Field* pTo);
     void enpassantMoveSequence(Field* pFrom, Field* pTo);
     void promoteMoveSequence(Field* pFrom, Field* pTo);
+    void promoteWithRemoveMoveSequence(Field* pFrom, Field* pTo);
     bool resetPiecePositions();
 };
 

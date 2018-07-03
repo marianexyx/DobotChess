@@ -58,7 +58,8 @@ public:
     Client getNextQueuedClient();
     QString getQueuedClientsList();
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
-    bool isGameTableOccupied();
+    bool isWholeGameTableEmpty();
+    bool isWholeGameTableOccupied();
     int64_t getClientPosInQueue(const Client& client);
     QWebSocket* getPlayerSocket(PLAYER_TYPE Type);
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
@@ -80,7 +81,7 @@ public slots:
 
 signals:
     void addTextToLogPTE(QString, LOG);
-    void showClientsList(QList<Client>);
+    void showClientsListInUI(QList<Client>);
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
 };
 

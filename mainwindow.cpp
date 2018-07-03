@@ -20,12 +20,11 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     _pClientsList = _pChess->getClientsPointer();
     _pUsb = _pChess->getDobotPointer()->getArduinoPointer();
 
-
-    _titleFormTitle = new QTimer();
-    _titleFormTitle->setInterval(200);
-    _titleFormTitle->setSingleShot(false);
-    connect(_titleFormTitle, SIGNAL(timeout()), this, SLOT(changeWindowTitle()));
-    _titleFormTitle->start();
+    _titleFormTimer = new QTimer();
+    _titleFormTimer->setInterval(200);
+    _titleFormTimer->setSingleShot(false);
+    connect(_titleFormTimer, SIGNAL(timeout()), this, SLOT(changeWindowTitle()));
+    _titleFormTimer->start();
 
     //ui signals to classes
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
@@ -69,8 +68,8 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
             this, SLOT(showLegalMovesInUI(QStringList)));
     connect(_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
             this, SLOT(showHistoryMovesInUI(QStringList)));
-    connect(_pClientsList, SIGNAL(showClientsList(QList<Client>)),
-            this, SLOT(showClientsList(QList<Client>)));
+    connect(_pClientsList, SIGNAL(showClientsListInUI(QList<Client>)),
+            this, SLOT(showClientsListInUI(QList<Client>)));
     connect(_pDobot, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
     connect(_pDobot, SIGNAL(AxisLabelText(QString, char)),
@@ -81,8 +80,8 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
             this, SLOT(setDobotButtonsStates(bool)));
     connect(_pDobot, SIGNAL(DobotErrorMsgBox()),
             this, SLOT(showDobotErrorMsgBox()));
-    connect(_pDobot, SIGNAL(queueLabels(int, int, int, int, int)),
-            this, SLOT(setQueueLabels(int, int, int, int, int)));
+    connect(_pDobot, SIGNAL(queueLabels(uint, uint64_t, uint64_t, int, uint64_t)),
+            this, SLOT(setQueueLabels(uint, uint64_t, uint64_t, int, uint64_t)));
     connect(_pUsb, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
     connect(_pPieceController, SIGNAL(showRealBoardInUI()),
@@ -93,6 +92,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
             this, SLOT(showSentArmCmdsToDobot()));
 
     this->initControl(); //init dobot JOG control
+    _pWebSockets->listenOnPort(1234);
 
     //future: make many tooltips
     ui->directTcpMsgCheckBox->setToolTip("//todo:");
@@ -131,17 +131,17 @@ void MainWindow::setAxisLabelText(QString QStrAxisLabelText, char chAxis)
     else if (chAxis == 'r') ui->rLabel->setText(QStrAxisLabelText);
 }
 
-void MainWindow::setQueueLabels(int nSpaceLeft, int nDobotId, int nCoreMaxId,
-                                int nCoreIdLeft, int nCoreNextId)
+void MainWindow::setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                                int nCoreIdLeft, uint64_t un64CoreNextId)
 {
-    if (nSpaceLeft == 0) nSpaceLeft = 1;  //future: it's only for temporary block...
+    if (unSpace == 0) unSpace = 1;  //future: it's only for temporary block...
     //...warning about unused parameter, till i will not check this function
     //ui->DobotQueuedCmdLeftSpaceLabel->
     //setText(QString::number(nSpace)); //future: make it by myself, or wait for update
-    ui->DobotQueuedIndexLabel->setText(QString::number(nDobotId));
-    ui->CoreMaxQueuedIndexLabel->setText(QString::number(nCoreMaxId));
+    ui->DobotQueuedIndexLabel->setText(QString::number(un64DobotId));
+    ui->CoreMaxQueuedIndexLabel->setText(QString::number(un64CoreMaxId));
     ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
-    ui->CoreNextIdLabel->setText(QString::number(nCoreNextId));
+    ui->CoreNextIdLabel->setText(QString::number(un64CoreNextId));
 }
 
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
@@ -381,7 +381,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
         {
             QStrServiceMove += "a1"; //walkaround
             if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
-            {
+            {                
                 PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
                 Field* pFieldFrom = _pBoardMain->getField(fromTo.from);
                 _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldFrom);
@@ -649,7 +649,7 @@ void MainWindow::showSentArmCmdsToDobot()
     ui->queuedOnDobot->setPlainText(QStrQueuedList);
 }
 
-void MainWindow::showClientsList(QList<Client> list)
+void MainWindow::showClientsListInUI(QList<Client> list)
 {
     QString QStrClientsList;
     Client client;

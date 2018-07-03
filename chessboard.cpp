@@ -171,7 +171,6 @@ void Chessboard::calculateRetreatPoints()
 
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*= false*/)
 {
-
     if (pField->isFieldOccupied(SHOW_ERRORS)) return;
     if (pPiece != nullptr && this->isPieceAlreadyExistsOnBoard(pPiece, SHOW_ERRORS)) return;
 
@@ -179,8 +178,8 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
 
     if (bDebugLog)
         qDebug() << "Chessboard::setPieceOnField(): new pieceNr ="
-                 << (pPiece == nullptr ? 0 : pPiece->getNr())
-                 << "on fieldNr =" << pField->getNrAsQStr();
+                 << (pPiece == nullptr ? 0 : pPiece->getNr()) << "on fieldNr ="
+                 << pField->getNrAsQStr() << "on" << boardTypeAsQstr(_boardType) ;
 }
 
 void Chessboard::clearField(Field* pField, bool bErrorLog /*= false*/)

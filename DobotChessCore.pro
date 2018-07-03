@@ -52,7 +52,6 @@ HEADERS  +=  \
     chess/chess_movements.h \
     chess/chess_status.h \
     chess/chess_timers.h \
-    dobot/vars/dobot_moves.h \
     dobot/dobot_queue.h \
     dobot/dobot_servo.h \
     DobotDll/DobotDll.h \
@@ -78,7 +77,8 @@ HEADERS  +=  \
     tcpmsgs.h \
     ui_mainwindow.h \
     websockets.h \
-    xml_reader.h
+    xml_reader.h \
+    dobot/vars/dobot_move_types.h
 
 FORMS    += mainwindow.ui
 

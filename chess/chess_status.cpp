@@ -57,6 +57,7 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
     {
         if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
+        else if (this->isMovePromotionWithRemoving(QStrMove)) return ST_PROMOTION_WITH_REMOVING;
         else if (this->isMoveRemoving(QStrMove)) return ST_REMOVING;
         else if (this->isMovePromotion(QStrMove)) return ST_PROMOTION;
         else return ST_REGULAR;
@@ -71,12 +72,21 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 
 bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
 {
-    //todo: and what if move contains remove, and promotion?
     if (QStrMoveToTest.length() != 4) return false;
 
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
     if (_pBoardMain->getField(move.to)->getPieceOnField() != nullptr)
         return true;
+    else return false;
+}
+
+bool ChessStatus::isMovePromotionWithRemoving(QString QStrMoveToTest)
+{
+    if (ChessStatus::isMovePromotion(QStrMoveToTest))
+    {
+        if (this->isMoveRemoving(QStrMoveToTest.left(4))) return true;
+        else return false;
+    }
     else return false;
 }
 
@@ -186,7 +196,8 @@ void ChessStatus::setMove(QString QStrMove)
     _MoveType = this->findMoveType(QStrMove);
     qDebug() << "ChessStatus::setMove(): found move type ="
              << sequenceTypeAsQstr(_MoveType);
-    if (_MoveType == ST_PROMOTION) QStrMove = QStrMove.left(4);
+    if (_MoveType == ST_PROMOTION || _MoveType == ST_PROMOTION_WITH_REMOVING)
+        QStrMove = QStrMove.left(4);
     _PosMove = PosFromTo::fromQStr(QStrMove);
 }
 

@@ -38,7 +38,7 @@ void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
     if (pFieldFrom == nullptr || pFieldTo == nullptr)
     {
         qDebug() << "ERROR: ChessMovements::doMoveSequence(): pFieldFrom or pFieldTo"
-                    "is nullptr";
+                    " is nullptr";
         return;
     }
 
@@ -52,6 +52,8 @@ void ChessMovements::doMoveSequence(PosFromTo PosMove, SEQUENCE_TYPE Type)
     case ST_ENPASSANT: this->enpassantMoveSequence(pFieldFrom, pFieldTo); break;
     case ST_CASTLING: this->castlingMoveSequence(pFieldFrom, pFieldTo); break;
     case ST_PROMOTION: this->promoteMoveSequence(pFieldFrom, pFieldTo); break;
+    case ST_PROMOTION_WITH_REMOVING:
+        this->promoteWithRemoveMoveSequence(pFieldFrom, pFieldTo); break;
     case ST_NONE:
     default:
         qDebug() << "ERROR: ChessMovements::doMoveSequence(): wrong MoveType:"
@@ -130,6 +132,12 @@ void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
 //future:
 void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo)
 {
+    this->regularMoveSequence(pFrom, pTo);
+}
+
+void ChessMovements::promoteWithRemoveMoveSequence(Field* pFrom, Field* pTo)
+{
+    this->removeMoveSequence(pTo);
     this->regularMoveSequence(pFrom, pTo);
 }
 

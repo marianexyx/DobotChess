@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Clients_t {
     QByteArrayData data[9];
-    char stringdata0[110];
+    char stringdata0[114];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,15 +36,15 @@ QT_MOC_LITERAL(0, 0, 7), // "Clients"
 QT_MOC_LITERAL(1, 8, 15), // "addTextToLogPTE"
 QT_MOC_LITERAL(2, 24, 0), // ""
 QT_MOC_LITERAL(3, 25, 3), // "LOG"
-QT_MOC_LITERAL(4, 29, 15), // "showClientsList"
-QT_MOC_LITERAL(5, 45, 13), // "QList<Client>"
-QT_MOC_LITERAL(6, 59, 17), // "setBoardDataLabel"
-QT_MOC_LITERAL(7, 77, 16), // "BOARD_DATA_LABEL"
-QT_MOC_LITERAL(8, 94, 15) // "showClientsInUI"
+QT_MOC_LITERAL(4, 29, 19), // "showClientsListInUI"
+QT_MOC_LITERAL(5, 49, 13), // "QList<Client>"
+QT_MOC_LITERAL(6, 63, 17), // "setBoardDataLabel"
+QT_MOC_LITERAL(7, 81, 16), // "BOARD_DATA_LABEL"
+QT_MOC_LITERAL(8, 98, 15) // "showClientsInUI"
 
     },
     "Clients\0addTextToLogPTE\0\0LOG\0"
-    "showClientsList\0QList<Client>\0"
+    "showClientsListInUI\0QList<Client>\0"
     "setBoardDataLabel\0BOARD_DATA_LABEL\0"
     "showClientsInUI"
 };
@@ -89,7 +89,7 @@ void Clients::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->addTextToLogPTE((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
-        case 1: _t->showClientsList((*reinterpret_cast< QList<Client>(*)>(_a[1]))); break;
+        case 1: _t->showClientsListInUI((*reinterpret_cast< QList<Client>(*)>(_a[1]))); break;
         case 2: _t->setBoardDataLabel((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABEL(*)>(_a[2]))); break;
         case 3: _t->showClientsInUI(); break;
         default: ;
@@ -105,7 +105,7 @@ void Clients::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         }
         {
             typedef void (Clients::*_t)(QList<Client> );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Clients::showClientsList)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Clients::showClientsListInUI)) {
                 *result = 1;
                 return;
             }
@@ -164,7 +164,7 @@ void Clients::addTextToLogPTE(QString _t1, LOG _t2)
 }
 
 // SIGNAL 1
-void Clients::showClientsList(QList<Client> _t1)
+void Clients::showClientsListInUI(QList<Client> _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

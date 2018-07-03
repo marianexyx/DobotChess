@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DobotQueue_t {
-    QByteArrayData data[9];
-    char stringdata0[127];
+    QByteArrayData data[10];
+    char stringdata0[136];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -38,13 +38,14 @@ QT_MOC_LITERAL(3, 36, 22), // "showSentArmCmdsToDobot"
 QT_MOC_LITERAL(4, 59, 13), // "sendMoveToArm"
 QT_MOC_LITERAL(5, 73, 9), // "DobotMove"
 QT_MOC_LITERAL(6, 83, 19), // "showQueueLabelsInUI"
-QT_MOC_LITERAL(7, 103, 19), // "addTextToLogPTEInUI"
-QT_MOC_LITERAL(8, 123, 3) // "LOG"
+QT_MOC_LITERAL(7, 103, 8), // "uint64_t"
+QT_MOC_LITERAL(8, 112, 19), // "addTextToLogPTEInUI"
+QT_MOC_LITERAL(9, 132, 3) // "LOG"
 
     },
     "DobotQueue\0showQueuedArmCmdsOnCore\0\0"
     "showSentArmCmdsToDobot\0sendMoveToArm\0"
-    "DobotMove\0showQueueLabelsInUI\0"
+    "DobotMove\0showQueueLabelsInUI\0uint64_t\0"
     "addTextToLogPTEInUI\0LOG"
 };
 #undef QT_MOC_LITERAL
@@ -67,14 +68,14 @@ static const uint qt_meta_data_DobotQueue[] = {
        3,    0,   40,    2, 0x06 /* Public */,
        4,    1,   41,    2, 0x06 /* Public */,
        6,    5,   44,    2, 0x06 /* Public */,
-       7,    2,   55,    2, 0x06 /* Public */,
+       8,    2,   55,    2, 0x06 /* Public */,
 
  // signals: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void, 0x80000000 | 5,    2,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int, QMetaType::Int,    2,    2,    2,    2,    2,
-    QMetaType::Void, QMetaType::QString, 0x80000000 | 8,    2,    2,
+    QMetaType::Void, QMetaType::UInt, 0x80000000 | 7, 0x80000000 | 7, QMetaType::Int, 0x80000000 | 7,    2,    2,    2,    2,    2,
+    QMetaType::Void, QMetaType::QString, 0x80000000 | 9,    2,    2,
 
        0        // eod
 };
@@ -88,7 +89,7 @@ void DobotQueue::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->showQueuedArmCmdsOnCore(); break;
         case 1: _t->showSentArmCmdsToDobot(); break;
         case 2: _t->sendMoveToArm((*reinterpret_cast< DobotMove(*)>(_a[1]))); break;
-        case 3: _t->showQueueLabelsInUI((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< int(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< int(*)>(_a[5]))); break;
+        case 3: _t->showQueueLabelsInUI((*reinterpret_cast< uint(*)>(_a[1])),(*reinterpret_cast< uint64_t(*)>(_a[2])),(*reinterpret_cast< uint64_t(*)>(_a[3])),(*reinterpret_cast< int(*)>(_a[4])),(*reinterpret_cast< uint64_t(*)>(_a[5]))); break;
         case 4: _t->addTextToLogPTEInUI((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< LOG(*)>(_a[2]))); break;
         default: ;
         }
@@ -116,7 +117,7 @@ void DobotQueue::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
-            typedef void (DobotQueue::*_t)(int , int , int , int , int );
+            typedef void (DobotQueue::*_t)(uint , uint64_t , uint64_t , int , uint64_t );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&DobotQueue::showQueueLabelsInUI)) {
                 *result = 3;
                 return;
@@ -188,7 +189,7 @@ void DobotQueue::sendMoveToArm(DobotMove _t1)
 }
 
 // SIGNAL 3
-void DobotQueue::showQueueLabelsInUI(int _t1, int _t2, int _t3, int _t4, int _t5)
+void DobotQueue::showQueueLabelsInUI(uint _t1, uint64_t _t2, uint64_t _t3, int _t4, uint64_t _t5)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)), const_cast<void*>(reinterpret_cast<const void*>(&_t4)), const_cast<void*>(reinterpret_cast<const void*>(&_t5)) };
     QMetaObject::activate(this, &staticMetaObject, 3, _a);

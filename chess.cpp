@@ -95,7 +95,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         break;
     case RT_SIT_ON:
         _pClientsList->setPlayerType(client, playerTypeFromQStr(_request.param));
-        if (_pClientsList->isGameTableOccupied())
+        if (_pClientsList->isWholeGameTableOccupied())
             _ChessGameStatus = _pTimers->startQueueTimer();
         this->sendDataToAllClients(this->getTableData());
         break;
@@ -121,7 +121,10 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         this->sendDataToAllClients(this->getTableData());
         break;
     case RT_CLIENT_LEFT:
-        this->removeClientFromList(client);
+        this->restorateGameIfDisconnectedClientAffectIt(client);
+        _pClientsList->removeClientFromList(client);
+        this->sendDataToAllClients(this->getTableData());
+        this->updateClientsInUI();
         break;
     default:
         qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received _request.type:"
@@ -224,8 +227,8 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = 
         qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame"
                     " val:" << playerTypeAsQStr(PlayerType);
 
-    if ((_pClientsList->isGameTableOccupied() && _pClientsList->isStartClickedByBothPlayers())
-            || _PlayerSource == ARDUINO || bService)
+    if ((_pClientsList->isWholeGameTableOccupied() &&
+         _pClientsList->isStartClickedByBothPlayers()) || _PlayerSource == ARDUINO || bService)
     {
         qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
                     "Try to start a game";
@@ -248,7 +251,7 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
 
 void Chess::sendMsgToTcp(QString QStrMsg)
 {
-    emit this->addTextToLogPTE("Sending to tcp:" + QStrMsg + "\n", LOG_CORE);
+    emit this->addTextToLogPTE("Sending to tcp: " + QStrMsg + "\n", LOG_CORE);
 
     _pTCPMsgs->queueCmd(_PlayerSource, QStrMsg);
 }
@@ -266,46 +269,59 @@ void Chess::newClientName(Client& client, clientRequest request)
     else //double login
     {
         qDebug() << "Chess::newClientName(): logout:doubleLogin";
-
         Client oldClient = _pClientsList->getClient(QStrIncomingClientName);
-
-        if (_pClientsList->isClientAPlayer(oldClient))
-            this->restartGame(ET_SOCKET_LOST, oldClient.type);
-        else if (_pClientsList->isClientInQueue(oldClient))
-        {
-            _pClientsList->removeClientFromQueue(oldClient);
-            this->sendDataToAllClients(this->getTableData()); //need to refresh queued clients
-        }
-        else this->sendDataToClient(this->getTableData());
-
+        this->restorateGameIfDisconnectedClientAffectIt(oldClient);
         _pClientsList->setClientName(oldClient, ""); //clear old client name
         oldClient.socket->sendTextMessage("logout:doubleLogin");
+        _pClientsList->removeClientFromList(client);
         _pClientsList->setClientName(client, QStrIncomingClientName); //set new client
+        this->updateClientsInUI();
     }
+
+    this->updateClientsInUI();
 }
 
-void Chess::removeClientFromList(Client& client)
+void Chess::updateClientsInUI()
 {
-    qDebug() << "Chess::removeClientFromList()";
+    QString QStrClientsInList = std::to_string(_pClientsList->getClientsList().size()).c_str();
+    emit this->setBoardDataLabelInUI(QStrClientsInList, BDL_SOCKETS_ONLINE);
+    emit _pClientsList->showClientsListInUI(_pClientsList->getClientsList());
+}
+
+void Chess::resetTableData()
+{
+    _pClientsList->resetPlayersStartConfirmInfo();
+    _pTimers->resetGameTimers();
+    //_pStatus->clearMove(); //future: move clearing must be after sending it, unless...
+    //...it will be read from "history"
+    _pStatus->resetStatusData();
+}
+
+void Chess::restorateGameIfDisconnectedClientAffectIt(Client& client)
+{
+    qDebug() << "Chess::restorateGameIfDisconnectedClientAffectIt()";
+
     if (_pClientsList->isClientAPlayer(client))
     {
         emit this->addTextToLogPTE(playerTypeAsQStr(client.type)
                                    + " player disconnected\n", LOG_CORE);
-        this->restartGame(ET_SOCKET_LOST, client.type);
+        if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
+        {
+            this->resetTableData();
+            _pClientsList->clearPlayerType(client.type);
+        }
+        else this->restartGame(ET_SOCKET_LOST, client.type);
     }
-    else //future: strange behavior with those info- seen more often then we should
-        emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
-
-    _pClientsList->removeClientFromList(client);
-
-    emit this->setBoardDataLabelInUI(std::to_string(_pClientsList->getClientsList().size()).c_str(),
-                            BDL_SOCKETS_ONLINE);
-    emit _pClientsList->showClientsList(_pClientsList->getClientsList());
+    else if (_pClientsList->isClientInQueue(client))
+    {
+        _pClientsList->removeClientFromQueue(client);
+        this->sendDataToAllClients(this->getTableData()); //need to refresh queued clients
+    }
+    else emit this->addTextToLogPTE("non-player disconnected\n", LOG_CORE);
 }
 
 void Chess::sendDataToClient(QString QStrMsg, Client client /* = Client */)
 {
-    //QString QStrMsg = QStrMsg.contains("TABLE_DATA{") ? "TABLE_DATA{...}" : QStrMsg;
     emit this->addTextToLogPTE("Sending msg to " + communicationTypeAsQStr(_PlayerSource)
                                 + ": " + QStrMsg + "\n", LOG_CORE);
 
@@ -374,7 +390,7 @@ void Chess::coreIsReadyForNewGame() //future: not best name?
 
     if (_PlayerSource == WEBSITE)
     {
-        if (_pClientsList->isGameTableOccupied())
+        if (_pClientsList->isWholeGameTableOccupied())
             _ChessGameStatus = _pTimers->startQueueTimer();
         else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
@@ -472,12 +488,7 @@ void Chess::restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear /* = PT_NONE 
 
     _ChessGameStatus = GS_TURN_NONE_RESETING;
 
-    //reset data
-    _pClientsList->resetPlayersStartConfirmInfo();
-    _pTimers->resetGameTimers();
-    //_pStatus->clearMove(); //future: move clearing must be after sending it, unless it will...
-    //...be read from "history"
-    _pStatus->resetStatusData();
+    this->resetTableData();
 
     this->changePlayersOnChairs();
     this->sendDataToAllClients(this->getEndGameMsg(WhoWon, this->getTableData(), PlayerToClear));
@@ -549,7 +560,7 @@ void Chess::timeOutStart()
         _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
     }
 
-    if (_pClientsList->isGameTableOccupied())
+    if (_pClientsList->isWholeGameTableOccupied())
         _ChessGameStatus = _pTimers->startQueueTimer();
     else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 

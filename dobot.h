@@ -16,12 +16,9 @@
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
-#include "dobot/vars/dobot_moves.h" //todo: types
+#include "dobot/vars/dobot_move_types.h"
 #include "dobot/dobot_servo.h"
 #include "dobot/dobot_queue.h"
-
-//class DobotQueue;
-//struct ServoArduino;
 
 class Dobot: public QObject
 {
@@ -44,6 +41,7 @@ private:
     Point3D _homeToMiddleAbove;
     Point3D _realTimePoint;
     Point3D _lastGivenPoint;
+    double _dSafeAxisZ;
 
     void createAndStartPeriodicTimer();
     void createAndStartPoseTimer();
@@ -59,7 +57,7 @@ public:
 
     void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove =
             VM_NONE, bool bRetreat = false);
-    bool isPointTotallyDiffrentFromLast(Point3D point);
+    bool isMoveSafe(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
@@ -88,8 +86,8 @@ public slots:
     void onConnectDobot();
     void onPeriodicTaskTimer();
     void onGetPoseTimer();
-    void showQueueLabelsInUI(int nSpace, int nDobotId, int nCoreMaxId,
-                             int nCoreIdLeft, int nCoreNextId);  //todo: those aren't ints
+    void showQueueLabelsInUI(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                             int nCoreIdLeft, uint64_t un64CoreNextId);
     void addTextToLogPTEInUI(QString QStrTxt, LOG log);
     void showQueuedArmCmdsOnCorePTE() { emit this->showQueuedArmCmdsOnCore(); }
     void showSentArmCmdsToDobotPTE() { emit this->showSentArmCmdsToDobot(); }
@@ -101,7 +99,8 @@ signals: //GUI mainWindow
     void setDobotButtonsStates(bool bDobotButtonsStates);
     void deviceLabels(QString QStrDeviceSN, QString QStrDeviceName, QString QStrDeviceVersion);
     void DobotErrorMsgBox();
-    void queueLabels(int nSpace, int nDobotId, int nCoreMaxId, int nCoreIdLeft, int nCoreNextId);
+    void queueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                     int nCoreIdLeft, uint64_t un64CoreNextId);
     void showArduinoGripperStateList(QList<ServoArduino>);
     void showQueuedArmCmdsOnCore();
     void showSentArmCmdsToDobot();

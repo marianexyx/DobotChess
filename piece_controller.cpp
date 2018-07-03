@@ -79,7 +79,8 @@ bool PieceController::isPieceSetOk()
         if (!bPieceExists)
         {
             qDebug() << "ERROR: PieceController::isPieceSetOk(): it isn't, missing piece nr:"
-                     << sPiece << ". item (piece) nr in gripper =" << _pDobot->getItemInGripper();
+                     << sPiece << ". item (piece) nr in gripper ="
+                     << _pDobot->getItemInGripper();
             return false;
         }
     }

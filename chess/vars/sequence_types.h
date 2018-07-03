@@ -13,7 +13,8 @@ enum SEQUENCE_TYPE
     ST_PROMOTION,
     ST_ENPASSANT,
     ST_CASTLING,
-    ST_REMOVING
+    ST_REMOVING,
+    ST_PROMOTION_WITH_REMOVING
 };
 
 inline QString sequenceTypeAsQstr(SEQUENCE_TYPE ST)
@@ -27,6 +28,7 @@ inline QString sequenceTypeAsQstr(SEQUENCE_TYPE ST)
     case ST_ENPASSANT: return "enpassant";
     case ST_CASTLING: return "castling";
     case ST_REMOVING: return "removing";
+    case ST_PROMOTION_WITH_REMOVING: return "promotionWithRemoving";
     default:
         qDebug() << "ERROR: sequenceTypeAsQstr(): wrong arg =" << ST;
         return "";
