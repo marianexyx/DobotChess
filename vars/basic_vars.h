@@ -33,7 +33,8 @@ struct Point3D
     double y;
     double z;
 
-    bool operator==(const struct Point3D& p) { return x == p.x && y == p.y && z == p.z; }
+    bool operator==(const struct Point3D& p)
+    { return x == p.x && y == p.y && z == p.z; }
 
     Point3D(): x(0.f), y(0.f), z(0.f) {}
     Point3D(double dX, double dY, double dZ): x(dX), y(dY), z(dZ) {}
@@ -88,6 +89,22 @@ inline bool isPointInLimits(Point3D point) //todo: xml
                     " scope range. point =" << point.x << point.y << point.z;
         return false;
     }
+}
+
+inline QString decToHex(int nDec)
+{
+    if (nDec > 256)
+    {
+        qDebug() << "WARNING: nDec > 256. change it to max for this funtion: "
+                    "256 (ff). nDec =" << nDec;
+        nDec = 256;
+    }
+
+    QString QStrReturn = QString::number(nDec, 16);
+    if (nDec < 10) QStrReturn = "0" + QStrReturn;
+    QStrReturn = "0x" + QStrReturn;
+
+    return QStrReturn;
 }
 
 #endif // BASIC_VARS_H

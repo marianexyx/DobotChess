@@ -24,7 +24,6 @@ SOURCES += main.cpp\
     chess/chess_status.cpp \
     chess/chess_timers.cpp \
     dobot/dobot_queue.cpp \
-    dobot/dobot_servo.cpp \
     arduinousb.cpp \
     chess.cpp \
     chessboard.cpp \
@@ -38,7 +37,8 @@ SOURCES += main.cpp\
     tcpmsgs.cpp \
     websockets.cpp \
     xml_reader.cpp \
-    vars/position_on_board.cpp
+    vars/position_on_board.cpp \
+    dobot/dobot_gripper.cpp
 
 HEADERS  +=  \
     chess/vars/chenard_io_msgs.h \
@@ -53,7 +53,6 @@ HEADERS  +=  \
     chess/chess_status.h \
     chess/chess_timers.h \
     dobot/dobot_queue.h \
-    dobot/dobot_servo.h \
     DobotDll/DobotDll.h \
     DobotDll/DobotType.h \
     vars/basic_vars.h \
@@ -78,7 +77,10 @@ HEADERS  +=  \
     ui_mainwindow.h \
     websockets.h \
     xml_reader.h \
-    dobot/vars/dobot_move_types.h
+    dobot/vars/dobot_move_types.h \
+    dobot/dobot_gripper.h \
+    vars/action_types.h \
+    vars/table_data_types.h
 
 FORMS    += mainwindow.ui
 

@@ -4,9 +4,11 @@
 #pragma once
 #include <QScrollBar>
 #include <QRegularExpression>
+#include "vars/action_types.h"
 #include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
 #include "vars/board_types.h"
+#include "vars/table_data_types.h"
 #include "tcpmsgs.h"
 #include "websockets.h"
 #include "chess/vars/game_status.h"
@@ -47,6 +49,9 @@ private:
 
     GAME_STATUS _ChessGameStatus;
     clientRequest _request;
+
+    //future: those 2 blocks below can be divided into classes...
+    //...f.e.: game+communication
 
     //communication methods
     void playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);

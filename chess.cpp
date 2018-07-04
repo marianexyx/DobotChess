@@ -3,6 +3,8 @@
 Chess::Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
              Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource)
 {
+    decToHex(5);
+
     _pPieceController = pPieceController;
     _pDobot = _pPieceController->getDobotPointer();
     _pBoardMain = _pPieceController->getBoardMainPointer();
@@ -242,7 +244,7 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = 
 void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg)
 {
     qDebug() << "Chess::tellPlayerThatHeGaveBadMove():" << QStrMsg;
-    QString QStrMsgForActivePlayer = "badMove " + QStrMsg + " "
+    QString QStrMsgForActivePlayer = actionTypeAsQstr(AT_BAD_MOVE) + " " + QStrMsg + " "
             + turnTypeAsBriefQstr(_pStatus->getWhoseTurn());
     Client player = _pClientsList->getPlayer(_pStatus->getActivePlayerType());
 
@@ -260,6 +262,10 @@ void Chess::newClientName(Client& client, clientRequest request)
 {    
     QString QStrIncomingClientName = request.param;
     qDebug() << "Chess::newClientName():" << QStrIncomingClientName;
+
+    //todo: kill client if he sends his name, while he already has one...
+    //... (on WWW create addition for client to not be able send his...
+    //... name, if he is not logged)
 
     if (!_pClientsList->isClientNameExists(QStrIncomingClientName))
     {
@@ -334,8 +340,10 @@ void Chess::sendDataToClient(QString QStrMsg, Client client /* = Client */)
         //future: non-harmonized types of communicates between site and arduino, so...
         //...communications got to be changed in a fly
         if (QStrMsg.contains("promote")) QStrMsg = "promote";
-        else if (QStrMsg.contains("newOk")) QStrMsg = "started";
-        else if (QStrMsg.contains("badMove")) QStrMsg = "BAD_MOVE";
+        else if (QStrMsg.contains(actionTypeAsQstr(AT_NEW_GAME_STARTED)))
+            QStrMsg = "started";
+        else if (QStrMsg.contains(actionTypeAsQstr(AT_BAD_MOVE)))
+            QStrMsg = "BAD_MOVE";
 
         _pUsb->sendDataToUsb(QStrMsg);
     }
@@ -369,8 +377,9 @@ QString Chess::getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
         //future: last move communicate can be wiped, cuz info about it can be found in "history"
 
         qDebug() << "Chess::getEndGameMsg(): move =" << QStrMove;
-        QStrReturnMsg = "moveOk " + QStrMove + " " + turnTypeAsBriefQstr(NO_TURN) + " "
-                + endTypeAsQstr(WhoWon) + " " + QStrTableData;
+        QStrReturnMsg = actionTypeAsQstr(AT_MOVE_OK) + " " + QStrMove + " "
+                + turnTypeAsBriefQstr(NO_TURN) + " " + endTypeAsQstr(WhoWon) + " "
+                + QStrTableData;
         return QStrReturnMsg;
     case ET_TIMEOUT_GAME:
     case ET_GIVE_UP:
@@ -394,8 +403,8 @@ void Chess::coreIsReadyForNewGame() //future: not best name?
             _ChessGameStatus = _pTimers->startQueueTimer();
         else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
-        this->sendDataToAllClients("resetComplited"); //don't add tableData- only
-        //...chess data has changed during reset
+        this->sendDataToAllClients(actionTypeAsQstr(AT_RESET_COMPLITED)); //don't add...
+        //...tableData- only chess data has changed during reset
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -422,7 +431,7 @@ void Chess::startNewGameInCore()
     _pTimers->startGameTimer();
     _pClientsList->resetPlayersStartConfirmInfo();
 
-    this->sendDataToAllClients("newOk");
+    this->sendDataToAllClients(actionTypeAsQstr(AT_NEW_GAME_STARTED));
 }
 
 void Chess::manageMoveRequest(clientRequest request)
@@ -432,8 +441,8 @@ void Chess::manageMoveRequest(clientRequest request)
         _pStatus->setMove(request.param);
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
                                                                     GS_TURN_BLACK_PROMOTE;
-        this->sendDataToClient("promoteToWhat", _pClientsList->getPlayer(
-                                   _pStatus->getActivePlayerType()));
+        this->sendDataToClient(actionTypeAsQstr(AT_PROMOTE_TO_WHAT),
+                               _pClientsList->getPlayer(_pStatus->getActivePlayerType()));
     }
     else if (!_pStatus->isMoveLegal(request.param))
     {
@@ -455,8 +464,8 @@ void Chess::continueGameplay()
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
         //future: enums, not strings
-        this->sendDataToAllClients("moveOk " + _pStatus->getMove().asQStr() + " " +
-                                   turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) + " cont");
+        this->sendDataToAllClients(actionTypeAsQstr(AT_MOVE_OK) + " " + _pStatus->getMove().asQStr()
+                                   + " " + turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) + " cont");
     }
     else if (_PlayerSource == ARDUINO)
     {
@@ -512,14 +521,30 @@ void Chess::changePlayersOnChairs()
 //example: "TABLE_DATA{\"wplr\":\"marianexyx\",\"bplr\":\"test\",\"turn\":\"bt\",\"wtime\":
 // 1713531,\"btime\":879094,\"queue\":\"queueEmpty\",\"history\":\"b4 b5 Nc3 Nc6
 // Nxb5 Na5 bxa5 Rb8 a6 Rb7 axb7 a6 b8=Q \",\"promoted\":\"b8:p\"}\n"
-QString Chess::getTableData()
+//clean not-JSON example: "TABLE_DATA{wplr:marianexyx,bplr:test, ... ,promoted:b8:p}\n"
+QString Chess::getTableData(/*ACTION_TYPE Action*/)
 {
-    QString QStrTableData = "TABLE_DATA{\"wplr\":\"" + _pClientsList->getPlayerName(PT_WHITE) +
-            "\",\"bplr\":\"" + _pClientsList->getPlayerName(PT_BLACK) +
-            "\",\"turn\":\"" +  turnTypeAsBriefQstr(_pStatus->getWhoseTurn()) +
-            "\",\"wtime\":" + QString::number(_pTimers->getWhiteTimeLeft())  +
-            ",\"btime\":" + QString::number(_pTimers->getBlackTimeLeft()) +
-            ",\"queue\":\"" + _pClientsList->getQueuedClientsList();
+    /*QString TD = "TABLE_DATA{\"";
+    TD += decToHex(TD_WHITE_PLAYER) + "\":\"" + _pClientsList->getPlayerName(PT_WHITE);
+    TD += "\",\"" + decToHex(TD_BLACK_PLAYER) + "\":\"" + _pClientsList->getPlayerName(PT_BLACK);
+    TD += "\",\"" + decToHex(TD_GAME_STATE) + "\":\"" +  turnTypeAsBriefQstr(_pStatus->getWhoseTurn());
+    //todo: use shorten time format (w/o ms)
+    TD += "\",\"" + decToHex(TD_WHITE_TIME) + "\":\"" + QString::number(_pTimers->getWhiteTimeLeft());
+    TD += "\",\"" + decToHex(TD_BLACK_TYPE) + "\":\"" + QString::number(_pTimers->getBlackTimeLeft());
+    TD += "\",\"" + decToHex(TD_QUEUE) + "\":\"" + _pClientsList->getQueuedClientsList();*/
+
+    QString TD = "TABLE_DATA{\"";
+    TD += decToHex(TD_WHITE_PLAYER) + ":" + _pClientsList->getPlayerName(PT_WHITE);
+    TD += "," + decToHex(TD_BLACK_PLAYER) + ":" + _pClientsList->getPlayerName(PT_BLACK);
+    //todo: decToHex(_ChessGameStatus);
+    TD += "," + decToHex(TD_GAME_STATE) + ":" + turnTypeAsBriefQstr(_pStatus->getWhoseTurn());
+    TD += "," + decToHex(TD_WHITE_TIME) + ":" + QString::number(_pTimers->getWhiteTimeLeft());
+    TD += "," + decToHex(TD_BLACK_TYPE) + ":" + QString::number(_pTimers->getBlackTimeLeft());
+    TD += "," + decToHex(TD_QUEUE) + ":" + _pClientsList->getQueuedClientsList();
+
+    //convert string to JSON format
+    TD.replace(":", "\":\"");
+    TD.replace(",", "\",\"");
 
     if (_pTimers->isStartTimerRunning())
     {
@@ -527,22 +552,22 @@ QString Chess::getTableData()
                 _pClientsList->isStartClickedByPlayer(PT_WHITE) ? "w" : "x";
         QString QStrBlackClickedStart =
                 _pClientsList->isStartClickedByPlayer(PT_BLACK) ? "b" : "x";
-        QStrTableData += "\",\"start\":\"" + QStrWhiteClickedStart + QStrBlackClickedStart +
-                QString::number(_pTimers->getStartTimeLeft());
+        TD += "\",\"" + decToHex(TD_START_TIME) + "\":\"" + QStrWhiteClickedStart +
+                QStrBlackClickedStart + QString::number(_pTimers->getStartTimeLeft());
     }
 
     if (!_pStatus->getHistoryMoves().isEmpty())
-        QStrTableData += "\",\"history\":\"" + _pStatus->getHistoryMovesAsQStr();
+        TD += "\",\"" + decToHex(TD_HISTORY) + "\":\"" + _pStatus->getHistoryMovesAsQStr();
 
     if (_pPieceController->isAnyPawnPromoted())
-        QStrTableData += "\",\"promoted\":\""  +
+        TD += "\",\"" + decToHex(TD_PROMOTIONS) + "\":\""  +
                 _pPieceController->getPromotedPawnsPositions();
     //QStrTableData += "\",\"promoted\":\"b2:Q c7:q g5:N b2:Q c7:q g5:N"; //tests
 
-    QStrTableData += "\"}";
+    TD += "\"}";
 
-    qDebug() << "Chess::getTableData(): QStrTableData =" << QStrTableData;
-    return QStrTableData;
+    qDebug() << "Chess::getTableData(): QStrTableData =" << TD;
+    return TD;
 }
 
 void Chess::timeOutStart()

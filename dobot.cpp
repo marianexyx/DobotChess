@@ -8,7 +8,7 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
     _pUsb = pUsb;
 
     _pQueue = new DobotQueue(retreatLeft, retreatRight);
-    _pServo = new DobotServo(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
+    _pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
     
@@ -43,7 +43,7 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
 Dobot::~Dobot()
 {
     delete _pQueue;
-    delete _pServo;
+    delete _pGripper;
 }
 
 void Dobot::onPeriodicTaskTimer()
@@ -283,13 +283,13 @@ void Dobot::sendMoveToArm(DobotMove move)
         break;
     }
     case DM_OPEN:
-        _pServo->openGripper(move.ID);
+        _pGripper->openGripper(move.ID);
         break;
     case DM_CLOSE:
-        _pServo->closeGripper(move.ID);
+        _pGripper->closeGripper(move.ID);
         break;
     case DM_WAIT:
-        _pServo->wait(move.ID);
+        _pGripper->wait(move.ID);
         break;
     case DM_CALIBRATE: //todo: this is home or calibrate? mess name
     {
@@ -310,7 +310,7 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
 {
     if (!_bConnectedToDobot)
     {
-        qDebug() << "ERROR: Dobot::queueMoveSequence(): dobot not connected";
+        qDebug() << "Dobot::queueMoveSequence(): dobot not connected";
         return;
     }
 

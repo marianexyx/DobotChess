@@ -43,8 +43,8 @@ struct DobotMove
     Point3D xyz;
 
     DobotMove(): ID(0), type(DM_NONE), xyz(0,0,0) {}
-    DobotMove(uint64_t id, DOBOT_MOVE_TYPE MT, Point3D p):
-        ID(id), type(MT), xyz(p) {}
+    DobotMove(uint64_t id, DOBOT_MOVE_TYPE DMT, Point3D p):
+        ID(id), type(DMT), xyz(p) {}
 };
 
 inline bool isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false)

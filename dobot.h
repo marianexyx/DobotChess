@@ -17,7 +17,7 @@
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
 #include "dobot/vars/dobot_move_types.h"
-#include "dobot/dobot_servo.h"
+#include "dobot/dobot_gripper.h"
 #include "dobot/dobot_queue.h"
 
 class Dobot: public QObject
@@ -27,7 +27,7 @@ class Dobot: public QObject
 private:
     ArduinoUsb *_pUsb;
 
-    DobotServo* _pServo;
+    DobotGripper* _pGripper;
     DobotQueue* _pQueue;
 
     const int _ARM_MAX_VELOCITY, _ARM_MAX_ACCELERATION;
@@ -74,12 +74,9 @@ public:
     Point3D getHomeToMiddleAbovePoint() const { return _homeToMiddleAbove; }
     Point3D getLastGivenPoint() const { return _lastGivenPoint; }
     //todo: below: friends
-    DobotServo* getServoPointer() const { return _pServo; }
+    DobotGripper* getServoPointer() const { return _pGripper; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
     ArduinoUsb* getArduinoPointer() const { return _pUsb; }
-
-    void showArduinoGripperStateListInUI(QList<ServoArduino> list)
-    { emit this->showArduinoGripperStateList(list); }
 
 public slots:
     void sendMoveToArm(DobotMove move);
@@ -101,7 +98,6 @@ signals: //GUI mainWindow
     void DobotErrorMsgBox();
     void queueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
                      int nCoreIdLeft, uint64_t un64CoreNextId);
-    void showArduinoGripperStateList(QList<ServoArduino>);
     void showQueuedArmCmdsOnCore();
     void showSentArmCmdsToDobot();
 };
