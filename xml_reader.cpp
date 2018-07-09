@@ -1,6 +1,6 @@
 #include "xml_reader.h"
 
-XmlReader::XmlReader(QString QStrFileName):
+XmlReader::XmlReader(QString QStrFileName, XML_FILE_TYPE XFT):
     _xmlFile(QStrFileName)
 {
     if (!_xmlFile.exists())
@@ -33,9 +33,63 @@ XmlReader::XmlReader(QString QStrFileName):
         _xmlFile.close();
     }
 
-    QDomElement docElem = _xmlDoc.documentElement();
+    if (XFT == XFT_GAME_CONFIG)
+        this->readGameConfigNodes();
+    else if (XFT == XFT_DATABASE)
+        this->readDatabaseNodes();
+    else qDebug() << "ERROR: XmlReader::XmlReader(): unknown XFT type =" << XFT;
+}
 
+void XmlReader::readDatabaseNodes()
+{
+    QDomElement docElem = _xmlDoc.documentElement();
     QDomNode node = docElem.firstChild();
+
+    while(!node.isNull())
+    {
+        QDomElement element = node.toElement(); //try to convert the node to an element
+        if(!element.isNull())
+        {
+            //qDebug() << qPrintable(element.tagName()); //the node really is an element
+
+            if (element.tagName() == "database")
+            {
+                QDomNodeList paramDomNodeList = docElem.elementsByTagName("param");
+
+                for(int i=0; i<paramDomNodeList.count(); i++)
+                {
+                    QDomNode paramNode = paramDomNodeList.at(i);
+                    if (paramNode.isElement())
+                    {
+                        QDomElement param = paramNode.toElement();
+
+                        if (param.attribute("name") == "hostName")
+                            _databaseVars.QStrHostName = param.attribute("value");
+                        else if (param.attribute("name") == "databaseName")
+                            _databaseVars.QStrDatabaseName = param.attribute("value");
+                        else if (param.attribute("name") == "userName")
+                            _databaseVars.QStrUserName = param.attribute("value");
+                        else if (param.attribute("name") == "password")
+                            _databaseVars.QStrPassword = param.attribute("value");
+                        else qDebug() << "ERROR: XmlReader::readDatabaseNodes(): unknown state"
+                                         " name =" << param.attribute("name");
+                    }
+                    else qDebug() << "ERROR: XmlReader::readDatabaseNodes(): "
+                                     "paramNode.isElement() == false";
+                }
+            }
+            else qDebug() << "ERROR: XmlReader::readDatabaseNodes(): element.tagName() "
+                             "!= 'database'. it's ==" << element.tagName();
+        }
+        node = node.nextSibling();
+    }
+}
+
+void XmlReader::readGameConfigNodes()
+{
+    QDomElement docElem = _xmlDoc.documentElement();
+    QDomNode node = docElem.firstChild();
+
     while(!node.isNull())
     {
         QDomElement element = node.toElement(); //try to convert the node to an element
@@ -67,7 +121,7 @@ void XmlReader::readPiece(QDomNodeList piece)
             QDomElement param = paramNode.toElement();
 
             if (param.attribute("name") == "height")
-                _vars.fPieceHeight = param.attribute("val").toFloat();
+                _gameConfigVars.fPieceHeight = param.attribute("val").toFloat();
             else qDebug() << "ERROR: XmlReader::readPiece(): param name != "
                              "height. it's =" << param.attribute("name");
         }
@@ -88,25 +142,25 @@ void XmlReader::readPoints(QDomNodeList points)
                         p.attribute("z").toDouble());
 
             if (p.attribute("name") == "mainFieldA1")
-                _vars.A1.setPoint(p3d);
+                _gameConfigVars.A1.setPoint(p3d);
             else if (p.attribute("name") == "mainFieldA8")
-                _vars.A8.setPoint(p3d);
+                _gameConfigVars.A8.setPoint(p3d);
             else if (p.attribute("name") == "mainFieldH1")
-                _vars.H1.setPoint(p3d);
+                _gameConfigVars.H1.setPoint(p3d);
             else if (p.attribute("name") == "mainFieldH8")
-                _vars.H8.setPoint(p3d);
+                _gameConfigVars.H8.setPoint(p3d);
             else if (p.attribute("name") == "remWhiteCloserOuter")
-                _vars.remWhiteCloserOuter.setPoint(p3d);
+                _gameConfigVars.remWhiteCloserOuter.setPoint(p3d);
             else if (p.attribute("name") == "remWhiteFurtherInner")
-                _vars.remWhiteFurtherInner.setPoint(p3d);
+                _gameConfigVars.remWhiteFurtherInner.setPoint(p3d);
             else if (p.attribute("name") == "remBlackCloserOuter")
-                _vars.remBlackCloserOuter.setPoint(p3d);
+                _gameConfigVars.remBlackCloserOuter.setPoint(p3d);
             else if (p.attribute("name") == "remBlackFurtherInner")
-                _vars.remBlackFurtherInner.setPoint(p3d);
+                _gameConfigVars.remBlackFurtherInner.setPoint(p3d);
             else if (p.attribute("name") == "home")
-                _vars.home.setPoint(p3d);
+                _gameConfigVars.home.setPoint(p3d);
             else if (p.attribute("name") == "homeToMiddleAbove")
-                _vars.homeToMiddleAbove.setPoint(p3d);
+                _gameConfigVars.homeToMiddleAbove.setPoint(p3d);
             else qDebug() << "ERROR: XmlReader::readPoints(): unknown param name ="
                           << p.attribute("name");
         }
@@ -123,9 +177,9 @@ void XmlReader::readGripper(QDomNodeList gripper)
             QDomElement state = stateNode.toElement();
 
             if (state.attribute("name") == "open")
-                _vars.fGripperOpened = state.attribute("pwm").toFloat();
+                _gameConfigVars.fGripperOpened = state.attribute("pwm").toFloat();
             else if (state.attribute("name") == "close")
-                _vars.fGripperClosed = state.attribute("pwm").toFloat();
+                _gameConfigVars.fGripperClosed = state.attribute("pwm").toFloat();
             else qDebug() << "ERROR: XmlReader::readGripper(): unknown state name ="
                           << state.attribute("name");
         }
@@ -135,19 +189,19 @@ void XmlReader::readGripper(QDomNodeList gripper)
 bool XmlReader::isVarsStructInLimits()
 {
     //todo: add few more tests and locks
-    if (this->isPieceHeightInLimits(_vars.fPieceHeight) &&
-            isPointInLimits(_vars.home) &&
-            isPointInLimits(_vars.homeToMiddleAbove) &&
-            isPointInLimits(_vars.A1) &&
-            isPointInLimits(_vars.A8) &&
-            isPointInLimits(_vars.H1) &&
-            isPointInLimits(_vars.H8) &&
-            isPointInLimits(_vars.remWhiteCloserOuter) &&
-            isPointInLimits(_vars.remWhiteFurtherInner) &&
-            isPointInLimits(_vars.remBlackCloserOuter) &&
-            isPointInLimits(_vars.remBlackFurtherInner) &&
-            isGripperParamInLimits(_vars.fGripperOpened) &&
-            isGripperParamInLimits(_vars.fGripperClosed))
+    if (this->isPieceHeightInLimits(_gameConfigVars.fPieceHeight) &&
+            isPointInLimits(_gameConfigVars.home) &&
+            isPointInLimits(_gameConfigVars.homeToMiddleAbove) &&
+            isPointInLimits(_gameConfigVars.A1) &&
+            isPointInLimits(_gameConfigVars.A8) &&
+            isPointInLimits(_gameConfigVars.H1) &&
+            isPointInLimits(_gameConfigVars.H8) &&
+            isPointInLimits(_gameConfigVars.remWhiteCloserOuter) &&
+            isPointInLimits(_gameConfigVars.remWhiteFurtherInner) &&
+            isPointInLimits(_gameConfigVars.remBlackCloserOuter) &&
+            isPointInLimits(_gameConfigVars.remBlackFurtherInner) &&
+            isGripperParamInLimits(_gameConfigVars.fGripperOpened) &&
+            isGripperParamInLimits(_gameConfigVars.fGripperClosed))
     {
         return true;
     }

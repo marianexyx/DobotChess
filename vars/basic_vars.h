@@ -50,6 +50,7 @@ struct Point3D
                 QString::number((int)y) + ", " + QString::number((int)z); }
 };
 
+//future: place it near xml reader
 struct RealVars
 {
     float fPieceHeight;
@@ -58,6 +59,14 @@ struct RealVars
     Point3D remWhiteCloserOuter, remWhiteFurtherInner;
     Point3D remBlackCloserOuter, remBlackFurtherInner;
     float fGripperOpened, fGripperClosed;
+};
+
+struct DatabaseVars
+{
+    QString QStrHostName;
+    QString QStrDatabaseName;
+    QString QStrUserName;
+    QString QStrPassword;
 };
 
 enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };

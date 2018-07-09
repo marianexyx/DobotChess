@@ -76,7 +76,8 @@ private:
 
 public:
     Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
-          Websockets* pWebsockets, TCPMsgs* pTCPMsgs, COMMUNICATION_TYPE PlayerSource);
+          Websockets* pWebsockets, TCPMsgs* pTCPMsgs,
+          COMMUNICATION_TYPE PlayerSource);
     ~Chess();
 
     void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }

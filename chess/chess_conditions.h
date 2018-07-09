@@ -6,6 +6,7 @@
 #include "chess/vars/game_status.h"
 #include "client.h"
 #include "chess/chess_status.h"
+#include "sql.h"
 
 //future: save all errors in log file with all necessary data
 

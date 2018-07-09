@@ -5,23 +5,18 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QDebug>
 #include <QString>
+#include <xml_reader.h>
 
-//todo: think where to put this class before i will anchor this in program
+static QSqlDatabase sqlDB;
 
-class sql
+struct Sql
 {
-
-private:
-    QSqlDatabase db;
-
-public:
-    sql();
-
-    void test();
-    void connect();
-
+    static void setDbConnectionData();
+    static bool isClientHashOk(int64_t n64sqlId, QString QStrHash);
+    static QString getClientName(int64_t n64sqlId);
 };
 
 #endif // SQL_H

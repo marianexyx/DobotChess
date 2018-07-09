@@ -5,7 +5,9 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    XmlReader xmlReader001(QDir::currentPath() + "/xmlGameConfig.xml");
+    XmlReader xmlReader001(QDir::currentPath() + "/xmlGameConfig.xml",
+                           XFT_GAME_CONFIG);
+    Sql::setDbConnectionData();
     RealVars gameConfigVars001 = xmlReader001.getRealVars();
     Clients ClientsList;
     ArduinoUsb USB001;

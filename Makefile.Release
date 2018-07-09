@@ -860,6 +860,7 @@ release/moc_chess.cpp: ../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QScrol
 		vars/board_axis.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		vars/table_data_types.h \
 		tcpmsgs.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QTcpSocket \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qtcpsocket.h \
@@ -942,6 +943,14 @@ release/moc_chess.cpp: ../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QScrol
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
 		chess/chess_status.h \
+		sql.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlDatabase \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqldatabase.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qtsqlglobal.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlQuery \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlquery.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlError \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlerror.h \
 		chess.h \
 		release/moc_predefs.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/bin/moc.exe
@@ -1566,6 +1575,7 @@ release/moc_mainwindow.cpp: ../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/Q
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QRegularExpression \
 		vars/action_types.h \
 		vars/board_types.h \
+		vars/table_data_types.h \
 		tcpmsgs.h \
 		chess/vars/game_status.h \
 		chess/vars/turn_types.h \
@@ -1585,6 +1595,14 @@ release/moc_mainwindow.cpp: ../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/Q
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
 		chess/chess_status.h \
+		sql.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlDatabase \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqldatabase.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qtsqlglobal.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlQuery \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlquery.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlError \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlerror.h \
 		mainwindow.h \
 		release/moc_predefs.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/bin/moc.exe
@@ -2245,6 +2263,7 @@ release/main.o: main.cpp mainwindow.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QRegularExpression \
 		vars/action_types.h \
 		vars/board_types.h \
+		vars/table_data_types.h \
 		tcpmsgs.h \
 		chess/vars/game_status.h \
 		chess/vars/turn_types.h \
@@ -2264,6 +2283,14 @@ release/main.o: main.cpp mainwindow.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
 		chess/chess_status.h \
+		sql.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlDatabase \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqldatabase.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qtsqlglobal.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlQuery \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlquery.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlError \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlerror.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QApplication \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qapplication.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qdesktopwidget.h \
@@ -3223,6 +3250,7 @@ release/chess.o: chess.cpp chess.h \
 		vars/board_axis.h \
 		vars/board_data_labels.h \
 		vars/board_types.h \
+		vars/table_data_types.h \
 		tcpmsgs.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/QTcpSocket \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtNetwork/qtcpsocket.h \
@@ -3304,7 +3332,15 @@ release/chess.o: chess.cpp chess.h \
 		chess/chess_timers.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
-		chess/chess_status.h
+		chess/chess_status.h \
+		sql.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlDatabase \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqldatabase.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qtsqlglobal.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlQuery \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlquery.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlError \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlerror.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\chess.o chess.cpp
 
 release/chessboard.o: chessboard.cpp chessboard.h \
@@ -3994,6 +4030,7 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QRegularExpression \
 		vars/action_types.h \
 		vars/board_types.h \
+		vars/table_data_types.h \
 		tcpmsgs.h \
 		chess/vars/game_status.h \
 		chess/vars/turn_types.h \
@@ -4013,70 +4050,15 @@ release/mainwindow.o: mainwindow.cpp mainwindow.h \
 		chess/chess_conditions.h \
 		chess/vars/request_types.h \
 		chess/chess_status.h \
-		ui_mainwindow.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QAction \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qaction.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qactiongroup.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QApplication \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qapplication.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qdesktopwidget.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qguiapplication.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qinputmethod.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QButtonGroup \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qbuttongroup.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QCheckBox \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qcheckbox.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractbutton.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QComboBox \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qcombobox.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qstyleoption.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractspinbox.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qslider.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qstyle.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qtabbar.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qrubberband.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qframe.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QGridLayout \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qgridlayout.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qlayout.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qlayoutitem.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qboxlayout.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QGroupBox \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qgroupbox.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QHeaderView \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qheaderview.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractitemview.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QLabel \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qlabel.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QLineEdit \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qlineedit.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtextcursor.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtextformat.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qpen.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtextoption.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QMenuBar \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qmenubar.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qmenu.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QPlainTextEdit \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qplaintextedit.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qtextedit.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtextdocument.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qabstracttextdocumentlayout.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qtextlayout.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qglyphrun.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qrawfont.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtGui/qfontdatabase.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QPushButton \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qpushbutton.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QRadioButton \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qradiobutton.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QStatusBar \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qstatusbar.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QToolBar \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/qtoolbar.h \
-		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtWidgets/QWidget
+		sql.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlDatabase \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqldatabase.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qtsqlglobal.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlQuery \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlquery.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlError \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlerror.h \
+		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\mainwindow.o mainwindow.cpp
 
 release/piece.o: piece.cpp piece.h \
@@ -4351,6 +4333,8 @@ release/sql.o: sql.cpp sql.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qtsqlglobal.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlQuery \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlquery.h \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/QSqlError \
+		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtSql/qsqlerror.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/QDebug \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qdebug.h \
 		../Qt/Qt5.10.1/5.10.1/mingw53_32/include/QtCore/qhash.h \

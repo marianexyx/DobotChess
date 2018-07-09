@@ -79,8 +79,8 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
     else
     {
         Client receiver = _pClientsList->getClient(n64ReceiverID);
-        emit this->addTextToLogPTE("send to: " + receiver.name + " : " + QStrMsg + "\n",
-                                    LOG_WEBSOCKET);
+        emit this->addTextToLogPTE("send to: " + receiver.name() + " : "
+                                   + QStrMsg + "\n", LOG_WEBSOCKET);
         receiver.socket->sendTextMessage(QStrMsg);
     }
 }

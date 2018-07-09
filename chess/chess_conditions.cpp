@@ -79,9 +79,9 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
         else bReturn = true;
         break;
     case RT_IM:
-        if (request.param.isEmpty())
-            bReturn = false;
-        else bReturn = true;
+        if (!request.param.isEmpty() && request.param.contains("&"))
+            bReturn = true;
+        else bReturn = false;
         break;
     case RT_PROMOTE_TO:
         if (ChessStatus::isSignProperPromotionType(request.param))
@@ -126,7 +126,7 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
     if (!_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
 
-    bool bLogged = _pClientsList->isClientLoggedIn(*pSender);
+    bool bLogged = pSender->sqlID > 0 ? true : false;
     bool bSittingOnChair = _pClientsList->isClientAPlayer(*pSender);
     bool bInQueue = _pClientsList->isClientInQueue(*pSender);
 
@@ -196,8 +196,10 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
             return true;
         else return false;
     }
-    case RT_IM: //name == empty || name = actual
-        if (pSender->name.isEmpty() || _pClientsList->getClientName(*pSender) == request.param)
+    case RT_IM: //(name == empty || name == actual name) && sql hash is ok
+        //todo: test ID for marianexyx
+        if (Sql::isClientHashOk(1, request.param.mid(request.param.indexOf("&")+1))
+            && (pSender->sqlID == 0 || pSender->name() == request.param))
             return true;
         else return false;
     case RT_QUEUE_ME:

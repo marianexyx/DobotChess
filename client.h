@@ -11,19 +11,24 @@
 #include "vars/board_data_labels.h"
 #include "vars/basic_vars.h"
 #include "typeinfo"
+#include "sql.h"
 
-const QString QUEUE_EMPTY = "queueEmpty";
+const QString QUEUE_EMPTY = "queueEmpty"; //todo: change to "0"
+enum CLIENT_ID { CID_CORE, CID_SQL };
 
 struct Client //todo: class friend to Clients
 {
     int64_t ID;
     QWebSocket *socket;
-    QString name;
+    int64_t sqlID;
     PLAYER_TYPE type;
     bool isStartClickedByPlayer;
     int64_t queue;
+    int64_t mySqlID;
 
     bool operator ==(const struct Client& cl) { return ID == cl.ID; }
+
+    QString name() const { return Sql::getClientName(sqlID); }
 };
 
 class Clients: public QObject
@@ -36,7 +41,7 @@ public:
     Clients(): _clients() {}
 
     void newClient(QWebSocket& clientSocket);
-    void setClientName(const Client& client, QString QStrName);
+    void setClientSqlID(const Client& client, int64_t ID);
     void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
     void setClientStartConfirmation(const Client& client, bool bState);
@@ -50,11 +55,8 @@ public:
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(const Client& client, bool bErrorLog = false);
     Client getClient(QWebSocket* pClientSocket);
-    Client getClient(int64_t n64ClientID);
-    Client getClient(QString QStrName);
+    Client getClient(int64_t n64ClientID, CLIENT_ID IdType = CID_CORE);
     Client getPlayer(PLAYER_TYPE Type);
-    QWebSocket* getClientSocket(QString QStrPlayerName);
-    QString getClientName(const Client& client);
     Client getNextQueuedClient();
     QString getQueuedClientsList();
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
@@ -65,9 +67,8 @@ public:
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
     bool isStartClickedByBothPlayers();
     QString getPlayerName(PLAYER_TYPE Type);
-    bool isClientLoggedIn(const Client& client);
     bool isClientInQueue(const Client& client);
-    bool isClientNameExists(QString QStrName, bool bErrorLog = false);
+    bool isClientSqlIDExists(int64_t n64ID, bool bErrorLog = false);
     int getAmountOfQueuedClients();
     bool isClientAPlayer(const Client& client, bool bErrorLog = false);
     bool isClientIDExists(int64_t n64ID);

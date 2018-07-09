@@ -91,7 +91,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     connect(_pDobot, SIGNAL(showSentArmCmdsToDobot()),
             this, SLOT(showSentArmCmdsToDobot()));
 
-    this->initControl(); //init dobot JOG control
+    this->initControl(); //init dobot JOG control from form
     _pWebSockets->listenOnPort(1234);
 
     //future: make many tooltips
@@ -660,8 +660,8 @@ void MainWindow::showClientsListInUI(QList<Client> list)
        QStrClientsList += QString::number(i+1) + ". ";
 
        QString QStrName = "-";
-       if (!client.name.isNull())
-           QStrName = client.name;
+       if (client.sqlID > 0)
+           QStrName = client.name();
        QStrClientsList += QStrName;
 
        if (client.type != PT_NONE)

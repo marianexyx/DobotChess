@@ -1,48 +1,106 @@
 #include "sql.h"
 
-sql::sql()
+/*static*/ void Sql::setDbConnectionData()
 {
-    db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("mysql.cba.pl");
-    db.setDatabaseName("budgames_cba_pl");
-    db.setUserName("marianexyx");
-    db.setPassword("1qazse4rfvgy7SX");
+    qDebug() << "Sql::setDbConnectionData()";
 
+    XmlReader xmlDB(QDir::currentPath() +
+                    "/../DobotChessDatabase/mysqlDatabaseConnectionData.xml",
+                    XFT_DATABASE);
+    DatabaseVars DBVars = xmlDB.getDatabaseVars();
 
+    qDebug() << "Sql::setDbConnectionData(): vars ="
+             << DBVars.QStrHostName << DBVars.QStrDatabaseName
+             << DBVars.QStrUserName << DBVars.QStrPassword;
+
+    sqlDB = QSqlDatabase::addDatabase("QMYSQL");
+    sqlDB.setHostName(DBVars.QStrHostName);
+    sqlDB.setDatabaseName(DBVars.QStrDatabaseName);
+    sqlDB.setUserName(DBVars.QStrUserName);
+    sqlDB.setPassword(DBVars.QStrPassword);
 }
 
-void sql::test()
+/*static*/ bool Sql::isClientHashOk(int64_t n64sqlId, QString QStrHash)
 {
-    //http://szymonsiarkiewicz.pl/poradniki/kurs-qt/kurs-qt-komunikacja-z-baza-danych/
-    //https://www.youtube.com/watch?v=LiHHm7cd5Bs&list=PL2D1942A4688E9D63&t=26
-
-    /*if(!db.open())
-        qDebug() << "Failed to connect with SQL database";
-    else
+    if (sqlDB.open())
     {
-        QStringList tables = db.tables();
-        for(int i=0;i<tables.size();i++)
-            qDebug() << tables.at(i);
+        QStringList tables = sqlDB.tables();
+        for(int i=0; i<tables.size(); i++)
+            qDebug() << "Sql::test(): tables =" << tables.at(i);
 
-        QSqlQuery pobieranie;
-        if(!pobieranie.exec("SELECT * FROM Stats")) //exec is making query for database
-            qDebug() << "No records in Stats table";
+        QString QStrQuery = "SELECT * FROM users WHERE id = "
+                + QString::number(n64sqlId);
 
-        while(pobieranie.next())
+        QSqlQuery query;
+        if (!query.exec(QStrQuery)) //exec is making query for database
         {
-            int d = pobieranie.value("Deaths").toInt(); //name of the column
-            int k = pobieranie.value(2).toInt(); //nr of the column (from 0)
-
-            qDebug() << k << " / " << d;
+            qDebug() << "ERROR: Sql::isClientHashOk(): No records in users table "
+                        "for ID =" << QString::number(n64sqlId);
+            return false;
         }
 
-        db.close();
-    }*/
+        if (query.size() != 1)
+        {
+            qDebug() << "ERROR: Sql::isClientHashOk(): query.size() != 1. it's ="
+                     << query.size();
+            return false;
+        }
+
+        while(query.next())
+        {
+            QString QStrDbHash = query.value("hash").toString();
+            if (QStrDbHash != QStrHash)
+            {
+                qDebug() << "ERROR: Sql::isClientHashOk(): hash parameter ("
+                            + QStrHash + ") is diffrent then hash from DB ("
+                         << QStrDbHash + ")";
+                return false;
+            }
+        }
+
+        sqlDB.close();
+        return true;
+    }
+    else
+    {
+        qDebug() << "ERROR: Sql::isClientHashOk(): Failed to connect with "
+                    "SQL database. Error =" << sqlDB.lastError().text();
+        return false;
+    }
 }
 
-void sql::connect()
+/* static */ QString Sql::getClientName(int64_t n64sqlId)
 {
+    QStringList tables = sqlDB.tables();
+    for(int i=0; i<tables.size(); i++)
+        qDebug() << "Sql::test(): tables =" << tables.at(i);
 
+    if (sqlDB.open())
+    {
+        QString QStrQuery = "SELECT * FROM users WHERE id = "
+                + QString::number(n64sqlId);
+
+        QSqlQuery query;
+        if(!query.exec(QStrQuery)) //exec is making query for database
+        {
+            qDebug() << "ERROR: Sql::getClientName(): No records in users table";
+            return "";
+        }
+
+        if (query.size() != 1)
+        {
+            qDebug() << "ERROR: Sql::getClientName(): query.size() != 1. it's ="
+                     << query.size();
+            return "";
+        }
+
+        sqlDB.close();
+        return query.value("login").toString();
+    }
+    else
+    {
+        qDebug() << "ERROR: Sql::test(): Failed to connect with SQL database. "
+                     "error =" << sqlDB.lastError().text();
+        return "";
+    }
 }
-
-
