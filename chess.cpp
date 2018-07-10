@@ -111,7 +111,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID)
         else this->restartGame(ET_GIVE_UP, client.type);
         break;
     case RT_IM:
-        this->newClientName(client, _request);
+        this->newClientLogged(client, _request.param.left(_request.param.indexOf("&")).toInt());
         break;
     case RT_QUEUE_ME:
         _pClientsList->addClientToQueue(client);
@@ -257,30 +257,28 @@ void Chess::sendMsgToTcp(QString QStrMsg)
     _pTCPMsgs->queueCmd(_PlayerSource, QStrMsg);
 }
 
-void Chess::newClientName(Client& client, clientRequest request)
+void Chess::newClientLogged(Client& client, int64_t sqlID)
 {    
-    QString QStrNewName = request.param.left(request.param.indexOf("&"));
-    qDebug() << "Chess::newClientName():" << QStrNewName;
-    int64_t n64ClientSqlID = QStrNewName.toInt();
-
     //todo: kill client if he sends his name, while he already has one...
     //... (on WWW create addition for client to not be able send his...
     //... name, if he is not logged). its propably done in conditions
 
-    if (!_pClientsList->isClientSqlIDExists(n64ClientSqlID))
+    if (!_pClientsList->isClientSqlIDExists(sqlID))
     {
-        _pClientsList->setClientSqlID(client, n64ClientSqlID);
+        qDebug() << "Chess::newClientLogged(): ID =" << sqlID
+                 << ", name =" << Sql::getClientName(sqlID);
+        _pClientsList->setClientSqlID(client, sqlID);
         this->sendDataToClient(this->getTableData(), client);
     }
     else //double login
     {
-        qDebug() << "Chess::newClientName(): logout:doubleLogin";
-        Client oldClient = _pClientsList->getClient(n64ClientSqlID, CID_SQL);
+        qDebug() << "Chess::newClientLogged(): logout:doubleLogin";
+        Client oldClient = _pClientsList->getClient(sqlID, CID_SQL);
         this->restorateGameIfDisconnectedClientAffectIt(oldClient);
         _pClientsList->setClientSqlID(oldClient, 0); //clear old client sqlID
         oldClient.socket->sendTextMessage("logout:doubleLogin");
         _pClientsList->removeClientFromList(client);
-        _pClientsList->setClientSqlID(client, n64ClientSqlID);
+        _pClientsList->setClientSqlID(client, sqlID);
         this->updateClientsInUI();
     }
 
@@ -518,15 +516,17 @@ void Chess::changePlayersOnChairs()
     _pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK);
 }
 
-//example: "TABLE_DATA{\"wplr\":\"marianexyx\",\"bplr\":\"test\",\"turn\":\"bt\",\"wtime\":
-// 1713531,\"btime\":879094,\"queue\":\"queueEmpty\",\"history\":\"b4 b5 Nc3 Nc6
-// Nxb5 Na5 bxa5 Rb8 a6 Rb7 axb7 a6 b8=Q \",\"promoted\":\"b8:p\"}\n"
-//clean not-JSON example: "TABLE_DATA{wplr:marianexyx,bplr:test, ... ,promoted:b8:p}\n"
 QString Chess::getTableData(/*ACTION_TYPE Action*/)
 {
+    QString QStrWhitePlayerID, QStrBlackPlayerID;
+    if (_pClientsList->isPlayerChairEmpty(PT_WHITE)) QStrWhitePlayerID = "0";
+    else QStrWhitePlayerID = QString::number(_pClientsList->getPlayer(PT_WHITE).sqlID);
+    if (_pClientsList->isPlayerChairEmpty(PT_BLACK)) QStrBlackPlayerID = "0";
+    else QStrBlackPlayerID = QString::number(_pClientsList->getPlayer(PT_BLACK).sqlID);
+
     QString TD = "TABLE_DATA{\"";
-    TD += decToHex(TD_WHITE_PLAYER) + ":" + _pClientsList->getPlayerName(PT_WHITE);
-    TD += "," + decToHex(TD_BLACK_PLAYER) + ":" + _pClientsList->getPlayerName(PT_BLACK);
+    TD += decToHex(TD_WHITE_PLAYER) + ":" + QStrWhitePlayerID;
+    TD += "," + decToHex(TD_BLACK_PLAYER) + ":" + QStrBlackPlayerID;
     //todo: decToHex(_ChessGameStatus);
     TD += "," + decToHex(TD_GAME_STATE) + ":" + turnTypeAsBriefQstr(_pStatus->getWhoseTurn());
     //todo: use shorten time format (w/o ms)

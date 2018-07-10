@@ -196,9 +196,9 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
             return true;
         else return false;
     }
-    case RT_IM: //(name == empty || name == actual name) && sql hash is ok
-        //todo: test ID for marianexyx
-        if (Sql::isClientHashOk(1, request.param.mid(request.param.indexOf("&")+1))
+    case RT_IM: //sql hash is ok && (name == empty || name == actual name)
+        if (Sql::isClientHashOk(request.param.left(request.param.indexOf("&")).toInt(),
+                                request.param.mid(request.param.indexOf("&")+1))
             && (pSender->sqlID == 0 || pSender->name() == request.param))
             return true;
         else return false;

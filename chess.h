@@ -57,7 +57,7 @@ private:
     void playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     void sendMsgToTcp(QString QStrMsg);
-    void newClientName(Client& client, clientRequest request);
+    void newClientLogged(Client& client, int64_t sqlID);
     void restorateGameIfDisconnectedClientAffectIt(Client& client);
     void sendDataToClient(QString QStrMsg, Client client = Client());
     void sendDataToAllClients(QString QStrMsg);

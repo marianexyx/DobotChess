@@ -22,12 +22,10 @@
 
 /*static*/ bool Sql::isClientHashOk(int64_t n64sqlId, QString QStrHash)
 {
+    qDebug() << "Sql::isClientHashOk(): n64sqlId =" << n64sqlId;
+
     if (sqlDB.open())
     {
-        QStringList tables = sqlDB.tables();
-        for(int i=0; i<tables.size(); i++)
-            qDebug() << "Sql::test(): tables =" << tables.at(i);
-
         QString QStrQuery = "SELECT * FROM users WHERE id = "
                 + QString::number(n64sqlId);
 
@@ -69,12 +67,8 @@
     }
 }
 
-/* static */ QString Sql::getClientName(int64_t n64sqlId)
+/*static*/ QString Sql::getClientName(int64_t n64sqlId)
 {
-    QStringList tables = sqlDB.tables();
-    for(int i=0; i<tables.size(); i++)
-        qDebug() << "Sql::test(): tables =" << tables.at(i);
-
     if (sqlDB.open())
     {
         QString QStrQuery = "SELECT * FROM users WHERE id = "
@@ -94,8 +88,13 @@
             return "";
         }
 
+        QString QStrDbLogin;
+        while(query.next())
+            QStrDbLogin = query.value("login").toString();
+
         sqlDB.close();
-        return query.value("login").toString();
+
+        return QStrDbLogin;
     }
     else
     {
