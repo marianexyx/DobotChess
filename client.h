@@ -13,7 +13,6 @@
 #include "typeinfo"
 #include "sql.h"
 
-const QString QUEUE_EMPTY = "queueEmpty"; //todo: change to "0"
 enum CLIENT_ID { CID_CORE, CID_SQL };
 
 struct Client //todo: class friend to Clients

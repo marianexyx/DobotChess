@@ -21,7 +21,13 @@
 }
 
 /*static*/ bool Sql::isClientHashOk(int64_t n64sqlId, QString QStrHash)
-{
+{    
+    if (n64sqlId < 1)
+    {
+        qDebug() << "ERROR: Sql::isClientHashOk(): ID param cannot be below 1. "
+                    "it's ==" << n64sqlId;
+        return false;
+    }
     qDebug() << "Sql::isClientHashOk(): n64sqlId =" << n64sqlId;
 
     if (sqlDB.open())
@@ -67,6 +73,14 @@
     }
 }
 
+/*static*/ bool Sql::isClientHashOk(QString QStrIDandHash)
+{
+    int64_t n64ID = QStrIDandHash.left(QStrIDandHash.indexOf("&")).toInt();
+    QString QStrHash = QStrIDandHash.mid(QStrIDandHash.indexOf("&")+1);
+
+    return Sql::isClientHashOk(n64ID, QStrHash);
+}
+
 /*static*/ QString Sql::getClientName(int64_t n64sqlId)
 {
     if (sqlDB.open())
@@ -98,7 +112,7 @@
     }
     else
     {
-        qDebug() << "ERROR: Sql::test(): Failed to connect with SQL database. "
+        qDebug() << "ERROR: Sql::getClientName(): Failed to connect with SQL database. "
                      "error =" << sqlDB.lastError().text();
         return "";
     }

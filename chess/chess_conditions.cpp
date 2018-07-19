@@ -197,9 +197,9 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         else return false;
     }
     case RT_IM: //sql hash is ok && (name == empty || name == actual name)
-        if (Sql::isClientHashOk(request.param.left(request.param.indexOf("&")).toInt(),
-                                request.param.mid(request.param.indexOf("&")+1))
-            && (pSender->sqlID == 0 || pSender->name() == request.param))
+        //todo: test double login
+        if ((pSender->sqlID == request.param.left(request.param.indexOf("&")).toInt()
+             || pSender->sqlID == 0) && Sql::isClientHashOk(request.param))
             return true;
         else return false;
     case RT_QUEUE_ME:

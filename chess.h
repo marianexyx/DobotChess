@@ -59,10 +59,9 @@ private:
     void sendMsgToTcp(QString QStrMsg);
     void newClientLogged(Client& client, int64_t sqlID);
     void restorateGameIfDisconnectedClientAffectIt(Client& client);
-    void sendDataToClient(QString QStrMsg, Client client = Client());
-    void sendDataToAllClients(QString QStrMsg);
-    QString getEndGameMsg(END_TYPE WhoWon, QString QStrTableData,
-                          PLAYER_TYPE PlayerToClear = PT_NONE);
+    void sendDataToClient(Client client = Client(), ACTION_TYPE AT = AT_NONE,
+                          END_TYPE ET = ET_NONE);
+    void sendDataToAllClients(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void updateClientsInUI();
 
     //gameplay methods
@@ -70,7 +69,7 @@ private:
     void startNewGameInCore();
     void manageMoveRequest(clientRequest request);
     void continueGameplay();
-    void restartGame(END_TYPE WhoWon, PLAYER_TYPE PlayerToClear = PT_NONE);
+    void restartGame(END_TYPE ET);
     void changePlayersOnChairs();
     void resetTableData();
 
@@ -106,7 +105,7 @@ public slots:
     void checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID);
     void checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond);
     void checkMsgFromUsb(QString QStrMsg);
-    QString getTableData();
+    QString getTableData(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showLegalMovesInForm(QStringList legalMoves);
     void showHistoryMovesInForm(QStringList historyMoves);

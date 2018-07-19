@@ -129,16 +129,30 @@ void ChessTimers::stopQueueTimer() //stop == reset
     this->updateTimeLabels();
 }
 
-int ChessTimers::getWhiteTimeLeft()
+int ChessTimers::getWhiteTimeLeft(bool bSeconds /*= false*/)
 {
+    int nReturnTime;
     if (_whiteTimer->remainingTime() != -1)
-        return _whiteTimer->remainingTime();
-    else return _nRemainingWhiteTime;
+        nReturnTime = _whiteTimer->remainingTime();
+    else nReturnTime = _nRemainingWhiteTime;
+    if (bSeconds == true) nReturnTime /= 1000;
+    return nReturnTime;
 }
 
-int ChessTimers::getBlackTimeLeft()
+int ChessTimers::getBlackTimeLeft(bool bSeconds /*= false*/)
 {
+    int nReturnTime;
     if (_blackTimer->remainingTime() != -1)
-        return _blackTimer->remainingTime();
-    else return _nRemainingBlackTime;
+        nReturnTime = _blackTimer->remainingTime();
+    else nReturnTime = _nRemainingBlackTime;
+    if (bSeconds == true) nReturnTime /= 1000;
+    return nReturnTime;
+}
+
+int ChessTimers::getStartTimeLeft(bool bSeconds /*= false*/)
+{
+    int nReturnTime;
+    nReturnTime = _startQueueTimer->remainingTime();
+    if (bSeconds == true) nReturnTime /= 1000;
+    return nReturnTime;
 }

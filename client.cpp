@@ -307,7 +307,7 @@ void Clients::putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair)
         return;
     }
 
-    if (this->getQueuedClientsList() != QUEUE_EMPTY)
+    if (this->getQueuedClientsList() != "0")
     {
         if (!this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS)) return;
 
@@ -456,12 +456,12 @@ QString Clients::getQueuedClientsList()
             //remember last biggest client for next iteration
             lastBiggestQueue = maxQueue;
 
-            //add last biggest found queued client name to string for return
+            //add last biggest found queued client sqlID to string for return
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl.queue == maxQueue)
                 {
-                    QStrQueuedClients = cl.name() + "," + QStrQueuedClients;
+                    QStrQueuedClients = cl.sqlID + " " + QStrQueuedClients;
                 }
             }
             maxQueue = 0; //clear for next iteration
@@ -478,7 +478,7 @@ QString Clients::getQueuedClientsList()
         } while (lastBiggestQueue != minQueue);
     }
     if (QStrQueuedClients.isEmpty())
-        QStrQueuedClients = QUEUE_EMPTY;
+        QStrQueuedClients = "0";
     else //remove last comma
         QStrQueuedClients = QStrQueuedClients.left(QStrQueuedClients.length() - 1);
 

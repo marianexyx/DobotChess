@@ -1,3 +1,5 @@
+//todo: move to chess vars dir
+
 #ifndef ACTION_TYPES_H
 #define ACTION_TYPES_H
 
@@ -9,15 +11,13 @@ enum ACTION_TYPE
 {
     AT_NONE,
     AT_NEW_GAME_STARTED,
-    AT_MOVE_OK,
+    AT_CONTINUE,
     AT_BAD_MOVE,
     AT_PROMOTE_TO_WHAT,
     AT_RESET_COMPLITED,
-    AT_END_GAME,
-    AT_ERROR
+    AT_END_GAME, //must be last, cuz END_TYPE is added, when this type is sent to WWW
+    AT_ERROR = 999 //big number prevent this type from covering diffrent AT_END_GAME
 };
-
-//" cont"
 
 inline QString actionTypeAsQstr(ACTION_TYPE AT)
 {
@@ -25,7 +25,7 @@ inline QString actionTypeAsQstr(ACTION_TYPE AT)
     {
     case AT_NONE: return "none";
     case AT_NEW_GAME_STARTED: return "newOk";
-    case AT_MOVE_OK: return "moveOk";
+    case AT_CONTINUE: return "continue";
     case AT_BAD_MOVE: return "badMove";
     case AT_PROMOTE_TO_WHAT: return "promoteToWhat";
     case AT_RESET_COMPLITED: return "resetComplited";

@@ -43,9 +43,9 @@ public:
     GAME_STATUS startQueueTimer();
     void stopQueueTimer();
 
-    int getWhiteTimeLeft();
-    int getBlackTimeLeft();
-    int getStartTimeLeft() { return _startQueueTimer->remainingTime(); }
+    int getWhiteTimeLeft(bool bSeconds = false);
+    int getBlackTimeLeft(bool bSeconds = false);
+    int getStartTimeLeft(bool bSeconds = false);
     bool isStartTimerRunning() { return _startQueueTimer->isActive(); }
 
 signals:

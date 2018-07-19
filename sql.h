@@ -16,6 +16,7 @@ struct Sql
 {
     static void setDbConnectionData();
     static bool isClientHashOk(int64_t n64sqlId, QString QStrHash);
+    static bool isClientHashOk(QString QStrIDandHash);
     static QString getClientName(int64_t n64sqlId);
 };
 
