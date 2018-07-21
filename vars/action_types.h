@@ -16,7 +16,7 @@ enum ACTION_TYPE
     AT_PROMOTE_TO_WHAT,
     AT_RESET_COMPLITED,
     AT_END_GAME, //must be last, cuz END_TYPE is added, when this type is sent to WWW
-    AT_ERROR = 999 //big number prevent this type from covering diffrent AT_END_GAME
+    AT_ERROR = 256 //big number prevent this type from covering diffrent AT_END_GAME
 };
 
 inline QString actionTypeAsQstr(ACTION_TYPE AT)

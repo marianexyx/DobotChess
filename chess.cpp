@@ -176,7 +176,6 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         break;
     case CMT_HISTORY:
         _pStatus->setHistoryMoves(QStrTcpRespond);
-        //todo: change site responses for endian node with parameters, instead strings
         this->sendDataToAllClients();
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
@@ -497,7 +496,7 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
     if (_pClientsList->isPlayerChairEmpty(PT_BLACK)) QStrBlackPlayerID = "0";
     else QStrBlackPlayerID = QString::number(_pClientsList->getPlayer(PT_BLACK).sqlID);
 
-    QString TD = "TABLE_DATA{\"";
+    QString TD = "{\"";
     TD += decToHex(TD_ACTION) + ":" + decToHex(AT + ET);
     TD += "," + decToHex(TD_WHITE_PLAYER) + ":" + QStrWhitePlayerID;
     TD += "," + decToHex(TD_BLACK_PLAYER) + ":" + QStrBlackPlayerID;
