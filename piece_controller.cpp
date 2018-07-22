@@ -168,6 +168,7 @@ QString PieceController::getPromotedPawnsPositions()
         QStrPromotedPawnsPositions = QStrPromotedPawnsPositions.left(
                     QStrPromotedPawnsPositions.length() - 1); //delete last spacebar
     }
+    else QStrPromotedPawnsPositions = "0";
 
     return QStrPromotedPawnsPositions; //f.e.: "b2_Q c7_q g5_N e1_R d4_b"
 }

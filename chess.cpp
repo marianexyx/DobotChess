@@ -410,8 +410,7 @@ void Chess::manageMoveRequest(clientRequest request)
         _pStatus->setMove(request.param);
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
                                                                     GS_TURN_BLACK_PROMOTE;
-        this->sendDataToClient(_pClientsList->getPlayer(_pStatus->getActivePlayerType()),
-                               AT_PROMOTE_TO_WHAT);
+        this->sendDataToClient(_pClientsList->getPlayer(_pStatus->getActivePlayerType()));
     }
     else if (!_pStatus->isMoveLegal(request.param))
     {
@@ -432,7 +431,7 @@ void Chess::continueGameplay()
         _pTimers->switchPlayersTimers(_pStatus->getWhoseTurn());
         _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
                                                                     GS_TURN_BLACK;
-        this->sendDataToAllClients(AT_CONTINUE);
+        this->sendDataToAllClients();
     }
     /*else if (_PlayerSource == ARDUINO)
     {
@@ -504,25 +503,9 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
     TD += "," + decToHex(TD_WHITE_TIME) + ":" + QString::number(_pTimers->getWhiteTimeLeft(true));
     TD += "," + decToHex(TD_BLACK_TYPE) + ":" + QString::number(_pTimers->getBlackTimeLeft(true));
     TD += "," + decToHex(TD_QUEUE) + ":" + _pClientsList->getQueuedClientsList();
-
-    if (_pTimers->isStartTimerRunning()) //todo: check from game status instead time function?
-    {
-        int nWhiteClickedStart = _pClientsList->isStartClickedByPlayer(PT_WHITE) ? 1 : 0;
-        int nBlackClickedStart = _pClientsList->isStartClickedByPlayer(PT_BLACK) ? 2 : 0;
-        int nPlayersClickedStart = nWhiteClickedStart + nBlackClickedStart;
-
-        TD += "," + decToHex(TD_START_TIME) + ":" + QString::number(nPlayersClickedStart)
-                + QString::number(_pTimers->getStartTimeLeft(true));
-    }
-
-    //todo: always return this data, even when it's empty? (return "0"?)
-    if (!_pStatus->getHistoryMoves().isEmpty())
-        TD += "," + decToHex(TD_HISTORY) + ":" + _pStatus->getHistoryMovesAsQStr();
-
-    //todo: always return this data, even when it's empty? (return "0"?)
-    if (_pPieceController->isAnyPawnPromoted())
-        TD += "," + decToHex(TD_PROMOTIONS) + ":" +
-                _pPieceController->getPromotedPawnsPositions();
+    TD += "," + decToHex(TD_START_TIME) + ":" + QString::number(_pTimers->getStartTimeLeft(true));
+    TD += "," + decToHex(TD_HISTORY) + ":" + _pStatus->getHistoryMovesAsQStr();
+    TD += "," + decToHex(TD_PROMOTIONS) + ":" + _pPieceController->getPromotedPawnsPositions();
 
     //convert string to JSON format
     TD.replace(":", "\":\"");
