@@ -249,16 +249,6 @@ void Clients::removeClientFromList(const Client& client)
                             "client can't be removed";
 
             return;
-
-            //info: erlier working code in chess class:
-            /*for(int i = 0; i < _pClientsList->getClientsList().count(); ++i)
-            { //don't bother yourself with trying to removeAll on structs
-              if(_pClientsList->getClientsList().at(i).socket == pClient->socket)
-              {
-                _pClientsList->getClientsList().removeAt(i);
-                break;
-              }
-            }*/
         }
     }
     qDebug() << "ERROR: Clients::removeClientFromList(): client not found";

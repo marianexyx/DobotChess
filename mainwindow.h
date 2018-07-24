@@ -43,7 +43,6 @@ private:
     Chessboard* _pBoardRemoved;
     Chessboard* _pBoardChenard;
     TCPMsgs* _pTCPMsg;
-    ArduinoUsb* _pUsb;
     Clients* _pClientsList;
     Chess* _pChess;
 
@@ -52,10 +51,6 @@ private:
     void initControl();
 
 private slots:
-    void onChangedMode();
-    void onJOGCtrlBtnPressed(int nID);
-    void onJOGCtrlBtnReleased();
-
     //slots for GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
@@ -67,6 +62,9 @@ private slots:
     void changeWindowTitle();
 
     //dobot slots
+    void onChangedMode();
+    void onJOGCtrlBtnPressed(int nID);
+    void onJOGCtrlBtnReleased();
     void setDobotPTEValidatorsInUI();
     void setJointLabelText(QString QStrJointLabelText, short sJoint);
     void setAxisLabelText(QString QStrAxisLabelText, char chAxis);
@@ -86,25 +84,15 @@ private slots:
     void on_upBtn_clicked();
     void on_downBtn_clicked();
     void on_resetDobotIndexBtn_clicked();
-    void on_AIBtn_clicked();
-    void on_AIEnemySendBtn_clicked();
     void showClientsListInUI(QList<Client> list);
 
-    //arduino usb slots
-    void updatePortsComboBox(int nUsbPorst);
-    void on_portsComboBox_currentIndexChanged(int nID);
-    void on_reloadPortsBtn_clicked();
-    void on_sendUsbBtn_clicked();
     void on_openGripperBtn_clicked();
     void on_closeGripperBtn_clicked();
     void on_startGmPosBtn_clicked();
     void on_startDtPosBtn_clicked();
-    void on_SimulateFromUsbBtn_clicked();
     void on_sendTcpBtn_clicked();
     void on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged);
-    void on_SimulateFromUsbLineEdit_textChanged(const QString& QStrTextChanged);
     void on_homeBtn_clicked();
-    void on_usbCmdLine_textChanged(const QString& QStrTextChanged);
     void on_middleAboveBtn_clicked();
     void on_sendBtn_clicked();
     void on_xPTPEdit_textChanged(const QString& QStrTextChanged);

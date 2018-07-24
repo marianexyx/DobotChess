@@ -4,9 +4,6 @@ DobotGripper::DobotGripper(float fGripperOpened, float fGripperClosed):
     _fGripOpened(fGripperOpened),
     _fGripClosed(fGripperClosed)
 {
-    qDebug() << "DobotGripper::DobotGripper(): _fGripOpened =" << _fGripOpened
-             << ", _fGripClosed =" << _fGripClosed;
-
     _gripper.address = 4;
     _gripper.dutyCycle = _fGripOpened;
     _gripper.frequency = 50.f;
@@ -38,7 +35,7 @@ void DobotGripper::checkPWMForErrors()
     }
 }
 
-void DobotGripper::changeGripperAngle(float fDutyCycle) //info: that should work
+void DobotGripper::changeGripperAngle(float fDutyCycle)
 {
     if (fDutyCycle != 0)
         _gripper.dutyCycle = fDutyCycle;
@@ -48,16 +45,12 @@ void DobotGripper::changeGripperAngle(float fDutyCycle) //info: that should work
 
 void DobotGripper::openGripper(uint64_t ID)
 {
-    qDebug() << "DobotGripper::openGripper(): _fGripOpened =" << _fGripOpened
-             << ", pin =" << _gripper.address << ", freq =" << _gripper.frequency;
     _gripper.dutyCycle = _fGripOpened;
     isArmReceivedCorrectCmd(SetIOPWM(&_gripper, true, &ID), SHOW_ERRORS);
 }
 
 void DobotGripper::closeGripper(uint64_t ID)
 {
-    qDebug() << "DobotGripper::closeGripper(): _fGripClosed =" << _fGripClosed
-             << ", pin =" << _gripper.address << ", freq =" << _gripper.frequency;
     _gripper.dutyCycle = _fGripClosed;
     isArmReceivedCorrectCmd(SetIOPWM(&_gripper, true, &ID), SHOW_ERRORS);
 }

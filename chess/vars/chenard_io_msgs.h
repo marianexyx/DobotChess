@@ -13,9 +13,7 @@ enum CHENARD_MSG_TYPE
     CMT_STATUS,
     CMT_LEGAL,
     CMT_HISTORY,
-    CMT_MOVE,
-    CMT_THINK,
-    CMT_UNDO
+    CMT_MOVE
 };
 
 inline CHENARD_MSG_TYPE ChenardMsgType(QString QStrMsgType)
@@ -25,8 +23,6 @@ inline CHENARD_MSG_TYPE ChenardMsgType(QString QStrMsgType)
     else if (QStrMsgType == "legal") return CMT_LEGAL;
     else if (QStrMsgType == "history pgn") return CMT_HISTORY;
     else if (QStrMsgType.left(5) == "move ") return CMT_MOVE;
-    else if (QStrMsgType == "think 5000") return CMT_THINK;
-    else if (QStrMsgType == "undo 1") return CMT_UNDO;
     else
     {
         qDebug() << "ERROR: ChenardMsgType(): unknown QStrMsgType type:" << QStrMsgType;
@@ -43,8 +39,6 @@ inline QString chenardMsgTypeAsQStr(CHENARD_MSG_TYPE CMT)
     case CMT_LEGAL: return "legal";
     case CMT_HISTORY: return "history pgn";
     case CMT_MOVE: return "move";
-    case CMT_THINK: return "think 5000";
-    case CMT_UNDO: return "undo 1";
     default:
         qDebug() << "ERROR: chenardMsgTypeAsQStr(): wrong arg =" << CMT;
         return "";
@@ -66,8 +60,6 @@ inline bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bo
         bReturn = true; //always ok
         break;
     case CMT_MOVE: //BAD_FORMAT ans is an error, because it shouldn't be possible
-    case CMT_THINK: //GAME_OVER ans is an error, because it shouldn't be possible
-    case CMT_UNDO: //BAD_NUM_TURNS ans is an error, because it shouldn't be possible
         bReturn = (QStrAns.left(4) == "OK 1") ? true : false; //"OK 1" and "OK 1\n"
         break;
     default:

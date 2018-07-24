@@ -9,8 +9,6 @@
 #include <QString>
 #include "vars/basic_vars.h"
 
-//https://www.youtube.com/watch?v=NzQwJdcdRKE&index=95&list=PL2D1942A4688E9D63
-
 enum XML_FILE_TYPE { XFT_GAME_CONFIG, XFT_DATABASE };
 
 //future: this class could be struct with static methods only

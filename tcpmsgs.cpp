@@ -8,14 +8,12 @@ TCPMsgs::TCPMsgs()
 }
 
 //todo: make queue as seperate thread
-void TCPMsgs::queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd)
+void TCPMsgs::queueCmd(QString QStrCmd)
 {
-    qDebug() << "TCPMsgs::queueCmd(): cmd =" << QStrCmd << ", sender ="
-             << communicationTypeAsQStr(Sender);
+    qDebug() << "TCPMsgs::queueCmd(): cmd =" << QStrCmd;
 
     TcpMsgMetadata QStrReceivedData;
     QStrReceivedData.n64TcpID = ++_n64CmdID;
-    QStrReceivedData.nSender = Sender;
     QStrReceivedData.QStrMsgForTcp = QStrCmd;
     TCPMsgsList << QStrReceivedData;
     if (!TCPMsgsList.isEmpty() && !_bWaitingForReadyRead)
@@ -90,7 +88,7 @@ void TCPMsgs::connected()
                  << QStrData.QStrMsgForTcp;
 
         QByteArray QabMsgArrayed;
-        //przetworzenie parametru dla funkcji write()
+        //prepare parameter for write() function
         QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n");
         //send msg to tcp from sender. chenard understand end of msg, when encounter "\n" msg
         //future: propably above warning "\n\n" messages are created?
@@ -153,8 +151,8 @@ void TCPMsgs::readyRead()
             return;
         }
 
-        qDebug() << "TCPMsgs::readyRead(): ID =" << QStrData.n64TcpID << ", sender ="
-                 << QStrData.nSender << ", msgForTcp =" << QStrData.QStrMsgForTcp
+        qDebug() << "TCPMsgs::readyRead(): ID =" << QStrData.n64TcpID
+                 << ", msgForTcp =" << QStrData.QStrMsgForTcp
                  << ", msgFromTcp =" << QStrMsgFromTcp;
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);

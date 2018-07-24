@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_TCPMsgs_t {
-    QByteArrayData data[17];
-    char stringdata0[196];
+    QByteArrayData data[15];
+    char stringdata0[170];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -45,17 +45,14 @@ QT_MOC_LITERAL(10, 124, 12), // "bytesWritten"
 QT_MOC_LITERAL(11, 137, 5), // "bytes"
 QT_MOC_LITERAL(12, 143, 9), // "readyRead"
 QT_MOC_LITERAL(13, 153, 8), // "queueCmd"
-QT_MOC_LITERAL(14, 162, 18), // "COMMUNICATION_TYPE"
-QT_MOC_LITERAL(15, 181, 6), // "Sender"
-QT_MOC_LITERAL(16, 188, 7) // "QStrCmd"
+QT_MOC_LITERAL(14, 162, 7) // "QStrCmd"
 
     },
     "TCPMsgs\0addTextToLogPTE\0\0LOG\0"
     "msgFromTcpToChess\0displayError\0"
     "QAbstractSocket::SocketError\0socketError\0"
     "connected\0disconnected\0bytesWritten\0"
-    "bytes\0readyRead\0queueCmd\0COMMUNICATION_TYPE\0"
-    "Sender\0QStrCmd"
+    "bytes\0readyRead\0queueCmd\0QStrCmd"
 };
 #undef QT_MOC_LITERAL
 
@@ -82,7 +79,7 @@ static const uint qt_meta_data_TCPMsgs[] = {
        9,    0,   68,    2, 0x08 /* Private */,
       10,    1,   69,    2, 0x08 /* Private */,
       12,    0,   72,    2, 0x08 /* Private */,
-      13,    2,   73,    2, 0x0a /* Public */,
+      13,    1,   73,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString, 0x80000000 | 3,    2,    2,
@@ -94,7 +91,7 @@ static const uint qt_meta_data_TCPMsgs[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::LongLong,   11,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 14, QMetaType::QString,   15,   16,
+    QMetaType::Void, QMetaType::QString,   14,
 
        0        // eod
 };
@@ -112,7 +109,7 @@ void TCPMsgs::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 4: _t->disconnected(); break;
         case 5: _t->bytesWritten((*reinterpret_cast< qint64(*)>(_a[1]))); break;
         case 6: _t->readyRead(); break;
-        case 7: _t->queueCmd((*reinterpret_cast< COMMUNICATION_TYPE(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
+        case 7: _t->queueCmd((*reinterpret_cast< QString(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {

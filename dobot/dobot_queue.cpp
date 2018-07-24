@@ -141,13 +141,8 @@ bool DobotQueue::isArmCoveringGame()
 {
     if (_bRetreat && _un64RealTimeDobotActualID > _un64RetreatID &&
             _un64RealTimeDobotActualID >= _un64CoreQueuedCmdID && _queuedArmCmdsOnCore.isEmpty())
-    {
         return true;
-    }
-    else
-    {
-        return false;
-    }
+    else return false;
 }
 
 void DobotQueue::retreat(Point3D lastPoint)

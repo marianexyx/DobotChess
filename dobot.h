@@ -12,7 +12,6 @@
 #include <limits>
 #include "DobotDll/DobotDll.h"
 #include "DobotDll/DobotType.h"
-#include "arduinousb.h"
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
@@ -25,8 +24,6 @@ class Dobot: public QObject
     Q_OBJECT
 
 private:
-    ArduinoUsb *_pUsb;
-
     DobotGripper* _pGripper;
     DobotQueue* _pQueue;
 
@@ -47,8 +44,7 @@ private:
     void createAndStartPoseTimer();
 
 public:
-    Dobot(ArduinoUsb* pUsb, RealVars gameConfigVars, Point3D retreatLeft,
-          Point3D retreatRight);
+    Dobot(RealVars gameConfigVars, Point3D retreatLeft, Point3D retreatRight);
     ~Dobot();
 
     void saveActualDobotPosition();
@@ -76,7 +72,6 @@ public:
     //todo: below: friends
     DobotGripper* getServoPointer() const { return _pGripper; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
-    ArduinoUsb* getArduinoPointer() const { return _pUsb; }
 
 public slots:
     void sendMoveToArm(DobotMove move);

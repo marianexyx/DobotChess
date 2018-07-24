@@ -18,13 +18,11 @@ TARGET = DobotChessCore
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    chess/chess_bot.cpp \
     chess/chess_conditions.cpp \
     chess/chess_movements.cpp \
     chess/chess_status.cpp \
     chess/chess_timers.cpp \
     dobot/dobot_queue.cpp \
-    arduinousb.cpp \
     chess.cpp \
     chessboard.cpp \
     client.cpp \
@@ -47,7 +45,6 @@ HEADERS  +=  \
     chess/vars/request_types.h \
     chess/vars/sequence_types.h \
     chess/vars/turn_types.h \
-    chess/chess_bot.h \
     chess/chess_conditions.h \
     chess/chess_movements.h \
     chess/chess_status.h \
@@ -62,7 +59,6 @@ HEADERS  +=  \
     vars/log.h \
     vars/players_types.h \
     vars/position_on_board.h \
-    arduinousb.h \
     chess.h \
     chessboard.h \
     client.h \

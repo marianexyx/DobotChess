@@ -77,8 +77,8 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt());
     to.Letter = pieceLetterPos(QStrMoveFromTo.mid(2,1));
     to.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(3,1).toInt());
-    //QString::right(1) function will crash if move is promotion (last 5th...
-    //...char != int
+    //don't use QString::right(1) above! function will crash if move...
+    //...is promotion (last 5th char != int)
 }
 
 /*static*/ bool PosFromTo::isMoveInProperFormat(QString QStrMoveFromTo)
@@ -131,8 +131,8 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
     move.from.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt());
     move.to.Letter = pieceLetterPos(QStrMoveFromTo.mid(2,1));
     move.to.Digit = static_cast<DIGIT>(QStrMoveFromTo.mid(3,1).toInt());
-    //QString::right(1) function will crash if move is promotion (last 5th...
-    //...char != int
+    //don't use QString::right(1) above! function will crash if move...
+    //...is promotion (last 5th char != int)
 
     return move;
 }

@@ -17,7 +17,6 @@
 #include "chess/vars/end_of_game_types.h"
 #include "piece_set.h"
 #include "chessboard.h"
-#include "chess/chess_bot.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_conditions.h" //must be as last chess...
@@ -37,11 +36,7 @@ private:
     Chessboard* _pBoardChenard;
     Websockets* _pWebsockets;
     TCPMsgs* _pTCPMsgs;
-    ArduinoUsb* _pUsb;
 
-    COMMUNICATION_TYPE _PlayerSource;
-
-    ChessBot* _pBot;
     ChessTimers* _pTimers;
     ChessStatus* _pStatus;
     ChessConditions* _pConditions;
@@ -75,8 +70,7 @@ private:
 
 public:
     Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
-          Websockets* pWebsockets, TCPMsgs* pTCPMsgs,
-          COMMUNICATION_TYPE PlayerSource);
+          Websockets* pWebsockets, TCPMsgs* pTCPMsgs);
     ~Chess();
 
     void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }
@@ -97,14 +91,12 @@ public:
 
     ChessTimers* getTimersPointer() const { return _pTimers; }
     ChessMovements* getMovementsPointer() const { return _pMovements; }
-    ChessBot* getBotPointer() const { return _pBot; }
     ChessStatus* getStatusPointer() const { return _pStatus; }
     ChessConditions* getConditionsPointer() const { return _pConditions; }
 
 public slots:
     void checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID);
     void checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond);
-    void checkMsgFromUsb(QString QStrMsg);
     QString getTableData(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showLegalMovesInForm(QStringList legalMoves);

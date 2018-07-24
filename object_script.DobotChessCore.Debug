@@ -1,12 +1,10 @@
 INPUT(
 ./debug\main.o
-./debug\chess_bot.o
 ./debug\chess_conditions.o
 ./debug\chess_movements.o
 ./debug\chess_status.o
 ./debug\chess_timers.o
 ./debug\dobot_queue.o
-./debug\arduinousb.o
 ./debug\chess.o
 ./debug\chessboard.o
 ./debug\client.o
@@ -21,11 +19,9 @@ INPUT(
 ./debug\xml_reader.o
 ./debug\position_on_board.o
 ./debug\dobot_gripper.o
-./debug\moc_chess_bot.o
 ./debug\moc_chess_status.o
 ./debug\moc_chess_timers.o
 ./debug\moc_dobot_queue.o
-./debug\moc_arduinousb.o
 ./debug\moc_chess.o
 ./debug\moc_chessboard.o
 ./debug\moc_client.o

@@ -7,6 +7,7 @@
 #include <QString>
 #include <QDebug>
 
+//todo: AT_NEW_WHITE_PLAYER, AT_NEW_BLACK_PLAYER
 enum ACTION_TYPE
 {
     AT_NONE,

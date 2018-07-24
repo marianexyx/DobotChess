@@ -1,12 +1,9 @@
 #include "dobot.h"
 
-Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
-             Point3D retreatLeft, Point3D retreatRight):
+Dobot::Dobot(RealVars gameConfigVars, Point3D retreatLeft, Point3D retreatRight):
     _ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
     _ARM_MAX_ACCELERATION(300)
 {
-    _pUsb = pUsb;
-
     _pQueue = new DobotQueue(retreatLeft, retreatRight);
     _pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
@@ -23,7 +20,7 @@ Dobot::Dobot(ArduinoUsb *pUsb, RealVars gameConfigVars,
     _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
 
     //future: this below shows that we r using chessboard. it may be wiped, only if...
-    //...it's passed, but it's not efficient. better wasy might be passing whole object.
+    //...it's passed, but it's not efficient. better way might be passing whole object.
     _dSafeAxisZ = qMin(qMin(gameConfigVars.A1.z, gameConfigVars.A8.z),
                        qMin(gameConfigVars.H1.z, gameConfigVars.H8.z)) +
             gameConfigVars.fPieceHeight;
@@ -56,7 +53,8 @@ void Dobot::onPeriodicTaskTimer()
 
 void Dobot::onGetPoseTimer()
 {
-    QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer"); //find timer by name
+    //find timer by name:
+    QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer");
 
     if (_bConnectedToDobot)
     {
@@ -310,7 +308,7 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
 {
     if (!_bConnectedToDobot)
     {
-        qDebug() << "Dobot::queueMoveSequence(): dobot not connected";
+        qDebug() << "WARNING: Dobot::queueMoveSequence(): dobot not connected";
         return;
     }
 

@@ -18,7 +18,6 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     _pBoardChenard = _pChess->getBoardChenardPointer();
     _pTCPMsg = _pChess->getTCPMsgsPointer();
     _pClientsList = _pChess->getClientsPointer();
-    _pUsb = _pChess->getDobotPointer()->getArduinoPointer();
 
     _titleFormTimer = new QTimer();
     _titleFormTimer->setInterval(200);
@@ -41,8 +40,6 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     connect(_pWebSockets, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
     connect(_pChess, SIGNAL(addTextToLogPTE(QString, LOG)),
-            this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pUsb, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
     connect(_pPieceController, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
@@ -82,8 +79,6 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
             this, SLOT(showDobotErrorMsgBox()));
     connect(_pDobot, SIGNAL(queueLabels(uint, uint64_t, uint64_t, int, uint64_t)),
             this, SLOT(setQueueLabels(uint, uint64_t, uint64_t, int, uint64_t)));
-    connect(_pUsb, SIGNAL(updatePortsComboBox(int)),
-            this, SLOT(updatePortsComboBox(int)));
     connect(_pPieceController, SIGNAL(showRealBoardInUI()),
             this, SLOT(showRealBoardInUI()));
     connect(_pDobot, SIGNAL(showQueuedArmCmdsOnCore()),
@@ -135,7 +130,7 @@ void MainWindow::setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un6
                                 int nCoreIdLeft, uint64_t un64CoreNextId)
 {
     if (unSpace == 0) unSpace = 1;  //future: it's only for temporary block...
-    //...warning about unused parameter, till i will not check this function
+    //...warning about unused parameter, till I will not check this function
     //ui->DobotQueuedCmdLeftSpaceLabel->
     //setText(QString::number(nSpace)); //future: make it by myself, or wait for update
     ui->DobotQueuedIndexLabel->setText(QString::number(un64DobotId));
@@ -168,13 +163,8 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->calibrateBtn->setEnabled(false);
         ui->upBtn->setEnabled(false);
         ui->downBtn->setEnabled(false);
-        ui->botOffRadioBtn->setEnabled(false);
-        ui->botOnRadioBtn->setEnabled(false);
-        ui->AIBtn->setEnabled(false);
-        ui->AIEnemySendBtn->setEnabled(false);
         ui->sendTcpBtn->setEnabled(false);
         ui->sendTcpLineEdit->setEnabled(false);
-        ui->simulateArduinoPlayer2checkBox->setEnabled(false);
         ui->emulatePlayerMsgLineEdit->setEnabled(false);
         ui->sendSimulatedMsgBtn->setEnabled(false);
         ui->openGripperBtn->setEnabled(false);
@@ -208,11 +198,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->calibrateBtn->setEnabled(true);
         ui->upBtn->setEnabled(true);
         ui->downBtn->setEnabled(true);
-        ui->botOffRadioBtn->setEnabled(true);
-        ui->botOnRadioBtn->setEnabled(true);
-        ui->AIBtn->setEnabled(true);
         ui->sendTcpLineEdit->setEnabled(true);
-        ui->simulateArduinoPlayer2checkBox->setEnabled(true);
         ui->emulatePlayerMsgLineEdit->setEnabled(true);
         ui->openGripperBtn->setEnabled(true);
         ui->closeGripperBtn->setEnabled(true);
@@ -474,71 +460,6 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
         this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
 }
 
-void MainWindow::on_AIBtn_clicked()
-{
-    if (ui->botOffRadioBtn->isChecked())
-    {
-        _pChess->getBotPointer()->setAI(false);
-        this->writeInConsole("Turned off Igors AI\n", LOG_MAINWINDOW);
-        ui->AIEnemySendBtn->setEnabled(false);
-        ui->AIEnemyLineEdit->setEnabled(false);
-    }
-    else if (ui->botOnRadioBtn->isChecked())
-    {
-        _pChess->getBotPointer()->setAI(true);
-        this->writeInConsole("Turned on Igors AI\n", LOG_MAINWINDOW);
-        ui->AIEnemySendBtn->setEnabled(true);
-        ui->AIEnemyLineEdit->setEnabled(true);
-    }
-
-    _pChess->getBotPointer()->enemyStart();
-}
-
-void MainWindow::on_AIEnemySendBtn_clicked()
-{
-    _pChess->getBotPointer()->setAIAsPlayer2(ui->simulateArduinoPlayer2checkBox->isChecked());
-
-    qDebug() << "WARNING: unfinished MainWindow::on_sendSimulatedMsgBtn_clicked() method";
-    //_pChess->checkMsgFromWebsockets(QStrServiceMove, ); //future:
-}
-
-void MainWindow::updatePortsComboBox(int nUsbPorst)
-{
-    QString QStrUsbPortsAmount = QString::number(nUsbPorst) + ((nUsbPorst == 1) ?
-                " port is ready to use\n" : " ports are ready to use\n");
-    this->writeInConsole(QStrUsbPortsAmount, LOG_USB);
-
-    //refresh ports list
-    ui->portsComboBox->clear();
-    ui->portsComboBox->addItem("NULL");
-    for(int i=0; i<nUsbPorst; i++)
-        ui->portsComboBox->addItem(_pUsb->availablePort.at(i).portName());
-}
-
-void MainWindow::on_portsComboBox_currentIndexChanged(int nID)
-{
-    _pUsb->portIndexChanged(nID);
-}
-
-void MainWindow::on_reloadPortsBtn_clicked()
-{
-    ui->usbCmdLine->setEnabled(true);
-    ui->portsComboBox->setEnabled(true);
-    ui->SimulateFromUsbLineEdit->setEnabled(true);
-    _pUsb->searchDevices();
-}
-
-void MainWindow::on_sendUsbBtn_clicked()
-{
-    if(_pUsb->usbInfo == NULL)
-        this->writeInConsole("None port selected\n", LOG_USB);
-    else
-    {
-        _pUsb->sendDataToUsb(ui->usbCmdLine->text());
-        ui->usbCmdLine->clear();
-    }
-}
-
 void MainWindow::on_openGripperBtn_clicked()
 {
     _pDobot->addArmMoveToQueue(DM_OPEN);
@@ -591,24 +512,11 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
 }
 
-void MainWindow::on_SimulateFromUsbBtn_clicked()
-{
-    if (!ui->SimulateFromUsbLineEdit->text().isEmpty())
-    {
-        _pUsb->msgFromUsbToChess(ui->SimulateFromUsbLineEdit->text());
-        ui->SimulateFromUsbLineEdit->clear();
-    }
-}
-
 void MainWindow::on_sendTcpBtn_clicked()
 {
     if (!ui->sendTcpLineEdit->text().isEmpty())
     {
-        if (ui->directTcpMsgCheckBox->isChecked())
-            _pTCPMsg->queueCmd(TEST, ui->sendTcpLineEdit->text());
-        else
-            _pTCPMsg->queueCmd(_pChess->getBotPointer()->getAI() ? ARDUINO : WEBSITE,
-                               ui->sendTcpLineEdit->text());
+        _pTCPMsg->queueCmd(ui->sendTcpLineEdit->text());
         ui->sendTcpLineEdit->clear();
     }
 }
@@ -836,22 +744,10 @@ void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
     ui->historyPTE->setPlainText(history);
 }
 
-void MainWindow::on_usbCmdLine_textChanged(const QString& QStrTextChanged)
-{
-    if (QStrTextChanged != NULL) ui->sendUsbBtn->setEnabled(true);
-    else ui->sendUsbBtn->setEnabled(false);
-}
-
 void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged)
 {
     if (QStrTextChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
     else ui->sendSimulatedMsgBtn->setEnabled(false);
-}
-
-void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString& QStrTextChanged)
-{
-    if (QStrTextChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
-    else ui->SimulateFromUsbBtn->setEnabled(false);
 }
 
 void MainWindow::on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged)

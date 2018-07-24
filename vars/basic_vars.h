@@ -12,21 +12,6 @@ const bool PRINT_DEBUG = true;
 const bool REAL = true;
 const bool IMAGINARY = false;
 
-
-enum COMMUNICATION_TYPE { WEBSITE = 1, ARDUINO, TEST };
-inline QString communicationTypeAsQStr(COMMUNICATION_TYPE Type)
-{
-    switch(Type)
-    {
-    case WEBSITE: return "website";
-    case ARDUINO: return "arduino";
-    case TEST: return "test";
-    default:
-        qDebug() << "ERROR: communicationTypeAsQStr(): unknown parametr =" << Type;
-        return "";
-    }
-}
-
 struct Point3D
 {
     double x;
@@ -110,7 +95,7 @@ inline QString decToHex(int nDec)
     }
 
     QString QStrReturn = QString::number(nDec, 16);
-    if (nDec < 10) QStrReturn = "0" + QStrReturn;
+    if (nDec < 16) QStrReturn = "0" + QStrReturn;
     QStrReturn = "0x" + QStrReturn;
 
     return QStrReturn;

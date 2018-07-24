@@ -19,6 +19,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
             _h1 = gameConfigVars.H1;
             _h8 = gameConfigVars.H8;
 
+            //todo: 7.f, 2.f??
             _dSquareWidth = ((_a1.y - _h1.y)/7 + (_a8.x - _h1.x)/7)/2;
 
             this->calculateFields3DLocationsOnMainBoard(_a1, _a8, _h1, _h8);
@@ -45,9 +46,6 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
 
 Chessboard::~Chessboard()
 {
-    qDebug() << "destroying board =" << boardTypeAsQstr(_boardType)
-             << ", _bBoardIsReal =" << _bBoardIsReal;
-
     for (int i=0; i<=63; ++i)
     {
         delete _pField[i];
@@ -129,7 +127,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
 void Chessboard::calculateMarginal3DValues()
 {
     _minBoard.x = _minBoard.y = _minBoard.z = std::numeric_limits<double>::max();
-    _maxBoard.x = _maxBoard.y = _maxBoard.z = -1000; //big int to start comparing
+    _maxBoard.x = _maxBoard.y = _maxBoard.z = -1000; //big number to start comparing
 
     for (int i=0; i<=63; ++i)
     {
@@ -164,7 +162,7 @@ void Chessboard::calculateMiddleAbovePoint()
 void Chessboard::calculateRetreatPoints()
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = -100; //future: get those vals from xml, or calculate it
+    _retreatLeft.y = -100; //todo: get those vals from xml, or calculate it
     _retreatRight.y = 100;
     _retreatLeft.z = _retreatRight.z = _maxBoard.z;
 }

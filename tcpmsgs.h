@@ -10,7 +10,6 @@
 struct TcpMsgMetadata
 {
     int64_t n64TcpID;
-    int nSender;
     QString QStrMsgForTcp;
 };
 
@@ -38,7 +37,7 @@ public:
     TCPMsgs();
 
 public slots:
-    void queueCmd(COMMUNICATION_TYPE Sender, QString QStrCmd); //todo: thread this
+    void queueCmd(QString QStrCmd); //todo: thread this
 
 signals:
     void addTextToLogPTE(QString, LOG);
