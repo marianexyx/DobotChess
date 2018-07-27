@@ -1,7 +1,7 @@
 #include "dobot.h"
 
 Dobot::Dobot(RealVars gameConfigVars, Point3D retreatLeft, Point3D retreatRight):
-    _ARM_MAX_VELOCITY(300), //todo: ile jest max? 200? 300?
+    _ARM_MAX_VELOCITY(300), //todo: wha't the max val? 200? 300?
     _ARM_MAX_ACCELERATION(300)
 {
     _pQueue = new DobotQueue(retreatLeft, retreatRight);
@@ -97,13 +97,6 @@ void Dobot::saveActualDobotPosition()
     emit AxisLabelText(QString::number(pose.y), 'y');
     emit AxisLabelText(QString::number(pose.z), 'z');
     emit AxisLabelText(QString::number(pose.r), 'r');
-}
-
-bool Dobot::bIsMoveInAxisRange(Point3D point)
-{
-    if (point.x > 300) qDebug() << "todo: comprehend locks";
-    //todo: get them from xml
-    return true;
 }
 
 void Dobot::setItemInGripper(short sGrippersItemID)
@@ -289,7 +282,7 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_WAIT:
         _pGripper->wait(move.ID);
         break;
-    case DM_CALIBRATE: //todo: this is home or calibrate? mess name
+    case DM_CALIBRATE: //todo: this is home or calibrate? messy name
     {
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 

@@ -11,6 +11,7 @@
 #include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
 #include "vars/board_types.h"
+#include "xml_reader.h"
 
 enum BOARD_POINTS { BP_MIN, BP_MAX, BP_MIDDLE, BP_RETREAT_LEFT, BP_RETREAT_RIGHT };
 
@@ -34,7 +35,7 @@ private:
           Point3D whiteFutherInner, Point3D blackCloserOuter, Point3D blackFutherInner);
     void calculateMarginal3DValues();
     void calculateMiddleAbovePoint();
-    void calculateRetreatPoints();
+    void calculateRetreatPoints(RealVars RV);
 
 public:
     Chessboard(BOARD BoardType, bool bBoardIsReal = true,

@@ -15,6 +15,7 @@
 #include "vars/log.h"
 #include "vars/basic_vars.h"
 #include "vars/board_axis.h"
+#include "xml_reader.h"
 #include "dobot/vars/dobot_move_types.h"
 #include "dobot/dobot_gripper.h"
 #include "dobot/dobot_queue.h"
@@ -58,7 +59,6 @@ public:
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
-    bool bIsMoveInAxisRange(Point3D point);
     bool bIsArmConnected() const { return _bConnectedToDobot; }
 
     void setItemInGripper(short sGrippersItemID);

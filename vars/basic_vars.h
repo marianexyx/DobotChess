@@ -35,25 +35,6 @@ struct Point3D
                 QString::number((int)y) + ", " + QString::number((int)z); }
 };
 
-//future: place it near xml reader
-struct RealVars
-{
-    float fPieceHeight;
-    Point3D home, homeToMiddleAbove;
-    Point3D A1, A8, H1, H8;
-    Point3D remWhiteCloserOuter, remWhiteFurtherInner;
-    Point3D remBlackCloserOuter, remBlackFurtherInner;
-    float fGripperOpened, fGripperClosed;
-};
-
-struct DatabaseVars
-{
-    QString QStrHostName;
-    QString QStrDatabaseName;
-    QString QStrUserName;
-    QString QStrPassword;
-};
-
 enum VERTICAL_MOVE { VM_NONE, VM_GRAB, VM_PUT };
 inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
 {
@@ -65,23 +46,6 @@ inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
     default:
         qDebug() << "ERROR: verticalMoveAsQStr(): wrong arg =" << VM;
         return "none";
-    }
-}
-
-inline bool isPointInLimits(Point3D point) //todo: xml
-{
-    Point3D minErrorCorner(100.f, -180.f, -25.f);
-    Point3D maxErrorCorner(340.f, 180.f, 50.f);
-
-    if (point.x > minErrorCorner.x && point.x < maxErrorCorner.x &&
-            point.y > minErrorCorner.y && point.y < maxErrorCorner.y &&
-            point.z > minErrorCorner.z && point.z < maxErrorCorner.z)
-        return true;
-    else
-    {
-        qDebug() << "ERROR: isPointInLimits(): one of the points vals is out of"
-                    " scope range. point =" << point.x << point.y << point.z;
-        return false;
     }
 }
 

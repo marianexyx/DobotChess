@@ -169,7 +169,7 @@ void DobotQueue::retreat(Point3D lastPoint)
 
 void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {    
-    if (Type != DM_OPEN && Type != DM_CLOSE && !isPointInLimits(point))
+    if (Type != DM_OPEN && Type != DM_CLOSE && !XmlReader::isPointInLimits(point))
     {
         qDebug() << "ERROR: DobotQueue::addArmMoveToQueue(): isPointInLimits == "
                     "false. move type =" << dobotMoveAsQstr(Type);

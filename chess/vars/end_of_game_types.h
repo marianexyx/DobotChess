@@ -5,7 +5,6 @@
 #include <QString>
 #include <QDebug>
 
-//todo: maybe it can be joined to ACTION_TYPEs?
 enum END_TYPE
 {
     ET_NONE,

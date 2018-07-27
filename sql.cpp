@@ -1,23 +1,17 @@
 #include "sql.h"
 
-/*static*/ void Sql::setDbConnectionData()
+/*static*/ QSqlDatabase Sql::sqlDB;
+
+/*static*/ void Sql::setDbConnectionData(DatabaseVars DBV)
 {
-    qDebug() << "Sql::setDbConnectionData()";
-
-    XmlReader xmlDB(QDir::currentPath() +
-                    "/../DobotChessDatabase/mysqlDatabaseConnectionData.xml",
-                    XFT_DATABASE);
-    DatabaseVars DBVars = xmlDB.getDatabaseVars();
-
-    qDebug() << "Sql::setDbConnectionData(): vars ="
-             << DBVars.QStrHostName << DBVars.QStrDatabaseName
-             << DBVars.QStrUserName << DBVars.QStrPassword;
+    qDebug() << "Sql::setDbConnectionData(): vars =" << DBV.QStrHostName
+             << DBV.QStrDatabaseName << DBV.QStrUserName << DBV.QStrPassword;
 
     sqlDB = QSqlDatabase::addDatabase("QMYSQL");
-    sqlDB.setHostName(DBVars.QStrHostName);
-    sqlDB.setDatabaseName(DBVars.QStrDatabaseName);
-    sqlDB.setUserName(DBVars.QStrUserName);
-    sqlDB.setPassword(DBVars.QStrPassword);
+    sqlDB.setHostName(DBV.QStrHostName);
+    sqlDB.setDatabaseName(DBV.QStrDatabaseName);
+    sqlDB.setUserName(DBV.QStrUserName);
+    sqlDB.setPassword(DBV.QStrPassword);
 }
 
 /*static*/ bool Sql::isClientHashOk(int64_t n64sqlId, QString QStrHash)

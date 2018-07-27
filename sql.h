@@ -10,11 +10,11 @@
 #include <QString>
 #include <xml_reader.h>
 
-static QSqlDatabase sqlDB;
-
 struct Sql
 {
-    static void setDbConnectionData();
+    static QSqlDatabase sqlDB;
+
+    static void setDbConnectionData(DatabaseVars DBV);
     static bool isClientHashOk(int64_t n64sqlId, QString QStrHash);
     static bool isClientHashOk(QString QStrIDandHash);
     static QString getClientName(int64_t n64sqlId);

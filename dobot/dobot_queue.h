@@ -7,6 +7,7 @@
 #include "vars/log.h"
 #include "DobotDll/DobotDll.h"
 #include "DobotDll/DobotType.h"
+#include "xml_reader.h"
 #include "dobot/vars/dobot_move_types.h"
 
 class DobotQueue: public QObject

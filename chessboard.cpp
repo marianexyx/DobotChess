@@ -40,7 +40,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
 
         this->calculateMarginal3DValues();
         this->calculateMiddleAbovePoint();
-        this->calculateRetreatPoints();
+        this->calculateRetreatPoints(gameConfigVars);
     }
 }
 
@@ -159,11 +159,11 @@ void Chessboard::calculateMiddleAbovePoint()
     _middleAbove.z = _maxBoard.z;
 }
 
-void Chessboard::calculateRetreatPoints()
+void Chessboard::calculateRetreatPoints(RealVars RV)
 {
     _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = -100; //todo: get those vals from xml, or calculate it
-    _retreatRight.y = 100;
+    _retreatLeft.y = RV.retreatLeft.y;
+    _retreatRight.y = RV.retreatRight.y;
     _retreatLeft.z = _retreatRight.z = _maxBoard.z;
 }
 

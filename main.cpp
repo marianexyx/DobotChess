@@ -5,10 +5,9 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    XmlReader xmlReader001(QDir::currentPath() + "/xmlGameConfig.xml",
-                           XFT_GAME_CONFIG);
-    Sql::setDbConnectionData();
-    RealVars gameConfigVars001 = xmlReader001.getRealVars();
+    XmlReader xmlReader001;
+    Sql::setDbConnectionData(xmlReader001.getDatabaseVars());
+    RealVars gameConfigVars001(xmlReader001.getRealVars());
     Clients ClientsList;
     Chessboard BoardChenard001(B_MAIN, IMAGINARY);
     Chessboard BoardMain001(B_MAIN, REAL, gameConfigVars001);
