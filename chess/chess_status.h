@@ -28,22 +28,12 @@ private:
     PosFromTo _PosMove;
     SEQUENCE_TYPE _MoveType;
 
-    WHOSE_TURN whoseTurn(QString QStrWhoseTurn);
-
-public:
-    ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
-                Clients* pClientsList);
-    ~ChessStatus() {}
-
     void saveStatusData(QString QStrStatus);
     void resetStatusData();
-
+    WHOSE_TURN whoseTurnFromFENStatus(QString QStrWhoseTurn);
     void promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType);
-    //todo: make setters as "friend" for chess class? check for this
-    void setGameStatus(QString QStrStatus) { _FENGameState = FENGameState(QStrStatus); }
-    void setWhoseTurn(WHOSE_TURN Turn) { _WhoseTurn = Turn; }
+
     void setMove(QString QStrMove);
-    void setMoveType(SEQUENCE_TYPE Type) { _MoveType = Type; }
     void setLegalMoves(QString QStrMsg);
     void setLegalMoves(QStringList moves);
     void setHistoryMoves(QString QStrMsg);
@@ -53,13 +43,19 @@ public:
     void clearLegalMoves();
     void clearHistoryMoves();
 
+public:
+    ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
+                Clients* pClientsList);
+    ~ChessStatus() {}
+
     static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
 
     SEQUENCE_TYPE findMoveType(QString QStrMove);
     bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
-    bool isMoveARequestForPromotion(QString QStrMove) { return _legalMoves.contains(QStrMove + "q")? true : false; }
+    bool isMoveARequestForPromotion(QString QStrMove)
+    { return _legalMoves.contains(QStrMove + "q")? true : false; }
     bool isMoveRemoving(QString QStrMoveToTest);
     bool isMovePromotionWithRemoving(QString QStrMoveToTest);
     bool isMoveCastling(QString QStrMoveToTest);

@@ -10,19 +10,23 @@
 
 class DobotGripper
 {
+    friend class Dobot;
+
 private:
     const float _fGripOpened, _fGripClosed;
     IOPWM _gripper;
 
-public:
-    DobotGripper(float fGripperOpened, float fGripperClosed);
-    ~DobotGripper() { qDebug() << "destroying DobotGripper"; }
-
     void checkPWMForErrors();
-    void changeGripperAngle(float fDutyCycle); //service usage
     void openGripper(uint64_t ID);
     void closeGripper(uint64_t ID);
     void wait(uint64_t ID);
+
+    DobotGripper(float fGripperOpened, float fGripperClosed);
+
+public:
+    ~DobotGripper() { qDebug() << "destroying DobotGripper"; } 
+
+    void changeGripperAngle(float fDutyCycle); //service usage
 };
 
 #endif // DOBOT_SERVO_H

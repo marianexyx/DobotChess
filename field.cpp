@@ -83,14 +83,6 @@ Field::Field(short sFieldNr)
     return Field::startPieceNrOnField(sFieldID);
 }
 
-void Field::setField3DLocation(Point3D point)
-{
-    //_location3D = point; //todo: repair operator (or not?)
-    _location3D.x = point.x;
-    _location3D.y = point.y;
-    _location3D.z = point.z;
-}
-
 void Field::setPieceOnField(Piece *pPiece)
 {
     if (pPiece == nullptr)

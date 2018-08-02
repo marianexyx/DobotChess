@@ -45,7 +45,7 @@ private:
     void createAndStartPoseTimer();
 
 public:
-    Dobot(RealVars gameConfigVars, Point3D retreatLeft, Point3D retreatRight);
+    Dobot(RealVars gameConfigVars, Point3D escape1, Point3D escape2);
     ~Dobot();
 
     void saveActualDobotPosition();
@@ -69,7 +69,7 @@ public:
     Point3D getHomePos();
     Point3D getHomeToMiddleAbovePoint() const { return _homeToMiddleAbove; }
     Point3D getLastGivenPoint() const { return _lastGivenPoint; }
-    //todo: below: friends
+
     DobotGripper* getServoPointer() const { return _pGripper; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
 

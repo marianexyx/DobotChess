@@ -1,10 +1,10 @@
 #include "dobot.h"
 
-Dobot::Dobot(RealVars gameConfigVars, Point3D retreatLeft, Point3D retreatRight):
+Dobot::Dobot(RealVars gameConfigVars, Point3D escape1, Point3D escape2):
     _ARM_MAX_VELOCITY(300), //todo: wha't the max val? 200? 300?
     _ARM_MAX_ACCELERATION(300)
 {
-    _pQueue = new DobotQueue(retreatLeft, retreatRight);
+    _pQueue = new DobotQueue(escape1, escape2);
     _pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
@@ -179,6 +179,7 @@ void Dobot::createAndStartPoseTimer()
 
 void Dobot::initDobot()
 {
+    //ClearAllAlarmsState() //future:
     SetCmdTimeout(3000); //command timeout
     SetQueuedCmdClear(); //clear commands queue on arm
     SetQueuedCmdStartExec(); //set the queued command running
@@ -263,7 +264,7 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_UP:
     case DM_DOWN:
     {
-        //todo: block "Z" axis, if it is too low
+        if (!XmlReader::isPointInLimits(move.xyz)) return;
         PTPCmd moveAsPtpCmd;
         moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian linear
         //future: dobot may have better way of movemenst. maybe CPAbsoluteMode?
@@ -282,13 +283,15 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_WAIT:
         _pGripper->wait(move.ID);
         break;
-    case DM_CALIBRATE: //todo: this is home or calibrate? messy name
+    case DM_CALIBRATE:
     {
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
-        HOMECmd HOME;
-        HOME.reserved = 1; //todo: i dont get this "1" ID. seen somewhere propably. ask of forum
-        isArmReceivedCorrectCmd(SetHOMECmd(&HOME, true, &move.ID), SHOW_ERRORS);
+        HOMECmd calibrateCmd;
+        //future: I dont get this "1" ID. seen somewhere propably. ask of forum?...
+        //... maybe remove it, and see if anything would change (might be useless)
+        calibrateCmd.reserved = 1;
+        isArmReceivedCorrectCmd(SetHOMECmd(&calibrateCmd, true, &move.ID), SHOW_ERRORS);
     }
         break;
     default:

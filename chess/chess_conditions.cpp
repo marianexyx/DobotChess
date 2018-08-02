@@ -126,7 +126,7 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
     if (!_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
 
-    bool bLogged = pSender->sqlID > 0 ? true : false;
+    bool bLogged = pSender->sqlID() > 0 ? true : false;
     bool bSittingOnChair = _pClientsList->isClientAPlayer(*pSender);
     bool bInQueue = _pClientsList->isClientInQueue(*pSender);
 
@@ -184,8 +184,8 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         return false;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((pSender->type == PT_WHITE && _pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (pSender->type == PT_BLACK && _pStatus->getWhoseTurn() == BLACK_TURN))
+        if ((pSender->type() == PT_WHITE && _pStatus->getWhoseTurn() == WHITE_TURN) ||
+                (pSender->type() == PT_BLACK && _pStatus->getWhoseTurn() == BLACK_TURN))
             return true;
         else return false;
     case RT_SIT_ON:
@@ -198,8 +198,8 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
     }
     case RT_IM: //sql hash is ok && (name == empty || name == actual name)
         //todo: test double login
-        if ((pSender->sqlID == request.param.left(request.param.indexOf("&")).toInt()
-             || pSender->sqlID == 0) && Sql::isClientHashOk(request.param))
+        if ((pSender->sqlID() == request.param.left(request.param.indexOf("&")).toInt()
+             || pSender->sqlID() == 0) && Sql::isClientHashOk(request.param))
             return true;
         else return false;
     case RT_QUEUE_ME:

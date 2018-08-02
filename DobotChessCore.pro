@@ -39,6 +39,7 @@ SOURCES += main.cpp\
     dobot/dobot_gripper.cpp
 
 HEADERS  +=  \
+    chess/vars/action_types.h \
     chess/vars/chenard_io_msgs.h \
     chess/vars/end_of_game_types.h \
     chess/vars/game_status.h \
@@ -59,6 +60,7 @@ HEADERS  +=  \
     vars/log.h \
     vars/players_types.h \
     vars/position_on_board.h \
+    vars/table_data_types.h \
     chess.h \
     chessboard.h \
     client.h \
@@ -74,9 +76,7 @@ HEADERS  +=  \
     websockets.h \
     xml_reader.h \
     dobot/vars/dobot_move_types.h \
-    dobot/dobot_gripper.h \
-    vars/action_types.h \
-    vars/table_data_types.h
+    dobot/dobot_gripper.h
 
 FORMS    += mainwindow.ui
 

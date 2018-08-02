@@ -48,8 +48,6 @@ void Websockets::onNewConnection()
 //...to: "for (QWebSocket *pClient : qAsConst(_pClientsList))".
 //it can be this way in old QT
 
-//TODO: let websockets service the service messages
-
 void Websockets::receivedMsg(QString QStrMsg)
 {    
     if (QStrMsg != "keepConnected")
@@ -63,7 +61,7 @@ void Websockets::receivedMsg(QString QStrMsg)
         return;
     }
 
-    emit this->msgFromWebsocketsToChess(QStrMsg, _pClientsList->getClient(pSocket).ID);
+    emit this->msgFromWebsocketsToChess(QStrMsg, _pClientsList->getClient(pSocket).ID());
 }
 
 void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
@@ -81,7 +79,7 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
         Client receiver = _pClientsList->getClient(n64ReceiverID);
         emit this->addTextToLogPTE("send to: " + receiver.name() + " : "
                                    + QStrMsg + "\n", LOG_WEBSOCKET);
-        receiver.socket->sendTextMessage(QStrMsg);
+        receiver.socket()->sendTextMessage(QStrMsg);
     }
 }
 
@@ -90,7 +88,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
     emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())
-        client.socket->sendTextMessage(QStrMsg);
+        client.socket()->sendTextMessage(QStrMsg);
 }
 
 void Websockets::socketDisconnected()
@@ -99,5 +97,5 @@ void Websockets::socketDisconnected()
 
     Client client = _pClientsList->getClient(pSocket);
     if (_pClientsList->isClientInList(client))
-        emit this->msgFromWebsocketsToChess("clientLeft", client.ID);
+        emit this->msgFromWebsocketsToChess("clientLeft", client.ID());
 }

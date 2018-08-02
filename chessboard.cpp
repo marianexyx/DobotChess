@@ -19,8 +19,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
             _h1 = gameConfigVars.H1;
             _h8 = gameConfigVars.H8;
 
-            //todo: 7.f, 2.f??
-            _dSquareWidth = ((_a1.y - _h1.y)/7 + (_a8.x - _h1.x)/7)/2;
+            _dSquareWidth = ((_a1.y - _h1.y)/7.f + (_a8.x - _h1.x)/7.f)/2.f;
 
             this->calculateFields3DLocationsOnMainBoard(_a1, _a8, _h1, _h8);
         }
@@ -81,7 +80,7 @@ void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
                     letter*(((A1.z-H1.z)/7.f)-
                             ((digit/14.f)*(((H8.z-H1.z)/7.f)-((A8.z-A1.z)/7.f))));
 
-            _pField[Field::nr(pos)-1]->setField3DLocation(p3D);
+            _pField[Field::nr(pos)-1]->set3DLocation(p3D);
         }
     }
 }
@@ -102,7 +101,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
             p3D.y = whiteCloserOuter.y - (column * _dSquareWidth);
             p3D.z = whiteCloserOuter.z + row*((whiteFutherInner.z - whiteCloserOuter.z)/7.f);
 
-            _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
+            _pField[Piece::nr(pos)-1]->set3DLocation(p3D);
         }
     }
 
@@ -119,7 +118,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
             p3D.y = blackCloserOuter.y + ((column-2) * _dSquareWidth);
             p3D.z = blackCloserOuter.z + row*((blackFutherInner.z - blackCloserOuter.z)/7.f);
 
-            _pField[Piece::nr(pos)-1]->setField3DLocation(p3D);
+            _pField[Piece::nr(pos)-1]->set3DLocation(p3D);
         }
     }
 }

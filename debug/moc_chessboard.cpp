@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Chessboard_t {
     QByteArrayData data[6];
-    char stringdata0[76];
+    char stringdata0[85];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -35,12 +35,12 @@ QT_MOC_LITERAL(0, 0, 10), // "Chessboard"
 QT_MOC_LITERAL(1, 11, 17), // "setBoardDataLabel"
 QT_MOC_LITERAL(2, 29, 0), // ""
 QT_MOC_LITERAL(3, 30, 16), // "BOARD_DATA_LABEL"
-QT_MOC_LITERAL(4, 47, 13), // "showBoardInUI"
-QT_MOC_LITERAL(5, 61, 14) // "clearBoardInUI"
+QT_MOC_LITERAL(4, 47, 22), // "showImaginaryBoardInUI"
+QT_MOC_LITERAL(5, 70, 14) // "clearBoardInUI"
 
     },
     "Chessboard\0setBoardDataLabel\0\0"
-    "BOARD_DATA_LABEL\0showBoardInUI\0"
+    "BOARD_DATA_LABEL\0showImaginaryBoardInUI\0"
     "clearBoardInUI"
 };
 #undef QT_MOC_LITERAL
@@ -78,7 +78,7 @@ void Chessboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->setBoardDataLabel((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< BOARD_DATA_LABEL(*)>(_a[2]))); break;
-        case 1: _t->showBoardInUI((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 1: _t->showImaginaryBoardInUI((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 2: _t->clearBoardInUI(); break;
         default: ;
         }
@@ -93,7 +93,7 @@ void Chessboard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         }
         {
             typedef void (Chessboard::*_t)(QString );
-            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Chessboard::showBoardInUI)) {
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Chessboard::showImaginaryBoardInUI)) {
                 *result = 1;
                 return;
             }
@@ -152,7 +152,7 @@ void Chessboard::setBoardDataLabel(QString _t1, BOARD_DATA_LABEL _t2)
 }
 
 // SIGNAL 1
-void Chessboard::showBoardInUI(QString _t1)
+void Chessboard::showImaginaryBoardInUI(QString _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 1, _a);

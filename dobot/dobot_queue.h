@@ -14,6 +14,8 @@ class DobotQueue: public QObject
 {
     Q_OBJECT
 
+    friend class Dobot;
+
 private:
     uint64_t _un64CoreQueuedCmdID;
     uint64_t _un64RealTimeDobotActualID;
@@ -23,11 +25,8 @@ private:
     uint64_t _lowestIDMoveInList;
     uint64_t _un64LastDobotIDShownInUI;
     uint64_t _un64RetreatID;
-    Point3D _retreatLeft, _retreatRight;
+    Point3D _escape1, _escape2;
     bool _bRetreat;
-
-public:
-    DobotQueue(Point3D retreatLeft, Point3D retreatRight);
 
     void parseNextMoveToArmIfPossible();
     bool isNextPhysicalMoveToQueueOnArmAvailable();
@@ -41,16 +40,11 @@ public:
     void saveIDFromConnectedDobot();
     //bool isDobotCmdsLeftSpaceEmpty();
 
-    void setCoreQueuedCmdID(uint64_t ID) { _un64CoreQueuedCmdID = ID; }
-    void setDobotQueuedCmdID(uint64_t ID) { _un64RealTimeDobotActualID = ID; }
-    void setQueuedCmdLeftSpace(uint unLeftSpace) { _unQueuedCmdLeftSpace =
-                unLeftSpace; }
     void setRetreat(bool bRetreat) { _bRetreat = bRetreat; }
 
-    int64_t getCoreQueuedCmdID() const { return _un64CoreQueuedCmdID; }
-    int64_t getDobotQueuedCmdID() const { return _un64RealTimeDobotActualID; }
-    uint getQueuedCmdLeftSpace() const { return _unQueuedCmdLeftSpace; }
-    int64_t getRealTimeDobotActualID() const { return _un64RealTimeDobotActualID; }
+    DobotQueue(Point3D escape1, Point3D escape2);
+
+public:
     QList<DobotMove> getQueuedArmCmds () const { return _queuedArmCmdsOnCore; }
     QList<DobotMove> getSentArmCmds () const { return _sentArmCmdsToDobot; }
 

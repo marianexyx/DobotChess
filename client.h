@@ -15,19 +15,28 @@
 
 enum CLIENT_ID { CID_CORE, CID_SQL };
 
-struct Client //todo: class friend to Clients
+class Client
 {
-    int64_t ID;
-    QWebSocket *socket;
-    int64_t sqlID;
-    PLAYER_TYPE type;
-    bool isStartClickedByPlayer;
-    int64_t queue;
-    int64_t mySqlID;
+    friend class Clients;
 
-    bool operator ==(const struct Client& cl) { return ID == cl.ID; }
+private:
+    int64_t _ID;
+    int64_t _sqlID;
+    QWebSocket *_socket;
+    PLAYER_TYPE _type;
+    bool _isStartClickedByPlayer;
+    int64_t _queue;
 
-    QString name() const { return Sql::getClientName(sqlID); }
+public:
+    bool operator ==(const struct Client& cl) { return _ID == cl._ID; }
+
+    int64_t ID() const { return _ID; }
+    int64_t sqlID() const { return _sqlID; }
+    QWebSocket *socket() const { return _socket; }
+    PLAYER_TYPE type() const { return _type; }
+    bool isStartClickedByPlayer() const { return _isStartClickedByPlayer; }
+    int64_t queue() const { return _queue; }
+    QString name() const { return Sql::getClientName(_sqlID); }
 };
 
 class Clients: public QObject
@@ -41,6 +50,7 @@ public:
 
     void newClient(QWebSocket& clientSocket);
     void setClientSqlID(const Client& client, int64_t ID);
+    void clearClientSqlID(const Client& client);
     void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
     void setClientStartConfirmation(const Client& client, bool bState);
@@ -49,7 +59,7 @@ public:
     void removeClientFromList(const Client& client);
     void removeClientFromQueue(const Client& client);
     void resetPlayersStartConfirmInfo();
-    void putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair);
+    bool putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair);
 
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(const Client& client, bool bErrorLog = false);

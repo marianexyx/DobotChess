@@ -143,11 +143,11 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qDebug() << "ChessStatus::saveStatusData(): QStrFENBoard =" << QStrFENBoard;
-        emit _pBoardMain->showBoardInUI(QStrFENBoard);
+        emit _pBoardMain->showImaginaryBoardInUI(QStrFENBoard);
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qDebug() << "ChessStatus::saveStatusData(): QStrWhoseTurn =" << QStrWhoseTurn;
-        _WhoseTurn = this->whoseTurn(QStrWhoseTurn);
+        _WhoseTurn = this->whoseTurnFromFENStatus(QStrWhoseTurn);
         emit this->setBoardDataLabel(turnTypeAsQstr(_WhoseTurn), BDL_TURN);
 
         _QStrCastlings = QStrFENRecord.at(3);
@@ -169,7 +169,7 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
 void ChessStatus::resetStatusData()
 {
-    this->setWhoseTurn(NO_TURN);
+    _WhoseTurn = NO_TURN;
     this->clearLegalMoves();
     this->clearHistoryMoves();
     _pPieceController->clearPawnsPromotions();
@@ -246,14 +246,14 @@ void ChessStatus::setHistoryMoves(QStringList moves)
     emit this->showHistoryMoves(_historyMoves);
 }
 
-WHOSE_TURN ChessStatus::whoseTurn(QString QStrWhoseTurn)
+WHOSE_TURN ChessStatus::whoseTurnFromFENStatus(QString QStrWhoseTurn)
 {
     if (QStrWhoseTurn == "w") return WHITE_TURN;
     else if (QStrWhoseTurn == "b") return BLACK_TURN;
     else
     {
         return NO_TURN;
-        qDebug() << "ERROR: ChessStatus::whoseTurn(); unknown parameter:" << QStrWhoseTurn;
+        qDebug() << "ERROR: ChessStatus::whoseTurnFromFENStatus(); unknown parameter:" << QStrWhoseTurn;
     }
 }
 

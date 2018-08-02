@@ -25,7 +25,7 @@ public:
     static short startPieceNrOnField(short sFieldNr);
     static short startPieceNrOnField(PosOnBoard fieldLines);
 
-    void setField3DLocation(Point3D point);
+    void set3DLocation(Point3D p) {_location3D = p; }
     void setPieceOnField(Piece* pPiece);
     void clearField(bool bErrorLog = false);
 

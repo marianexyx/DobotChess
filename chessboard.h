@@ -15,10 +15,16 @@
 
 enum BOARD_POINTS { BP_MIN, BP_MAX, BP_MIDDLE, BP_RETREAT_LEFT, BP_RETREAT_RIGHT };
 
-//future: this class can have its own dir amongfull classes like piece, field; also enums
+//future: this class can have its own dir amongfull classes like...
+//...piece, field; also enums. this dir should be inside chess dir?
+
+//class PieceController;
+
 class Chessboard: public QObject
 {
     Q_OBJECT
+    friend class PieceController;
+    friend class ChessMovements;
 
 private:
     BOARD _boardType;
@@ -37,27 +43,28 @@ private:
     void calculateMiddleAbovePoint();
     void calculateRetreatPoints(RealVars RV);
 
+    void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
+    void clearField(Field* pField, bool bErrorLog = false);
+
 public:
     Chessboard(BOARD BoardType, bool bBoardIsReal = true,
-               RealVars gameConfigVars = RealVars());  //todo: friend for chess
+               RealVars gameConfigVars = RealVars());
     ~Chessboard();
 
     const float fMaxPieceHeight;
 
     bool isBoardReal(bool bErrorLog = false);
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
-    //todo: friend for gripper?
-    void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
+
     BOARD getBoardType() const { return _boardType; }
     Point3D getBoardPoint3D(BOARD_POINTS BP) const;
     Field* getField(short sFieldNr) const;
     Field* getField(PosOnBoard Pos) const;
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);
-    void clearField(Field* pField, bool bErrorLog = false);
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
-    void showBoardInUI(QString);
+    void showImaginaryBoardInUI(QString);
     void clearBoardInUI();
 };
 

@@ -54,7 +54,7 @@ private slots:
     //slots for GUI MainWindow
     void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
-    void showBoardInUI(QString QStrBoard);
+    void showImaginaryBoardInUI(QString QStrBoard);
     void showRealBoardInUI();
     void clearBoardInUI();
     void showLegalMovesInUI(QStringList legalMoves);
@@ -94,7 +94,7 @@ private slots:
     void on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged);
     void on_homeBtn_clicked();
     void on_middleAboveBtn_clicked();
-    void on_sendBtn_clicked();
+    void on_sendPointBtn_clicked();
     void on_xPTPEdit_textChanged(const QString& QStrTextChanged);
     void on_yPTPEdit_textChanged(const QString& QStrTextChanged);
     void on_zPTPEdit_textChanged(const QString& QStrTextChanged);

@@ -1,6 +1,6 @@
 #include "dobot_queue.h"
 
-DobotQueue::DobotQueue(Point3D retreatLeft, Point3D retreatRight)
+DobotQueue::DobotQueue(Point3D escape1, Point3D escape2)
 {
     _un64CoreQueuedCmdID = 1; //set 1st ID
     _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max(); //future:
@@ -8,8 +8,8 @@ DobotQueue::DobotQueue(Point3D retreatLeft, Point3D retreatRight)
     _un64RetreatID = 0;
     _un64LastDobotIDShownInUI = 0;
     _lowestIDMoveInList = 0;
-    _retreatLeft = retreatLeft;
-    _retreatRight = retreatRight;
+    _escape1 = escape1;
+    _escape2 = escape2;
     _bRetreat = false;
 }
 
@@ -147,9 +147,9 @@ bool DobotQueue::isArmCoveringGame()
 
 void DobotQueue::retreat(Point3D lastPoint)
 {
-    if (qAbs(lastPoint.y - _retreatLeft.y) > qAbs(lastPoint.y - _retreatRight.y))
-        this->addArmMoveToQueue(DM_TO_POINT, _retreatRight);
-    else this->addArmMoveToQueue(DM_TO_POINT, _retreatLeft);
+    if (qAbs(lastPoint.y - _escape1.y) > qAbs(lastPoint.y - _escape2.y))
+        this->addArmMoveToQueue(DM_TO_POINT, _escape2);
+    else this->addArmMoveToQueue(DM_TO_POINT, _escape1);
 
     _un64RetreatID = _un64CoreQueuedCmdID;
     _bRetreat = false; //prevent unwanted retreats

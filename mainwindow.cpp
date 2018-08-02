@@ -55,12 +55,8 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed board
             this, SLOT(clearBoardInUI()));
-    connect(_pBoardMain, SIGNAL(showBoardInUI(QString)),
-            this, SLOT(showBoardInUI(QString)));
-    connect(_pBoardRemoved, SIGNAL(showBoardInUI(QString)),
-            this, SLOT(showBoardInUI(QString)));
-    connect(_pBoardChenard, SIGNAL(showBoardInUI(QString)), //todo: useless board
-            this, SLOT(showBoardInUI(QString)));
+    connect(_pBoardChenard, SIGNAL(showImaginaryBoardInUI(QString)),
+            this, SLOT(showImaginaryBoardInUI(QString)));
     connect(_pChess, SIGNAL(showLegalMovesInUI(QStringList)),
             this, SLOT(showLegalMovesInUI(QStringList)));
     connect(_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
@@ -89,10 +85,36 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     this->initControl(); //init dobot JOG control from form
     _pWebSockets->listenOnPort(1234);
 
-    //future: make many tooltips
-    ui->directTcpMsgCheckBox->setToolTip("//todo:");
-    ui->emulatePlayerMsgLineEdit->setToolTip("send msg to Websockets::receivedMsg");
-    ui->sendSimulatedMsgBtn->setToolTip("f.e.: 'e2' or 'e2r' or 'e2e4");
+    ui->connectBtn->setToolTip("Connect with arm.");
+    ui->homeBtn->setToolTip("Go to start position.");
+    ui->calibrateBtn->setToolTip("Initialize move sequence: calibrate stepper"
+                                 " motors. Needed after power up arm.");
+    ui->startGmPosBtn->setToolTip("Initialize move sequence: go to game's start "
+                                  "position, from dobot's start position.");
+    ui->startDtPosBtn->setToolTip("Initialize move sequence: go to dobot's start "
+                                  "position, from game's start position.");
+    ui->retreatLeftBtn->setToolTip("Go to left side of chessboard (retreat) "
+                                   "position.");
+    ui->middleAboveBtn->setToolTip("Go to middle point of chessboard, above the "
+                                   "highest pieces.");
+    ui->retreatRightBtn->setToolTip("Go to right side of chessboard (retreat) "
+                                    "position.");
+    ui->upBtn->setToolTip("Move arm above piece height (works only with field set).");
+    ui->downBtn->setToolTip("Move arm do the ground level of the chessboard (works "
+                            "only with field set).");
+    ui->openGripperBtn->setToolTip("Open robot arm gripper (release piece).");
+    ui->closeGripperBtn->setToolTip("Close robot arm gripper (grab piece).");
+    ui->emulatePlayerMsgLineEdit->setToolTip("Write player move command, f.e.: "
+                                             "'e2' or 'e2r' or 'e2e4.");
+    ui->sendSimulatedMsgBtn->setToolTip("Execute player move command, f.e.: 'e2' "
+                                        "or 'e2r' or 'e2e4.");
+    ui->sendTcpLineEdit->setToolTip("Write command directly to TCP chess engine.");
+    ui->sendTcpBtn->setToolTip("Send command directly to TCP chess engine.");
+    ui->sendPointBtn->setToolTip("Send Cartesian point immediately to arm to "
+                                 "execute.");
+    ui->resetDobotIndexBtn->setToolTip("Reset dobot (only) current ID.");
+    ui->teachMode->setToolTip("Change manual arm control with buttons between "
+                              "joint and axis buttons.");
 }
 
 MainWindow::~MainWindow()
@@ -155,7 +177,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->rHeadSubBtn->setEnabled(false);
         ui->startGmPosBtn->setEnabled(false);
         ui->startDtPosBtn->setEnabled(false);
-        ui->sendBtn->setEnabled(false);
+        ui->sendPointBtn->setEnabled(false);
         ui->xPTPEdit->setEnabled(false);
         ui->yPTPEdit->setEnabled(false);
         ui->zPTPEdit->setEnabled(false);
@@ -170,8 +192,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->openGripperBtn->setEnabled(false);
         ui->closeGripperBtn->setEnabled(false);
         ui->homeBtn->setEnabled(false);
-        ui->directTcpMsgCheckBox->setEnabled(false);
-        ui->moveRestrictionsCheckBox->setEnabled(false);
         ui->middleAboveBtn->setEnabled(false);
         ui->retreatLeftBtn->setEnabled(false);
         ui->retreatRightBtn->setEnabled(false);
@@ -190,7 +210,7 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->rHeadSubBtn->setEnabled(true);
         ui->startGmPosBtn->setEnabled(true);
         ui->startDtPosBtn->setEnabled(true);
-        ui->sendBtn->setEnabled(true);
+        ui->sendPointBtn->setEnabled(true);
         ui->xPTPEdit->setEnabled(true);
         ui->yPTPEdit->setEnabled(true);
         ui->zPTPEdit->setEnabled(true);
@@ -203,8 +223,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->openGripperBtn->setEnabled(true);
         ui->closeGripperBtn->setEnabled(true);
         ui->homeBtn->setEnabled(true);
-        ui->directTcpMsgCheckBox->setEnabled(true);
-        ui->moveRestrictionsCheckBox->setEnabled(true);
         ui->middleAboveBtn->setEnabled(true);
         ui->retreatLeftBtn->setEnabled(true);
         ui->retreatRightBtn->setEnabled(true);
@@ -219,11 +237,11 @@ void MainWindow::setDeviceLabels(QString QStrDeviceSN, QString QStrDeviceName,
     ui->DeviceInfoLabel->setText(QStrDeviceVersion);
 }
 
-void MainWindow::on_sendBtn_clicked()
+void MainWindow::on_sendPointBtn_clicked()
 {
-    qDebug() << "sendBtn clicked";
+    qDebug() << "sendPointBtn clicked";
 
-    _pChess->getStatusPointer()->clearMove();
+    _pChess->clearLastSavedMadeMove();
 
     bool bConversionXOk, bConversionYOk, bConversionZOk;
 
@@ -389,7 +407,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldFrom);
             }
         }
-        else if (QStrServiceMove.length() == 4) //todo: propably this didn't work well
+        else if (QStrServiceMove.length() == 4)
         {
             if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
             {
@@ -568,20 +586,20 @@ void MainWindow::showClientsListInUI(QList<Client> list)
        QStrClientsList += QString::number(i+1) + ". ";
 
        QString QStrName = "-";
-       if (client.sqlID > 0)
+       if (client.sqlID() > 0)
            QStrName = client.name();
        QStrClientsList += QStrName;
 
-       if (client.type != PT_NONE)
+       if (client.type() != PT_NONE)
        {
-           QString QStrPlayerType = playerTypeAsQStr(client.type);
-           QString QStrStartState = client.isStartClickedByPlayer ? "1" : "0";
+           QString QStrPlayerType = playerTypeAsQStr(client.type());
+           QString QStrStartState = client.isStartClickedByPlayer() ? "1" : "0";
            QStrClientsList += ", plr: " + QStrPlayerType + ", st:" + QStrStartState;
        }
-       else if (client.queue != -1)
-           QStrClientsList += ", q:" + QString::number(client.queue);
+       else if (client.queue() != -1)
+           QStrClientsList += ", q:" + QString::number(client.queue());
 
-       QStrClientsList += ", ID:" + QString::number(client.ID) + "\n";
+       QStrClientsList += ", ID:" + QString::number(client.ID()) + "\n";
     }
     ui->clientsPTE->clear();
     ui->clientsPTE->setPlainText(QStrClientsList);
@@ -613,7 +631,7 @@ void MainWindow::clearBoardInUI()
     ui->chenardBoardPTE->clear();
 }
 
-void MainWindow::showBoardInUI(QString QStrBoard) //todo: chenard
+void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
 {
     QString QStrBoardArray[8][8];
 
@@ -637,7 +655,7 @@ void MainWindow::showBoardInUI(QString QStrBoard) //todo: chenard
                 {
                     QStrBoardArray[nColumn][nRow] = QStrFENSign;
                     if (nColumn > D_8)
-                        qDebug() << "ERROR: MainWindow::showBoardInUI(): nColumn > 8 ="
+                        qDebug() << "ERROR: MainWindow::showImaginaryBoardInUI(): nColumn > 8 ="
                                  << nColumn;
                     ++nColumn;
                 }
@@ -647,7 +665,7 @@ void MainWindow::showBoardInUI(QString QStrBoard) //todo: chenard
                     {
                         QStrBoardArray[nColumn][nRow] = ".";
                         if (nColumn > D_8)
-                            qDebug() << "ERROR: MainWindow::showBoardInUI: nColumn > 8 ="
+                            qDebug() << "ERROR: MainWindow::showImaginaryBoardInUI: nColumn > 8 ="
                                      << nColumn;
                         ++nColumn;
                     }
@@ -657,7 +675,7 @@ void MainWindow::showBoardInUI(QString QStrBoard) //todo: chenard
     }
     else
     {
-        qDebug() << "ERROR: MainWindow::showBoardInUI(): boardRows.size() != 8. Size = "
+        qDebug() << "ERROR: MainWindow::showImaginaryBoardInUI(): boardRows.size() != 8. Size = "
                  << QStrFENBoardRows.size();
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
             qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
@@ -759,22 +777,22 @@ void MainWindow::on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged)
 void MainWindow::on_xPTPEdit_textChanged(const QString& QStrTextChanged)
 {
     if (QStrTextChanged != NULL || ui->yPTPEdit->text() != NULL || ui->zPTPEdit->text() != NULL)
-        ui->sendBtn->setEnabled(true);
-    else ui->sendBtn->setEnabled(false);
+        ui->sendPointBtn->setEnabled(true);
+    else ui->sendPointBtn->setEnabled(false);
 }
 
 void MainWindow::on_yPTPEdit_textChanged(const QString& QStrTextChanged)
 {
     if (ui->xPTPEdit->text() != NULL || QStrTextChanged != NULL || ui->zPTPEdit->text() != NULL)
-        ui->sendBtn->setEnabled(true);
-    else ui->sendBtn->setEnabled(false);
+        ui->sendPointBtn->setEnabled(true);
+    else ui->sendPointBtn->setEnabled(false);
 }
 
 void MainWindow::on_zPTPEdit_textChanged(const QString& QStrTextChanged)
 {
     if (ui->xPTPEdit->text() != NULL || ui->yPTPEdit->text() != NULL  || QStrTextChanged != NULL)
-        ui->sendBtn->setEnabled(true);
-    else ui->sendBtn->setEnabled(false);
+        ui->sendPointBtn->setEnabled(true);
+    else ui->sendPointBtn->setEnabled(false);
 }
 
 void MainWindow::on_retreatLeftBtn_clicked()
