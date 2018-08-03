@@ -77,6 +77,12 @@
 
 /*static*/ QString Sql::getClientName(int64_t n64sqlId)
 {
+    if (n64sqlId <= 0)
+    {
+        qDebug() << "ERROR: Sql::getClientName(): given ID < 1. its =" << n64sqlId;
+        return "";
+    }
+
     if (sqlDB.open())
     {
         QString QStrQuery = "SELECT * FROM users WHERE id = "

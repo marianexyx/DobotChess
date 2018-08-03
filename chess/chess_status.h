@@ -67,7 +67,8 @@ public:
     SEQUENCE_TYPE getMoveType() const { return _MoveType; }
     QStringList getLegalMoves() const { return _legalMoves; }
     QStringList getHistoryMoves() const { return _historyMoves; }
-    QString getHistoryMovesAsQStr() const { return _historyMoves.join(" "); }
+    QString getHistoryMovesAsQStr() const
+    { return (_historyMoves.size() ? _historyMoves.join(" ") : "0"); }
     QString getCastlings() const { return _QStrCastlings; }
     QString getEnpassant() const { return _QStrEnpassant; }
     PLAYER_TYPE getActivePlayerType();

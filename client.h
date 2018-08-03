@@ -63,6 +63,7 @@ public:
 
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(const Client& client, bool bErrorLog = false);
+    bool isClientInList(QWebSocket* pClientSocket, bool bErrorLog = false);
     Client getClient(QWebSocket* pClientSocket);
     Client getClient(int64_t n64ClientID, CLIENT_ID IdType = CID_CORE);
     Client getPlayer(PLAYER_TYPE Type);

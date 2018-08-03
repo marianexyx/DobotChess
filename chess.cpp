@@ -235,14 +235,14 @@ void Chess::newClientLogged(Client& client, int64_t sqlID)
 {    
     if (!_pClientsList->isClientSqlIDExists(sqlID))
     {
+        _pClientsList->setClientSqlID(client, sqlID);
         qDebug() << "Chess::newClientLogged(): ID =" << sqlID
                  << ", name =" << Sql::getClientName(sqlID);
-        _pClientsList->setClientSqlID(client, sqlID);
         this->sendDataToClient(client);
     }
     else
     {
-        if (client.sqlID() != sqlID)
+        if (client.sqlID() > 0 && client.sqlID() != sqlID)
         {
             qDebug() << "ERROR: Chess::newClientLogged(): client has a sqlID, and he "
                         "sent another diffrent one (hacker?). his ID =" << client.sqlID()
@@ -260,7 +260,6 @@ void Chess::newClientLogged(Client& client, int64_t sqlID)
             _pClientsList->clearClientSqlID(oldClient);
             oldClient.socket()->sendTextMessage("logout:doubleLogin");
             _pClientsList->removeClientFromList(client);
-            _pClientsList->setClientSqlID(client, sqlID);
             this->updateClientsInUI();
         }
     }
@@ -278,6 +277,7 @@ void Chess::updateClientsInUI()
 void Chess::resetTableData()
 {
     _pClientsList->resetPlayersStartConfirmInfo();
+    _pTimers->stopQueueTimer();
     _pTimers->resetGameTimers();
     _pStatus->clearMove();
     _pStatus->resetStatusData();
@@ -293,10 +293,12 @@ void Chess::restorateGameIfDisconnectedClientAffectIt(Client& client)
                                    + " player disconnected\n", LOG_CORE);
         if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
         {
+            _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
             this->resetTableData();
-            this->sendDataToAllClients(client.type() == PT_WHITE ? AT_NEW_WHITE_PLAYER :
-                                                                 AT_NEW_BLACK_PLAYER);
-            _pClientsList->clearPlayerType(client.type());
+            PLAYER_TYPE PlayerToClear = client.type(); //temp is necessary
+            _pClientsList->clearPlayerType(PlayerToClear);
+            this->sendDataToAllClients(PlayerToClear == PT_WHITE ? AT_NEW_WHITE_PLAYER :
+                                                                   AT_NEW_BLACK_PLAYER);
         }
         else this->restartGame(client.type() == PT_WHITE ? ET_SOCKET_LOST_WHITE :
                                                          ET_SOCKET_LOST_BLACK);

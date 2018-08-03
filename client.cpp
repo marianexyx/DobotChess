@@ -53,6 +53,7 @@ void Clients::setClientSqlID(const Client& client, int64_t ID)
 
 void Clients::clearClientSqlID(const Client& client)
 {
+    qDebug() << "Clients::clearClientSqlID()";
     this->setClientSqlID(client, 0);
 }
 
@@ -242,6 +243,9 @@ void Clients::addClientToQueue(const Client& client)
 void Clients::removeClientFromList(const Client& client)
 {
     qDebug() << "Clients::removeClientFromList()";
+
+    if (!this->isClientInList(client)) return;
+
     Q_FOREACH (Client cl, _clients)
     {
         if (cl == client)
@@ -330,7 +334,20 @@ bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
 
     if (bErrorLog)
         qDebug() << "ERROR: Clients::isClientInList(): client of not found";
-    else qDebug() << "WARNING: Clients::isClientInList(): client not found";
+
+    return false;
+}
+
+bool Clients::isClientInList(QWebSocket* pClientSocket, bool bErrorLog /*= false*/)
+{
+    Q_FOREACH (Client cl, _clients)
+    {
+        if (cl.socket() == pClientSocket)
+            return true;
+    }
+
+    if (bErrorLog)
+        qDebug() << "ERROR: Clients::isClientInList(): client of not found";
 
     return false;
 }
@@ -426,7 +443,7 @@ Client Clients::getNextQueuedClient()
 
 QString Clients::getQueuedClientsList()
 {
-    QString QStrQueuedClients;
+    QString QStrQueuedClients = "";
     int64_t maxQueue = 0;
     int64_t minQueue = std::numeric_limits<int64_t>::max();
     int64_t lastBiggestQueue = std::numeric_limits<int64_t>::max();
@@ -435,9 +452,12 @@ QString Clients::getQueuedClientsList()
         if (minQueue > cl._queue && cl._queue > 0)
             minQueue = cl._queue;
     }
-    int nNumberOFClients = _clients.size();
+    int nNumberOfClients = _clients.size();
+    qDebug() << "Clients::getQueuedClientsList(): nNumberOfClients ="
+             << nNumberOfClients << ", minQueue =" << minQueue;
     int nLoopBreakingCounter = 0;
-    if (minQueue != 0 && minQueue != std::numeric_limits<int64_t>::max())
+
+    if (minQueue > 0 && minQueue != std::numeric_limits<int64_t>::max())
     {
         do
         {
@@ -445,39 +465,46 @@ QString Clients::getQueuedClientsList()
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl._queue > maxQueue && cl._queue < lastBiggestQueue)
-                {
                     maxQueue = cl._queue;
-                }
             }
 
             //remember last biggest client for next iteration
             lastBiggestQueue = maxQueue;
+            qDebug() << "Clients::getQueuedClientsList(): last biggest client ="
+                     << lastBiggestQueue << ", maxQueue =" << maxQueue;
 
             //add last biggest found queued client sqlID to string for return
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl._queue == maxQueue)
                 {
-                    QStrQueuedClients = cl._sqlID + " " + QStrQueuedClients;
+                    QStrQueuedClients = QString::number(cl._sqlID) + " "
+                            + QStrQueuedClients;
+                    qDebug() << "Clients::getQueuedClientsList(): found next queued "
+                                "client name =" << cl.name() << ", his queue =" << cl._queue
+                             << ", actual QStrQueuedClients =" << QStrQueuedClients;
                 }
             }
             maxQueue = 0; //clear for next iteration
 
-            if (nLoopBreakingCounter > nNumberOFClients + 1)
+            qDebug() << "Clients::getQueuedClientsList(): nLoopBreakingCounter ="
+                     << nLoopBreakingCounter << ", nNumberOfClients + 1 ="
+                     << nNumberOfClients + 1;
+            if (nLoopBreakingCounter > nNumberOfClients + 1)
             {
                 qDebug() << "ERROR: Clients::getQueuedClientsList(): incorrect loop "
                             "break. nLoopBreakingCounter =" << nLoopBreakingCounter <<
-                            ", nNumberOFClients =" << nNumberOFClients+1;
-                break;
+                            ", nNumberOfClients =" << nNumberOfClients+1;
+                return "ERROR";
             }
             nLoopBreakingCounter++;
 
         } while (lastBiggestQueue != minQueue);
-    }
-    if (QStrQueuedClients.isEmpty())
-        QStrQueuedClients = "0";
-    else //remove last comma
+
+        //remove last comma
         QStrQueuedClients = QStrQueuedClients.left(QStrQueuedClients.length() - 1);
+    }
+    else QStrQueuedClients = "0";
 
     return QStrQueuedClients;
 }
@@ -625,7 +652,7 @@ bool Clients::isClientInQueue(const Client &client)
 }
 
 bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
-{
+{   
     Q_FOREACH (Client cl, _clients)
     {
         if (cl._sqlID == n64ID)

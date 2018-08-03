@@ -77,7 +77,8 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
     else
     {
         Client receiver = _pClientsList->getClient(n64ReceiverID);
-        emit this->addTextToLogPTE("send to: " + receiver.name() + " : "
+        QString QStrReceiverName = receiver.sqlID() > 0 ? receiver.name() : "client";
+        emit this->addTextToLogPTE("send to: " + QStrReceiverName + " : "
                                    + QStrMsg + "\n", LOG_WEBSOCKET);
         receiver.socket()->sendTextMessage(QStrMsg);
     }
@@ -94,8 +95,10 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 void Websockets::socketDisconnected()
 {
     QWebSocket* pSocket = qobject_cast<QWebSocket *>(sender());
-
-    Client client = _pClientsList->getClient(pSocket);
-    if (_pClientsList->isClientInList(client))
-        emit this->msgFromWebsocketsToChess("clientLeft", client.ID());
+    if (_pClientsList->isClientInList(pSocket))
+    {
+        Client client = _pClientsList->getClient(pSocket);
+        if (_pClientsList->isClientInList(client))
+            emit this->msgFromWebsocketsToChess("clientLeft", client.ID());
+    }
 }
