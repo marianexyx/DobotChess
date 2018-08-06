@@ -17,7 +17,7 @@ void Clients::newClient(QWebSocket& clientSocket)
 
 void Clients::setClientSqlID(const Client& client, int64_t ID)
 {
-    Q_FOREACH (Client cl, _clients)
+    Q_FOREACH (Client cl, _clients) //todo: just use "foreach"?
     {
         if (cl._sqlID == ID && cl._sqlID > 0)
         {
@@ -296,19 +296,18 @@ void Clients::resetPlayersStartConfirmInfo()
         this->setClientStartConfirmation(PT_BLACK, false);
 }
 
-bool Clients::putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair)
+void Clients::putOnChairNextQueuedClient(PLAYER_TYPE Chair)
 {
     if (!this->isPlayerChairEmpty(Chair))
     {
-        qDebug() << "ERROR: Clients::PutOnChairNextQueuedClientIfExist():"
+        qDebug() << "ERROR: Clients::putOnChairNextQueuedClient():"
                  << playerTypeAsQStr(Chair) << "chair isn't empty";
-        return false;
+        return;
     }
 
     if (this->getQueuedClientsList() != "0")
     {
-        if (!this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS))
-            return false;
+        if (!this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS)) return;
 
         int64_t nextQueuedClientID = this->getNextQueuedClient()._ID;
         this->removeClientFromQueue(this->getClient(nextQueuedClientID));
@@ -319,9 +318,13 @@ bool Clients::putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair)
                                       Chair == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
         emit this->addTextToLogPTE("New " + playerTypeAsQStr(Chair) + " player: " +
                                     this->getPlayerName(Chair) + "\n", LOG_CORE);
-        return true;
     }
-    else return false;
+    else
+    {
+        qDebug() << "ERROR: Clients::putOnChairNextQueuedClient(): there are no "
+                    "clients in queue";
+        return;
+    }
 }
 
 bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)

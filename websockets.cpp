@@ -11,7 +11,7 @@ Websockets::~Websockets()
 {
     _pWebSocketServer->close();
 
-    //future: not needed for just one instance of class
+    //future: code below isn't needed for just one instance of class
     //qDeleteAll(_pClientsList.begin(), _pClientsList.end());
 }
 
@@ -44,9 +44,9 @@ void Websockets::onNewConnection()
     _pClientsList->showClientsInUI();
 }
 
-//future: Q_FOREACH (QWebSocket *pNextClient, _pClientsList) will be depreciated...
+//todo: Q_FOREACH (QWebSocket *pNextClient, _pClientsList) will be depreciated...
 //...to: "for (QWebSocket *pClient : qAsConst(_pClientsList))".
-//it can be this way in old QT
+//it can be this way in old QT. or try change all to "foreach" maybe?
 
 void Websockets::receivedMsg(QString QStrMsg)
 {    
@@ -89,7 +89,11 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
     emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())
+    {
+        qDebug() << "Websockets::sendMsgToAllClients(): client name ="
+                 << client.name();
         client.socket()->sendTextMessage(QStrMsg);
+    }
 }
 
 void Websockets::socketDisconnected()

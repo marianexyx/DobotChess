@@ -59,7 +59,7 @@ public:
     void removeClientFromList(const Client& client);
     void removeClientFromQueue(const Client& client);
     void resetPlayersStartConfirmInfo();
-    bool putOnChairNextQueuedClientIfExist(PLAYER_TYPE Chair);
+    void putOnChairNextQueuedClient(PLAYER_TYPE Chair);
 
     QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(const Client& client, bool bErrorLog = false);

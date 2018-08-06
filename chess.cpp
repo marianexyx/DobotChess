@@ -101,15 +101,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
         break;
     }
     case RT_STAND_UP:
-        if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
-        {
-            _pClientsList->clearPlayerType(client.type());
-            _pTimers->stopQueueTimer();
-            _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
-            this->sendDataToAllClients(client.type() == PT_WHITE ? AT_NEW_WHITE_PLAYER :
-                                                                   AT_NEW_BLACK_PLAYER);
-        }
-        else this->restartGame(client.type() == PT_WHITE ? ET_GIVE_UP_WHITE : ET_GIVE_UP_BLACK);
+        this->playerLeftChair(client.type());
         break;
     case RT_IM:
         this->newClientLogged(client, _request.param.left(_request.param.indexOf("&")).toInt());
@@ -157,7 +149,7 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         if (ET == ET_NONE)
         {
             this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_HISTORY));
-            this->continueGameplay(); //future: send move confirmation to web after...
+            this->continueGameplay(); //todo: send move confirmation to web after...
             //..."legal" response (i.e. realise blockade before next move)- is this old comment?
         }
         else if (ET == ET_NORMAL_WIN_WHITE || ET == ET_NORMAL_WIN_BLACK || ET == ET_DRAW)
@@ -288,21 +280,7 @@ void Chess::restorateGameIfDisconnectedClientAffectIt(Client& client)
     qDebug() << "Chess::restorateGameIfDisconnectedClientAffectIt()";
 
     if (_pClientsList->isClientAPlayer(client))
-    {
-        emit this->addTextToLogPTE(playerTypeAsQStr(client.type())
-                                   + " player disconnected\n", LOG_CORE);
-        if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
-        {
-            _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
-            this->resetTableData();
-            PLAYER_TYPE PlayerToClear = client.type(); //temp is necessary
-            _pClientsList->clearPlayerType(PlayerToClear);
-            this->sendDataToAllClients(PlayerToClear == PT_WHITE ? AT_NEW_WHITE_PLAYER :
-                                                                   AT_NEW_BLACK_PLAYER);
-        }
-        else this->restartGame(client.type() == PT_WHITE ? ET_SOCKET_LOST_WHITE :
-                                                         ET_SOCKET_LOST_BLACK);
-    }
+        this->playerLeftChair(client.type());
     else if (_pClientsList->isClientInQueue(client))
     {
         _pClientsList->removeClientFromQueue(client);
@@ -322,7 +300,7 @@ void Chess::sendDataToAllClients(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= E
     _pWebsockets->sendMsgToAllClients(this->getTableData(AT, ET));
 }
 
-void Chess::coreIsReadyForNewGame() //future: not best name?
+void Chess::coreIsReadyForNewGame() //todo: not best name?
 {
     qDebug() << "Chess::coreIsReadyForNewGame()";
 
@@ -392,17 +370,70 @@ void Chess::restartGame(END_TYPE ET)
     this->sendDataToAllClients();
 }
 
-void Chess::changePlayersOnChairs(bool bInformClients /*=false*/)
+void Chess::changePlayersOnChairs()
 {
+    qDebug() << "Chess::changePlayersOnChairs()";
+
     _pClientsList->clearPlayerType(PT_WHITE);
     this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
     _pClientsList->clearPlayerType(PT_BLACK);
     this->sendDataToAllClients(AT_NEW_BLACK_PLAYER);
 
-    if (_pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE) && bInformClients)
-        this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
-    if (_pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK) && bInformClients)
-        this->sendDataToAllClients(AT_NEW_BLACK_PLAYER);
+    this->fillTableWithNextQueuedClientsIfTheyExist();
+}
+
+void Chess::playerLeftChair(PLAYER_TYPE PT)
+{
+    emit this->addTextToLogPTE(playerTypeAsQStr(PT) + " player disconnected\n", LOG_CORE);
+
+    if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
+    {
+        _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
+        this->resetTableData();
+        _pClientsList->clearPlayerType(PT);
+        this->sendDataToAllClients(PT == PT_WHITE ? AT_NEW_WHITE_PLAYER : AT_NEW_BLACK_PLAYER);
+        this->fillTableWithNextQueuedClientsIfTheyExist();
+    }
+    else this->restartGame(PT == PT_WHITE ? ET_SOCKET_LOST_WHITE : ET_SOCKET_LOST_BLACK);
+}
+
+void Chess::fillTableWithNextQueuedClientsIfTheyExist()
+{
+    if (whoseTurnFromGameStatus(_ChessGameStatus) != NO_TURN)
+    {
+        qDebug() << "ERROR: Chess::fillTableWithNextQueuedClientsIfTheyExist(): "
+                    "whose turn != NO_TURN. status =" << gameStatusAsQStr(_ChessGameStatus);
+        return;
+    }
+
+    if (_pClientsList->isWholeGameTableOccupied())
+    {
+        qDebug() << "WARNING: Chess::fillTableWithNextQueuedClientsIfTheyExist(): "
+                    "table is already occupied";
+        return;
+    }
+    else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
+
+    if (_pClientsList->getAmountOfQueuedClients() <= 0) return;
+    else
+    {
+        if (_pClientsList->isPlayerChairEmpty(PT_WHITE))
+        {
+            _pClientsList->putOnChairNextQueuedClient(PT_WHITE);
+            this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
+        }
+        if (_pClientsList->isPlayerChairEmpty(PT_BLACK))
+        {
+            _pClientsList->putOnChairNextQueuedClient(PT_BLACK);
+            this->sendDataToAllClients(AT_NEW_BLACK_PLAYER);
+        }
+    }
+
+    if (_pClientsList->isWholeGameTableOccupied())
+    {
+        _ChessGameStatus = _pTimers->startQueueTimer();
+        this->sendDataToAllClients();
+    }
 }
 
 QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NONE*/)
@@ -456,20 +487,14 @@ void Chess::timeOutStart()
     {
         _pClientsList->clearPlayerType(PT_WHITE);
         this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
-        if (_pClientsList->putOnChairNextQueuedClientIfExist(PT_WHITE))
-            this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
     }
     if (!_pClientsList->isStartClickedByPlayer(PT_BLACK))
     {
         _pClientsList->clearPlayerType(PT_BLACK);
         this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
-        if (_pClientsList->putOnChairNextQueuedClientIfExist(PT_BLACK))
-            this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
     }
 
-    if (_pClientsList->isWholeGameTableOccupied())
-        _ChessGameStatus = _pTimers->startQueueTimer();
-    else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
+    this->fillTableWithNextQueuedClientsIfTheyExist();
 
     this->sendDataToAllClients();
 }

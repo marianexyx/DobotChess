@@ -4,7 +4,7 @@
 #pragma once
 #include <QString>
 
-//future: this dir may not exists, if every class would have its own dir
+//todo: this dir may not exists, if every class would have its own dir
 
 const bool SHOW_ERRORS = true;
 const bool PRINT_DEBUG = true;
@@ -48,22 +48,6 @@ inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
         qDebug() << "ERROR: verticalMoveAsQStr(): wrong arg =" << VM;
         return "none";
     }
-}
-
-inline QString decToHex(int nDec)
-{
-    if (nDec > 256)
-    {
-        qDebug() << "WARNING: nDec > 256. change it to max for this funtion: "
-                    "256 (ff). nDec =" << nDec;
-        nDec = 256;
-    }
-
-    QString QStrReturn = QString::number(nDec, 16);
-    //if (nDec < 16) QStrReturn = "0" + QStrReturn;
-    QStrReturn = /*"0x" +*/ QStrReturn;
-
-    return QStrReturn;
 }
 
 #endif // BASIC_VARS_H

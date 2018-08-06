@@ -15,10 +15,8 @@
 
 enum BOARD_POINTS { BP_MIN, BP_MAX, BP_MIDDLE, BP_RETREAT_LEFT, BP_RETREAT_RIGHT };
 
-//future: this class can have its own dir amongfull classes like...
+//todo: this class can have its own dir amongfull classes like...
 //...piece, field; also enums. this dir should be inside chess dir?
-
-//class PieceController;
 
 class Chessboard: public QObject
 {

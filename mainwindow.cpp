@@ -293,8 +293,6 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     //auto scroll
     QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
     scroll_logPTE->setValue(scroll_logPTE->maximum());
-
-    //future: all logs and debugs write to txt files (am i sure about this?)
 }
 
 void MainWindow::initControl() {

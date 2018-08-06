@@ -141,8 +141,8 @@ void ChessMovements::promoteWithRemoveMoveSequence(Field* pFrom, Field* pTo)
     this->regularMoveSequence(pFrom, pTo);
 }
 
-//future: divide this function into smaller pieces
-//future: although it works, i was somewhere still able to get error msg (in last scenario?)
+//todo: divide this function into smaller pieces
+//todo: although it works, i was somewhere still able to get error msg (in last scenario?)
 bool ChessMovements::resetPiecePositions()
 {
     qDebug() << "ChessMovements::resetPiecePositions()";

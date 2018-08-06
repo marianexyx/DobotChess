@@ -19,7 +19,7 @@ Dobot::Dobot(RealVars gameConfigVars, Point3D escape1, Point3D escape2):
 
     _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
 
-    //future: this below shows that we r using chessboard. it may be wiped, only if...
+    //todo: this below shows that we r using chessboard. it may be wiped, only if...
     //...it's passed, but it's not efficient. better way might be passing whole object.
     _dSafeAxisZ = qMin(qMin(gameConfigVars.A1.z, gameConfigVars.A8.z),
                        qMin(gameConfigVars.H1.z, gameConfigVars.H8.z)) +

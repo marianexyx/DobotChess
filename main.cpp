@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[])
 {
+    qSetMessagePattern("%{function}(%{line}): %{message}");
     QApplication app(argc, argv);
 
     XmlReader xmlReader001;

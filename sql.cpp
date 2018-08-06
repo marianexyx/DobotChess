@@ -75,6 +75,8 @@
     return Sql::isClientHashOk(n64ID, QStrHash);
 }
 
+//todo: it must be checked only once per client, when he gives his sqlId, because...
+//...I think this slow the communication with players
 /*static*/ QString Sql::getClientName(int64_t n64sqlId)
 {
     if (n64sqlId <= 0)
