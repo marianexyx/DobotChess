@@ -1,6 +1,6 @@
 #include "position_on_board.h"
 
-//PosOnBoard:
+///PosOnBoard:
 PosOnBoard::PosOnBoard(int nL, int nD)
 {
     if ((nL >= L_A && nL <= L_H && nD >= D_1 && nD <= D_8) || (nL == L_X && nD == D_X))
@@ -12,8 +12,7 @@ PosOnBoard::PosOnBoard(int nL, int nD)
     {
         Letter = L_X;
         Digit = D_X;
-        qDebug() << "ERROR: PosOnBoard(int nL, int nD): parameters out of range: nL ="
-                 << nL << ", nD =" << nD;
+        qCritical() << "parameters out of range: nL =" << nL << ", nD =" << nD;
     }
 }
 
@@ -22,8 +21,7 @@ PosOnBoard::PosOnBoard(QString QStrL, DIGIT D)
     Letter = pieceLetterPos(QStrL);
     Digit = D;
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PosOnBoard(QString QStrL, DIGIT D): parameter is X: Letter ="
-                 << Letter << ", Digit =" << Digit;
+        qCritical() << "parameter is X: Letter =" << Letter << ", Digit =" << Digit;
 }
 
 PosOnBoard::PosOnBoard(QString QStrL, int nD)
@@ -31,14 +29,13 @@ PosOnBoard::PosOnBoard(QString QStrL, int nD)
     Letter = pieceLetterPos(QStrL);
     Digit = static_cast<DIGIT>(nD);
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PosOnBoard(QString QStrL, int nD): parameter is X: Letter ="
-                 << Letter << ", Digit =" << Digit;
+        qCritical() << "parameter is X: Letter =" << Letter << ", Digit =" << Digit;
 }
 PosOnBoard::PosOnBoard(QString QStrBoardPos)
 {
     if (QStrBoardPos.length() != 2)
     {
-        qDebug() << "ERROR: PosOnBoard(QString QStrBoardPos): QStrBoardPos.length() != 2)";
+        qCritical() << "QStrBoardPos.length() != 2)";
         Letter = L_X;
         Digit = D_X;
     }
@@ -48,11 +45,10 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
         Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt());
     }
     if (Letter == L_X || Digit == D_X)
-        qDebug() << "WARNING: PosOnBoard(QString QStrBoardPos): parameter is X: Letter ="
-                 << Letter << ", Digit =" << Digit;
+        qWarning() << "parameter is X: Letter =" << Letter << ", Digit =" << Digit;
 }
 
-//PosFromTo:
+///PosFromTo:
 PosFromTo::PosFromTo()
 {
     from.Letter = L_X;
@@ -91,10 +87,9 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
         if (static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt()) < D_1 ||
                 static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt()) > D_8)
         {
-            qDebug() << "ERROR: PosFromTo::isMoveInProperFormat():"
-                        " pieceFromDigit is out of range <1, 8>. it's ="
-                     << static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt())
-                     << ", QStrMoveFromTo.mid(2,1) =" << QStrMoveFromTo.mid(1,1);
+            qCritical() << "pieceFromDigit is out of range <1, 8>. it's ="
+                        << static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt())
+                        << ", QStrMoveFromTo.mid(2,1) =" << QStrMoveFromTo.mid(1,1);
             return false;
         }
 
@@ -104,17 +99,16 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
         if (static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt()) < D_1 ||
                 static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt()) > D_8)
         {
-            qDebug() << "ERROR: PosFromTo::isMoveInProperFormat():"
-                        " pieceToDigit is out of range <1, 8>. it's ="
-                     << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt())
-                     << ", QStrMoveFromTo.right(1) =" << QStrMoveFromTo.right(1);
+            qCritical() << "pieceToDigit is out of range <1, 8>. it's ="
+                        << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt())
+                        << ", QStrMoveFromTo.right(1) =" << QStrMoveFromTo.right(1);
             return false;
         }
     }
     else
     {
-        qDebug() << "ERROR: PosFromTo::isMoveInProperFormat(): wrong length:"
-                 << QStrMoveFromTo.length() << ". full string =" << QStrMoveFromTo;
+        qCritical() << "wrong length:" << QStrMoveFromTo.length()
+                    << ". full string =" << QStrMoveFromTo;
         return false;
     }
 

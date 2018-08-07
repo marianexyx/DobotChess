@@ -49,7 +49,7 @@ public:
     Clients(): _clients() {}
 
     void newClient(QWebSocket& clientSocket);
-    void setClientSqlID(const Client& client, int64_t ID);
+    void setClientSqlID(const Client& client, int64_t sqlID);
     void clearClientSqlID(const Client& client);
     void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);
@@ -84,8 +84,6 @@ public:
     bool isClientIDExists(int64_t n64ID);
     int64_t getClientID(const Client& client);
     int64_t getNextAvailableClientID();
-
-    //void testQueuedClients(); //unit test
 
 public slots:
     void showClientsInUI();

@@ -4,8 +4,8 @@
 
 /*static*/ void Sql::setDbConnectionData(DatabaseVars DBV)
 {
-    qDebug() << "Sql::setDbConnectionData(): vars =" << DBV.QStrHostName
-             << DBV.QStrDatabaseName << DBV.QStrUserName << DBV.QStrPassword;
+    qInfo() << "vars =" << DBV.QStrHostName << DBV.QStrDatabaseName
+            << DBV.QStrUserName << DBV.QStrPassword;
 
     sqlDB = QSqlDatabase::addDatabase("QMYSQL");
     sqlDB.setHostName(DBV.QStrHostName);
@@ -18,11 +18,10 @@
 {    
     if (n64sqlId < 1)
     {
-        qDebug() << "ERROR: Sql::isClientHashOk(): ID param cannot be below 1. "
-                    "it's ==" << n64sqlId;
+        qCritical() << "ID param cannot be below 1. it's ==" << n64sqlId;
         return false;
     }
-    qDebug() << "Sql::isClientHashOk(): n64sqlId =" << n64sqlId;
+    qInfo() << "n64sqlId =" << n64sqlId;
 
     if (sqlDB.open())
     {
@@ -32,15 +31,13 @@
         QSqlQuery query;
         if (!query.exec(QStrQuery)) //exec is making query for database
         {
-            qDebug() << "ERROR: Sql::isClientHashOk(): No records in users table "
-                        "for ID =" << QString::number(n64sqlId);
+            qCritical() << "no records in users table for ID =" << QString::number(n64sqlId);
             return false;
         }
 
         if (query.size() != 1)
         {
-            qDebug() << "ERROR: Sql::isClientHashOk(): query.size() != 1. it's ="
-                     << query.size();
+            qCritical() << "query.size() != 1. it's =" << query.size();
             return false;
         }
 
@@ -49,9 +46,8 @@
             QString QStrDbHash = query.value("hash").toString();
             if (QStrDbHash != QStrHash)
             {
-                qDebug() << "ERROR: Sql::isClientHashOk(): hash parameter ("
-                            + QStrHash + ") is diffrent then hash from DB ("
-                         << QStrDbHash + ")";
+                qCritical() << "hash parameter (" + QStrHash +
+                               ") is diffrent then hash from DB:" << QStrDbHash;
                 return false;
             }
         }
@@ -61,8 +57,7 @@
     }
     else
     {
-        qDebug() << "ERROR: Sql::isClientHashOk(): Failed to connect with "
-                    "SQL database. Error =" << sqlDB.lastError().text();
+        qCritical() << "failed to connect with SQL DB. err =" << sqlDB.lastError().text();
         return false;
     }
 }
@@ -81,7 +76,7 @@
 {
     if (n64sqlId <= 0)
     {
-        qDebug() << "ERROR: Sql::getClientName(): given ID < 1. its =" << n64sqlId;
+        qCritical() << "given ID < 1. its =" << n64sqlId;
         return "";
     }
 
@@ -93,14 +88,13 @@
         QSqlQuery query;
         if(!query.exec(QStrQuery)) //exec is making query for database
         {
-            qDebug() << "ERROR: Sql::getClientName(): No records in users table";
+            qCritical() << "no records in users table";
             return "";
         }
 
         if (query.size() != 1)
         {
-            qDebug() << "ERROR: Sql::getClientName(): query.size() != 1. it's ="
-                     << query.size();
+            qCritical() << "query.size() != 1. it's =" << query.size();
             return "";
         }
 
@@ -114,8 +108,7 @@
     }
     else
     {
-        qDebug() << "ERROR: Sql::getClientName(): Failed to connect with SQL database. "
-                     "error =" << sqlDB.lastError().text();
+        qCritical() << "failed to connect with SQL DT. err =" << sqlDB.lastError().text();
         return "";
     }
 }

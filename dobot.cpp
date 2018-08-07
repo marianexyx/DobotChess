@@ -46,8 +46,7 @@ Dobot::~Dobot()
 void Dobot::onPeriodicTaskTimer()
 {
     PeriodicTask(); //start arm task loop. non-return funcion
-    //find timer by name:
-    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer");
+    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
     periodicTaskTimer->start(); //auto restart timer
 }
 
@@ -103,8 +102,8 @@ void Dobot::setItemInGripper(short sGrippersItemID)
 {
     if (!this->isGripperEmpty())
     {
-        qDebug() << "ERROR: Dobot::isGripperEmpty(): it isn't. item nr in gripper: "
-                 << _sItemIDInGripper << ". passed item nr as par:" << sGrippersItemID;
+        qCritical() << "it isn't. item nr in gripper:" << _sItemIDInGripper
+                    << ". passed item nr as param:" << sGrippersItemID;
         return;
     }
 
@@ -115,7 +114,7 @@ void Dobot::clearGripper()
 {
     if (this->isGripperEmpty())
     {
-        qDebug() << "ERROR: Dobot::clearGripper(): gripper is already empty";
+        qCritical() << "gripper is already empty";
         return;
     }
 
@@ -248,15 +247,13 @@ void Dobot::initDobot()
     IOMultiplexing iom;
     iom.address = 4;
     iom.multiplex = IOFunctionPWM;
-    int iomResult = SetIOMultiplexing(&iom, false, NULL);
-    if (iomResult != DobotCommunicate_NoError)
-        qDebug() << "SetIOMultiplexing error";
+    isArmReceivedCorrectCmd(SetIOMultiplexing(&iom, false, NULL), SHOW_ERRORS);
 }
 
 void Dobot::sendMoveToArm(DobotMove move)
 {
-    qDebug() << "Dobot::sendMoveToArm(): move type =" << dobotMoveAsQstr(move.type)
-             << ", ID =" << move.ID << ", xyz =" << move.xyz.getAsQStr();
+    qInfo() << "move type =" << dobotMoveAsQstr(move.type) << ", ID ="
+            << move.ID << ", xyz =" << move.xyz.getAsQStr();
 
     switch(move.type)
     {
@@ -294,8 +291,7 @@ void Dobot::sendMoveToArm(DobotMove move)
         isArmReceivedCorrectCmd(SetHOMECmd(&calibrateCmd, true, &move.ID), SHOW_ERRORS);
     }
         break;
-    default:
-        qDebug() << "ERROR: Dobot::sendMoveToArm(): wrong move type:" << move.type;
+    default: qCritical() << "wrong move type:" << move.type;
     }
 }
 
@@ -304,7 +300,7 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
 {
     if (!_bConnectedToDobot)
     {
-        qDebug() << "WARNING: Dobot::queueMoveSequence(): dobot not connected";
+        qWarning() << "dobot not connected";
         return;
     }
 
@@ -337,9 +333,8 @@ bool Dobot::isMoveSafe(Point3D point)
     if (point.z <= _dSafeAxisZ && point.x != _lastGivenPoint.x &&
             point.y != _lastGivenPoint.y)
     {
-        qDebug() << "ERROR: Dobot::isMoveSafe(): it's not. given point =" <<
-                    point.getAsQStr() << ", _lastGivenPoint =" <<
-                    _lastGivenPoint.getAsQStr() << ", _dSafeAxisZ =" << _dSafeAxisZ;
+        qCritical() << "it's not. given point =" << point.getAsQStr() << ", _lastGivenPoint ="
+                    << _lastGivenPoint.getAsQStr() << ", _dSafeAxisZ =" << _dSafeAxisZ;
         return false;
     }
     else return true;
@@ -349,9 +344,8 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
 {
     if (point.x != _lastGivenPoint.x || point.y != _lastGivenPoint.y)
     {
-        qDebug() << "ERROR: Dobot::isPointDiffrentOnlyInZAxis(): tried to move Z axis"
-                    " with X or Y axis. point xy =" << point.x << point.y <<
-                    "_lastGivenPoint xy =" << _lastGivenPoint.x << _lastGivenPoint.y;
+        qCritical() << "tried to move Z axis with X or Y axis. point xy =" << point.x << point.y
+                    << "_lastGivenPoint xy =" << _lastGivenPoint.x << _lastGivenPoint.y;
         return false;
     }
     else return true;
@@ -361,8 +355,7 @@ void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
 {
     if (!_bFirstMoveIsDone && (Type == DM_TO_POINT || Type == DM_UP || Type == DM_DOWN))
     {
-        qDebug() << "WARNING: Dobot::addArmMoveToQueue(): move type =" <<
-                    dobotMoveAsQstr(Type) << "cannot be the first arm move";
+        qWarning() << "move type =" << dobotMoveAsQstr(Type) << "cannot be the first arm move";
         return;
     }
 
@@ -384,14 +377,13 @@ void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
 {
     if (!_bFirstMoveIsDone)
     {
-        qDebug() << "WARNING: Dobot::armUpDown(): first move cannot be up/down type";
+        qWarning() << "first move cannot be up/down type";
         return;
     }
 
     if (ArmDestination != DM_UP && ArmDestination != DM_DOWN)
     {
-        qDebug() << "ERROR: Dobot::armUpDown(): wrong armDestination val ="
-                 << dobotMoveAsQstr(ArmDestination);
+        qCritical() << "wrong armDestination val =" << dobotMoveAsQstr(ArmDestination);
         return;
     }
 

@@ -25,7 +25,7 @@ inline CHENARD_MSG_TYPE ChenardMsgType(QString QStrMsgType)
     else if (QStrMsgType.left(5) == "move ") return CMT_MOVE;
     else
     {
-        qDebug() << "ERROR: ChenardMsgType(): unknown QStrMsgType type:" << QStrMsgType;
+        qCritical() << "unknown QStrMsgType type:" << QStrMsgType;
         return CMT_ERROR;
     }
 }
@@ -40,7 +40,7 @@ inline QString chenardMsgTypeAsQStr(CHENARD_MSG_TYPE CMT)
     case CMT_HISTORY: return "history pgn";
     case CMT_MOVE: return "move";
     default:
-        qDebug() << "ERROR: chenardMsgTypeAsQStr(): wrong arg =" << CMT;
+        qCritical() << "wrong arg =" << CMT;
         return "";
     }
 }
@@ -63,13 +63,13 @@ inline bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bo
         bReturn = (QStrAns.left(4) == "OK 1") ? true : false; //"OK 1" and "OK 1\n"
         break;
     default:
-        qDebug() << "ERROR: chenardMsgTypeAsQStr(): wrong arg =" << Command;
+        qCritical() << "wrong arg =" << Command;
         bReturn = false;
     }
 
     if (!bReturn && bErrorLog)
-        qDebug() << "ERROR: isChenardAnswerCorrect(): wrong answer:" << QStrAns
-                 << "for" << chenardMsgTypeAsQStr(CMT_NEW) << "command";
+        qCritical() << "wrong answer:" << QStrAns << "for"
+                    << chenardMsgTypeAsQStr(CMT_NEW) << "command";
 
     return bReturn;
 }

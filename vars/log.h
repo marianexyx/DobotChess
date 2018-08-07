@@ -27,7 +27,7 @@ inline QString logAsQstr(LOG Log)
     case LOG_WEBSOCKET: QStrLog = "websocket"; break;
     case LOG_MAINWINDOW: QStrLog = "mainwindow"; break;
     default:
-        qDebug() << "ERROR: logAsQstr(): wrong arg = " << Log;
+        qCritical() << "wrong arg = " << Log;
         return "";
     }
     return "<" + QStrLog + ">: ";

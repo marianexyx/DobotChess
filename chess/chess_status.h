@@ -5,7 +5,6 @@
 #include "chess/vars/sequence_types.h"
 #include "chess/vars/end_of_game_types.h"
 #include "chess/vars/turn_types.h"
-#include "chessboard.h"
 #include "client.h"
 #include "piece_controller.h"
 

@@ -25,7 +25,7 @@ struct PosOnBoard
         if (Letter != L_X && Digit != D_X) return true;
         else
         {
-            if (bErrorLog) qDebug() << "ERROR: PosOnBoard::isPosSet(): false";
+            if (bErrorLog) qCritical() << "pos isn't false";
             return false;
         }
     }

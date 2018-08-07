@@ -31,7 +31,7 @@ inline QString dobotMoveAsQstr(DOBOT_MOVE_TYPE DM)
     case DM_DOWN: return "down";
     case DM_WAIT: return "wait";
     default:
-        qDebug() << "ERROR: dobotMoveAsQstr(): wrong arg =" << DM;
+        qCritical() << "wrong arg =" << DM;
         return "";
     }
 }
@@ -55,13 +55,9 @@ inline bool isArmReceivedCorrectCmd(int nResult, bool bErrorLog = false)
     {
         if (bErrorLog)
         {
-            if (nResult == DobotCommunicate_BufferFull)
-                qDebug() << "ERROR: isArmReceivedCorrectCmd(): dobot buffer is full";
-            else if (nResult == DobotCommunicate_Timeout)
-                qDebug() << "ERROR: isArmReceivedCorrectCmd(): cmd timeout";
-            else
-                qDebug() << "ERROR: isArmReceivedCorrectCmd(): unknown error:"
-                         << nResult;
+            if (nResult == DobotCommunicate_BufferFull) qCritical() << "dobot buffer is full";
+            else if (nResult == DobotCommunicate_Timeout) qCritical() << "cmd timeout";
+            else qCritical() << "unknown error:" << nResult;
         }
 
         return false;

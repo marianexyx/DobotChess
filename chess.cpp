@@ -48,7 +48,6 @@ Chess::~Chess()
 void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
                                    bool bService /*= false*/)
 {
-    //future: use ID everywhere
     Client client = _pClientsList->getClient(n64SenderID);
 
     emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
@@ -59,13 +58,12 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
         _request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
         _request.param = _pConditions->extractParameterIfTypeIsInProperFormat(_request.type,
                                                                               QStrMsg);
-        qDebug() << "Chess::checkMsgFromWebsockets(): accepted client request: type ="
-                 << requestTypeAsQStr(_request.type) << ", param =" << _request.param;
+        qInfo() << "accepted client request: type =" << requestTypeAsQStr(_request.type)
+                << ", param =" << _request.param;
     }
     else
     {
-        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): "
-                    "client request can't be accepted";
+        qWarning() << "client request can't be accepted"; //todo: react somehow on player
         return;
     }
 
@@ -78,8 +76,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
             this->playerWantToStartNewGame(PT_BLACK);
         else if (bService)
             this->playerWantToStartNewGame(PT_NONE, bService);
-        else qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): switch: "
-                         "RT_NEW_GAME: client isn't a player";
+        else qCritical() << "switch: RT_NEW_GAME: client isn't a player";
         break;
     case RT_PROMOTE_TO:
         _request.param = _pStatus->getMove().asQStr() + _request.param;
@@ -120,8 +117,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
         this->updateClientsInUI();
         break;
     default:
-        qDebug() << "ERROR: Chess::checkMsgFromWebsockets(): received _request.type:"
-                          << _request.type;
+        qCritical() << "received _request.type:" << _request.type;
     }
 
     _pClientsList->showClientsInUI();
@@ -129,12 +125,9 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
 
 void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
 {
-    qDebug() << "Chess::checkMsgFromChenard(): QStrTcpMsgType=" << QStrTcpMsgType
-             << ", QStrTcpRespond:" << QStrTcpRespond;
-
+    qInfo() << "QStrTcpMsgType=" << QStrTcpMsgType << ", QStrTcpRespond:" << QStrTcpRespond;
     CHENARD_MSG_TYPE ProcessedChenardMsgType = ChenardMsgType(QStrTcpMsgType);
-    qDebug() << "Chess::checkMsgFromChenard(): ProcessedChenardMsgType ="
-             << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
+    qInfo() << "ProcessedChenardMsgType =" << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
     if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpRespond, SHOW_ERRORS)) return;
 
     switch(ProcessedChenardMsgType)
@@ -142,36 +135,29 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
     case CMT_NEW:
         this->startNewGameInCore();
         break;
+    case CMT_MOVE:
+        this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_STATUS));
+        break;
     case CMT_STATUS:
     {
         _pStatus->saveStatusData(QStrTcpRespond);
         END_TYPE ET = _pStatus->getFENGameState();
         if (ET == ET_NONE)
-        {
             this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_HISTORY));
-            this->continueGameplay(); //todo: send move confirmation to web after...
-            //..."legal" response (i.e. realise blockade before next move)- is this old comment?
-        }
         else if (ET == ET_NORMAL_WIN_WHITE || ET == ET_NORMAL_WIN_BLACK || ET == ET_DRAW)
             this->restartGame(ET);
-        else qDebug() << "ERROR: Chess::checkMsgFromChenard(): case CMT_STATUS: unacceptable "
-                         "END_TYPE parameter =" << ET;
+        else qCritical() << "unacceptable END_TYPE param =" << endTypeAsQstr(ET);
         break;
     }
-    case CMT_LEGAL:
-        _pStatus->setLegalMoves(QStrTcpRespond);
-        break;
     case CMT_HISTORY:
         _pStatus->setHistoryMoves(QStrTcpRespond);
-        this->sendDataToAllClients();
         this->sendMsgToTcp(chenardMsgTypeAsQStr(CMT_LEGAL));
         break;
-    case CMT_MOVE:
-        this->sendMsgToTcp("status");
+    case CMT_LEGAL:
+        _pStatus->setLegalMoves(QStrTcpRespond);
+        this->continueGameplay();
         break;
-    default:
-        qDebug() << "ERROR: Chess:checkMsgFromChenard(): unknown ProcessedChenardMsgType:"
-                 << ProcessedChenardMsgType;
+    default: qCritical() << "unknown ProcessedChenardMsgType:" << ProcessedChenardMsgType;
     }
 }
 
@@ -179,25 +165,23 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = 
 {
     if (PlayerType == PT_WHITE)
     {
-        qDebug() << "Chess::playerWantToStartNewGame(): white";
+        qInfo() << "white";
         _pClientsList->setClientStartConfirmation(PT_WHITE, true);
     }
     else if (PlayerType == PT_BLACK)
     {
         _pClientsList->setClientStartConfirmation(PT_BLACK, true);
-        qDebug() << "Chess::playerWantToStartNewGame(): black";
+        qInfo() << "black";
     }
     else if (bService)
-        qDebug() << "Chess::playerWantToStartNewGame(): service start";
+        qInfo() << "service start";
     else
-        qDebug() << "ERROR: Chess::playerWantToStartNewGame(): unknown playerWantToStartNewGame"
-                    " val:" << playerTypeAsQStr(PlayerType);
+        qCritical() << "unknown playerWantToStartNewGame val:" << playerTypeAsQStr(PlayerType);
 
     if ((_pClientsList->isWholeGameTableOccupied() &&
          _pClientsList->isStartClickedByBothPlayers()) || bService)
     {
-        qDebug() << "Chess::playerWantToStartNewGame(): both have clicked start. "
-                    "Try to start a game";
+        qInfo() << "both have clicked start. Try to start a game";
         _pTimers->stopQueueTimer();
         this->sendMsgToTcp("new");
         if (!bService)
@@ -210,7 +194,7 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = 
 
 void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg) //move not included in answer
 {
-    qDebug() << "Chess::tellPlayerThatHeGaveBadMove():" << QStrMsg;
+    qInfo() << QStrMsg;
     Client player = _pClientsList->getPlayer(_pStatus->getActivePlayerType());
 
     this->sendDataToClient(player, AT_BAD_MOVE);
@@ -228,17 +212,15 @@ void Chess::newClientLogged(Client& client, int64_t sqlID)
     if (!_pClientsList->isClientSqlIDExists(sqlID))
     {
         _pClientsList->setClientSqlID(client, sqlID);
-        qDebug() << "Chess::newClientLogged(): ID =" << sqlID
-                 << ", name =" << Sql::getClientName(sqlID);
+        qInfo() << "ID =" << sqlID << ", name =" << Sql::getClientName(sqlID);
         this->sendDataToClient(client);
     }
     else
     {
         if (client.sqlID() > 0 && client.sqlID() != sqlID)
         {
-            qDebug() << "ERROR: Chess::newClientLogged(): client has a sqlID, and he "
-                        "sent another diffrent one (hacker?). his ID =" << client.sqlID()
-                     << ", new ID =" << sqlID;
+            qCritical() << "client has a sqlID, and he sent another diffrent one (hacker?). "
+                           "his ID =" << client.sqlID() << ", new ID =" << sqlID;
             this->restorateGameIfDisconnectedClientAffectIt(client);
             //future: F5 his page
             _pClientsList->removeClientFromList(client);
@@ -246,7 +228,7 @@ void Chess::newClientLogged(Client& client, int64_t sqlID)
         }
         else //double login
         {
-            qDebug() << "Chess::newClientLogged(): logout:doubleLogin";
+            qInfo() << "logout:doubleLogin";
             Client oldClient = _pClientsList->getClient(sqlID, CID_SQL);
             this->restorateGameIfDisconnectedClientAffectIt(oldClient);
             _pClientsList->clearClientSqlID(oldClient);
@@ -277,7 +259,7 @@ void Chess::resetTableData()
 
 void Chess::restorateGameIfDisconnectedClientAffectIt(Client& client)
 {
-    qDebug() << "Chess::restorateGameIfDisconnectedClientAffectIt()";
+    qInfo();
 
     if (_pClientsList->isClientAPlayer(client))
         this->playerLeftChair(client.type());
@@ -300,9 +282,9 @@ void Chess::sendDataToAllClients(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= E
     _pWebsockets->sendMsgToAllClients(this->getTableData(AT, ET));
 }
 
-void Chess::coreIsReadyForNewGame() //todo: not best name?
+void Chess::makeCoreReadyForNewGame()
 {
-    qDebug() << "Chess::coreIsReadyForNewGame()";
+    qInfo();
 
     if (_pClientsList->isWholeGameTableOccupied())
         _ChessGameStatus = _pTimers->startQueueTimer();
@@ -353,26 +335,25 @@ void Chess::manageMoveRequest(clientRequest request)
 void Chess::continueGameplay()
 {
     _pTimers->switchPlayersTimers(_pStatus->getWhoseTurn());
-    _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE :
-                                                                GS_TURN_BLACK;
+    _ChessGameStatus = _pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE : GS_TURN_BLACK;
     this->sendDataToAllClients();
 }
 
 void Chess::restartGame(END_TYPE ET)
 {
-    qDebug() << "Chess::restartGame():" << endTypeAsQstr(ET);
+    qInfo() << endTypeAsQstr(ET);
     _ChessGameStatus = GS_TURN_NONE_RESETING;
     this->resetTableData();
     this->sendDataToAllClients(AT_END_GAME, ET);
     this->changePlayersOnChairs();
-    if(_pMovements->resetPiecePositions())
-        this->coreIsReadyForNewGame();
+    if (_pMovements->resetPiecePositions())
+        this->makeCoreReadyForNewGame();
     this->sendDataToAllClients();
 }
 
 void Chess::changePlayersOnChairs()
 {
-    qDebug() << "Chess::changePlayersOnChairs()";
+    qInfo();
 
     _pClientsList->clearPlayerType(PT_WHITE);
     this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
@@ -401,15 +382,13 @@ void Chess::fillTableWithNextQueuedClientsIfTheyExist()
 {
     if (whoseTurnFromGameStatus(_ChessGameStatus) != NO_TURN)
     {
-        qDebug() << "ERROR: Chess::fillTableWithNextQueuedClientsIfTheyExist(): "
-                    "whose turn != NO_TURN. status =" << gameStatusAsQStr(_ChessGameStatus);
+        qCritical() << "whose turn != NO_TURN. status =" << gameStatusAsQStr(_ChessGameStatus);
         return;
     }
 
     if (_pClientsList->isWholeGameTableOccupied())
     {
-        qDebug() << "WARNING: Chess::fillTableWithNextQueuedClientsIfTheyExist(): "
-                    "table is already occupied";
+        qCritical() << "table is already occupied";
         return;
     }
     else _ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
@@ -440,8 +419,7 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
 {
     if (ET > ET_NONE && AT != AT_END_GAME)
     {
-        qDebug() << "ERROR: Chess::getTableData(): END_TYPE must be ET_NONE "
-                    "if ACTION_TYPE isn't AT_END_GAME";
+        qCritical() << "END_TYPE must be ET_NONE if ACTION_TYPE isn't AT_END_GAME";
         return "";
     }
 
@@ -475,7 +453,7 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
 
     TD += "\"}";
 
-    qDebug() << "Chess::getTableData(): QStrTableData =" << TD;
+    qInfo() << "QStrTableData =" << TD;
     return TD;
 }
 

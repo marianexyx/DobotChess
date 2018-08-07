@@ -53,7 +53,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
     connect(_pClientsList, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //no need connect for removed board
+    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //connect for removed board not needed
             this, SLOT(clearBoardInUI()));
     connect(_pBoardChenard, SIGNAL(showImaginaryBoardInUI(QString)),
             this, SLOT(showImaginaryBoardInUI(QString)));
@@ -239,8 +239,6 @@ void MainWindow::setDeviceLabels(QString QStrDeviceSN, QString QStrDeviceName,
 
 void MainWindow::on_sendPointBtn_clicked()
 {
-    qDebug() << "sendPointBtn clicked";
-
     _pChess->clearLastSavedMadeMove();
 
     bool bConversionXOk, bConversionYOk, bConversionZOk;
@@ -284,7 +282,7 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
             logAsQstr(TypeOfMsg) + QStrMsg;
 
     ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
-    qDebug() << QStrMsg;
+    qInfo() << QStrMsg;
 
     //prevent big string data
     int nMaximum = 30 * 1000;
@@ -376,8 +374,6 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
     {
         QString QStrServiceMove = ui->emulatePlayerMsgLineEdit->text();
-        qDebug() << "MainWindow::on_sendSimulatedMsgBtn_clicked(): "
-                    "QStrServiceMove =" << QStrServiceMove;
 
         if (QStrServiceMove.length() == 2)
         {
@@ -398,8 +394,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 Field* pFieldFrom = _pBoardRemoved->getField(fromTo.from);
                 if ((int)fromTo.from.Digit > 4)
                 {
-                    qDebug() << "WARNING: MainWindow::on_sendSimulatedMsgBtn_clicked(): "
-                                "fromTo.from.Digit > 4";
+                    qWarning() << "fromTo.from.Digit > 4";
                     return;
                 }
                 _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldFrom);
@@ -417,8 +412,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             }
 
         }
-        else qDebug() << "ERROR: MainWindow::on_sendSimulatedMsgBtn_clicked(): wrong"
-                         " QStrServiceMove msg =" << QStrServiceMove;
+        else qWarning() << "QStrServiceMove msg =" << QStrServiceMove;
     }
 
     ui->emulatePlayerMsgLineEdit->clear();
@@ -434,8 +428,7 @@ void MainWindow::on_calibrateBtn_clicked()
         _pDobot->addArmMoveToQueue(DM_CALIBRATE);
     }
     else
-        qDebug() << "ERROR: MainWindow::on_calibrateBtn_clicked(): "
-                    "Dobot not in home positions";
+        qWarning() << "Dobot not in home positions";
 }
 
 void MainWindow::on_homeBtn_clicked()
@@ -450,11 +443,11 @@ void MainWindow::on_upBtn_clicked()
     {
         double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
                 ->getLocation3D().z + (double)_pBoardMain->fMaxPieceHeight;
-        qDebug() << "MainWindow::on_upBtn_clicked(): dZAxisVal =" << dZAxisVal;
+        qInfo() << "dZAxisVal =" << dZAxisVal;
         _pDobot->armUpDown(DM_DOWN, dZAxisVal);
     }
     else
-        qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
+        qWarning() << "move isn't set";
 }
 
 void MainWindow::on_downBtn_clicked()
@@ -463,11 +456,11 @@ void MainWindow::on_downBtn_clicked()
     {
         double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
                 ->getLocation3D().z;
-        qDebug() << "MainWindow::on_downBtn_clicked(): dZAxisVal =" << dZAxisVal;
+        qInfo() << "dZAxisVal =" << dZAxisVal;
         _pDobot->armUpDown(DM_DOWN, dZAxisVal);
     }
     else
-        qDebug() << "ERROR: MainWindow::on_upBtn_clicked(): move isn't set";
+        qWarning() << "move isn't set";
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()
@@ -498,10 +491,10 @@ void MainWindow::on_startGmPosBtn_clicked()
     if (qAbs(qAbs(ui->xLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().x)) < 3 &&
             qAbs(qAbs(ui->yLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().y)) < 3 &&
             qAbs(qAbs(ui->zLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().z)) < 3)
-    { //if actual point is +/-3 near home point
+    { //if actual point is +/-3 near home point //todo: not working (?)
         _pPieceController->clearLastPos();
 
-        //future: not cool code below
+        //todo: not cool code below
         this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
@@ -511,7 +504,7 @@ void MainWindow::on_startGmPosBtn_clicked()
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
     }
     else
-        qDebug() << "ERROR: MainWindow::on_startGmPosBtn_clicked(): Dobot not in home positions";
+        qWarning() << "Dobot not in home positions";
 }
 
 void MainWindow::on_startDtPosBtn_clicked()
@@ -619,8 +612,7 @@ void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType
     case BDL_BLACK_TIME: ui->blackTimeLbl->setText(QStrLabel); break;
     case BDL_QUEUE_PLAYERS: ui->queuedPlayersLbl->setText(QStrLabel); break;
     case BDL_QUEUE_TIME: ui->queueTimeLbl->setText(QStrLabel); break;
-    default: qDebug() << "ERROR: MainWindow::setBoardDataLabel(): unknown labelType"
-                      << LabelType;
+    default: qWarning() << "unknown labelType:" << LabelType;
     }
 }
 
@@ -653,8 +645,7 @@ void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
                 {
                     QStrBoardArray[nColumn][nRow] = QStrFENSign;
                     if (nColumn > D_8)
-                        qDebug() << "ERROR: MainWindow::showImaginaryBoardInUI(): nColumn > 8 ="
-                                 << nColumn;
+                        qWarning() << "nColumn > 8 =" << nColumn;
                     ++nColumn;
                 }
                 else //digits
@@ -663,8 +654,7 @@ void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
                     {
                         QStrBoardArray[nColumn][nRow] = ".";
                         if (nColumn > D_8)
-                            qDebug() << "ERROR: MainWindow::showImaginaryBoardInUI: nColumn > 8 ="
-                                     << nColumn;
+                            qWarning() << "nColumn > 8 =" << nColumn;
                         ++nColumn;
                     }
                 }
@@ -673,19 +663,16 @@ void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
     }
     else
     {
-        qDebug() << "ERROR: MainWindow::showImaginaryBoardInUI(): boardRows.size() != 8. Size = "
-                 << QStrFENBoardRows.size();
+        qWarning() << "boardRows.size() != 8. size =" << QStrFENBoardRows.size();
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
-            qDebug() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
+            qInfo() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
     }
 
     QString QStrBoardPTE;
     for (int i=0; i<=7; ++i)
     {
         for (int j=0; j<=7; ++j)
-        {
             QStrBoardPTE += QStrBoardArray[i][j] + " ";
-        }
         QStrBoardPTE += "\n";
     }
     while (QStrBoardPTE.right(1) == "\n")

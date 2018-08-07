@@ -3,7 +3,6 @@
 
 #pragma once
 #include "chess/vars/sequence_types.h"
-#include "chessboard.h"
 #include "piece_controller.h"
 
 class ChessMovements
@@ -18,6 +17,10 @@ private:
     void copyPiecesToBoard(const Chessboard &source, Chessboard& target);
     bool isPieceSetOnStartFields();
     bool isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2);
+    bool isFieldMissingItsStartPiece(Field* pField);
+    void findAndReturnPieceToItsStartingField(Field* pField);
+    void tryToMovePieceFromHisNotStartingField(Piece* pPiece, Field* pField);
+    void tryToPutPieceOnItsStartingField(short sFieldNr);
 
 public:
     ChessMovements(PieceController* pPieceController, Chessboard* pBoardMain,

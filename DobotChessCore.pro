@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     websockets.cpp \
     xml_reader.cpp \
     vars/position_on_board.cpp \
-    dobot/dobot_gripper.cpp
+    dobot/dobot_gripper.cpp \
+    errors.cpp
 
 HEADERS  +=  \
     chess/vars/action_types.h \
@@ -76,7 +77,8 @@ HEADERS  +=  \
     websockets.h \
     xml_reader.h \
     dobot/vars/dobot_move_types.h \
-    dobot/dobot_gripper.h
+    dobot/dobot_gripper.h \
+    errors.h
 
 FORMS    += mainwindow.ui
 

@@ -47,8 +47,7 @@ bool DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable()
                 if (_lowestIDMoveInList - _un64RealTimeDobotActualID < 15)
                     return true;
             }
-            else qDebug() << "ERROR: DobotQueue::isNextPhysicalMoveToQueueOnArmAvailable(): "
-                             "_lowestIDMoveInList < _un64RealTimeDobotActualID ("
+            else qCritical() << "_lowestIDMoveInList < _un64RealTimeDobotActualID ("
                           << _lowestIDMoveInList << "<" << _un64RealTimeDobotActualID << ")";
         }
     }
@@ -67,15 +66,14 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
             _lowestIDMoveInList = QueuedCmdIDIter.peekNext().ID;
             //future: why those 2 qdebugs below must be here for funtion to work?
             ///WARNING!!! WITHOUT THIS QDEBUG ARM WILL NOT WORK PROPERLY (DUNNO WHY)
-            qDebug() << "DobotQueue::getNextMoveToSendToArm(): "
-                        "new _lowestIDMoveInList =" << _lowestIDMoveInList;
+            qInfo() << "new _lowestIDMoveInList =" << _lowestIDMoveInList;
 
             if (_lowestIDMoveInList >= _un64RealTimeDobotActualID)
             {
                 if(_lowestIDMoveInList - _un64RealTimeDobotActualID < 15)
                 {
                     ///WARNING!!! WITHOUT THIS QDEBUG ARM WILL NOT WORK PROPERLY (DUNNO WHY)
-                    qDebug() << "DobotQueue: return next queued move. type ="
+                    qInfo() << "return next queued move. type ="
                              << dobotMoveAsQstr(_queuedArmCmdsOnCore.first().type) << ", ID ="
                              << _queuedArmCmdsOnCore.first().ID << ", point ="
                              << _queuedArmCmdsOnCore.first().xyz.getAsQStr();
@@ -83,16 +81,13 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
                     return _queuedArmCmdsOnCore.takeFirst();
                 }
             }
-            else qDebug() << "ERROR: DobotQueue::getNextMoveToSendToArm(): "
-                             "_lowestIDMoveInList < _un64RealTimeDobotActualID ("
-                          << _lowestIDMoveInList << "<"
-                          << _un64RealTimeDobotActualID << ")";
+            else qCritical() << "_lowestIDMoveInList < _un64RealTimeDobotActualID ("
+                             << _lowestIDMoveInList << "<" << _un64RealTimeDobotActualID << ")";
         }
     }
 
     DobotMove errorMove;
-    qDebug() << "ERROR: DobotQueue::getNextMoveToSendToArm(): reached artificially "
-                "created anty-error return (shouldn't be possible)";
+    qCritical() << "reached artificially created anty-error return (shouldn't be possible)";
     return errorMove;
 }
 
@@ -132,8 +127,7 @@ DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)
     }
 
     DobotMove errorMove;
-    qDebug() << "ERROR: DobotQueue::getQueuedMove(): move with ID nr"
-             << un64ID << "doesn't exists";
+    qCritical() << "move with ID nr" << un64ID << "doesn't exists";
     return errorMove;
 }
 
@@ -171,8 +165,7 @@ void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 {    
     if (Type != DM_OPEN && Type != DM_CLOSE && !XmlReader::isPointInLimits(point))
     {
-        qDebug() << "ERROR: DobotQueue::addArmMoveToQueue(): isPointInLimits == "
-                    "false. move type =" << dobotMoveAsQstr(Type);
+        qCritical() << "isPointInLimits == false. move type =" << dobotMoveAsQstr(Type);
         return;
     }
 

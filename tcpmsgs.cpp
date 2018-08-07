@@ -10,7 +10,7 @@ TCPMsgs::TCPMsgs()
 //todo: make queue as seperate thread
 void TCPMsgs::queueCmd(QString QStrCmd)
 {
-    qDebug() << "TCPMsgs::queueCmd(): cmd =" << QStrCmd;
+    qInfo() << "cmd =" << QStrCmd;
 
     TcpMsgMetadata QStrReceivedData;
     QStrReceivedData.n64TcpID = ++_n64CmdID;
@@ -41,7 +41,7 @@ void TCPMsgs::doTcpConnect()
     connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
             this, displayError);
 
-    qDebug() << "TCPMsgs::doTcpConnect(): connecting...";
+    qInfo() << "connecting...";
 
     socket->abort();
     //this allow to end old connection, if it wasn't closed yet, making a place for new one
@@ -51,9 +51,7 @@ void TCPMsgs::doTcpConnect()
     socket->connectToHost("localhost", 22222); //will emit signal "connected"
 
     if(!socket->waitForConnected(5000))
-    {
-        qDebug() << "ERROR: TCPMsgs::doTcpConnect():" << socket->errorString();
-    }
+        qCritical() << socket->errorString();
 }
 
 void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
@@ -63,17 +61,13 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
     case QAbstractSocket::RemoteHostClosedError:
         break; //server protocol ends with the server closing the connection
     case QAbstractSocket::HostNotFoundError:
-        qDebug() << "ERROR: TCPMsgs::doTcpConnect(): The host was not found. Please "
-                    "check the host name and port settings." ;
+        qCritical() << "The host was not found. Check the host name and port settings." ;
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        qDebug() << "ERROR: TCPMsgs::doTcpConnect(): The connection was refused by the "
-                    "peer. Make sure the server is running, and check that the host name "
-                    "and port settings are correct.";
+        qCritical() << "The connection was refused by the peer. Make sure the server is running,"
+                       " and check that the host name and port settings are correct.";
         break;
-    default:
-        qDebug() << "ERROR: TCPMsgs::doTcpConnect(): The following error occurred:"
-                 << socket->errorString();
+    default: qCritical() << socket->errorString();
     }
 }
 
@@ -84,8 +78,7 @@ void TCPMsgs::connected()
     {
         QStrData = TCPMsgsList.last();
 
-        qDebug() << "TCPMsgs::connected(): Connected. Parsing msg to chenard:"
-                 << QStrData.QStrMsgForTcp;
+        qInfo() << "Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 
         QByteArray QabMsgArrayed;
         //prepare parameter for write() function
@@ -98,37 +91,35 @@ void TCPMsgs::connected()
     }
     else
     {
-        qDebug() << "ERROR: TCPMsgs::connected(): TCPMsgsList is empty";
+        qCritical() << "TCPMsgsList is empty";
         return;
     }
 }
 
 void TCPMsgs::disconnected()
 {
-    qDebug() << "TCPMsgs::disconnected()";
+    qInfo();
 }
 
 void TCPMsgs::bytesWritten(qint64 bytes)
 {
-    qDebug() << "TCPMsgs::bytesWritten(): " << QString::number(bytes) << " bytes written...";
+    qInfo() << QString::number(bytes) << "bytes written...";
 }
 
 void TCPMsgs::readyRead()
 {
-    qDebug() << "TCPMsgs::readyRead(): reading...";
+    qInfo() << "reading...";
 
     QString QStrMsgFromTcp;
     do
     {
         if (!QStrMsgFromTcp.isEmpty())
-            qDebug() << "WARNING: TCPMsgs::readyRead- needed to read data from"
-                        " socket 1 more time";
+            qWarning() << "needed to read data from socket 1 more time";
 
         QStrMsgFromTcp += socket->readAll();
 
         if (socket->bytesAvailable() > 0)
-            qDebug() << "WARNING: TCPMsgs::readyRead- socket->bytesAvailable() > 0"
-                        " after 1st read";
+            qWarning() << "socket->bytesAvailable() > 0 after 1st read";
     }
     while (socket->bytesAvailable() > 0);
 
@@ -147,25 +138,24 @@ void TCPMsgs::readyRead()
             QStrData = TCPMsgsList.takeLast();
         else
         {
-            qDebug() << "ERROR: TCPMsgs::readyRead(): TCPMsgsList is empty";
+            qCritical() << "TCPMsgsList is empty";
             return;
         }
 
-        qDebug() << "TCPMsgs::readyRead(): ID =" << QStrData.n64TcpID
-                 << ", msgForTcp =" << QStrData.QStrMsgForTcp
-                 << ", msgFromTcp =" << QStrMsgFromTcp;
+        qInfo() << "ID =" << QStrData.n64TcpID << ", msgForTcp =" << QStrData.QStrMsgForTcp
+                << ", msgFromTcp =" << QStrMsgFromTcp;
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
     }
     else if (QStrMsgFromTcp.isEmpty())
     {
-        qDebug() << "WARNING: TCPMsgs::readyRead(): received empty msg.";
+        qWarning() << "received empty msg.";
         return;
     }
     else if (QStrMsgFromTcp == "\n")
-        qDebug() << "WARNING: TCPMsgs::readyRead(): received '\\n' msg.";
+        qWarning() << "received '\\n' msg.";
     else
-        qDebug() << "WARNING: TCPMsgs::readyRead(): received:" << QStrMsgFromTcp;
+        qWarning() << "received:" << QStrMsgFromTcp;
 
     _bWaitingForReadyRead = false;
 

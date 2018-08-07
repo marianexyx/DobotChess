@@ -29,7 +29,6 @@ private:
 
 public:
     Piece(short sPieceID);
-    ~Piece() { qDebug() << "destroying piece nr =" << _sPieceID; }
 
     bool operator ==(const class Piece& p) { return _sPieceID == p.getNr(); }
 

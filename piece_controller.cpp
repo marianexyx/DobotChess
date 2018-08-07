@@ -78,9 +78,8 @@ bool PieceController::isPieceSetOk()
         }
         if (!bPieceExists)
         {
-            qDebug() << "ERROR: PieceController::isPieceSetOk(): it isn't, missing piece nr:"
-                     << sPiece << ". item (piece) nr in gripper ="
-                     << _pDobot->getItemInGripper();
+            qCritical() << "it isn't, missing piece nr:" << sPiece
+                        << ". item (piece) nr in gripper =" << _pDobot->getItemInGripper();
             return false;
         }
     }
@@ -92,8 +91,7 @@ bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLo
     if (pPiece == nullptr)
     {
         if (bErrorLog)
-            qDebug() << "ERROR: PieceController::isPieceStayOnItsStartingField(): "
-                        "piece can't be nullptr";
+            qCritical() << "piece can't be nullptr";
         return false;
     }
 
@@ -127,8 +125,7 @@ Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Pie
 {
     if (pPiece == nullptr)
     {
-        qDebug() << "ERROR: PieceController::searchForPieceActualFieldOnBoard(): "
-                    "piece == nullptr";
+        qCritical() << "piece == nullptr";
         return nullptr;
     }
 

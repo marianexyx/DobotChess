@@ -35,23 +35,19 @@ bool XmlReader::openFile(XML_FILE_TYPE XFT)
         xmlDoc = &_xmlDocDatabase;
         break;
     default:
-        qDebug() << "ERROR: XmlReader::openFile(): unnknown file type =" << XFT;
+        qCritical() << "unknown file type =" << XFT;
         return false;
     }
 
     if (!xmlFile->exists())
     {
-        qDebug() << "ERROR: XmlReader::openFile(): file name:" << xmlFile->fileName()
-                 << "don't exists";
+        qCritical() << "file name:" << xmlFile->fileName() << "don't exists";
         return false;
     }
 
-    QString errMsg;
     if (!xmlFile->open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        errMsg = xmlFile->errorString();
-        qDebug() << "ERROR: XmlReader::openFile(): failed to load file:" << errMsg;
-
+        qCritical() << "failed to load file:" << xmlFile->errorString();
         return false;
     }
     else
@@ -61,8 +57,8 @@ bool XmlReader::openFile(XML_FILE_TYPE XFT)
         int errorColumn;
         if(!xmlDoc->setContent(xmlFile, false, &errorStr, &errorLine, &errorColumn))
         {
-            qDebug() << "ERROR: XmlReader::openFile(): failed to load document. error:"
-                     << errorStr << "at line" << errorLine << "column" << errorColumn;
+            qCritical() << "failed to load document. error:" << errorStr << "at line"
+                        << errorLine << "column" << errorColumn;
             xmlFile->close();
             return false;
         }
@@ -83,12 +79,9 @@ QString XmlReader::getParam(QDomDocument xmlDoc, QString QStrDomElMain, QString 
         QDomElement element = node.toElement(); //try to convert the node to an element
         if(!element.isNull())
         {
-            /*qDebug() << "XmlReader::readGameLimitsNodes(): element.tagName()"
-                     << qPrintable(element.tagName()); //the node really is an element*/
             if (element.tagName() == QStrDomElMain)
             {
                 QDomNodeList paramDomNodeList = docElem.elementsByTagName(QStrDomNodeList);
-                //qDebug() << "paramDomNodeList amount =" << paramDomNodeList.count();
                 for(int i=0; i<paramDomNodeList.count(); i++)
                 {
                     QDomNode paramNode = paramDomNodeList.at(i);
@@ -104,9 +97,9 @@ QString XmlReader::getParam(QDomDocument xmlDoc, QString QStrDomElMain, QString 
         }
         node = node.nextSibling();
     }
-    qDebug() << "ERROR: XmlReader::getParam(): element.tagName() not found. name ="
-             << QStrDomElMain << ", QStrDomNodeList =" << QStrDomNodeList
-             << ", QStrDomElName =" << QStrDomElName << ", QStrValue =" << QStrValue;
+    qCritical() << "element.tagName() not found. name =" << QStrDomElMain
+                << ", QStrDomNodeList =" << QStrDomNodeList << ", QStrDomElName ="
+                << QStrDomElName << ", QStrValue =" << QStrValue;
     return "";
 }
 
@@ -206,11 +199,7 @@ bool XmlReader::isVarsStructInLimits()
     {
         return true;
     }
-    else
-    {
-        qDebug() << "FATAL ERROR: real data out of scope. crash app";
-        exit(EXIT_FAILURE);
-    }
+    else qFatal("real data out of scope");
 }
 
 /*static*/ bool XmlReader::isPieceHeightInLimits(float fPieceHeight)
@@ -221,8 +210,8 @@ bool XmlReader::isVarsStructInLimits()
         return true;
     else
     {
-        qDebug() << "ERROR: XmlReader::isPieceHeightInLimits(): pieceHeight out of "
-                    "scope range(" << fHmin << "," << fHmax << "):" << fPieceHeight;
+        qCritical() << "pieceHeight out of scope range(" << fHmin << ","
+                    << fHmax << "):" << fPieceHeight;
         return false;
     }
 }
@@ -237,9 +226,9 @@ bool XmlReader::isVarsStructInLimits()
         return true;
     else
     {
-        qDebug() << "ERROR: isPointInLimits(): one of the points vals is out of "
-                    "scope range(" << minErrorCorner.getAsQStr() << ","
-                 << maxErrorCorner.getAsQStr() << "). point =" << point.getAsQStr();
+        qCritical() << "one of the points vals is out of scope range("
+                    << minErrorCorner.getAsQStr() << "," << maxErrorCorner.getAsQStr()
+                    << "). point =" << point.getAsQStr();
         return false;
     }
 }
@@ -252,9 +241,8 @@ bool XmlReader::isVarsStructInLimits()
         return true;
     else
     {
-        qDebug() << "ERROR: XmlReader::isGripperParamInLimits(): one of the gripper "
-                    "vals is out of scope range(" << fGmin << "," << fGmax << "):"
-                 << fGripperPar;
+        qCritical() << "one of the gripper vals is out of scope range(" << fGmin
+                    << "," << fGmax << "):" << fGripperPar;
         return false;
     }
 }

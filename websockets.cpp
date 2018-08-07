@@ -21,7 +21,7 @@ void Websockets::listenOnPort(quint16 port)
                                               QWebSocketServer::NonSecureMode, this);
     if (_pWebSocketServer->listen(QHostAddress::Any, port))
     {
-        qDebug() << "Websockets::Websockets(): connecting to port:" << port;
+        qInfo() << "connecting to port:" << port;
 
         connect(_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
@@ -33,8 +33,6 @@ void Websockets::listenOnPort(quint16 port)
 
 void Websockets::onNewConnection()
 {
-    qDebug() << "Websockets::onNewConnection()";
-
     QWebSocket* pSocket = _pWebSocketServer->nextPendingConnection();
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
@@ -51,13 +49,13 @@ void Websockets::onNewConnection()
 void Websockets::receivedMsg(QString QStrMsg)
 {    
     if (QStrMsg != "keepConnected")
-        qDebug() << "Websockets::receivedMsg():" << QStrMsg;
+        qInfo() << QStrMsg;
     else return;
 
     QWebSocket* pSocket = qobject_cast<QWebSocket*>(sender());
     if (!_pClientsList->isClientInList(_pClientsList->getClient(pSocket)))
     {
-        qDebug() << "WARNING: Websockets::receivedMsg(): sender not in clients list";
+        qWarning() << "sender not in clients list";
         return;
     }
 
@@ -66,12 +64,11 @@ void Websockets::receivedMsg(QString QStrMsg)
 
 void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 {
-    qDebug() << "Websockets::sendMsgToClient(): received:" << QStrMsg;
+    qInfo() << "received:" << QStrMsg;
 
     if (n64ReceiverID < 1)
     {
-        qDebug() << "ERROR: Websockets::sendMsgToClient(): receiver ID < 1. "
-                    "it's =" << n64ReceiverID;
+        qCritical() << "receiver ID < 1. it's =" << n64ReceiverID;
         return;
     }
     else
@@ -90,8 +87,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 
     Q_FOREACH (Client client, _pClientsList->getClientsList())
     {
-        qDebug() << "Websockets::sendMsgToAllClients(): client name ="
-                 << client.name();
+        qInfo() << "client name =" << client.name();
         client.socket()->sendTextMessage(QStrMsg);
     }
 }

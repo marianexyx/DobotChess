@@ -27,7 +27,7 @@ inline QString actionTypeAsQstr(ACTION_TYPE AT)
     case AT_RESET_COMPLITED: return "resetComplited";
     case AT_END_GAME: return "endGame";
     default:
-        qDebug() << "ERROR: actionTypeAsQstr(): wrong arg =" << AT;
+        qCritical() << "wrong arg =" << AT;
         return "";
     }
 }

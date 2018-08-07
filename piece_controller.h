@@ -23,8 +23,7 @@ public:
     PieceController(Dobot* pDobot, Chessboard *pBoardMain, Chessboard *pBoardRemoved);
 
     void movePieceWithManipulator(Chessboard *pRealBoard, Field* pField,
-                                  VERTICAL_MOVE VertMove = VM_NONE,
-                                  bool bRetreat = false);
+                                  VERTICAL_MOVE VertMove = VM_NONE, bool bRetreat = false);
     bool isPieceSetOk();
     bool isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog = false);
     bool isMoveSet();
@@ -40,7 +39,6 @@ public:
     Dobot* getDobotPointer() const { return _pDobot; }
     Chessboard* getBoardMainPointer() const { return _pBoardMain; }
     Chessboard* getBoardRemovedPointer() const { return _pBoardRemoved; }
-
 
 signals:
     void addTextToLogPTE(QString, LOG);

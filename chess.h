@@ -15,8 +15,7 @@
 #include "chess/vars/chenard_io_msgs.h"
 #include "chess/vars/sequence_types.h"
 #include "chess/vars/end_of_game_types.h"
-#include "piece_set.h"
-#include "chessboard.h"
+#include "piece_controller.h"
 #include "chess/chess_movements.h"
 #include "chess/chess_timers.h"
 #include "chess/chess_conditions.h" //must be included as last chess...
@@ -59,7 +58,7 @@ private:
     void updateClientsInUI();
 
     //gameplay methods
-    void coreIsReadyForNewGame();
+    void makeCoreReadyForNewGame();
     void startNewGameInCore();
     void manageMoveRequest(clientRequest request);
     void continueGameplay();

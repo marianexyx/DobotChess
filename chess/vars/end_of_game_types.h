@@ -34,7 +34,7 @@ inline QString endTypeAsQstr(END_TYPE ET)
     case ET_TIMEOUT_GAME_WHITE: return "timeOutWhite";
     case ET_TIMEOUT_GAME_BLACK: return "timeOutBlack";
     default:
-        qDebug() << "ERROR: endTypeAsQstr(): wrong arg =" << ET;
+        qCritical() << "wrong arg =" << ET;
         return "";
     }
 }
@@ -47,7 +47,7 @@ inline END_TYPE FENGameState(QString QStrFENGameState)
     else if (QStrFENGameState == "1/2-1/2") return ET_DRAW;
     else
     {
-        qDebug() << "ERROR: FENGameState(): unknown val:" << QStrFENGameState;
+        qCritical() << "unknown val:" << QStrFENGameState;
         return ET_NONE;
     }
 }

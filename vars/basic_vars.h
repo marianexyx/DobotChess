@@ -45,7 +45,7 @@ inline QString verticalMoveAsQStr(VERTICAL_MOVE VM)
     case VM_GRAB: return "grab"; break;
     case VM_PUT: return "put"; break;
     default:
-        qDebug() << "ERROR: verticalMoveAsQStr(): wrong arg =" << VM;
+        qCritical() << "wrong arg =" << VM;
         return "none";
     }
 }

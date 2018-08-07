@@ -174,8 +174,7 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
     pField->setPieceOnField(pPiece);
 
     if (bDebugLog)
-        qDebug() << "Chessboard::setPieceOnField(): new pieceNr ="
-                 << (pPiece == nullptr ? 0 : pPiece->getNr()) << "on fieldNr ="
+        qInfo() << "new pieceNr:" << (pPiece == nullptr ? 0 : pPiece->getNr()) << "on fieldNr:"
                  << pField->getNrAsQStr() << "on" << boardTypeAsQstr(_boardType) ;
 }
 
@@ -194,11 +193,8 @@ bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= f
         if (pPiece != nullptr && pPiece->getNr() == sPieceNr)
         {
             if (bErrorLog)
-            {
-                qDebug() << "ERROR: Chessboard::isPieceAlreadyExistsOnBoard(): this piece "
-                            "already exist on board. piece =" << pPiece->getNr() <<
-                            "on field =" << _pField[i]->getNrAsQStr();
-            }
+                qCritical() << "this piece already exist on board. piece =" << pPiece->getNr()
+                            << "on field =" << _pField[i]->getNrAsQStr();
             return true;
         }
     }
@@ -211,7 +207,7 @@ bool Chessboard::isBoardReal(bool bErrorLog /*= false*/)
     else
     {
         if (bErrorLog)
-            qDebug() << "ERROR: Chessboard::isBoardReal(): it's not.";
+            qCritical() << "it's not.";
 
         return false;
     }
@@ -236,8 +232,7 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog 
     }
 
     if (bErrorLog)
-        qDebug() << "ERROR: Chessboard::getFieldWithGivenPieceIfExists(): "
-                    "field not found. return nullptr";
+        qCritical() << "field not found. return nullptr";
 
     return nullptr;
 }
@@ -251,7 +246,7 @@ Point3D Chessboard::getBoardPoint3D(BOARD_POINTS BP) const
     case BP_MIDDLE: return _middleAbove; break;
     case BP_RETREAT_LEFT: return _retreatLeft; break;
     case BP_RETREAT_RIGHT: return _retreatRight; break;
-    default: qDebug() << "ERROR: Chessboard::getBoardPoint3D(): unknown bp:" << BP;
+    default: qCritical() << "unknown bp:" << BP;
         return _middleAbove;
     }
 }

@@ -24,8 +24,6 @@ private:
     DobotGripper(float fGripperOpened, float fGripperClosed);
 
 public:
-    ~DobotGripper() { qDebug() << "destroying DobotGripper"; } 
-
     void changeGripperAngle(float fDutyCycle); //service usage
 };
 

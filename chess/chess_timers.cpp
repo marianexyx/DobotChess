@@ -104,9 +104,7 @@ void ChessTimers::switchPlayersTimers(WHOSE_TURN Turn)
         _blackTimer->setInterval(_nRemainingBlackTime);
         _blackTimer->start();
     }
-    else qDebug() << "ERROR: ChessTimers::switchPlayersTimers(): getWhoseTurn isn't "
-                     "white or black.  it's' ="
-                  << turnTypeAsQstr(Turn);
+    else qCritical() << "getWhoseTurn isn't white or black. it's =" << turnTypeAsQstr(Turn);
 }
 
 GAME_STATUS ChessTimers::startQueueTimer()

@@ -15,7 +15,7 @@ Field::Field(short sFieldNr)
 {
     if (sFieldNr < 1 || sFieldNr > 64)
     {
-        qDebug() << "ERROR: Field::isInRange(): out of range. nr =" << sFieldNr;
+        qCritical() << " out of range. nr =" << sFieldNr;
         return false;
     }
     else return true;
@@ -38,8 +38,7 @@ Field::Field(short sFieldNr)
     }
 
     if (!Field::isInRange(Field::nr(FieldLines)))
-        qDebug() << "ERROR: Field::Pos(): field isn't in range after conversation. it's ="
-                 << Field::nr(FieldLines);
+        qCritical() << "field" << Field::nr(FieldLines) << "isn't in range after convertation";
 
     return FieldLines;
 }
@@ -87,7 +86,7 @@ void Field::setPieceOnField(Piece *pPiece)
 {
     if (pPiece == nullptr)
     {
-        qDebug() << "ERROR: Field::setPieceOnField(): piece can't be nullptr";
+        qCritical() << "piece can't be nullptr";
         return;
     }
     else _pPieceOnField = pPiece;
@@ -96,15 +95,14 @@ void Field::setPieceOnField(Piece *pPiece)
 void Field::clearField(bool bErrorLog /*= false*/)
 {
     if (bErrorLog && _pPieceOnField == nullptr)
-        qDebug() << "ERROR: Field::clearField(): field is already clear (=0)."
-                    " field =" << Field::nrAsQStr(_sNr);
+        qCritical() << "field is already clear (=0). field =" << Field::nrAsQStr(_sNr);
     _pPieceOnField = nullptr;
 }
 
 Point3D Field::getLocation3D()
 {
     if (!_location3D.isPointSet())
-        qDebug() << "ERROR: Field::getLocation3D(): _location3D not set";
+        qCritical() << "_location3D not set";
 
     return _location3D;
 }
@@ -115,8 +113,8 @@ bool Field::isFieldOccupied(bool bErrorLog /*= false*/)
     {
         return true;
         if (bErrorLog)
-            qDebug() << "ERROR: Field::isFieldOccupied: field is already occupied by another"
-                        " piece, field =" << _sNr << ", piece =" << _pPieceOnField->getNr();
+            qCritical() << "field is already occupied by another piece, field ="
+                        << _sNr << ", piece =" << _pPieceOnField->getNr();
     }
     else return false;
 }
@@ -124,7 +122,7 @@ bool Field::isFieldOccupied(bool bErrorLog /*= false*/)
 Piece* Field::getPieceOnField(bool bErrorLog /*= false*/) const
 {
     if (bErrorLog && _pPieceOnField == nullptr)
-        qDebug() << "ERROR: Field::getPieceOnField(): piece == nullptr";
+        qCritical() << "piece == nullptr";
 
     return _pPieceOnField;
 }

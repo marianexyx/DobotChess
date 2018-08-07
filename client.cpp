@@ -6,7 +6,7 @@ void Clients::newClient(QWebSocket& clientSocket)
     Client newClient;
     newClient._ID = this->getNextAvailableClientID();
     newClient._sqlID = 0;
-    newClient._socket = &clientSocket; //future: if this param is const, then...
+    newClient._socket = &clientSocket; //todo: if this param is const, then...
     //...this won't work? why?
     newClient._queue = 0;
     newClient._isStartClickedByPlayer = false;
@@ -15,14 +15,13 @@ void Clients::newClient(QWebSocket& clientSocket)
     _clients << newClient;
 }
 
-void Clients::setClientSqlID(const Client& client, int64_t ID)
+void Clients::setClientSqlID(const Client& client, int64_t sqlID)
 {
     Q_FOREACH (Client cl, _clients) //todo: just use "foreach"?
     {
-        if (cl._sqlID == ID && cl._sqlID > 0)
+        if (cl._sqlID == sqlID && cl._sqlID > 0)
         {
-            qDebug() << "ERROR: Clients::setClientSqlID(): name"
-                     << cl.name() << "already exists.";
+            qCritical() << "name" << cl.name() << "already exists.";
             return;
         }
     }
@@ -32,28 +31,26 @@ void Clients::setClientSqlID(const Client& client, int64_t ID)
         if (cl == client)
         {
             Client changedClient = cl;
-            changedClient._sqlID = ID;
+            changedClient._sqlID = sqlID;
 
             int nClientPos = _clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setClientSqlID(): new sqlID ="
-                         << _clients.at(nClientPos)._sqlID;
+                qInfo() << "new sqlID =" << _clients.at(nClientPos)._sqlID;
             }
-            else qDebug() << "ERROR: Clients::setClientSqlID(): iteration error. "
-                             "iter val ="  << nClientPos;
+            else qCritical() << "iteration error. ter val ="  << nClientPos;
 
             return;
         }
     }
 
-    qDebug() << "ERROR: Clients::setClientSqlID(): client not found";
+    qCritical() << "client not found";
 }
 
 void Clients::clearClientSqlID(const Client& client)
 {
-    qDebug() << "Clients::clearClientSqlID()";
+    qInfo();
     this->setClientSqlID(client, 0);
 }
 
@@ -65,8 +62,7 @@ void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
         {
             if (Type != PT_NONE && client._queue > 0)
             {
-                qDebug() << "ERROR: Clients::setPlayerType(): client" << client.name()
-                         << "in queue can not sit on chair. player type ="
+                qCritical() << "client" << client.name() << "in queue can't sit on chair. PT ="
                          << playerTypeAsQStr(Type) << ", client.queue =" << client._queue;
                 return;
             }
@@ -87,14 +83,13 @@ void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
                                         Type == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
             }
             else
-                qDebug() << "ERROR: Clients::setPlayerType(): iteration error. iter val ="
-                         << nClientPos;
+                qCritical() << "iteration error. iter val =" << nClientPos;
 
             return;
         }
     }
 
-    qDebug() << "ERROR: Clients::setPlayerType(): client not found";
+    qCritical() << "client not found";
 }
 
 void Clients::clearPlayerType(PLAYER_TYPE Type)
@@ -112,18 +107,17 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
                 int nClientPos = _clients.indexOf(client);
                 if (nClientPos >= 0 && nClientPos < _clients.size())
                 {
-                    qDebug() << "Clients::clearPlayerType():" << playerTypeAsQStr(Type);
+                    qInfo() << playerTypeAsQStr(Type);
                     _clients.replace(nClientPos, changedClient);
                 }
-                else qDebug() << "ERROR: Clients::clearPlayerType(): iteration error. iter"
-                                 " val =" << nClientPos;
+                else qCritical() << "iteration error. iter val =" << nClientPos;
 
                 return;
             }
         }
-        qDebug() << "WARNING: Clients::clearPlayerType(): client.type not found";
+        qWarning() << "client.type not found";
     }
-    else qDebug() << "WARNING: Clients::clearPlayerType(): already clear";
+    else qWarning() << "already clear";
 }
 
 void Clients::setClientStartConfirmation(const Client& client, bool bState)
@@ -133,8 +127,7 @@ void Clients::setClientStartConfirmation(const Client& client, bool bState)
         if (cl == client)
         {
             if(bState && cl._isStartClickedByPlayer == bState)
-                qDebug() << "WARNING: Clients::setClientStartConfirmation(Client client, "
-                            "bool state): client has already clicked start";
+                qWarning() << "client has already clicked start";
 
             Client changedClient = cl;
             changedClient._isStartClickedByPlayer = bState;
@@ -143,16 +136,14 @@ void Clients::setClientStartConfirmation(const Client& client, bool bState)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setClientStartConfirmation(): new state ="
-                         << _clients.at(nClientPos)._isStartClickedByPlayer;
+                qInfo() << "new state =" << _clients.at(nClientPos)._isStartClickedByPlayer;
             }
-            else qDebug() << "ERROR: Clients::setClientStartConfirmation(): iteration "
-                             "error. iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << nClientPos;
 
             return;
         }
     }
-    qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
+    qCritical() << "client not found";
 }
 
 void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
@@ -162,8 +153,7 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
         if (cl._type == Type)
         {
             if(bState && cl._isStartClickedByPlayer == bState)
-                qDebug() << "WARNING: Clients::setClientStartConfirmation(PLAYER_TYPE type, "
-                            "bool state): client has already clicked start";
+                qWarning() << "client has already clicked start";
 
             Client changedClient = cl;
             changedClient._isStartClickedByPlayer = bState;
@@ -172,18 +162,16 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::setClientStartConfirmation(): new state ="
-                         << _clients.at(nClientPos)._isStartClickedByPlayer;
+                qInfo() << "new state =" << _clients.at(nClientPos)._isStartClickedByPlayer;
             }
-            else qDebug() << "ERROR: Clients::setClientStartConfirmation(): iteration "
-                             "error. iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << nClientPos;
 
             this->showClientsInUI();
 
             return;
         }
     }
-    qDebug() << "ERROR: Clients::setClientStartConfirmation(): client not found";
+    qCritical() << "client not found";
 }
 
 void Clients::addClientToQueue(const Client& client)
@@ -194,14 +182,12 @@ void Clients::addClientToQueue(const Client& client)
         {
             if (cl._queue > 0)
             {
-                qDebug() << "ERROR: Clients::addClientToQueue(): "
-                            "client already in queue:" << cl._queue;
+                qCritical() << "client already in queue:" << cl._queue;
                 return;
             }
             if (cl._type != PT_NONE)
             {
-                qDebug() << "ERROR: Clients::addClientToQueue(): client is" <<
-                            playerTypeAsQStr(cl._type);
+                qCritical() << "client is" << playerTypeAsQStr(cl._type);
                 return;
             }
         }
@@ -224,12 +210,10 @@ void Clients::addClientToQueue(const Client& client)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qDebug() << "Clients::addClientToQueue(): client named =" <<
-                            _clients.at(nClientPos).name() <<  "queued in list with nr ="
-                         << _clients.at(nClientPos)._queue;
+                qInfo() << "client named =" << _clients.at(nClientPos).name()
+                        << "queued in list with nr =" << _clients.at(nClientPos)._queue;
             }
-            else qDebug() << "ERROR: Clients::addClientToQueue(): iteration error. "
-                             "iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << nClientPos;
 
             emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
@@ -242,7 +226,7 @@ void Clients::addClientToQueue(const Client& client)
 
 void Clients::removeClientFromList(const Client& client)
 {
-    qDebug() << "Clients::removeClientFromList()";
+    qInfo();
 
     if (!this->isClientInList(client)) return;
 
@@ -253,13 +237,12 @@ void Clients::removeClientFromList(const Client& client)
             cl._socket->deleteLater();
 
             if(!_clients.removeOne(cl))
-                qDebug() << "ERROR: Clients::removeClientFromList(): "
-                            "client can't be removed";
+                qCritical() << "client can't be removed";
 
             return;
         }
     }
-    qDebug() << "ERROR: Clients::removeClientFromList(): client not found";
+    qCritical() << "client not found";
 }
 
 void Clients::removeClientFromQueue(const Client &client)
@@ -276,8 +259,7 @@ void Clients::removeClientFromQueue(const Client &client)
             {
                 _clients.replace(nClientPos, changedClient);
             }
-            else qDebug() << "ERROR: Clients::removeClientFromQueue(): iteration error. "
-                             "iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << nClientPos;
 
             emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
@@ -300,8 +282,7 @@ void Clients::putOnChairNextQueuedClient(PLAYER_TYPE Chair)
 {
     if (!this->isPlayerChairEmpty(Chair))
     {
-        qDebug() << "ERROR: Clients::putOnChairNextQueuedClient():"
-                 << playerTypeAsQStr(Chair) << "chair isn't empty";
+        qCritical() << playerTypeAsQStr(Chair) << "chair isn't empty";
         return;
     }
 
@@ -321,8 +302,7 @@ void Clients::putOnChairNextQueuedClient(PLAYER_TYPE Chair)
     }
     else
     {
-        qDebug() << "ERROR: Clients::putOnChairNextQueuedClient(): there are no "
-                    "clients in queue";
+        qCritical() << "there are no clients in queue";
         return;
     }
 }
@@ -336,7 +316,7 @@ bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
     }
 
     if (bErrorLog)
-        qDebug() << "ERROR: Clients::isClientInList(): client of not found";
+        qCritical() << "client of not found";
 
     return false;
 }
@@ -350,7 +330,7 @@ bool Clients::isClientInList(QWebSocket* pClientSocket, bool bErrorLog /*= false
     }
 
     if (bErrorLog)
-        qDebug() << "ERROR: Clients::isClientInList(): client of not found";
+        qCritical() << "client of not found";
 
     return false;
 }
@@ -365,7 +345,7 @@ Client Clients::getClient(QWebSocket* pClientSocket)
             return client;
         }
     }
-    qDebug() << "ERROR: Clients::getClient(QWebSocket): client not found";
+    qCritical() << "client not found";
     Client client;
     return client;
 }
@@ -396,14 +376,12 @@ Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */
     }
     else
     {
-        qDebug() << "ERROR: Clients::getClient(int64_t, CLIENT_ID): unknown "
-                     "CLIENT_ID type =" << IdType;
+        qCritical() << "unknown CLIENT_ID type =" << IdType;
         Client errorClient;
         return errorClient;
     }
 
-    qDebug() << "ERROR: Clients::getClient(int64_t, CLIENT_ID): client not found. "
-                "ID =" << n64ClientID;
+    qCritical() << "client not found. ID =" << n64ClientID;
     Client errorClient;
     return errorClient;
 }
@@ -416,7 +394,7 @@ Client Clients::getPlayer(PLAYER_TYPE Type)
             return cl;
     }
 
-    qDebug() << "ERROR: Clients::getPlayer(PLAYER_TYPE): client not found";
+    qCritical() << "client not found";
     Client cl;
     return cl;
 }
@@ -429,17 +407,16 @@ Client Clients::getNextQueuedClient()
         if (minQueue > cl._queue && cl._queue > 0)
             minQueue = cl._queue;
     }
-    qDebug() << "Clients::getNextQueuedClient(): minQueue =" << minQueue;
+    qInfo() << "minQueue =" << minQueue;
     Q_FOREACH (Client cl, _clients)
     {
         if (cl._queue == minQueue)
         {
-            qDebug() << "Clients::getNextQueuedClient(): client.name =" <<
-                        cl.name();
+            qInfo() << "client.name =" << cl.name();
             return cl;
         }
     }
-    qDebug() << "ERROR: Clients::getNextQueuedClient(): client not found";
+    qCritical() << "client not found";
     Client client;
     return client;
 }
@@ -456,10 +433,8 @@ QString Clients::getQueuedClientsList()
             minQueue = cl._queue;
     }
     int nNumberOfClients = _clients.size();
-    qDebug() << "Clients::getQueuedClientsList(): nNumberOfClients ="
-             << nNumberOfClients << ", minQueue =" << minQueue;
-    int nLoopBreakingCounter = 0;
 
+    int nLoopBreakingCounter = 0;
     if (minQueue > 0 && minQueue != std::numeric_limits<int64_t>::max())
     {
         do
@@ -473,31 +448,19 @@ QString Clients::getQueuedClientsList()
 
             //remember last biggest client for next iteration
             lastBiggestQueue = maxQueue;
-            qDebug() << "Clients::getQueuedClientsList(): last biggest client ="
-                     << lastBiggestQueue << ", maxQueue =" << maxQueue;
 
             //add last biggest found queued client sqlID to string for return
             Q_FOREACH (Client cl, _clients)
             {
                 if (cl._queue == maxQueue)
-                {
-                    QStrQueuedClients = QString::number(cl._sqlID) + " "
-                            + QStrQueuedClients;
-                    qDebug() << "Clients::getQueuedClientsList(): found next queued "
-                                "client name =" << cl.name() << ", his queue =" << cl._queue
-                             << ", actual QStrQueuedClients =" << QStrQueuedClients;
-                }
+                    QStrQueuedClients = QString::number(cl._sqlID) + " " + QStrQueuedClients;
             }
             maxQueue = 0; //clear for next iteration
 
-            qDebug() << "Clients::getQueuedClientsList(): nLoopBreakingCounter ="
-                     << nLoopBreakingCounter << ", nNumberOfClients + 1 ="
-                     << nNumberOfClients + 1;
             if (nLoopBreakingCounter > nNumberOfClients + 1)
             {
-                qDebug() << "ERROR: Clients::getQueuedClientsList(): incorrect loop "
-                            "break. nLoopBreakingCounter =" << nLoopBreakingCounter <<
-                            ", nNumberOfClients =" << nNumberOfClients+1;
+                qCritical() << "incorrect loop break. counter =" << nLoopBreakingCounter
+                            << ", nNumberOfClients =" << nNumberOfClients+1;
                 return "ERROR";
             }
             nLoopBreakingCounter++;
@@ -512,28 +475,6 @@ QString Clients::getQueuedClientsList()
     return QStrQueuedClients;
 }
 
-/*void Clients::testQueuedClients()
-{
-    //for (int i=1; i<10; i++)
-    for (int i=10; i>1; i--)
-    {
-        Client testClient;
-        testClient.name = "test" + QString::number(i);
-        testClient.queue = i;
-        qDebug() << "client" << testClient.name << "queue =" << testClient.queue;
-        testClient.socket = nullptr;
-        testClient.isStartClickedByPlayer = false;
-        testClient.type = PT_NONE;
-
-        _clients << testClient;
-    }
-
-    qDebug() << "Clients::testQueuedClients(): _clients.size =" << _clients.size();
-    QString QStrQueuedClients = this->getQueuedClientsList();
-    qDebug() << "Clients::testQueuedClients(): QStrQueuedClients =" << QStrQueuedClients;
-}*/
-
-
 bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
 {
     Q_FOREACH (Client cl, _clients)
@@ -543,8 +484,7 @@ bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
     }
 
     if (bErrorLog)
-        qDebug() << "ERROR: Clients::isPlayerChairEmpty():" << playerTypeAsQStr(Type)
-                 << "player chair is empty";
+        qCritical() << playerTypeAsQStr(Type) << "player chair is empty";
 
     return true;
 }
@@ -570,7 +510,7 @@ int64_t Clients::getClientPosInQueue(const Client &client)
         if (cl == client)
             return cl._queue;
     }
-    qDebug() << "ERROR: Clients::getQueuedClient(): client not found";
+    qCritical() << "client not found";
     return -1;
 }
 
@@ -587,8 +527,7 @@ QWebSocket* Clients::getPlayerSocket(PLAYER_TYPE Type)
     }
     else
     {
-        qDebug() << "ERROR: Clients::getPlayerSocket(): wrong parameter:"
-                  << Type;
+        qCritical() << "wrong parameter:" << Type;
         return nullptr;
     }
 }
@@ -606,8 +545,7 @@ bool Clients::isStartClickedByPlayer(PLAYER_TYPE Type)
     }
     else
     {
-        qDebug() << "ERROR: Clients::isStartClickedByPlayer(): wrong parameter:"
-                  << Type;
+        qCritical() << "wrong parameter:" << Type;
         return false;
     }
 }
@@ -633,8 +571,7 @@ QString Clients::getPlayerName(PLAYER_TYPE Type)
             if (cl._type == Type)
                 return cl.name();
         }
-        qDebug() << "ERROR: Clients::getPlayerName(): player not found:"
-                  << playerTypeAsQStr(Type);
+        qCritical() << "player not found:" << playerTypeAsQStr(Type);
         return "";
     }
 }
@@ -650,7 +587,7 @@ bool Clients::isClientInQueue(const Client &client)
             else return false;
         }
     }
-    qDebug() << "ERROR: Clients::isClientInQueue(): client not found";
+    qCritical() << "client not found";
     return false;
 }
 
@@ -663,8 +600,7 @@ bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
     }
 
     if (bErrorLog)
-        qDebug() << "ERROR: Clients::isClientSqlIDExists(): ID:" << n64ID
-                 << "already exists";
+        qCritical() << "ID:" << n64ID << "already exists";
 
     return false;
 }
@@ -700,7 +636,7 @@ bool Clients::isClientAPlayer(const Client &client, bool bErrorLog /*= false*/)
     else
     {
         if (bErrorLog)
-            qDebug() << "ERROR: Clients::isClientAPlayer(): client isnt a player";
+            qCritical() << "client isn't a player";
 
         return false;
     }
@@ -723,7 +659,7 @@ int64_t Clients::getClientID(const Client &client)
         if (cl == client)
             return cl._ID;
     }
-    qDebug() << "ERROR: Clients::getClientID(): socket not found";
+    qCritical() << "socket not found";
     return 0;
 }
 

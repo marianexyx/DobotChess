@@ -31,8 +31,7 @@ QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Typ
     {
         QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
 
-        qDebug() << "ChessConditions::extractParameterIfTypeIsInProperFormat(): "
-                    "extracted param =" << QStrParam;
+        qCritical() << "extracted param =" << QStrParam;
 
         clientRequest r;
         r.type = Type;
@@ -54,8 +53,7 @@ bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog 
         return true;
     default:
         if (bErrorLog)
-            qDebug() << "ERROR: ChessConditions::isRequestAParameterType(): unknown "
-                        "REQUEST_TYPE:" << requestTypeAsQStr(Type);
+            qCritical() << "unknown REQUEST_TYPE:" << requestTypeAsQStr(Type);
 
         return false;
     }
@@ -89,13 +87,11 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
         else bReturn = false;
         break;
     default:
-        qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): unknown "
-                    "request.type:" << requestTypeAsQStr(request.type);
+        qCritical() << "unknown request.type:" << requestTypeAsQStr(request.type);
     }
 
     if (!bReturn)
-        qDebug() << "ERROR: ChessConditions::isRequestParameterInProperFormat(): requirements"
-                    " not met (==false) in:" << requestTypeAsQStr(request.type);
+        qCritical() << "requirements not met (==0) in:" << requestTypeAsQStr(request.type);
 
     return bReturn;
 }
@@ -106,7 +102,7 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
     switch(Type)
     {
     case RT_NONE:
-        qDebug() << "ERROR: ChessConditions::isRequestAppropriateToGameStatus(): Type = RT_NONE";
+        qCritical() << "Type == RT_NONE";
         return false;
     case RT_NEW_GAME: return Status == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS ? true : false;
     case RT_MOVE: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
@@ -134,7 +130,7 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
     switch(Type)
     {
     case RT_NONE:
-        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = RT_NONE";
+        qCritical() << "Type == RT_NONE";
         bSuccess = false;
         break;
     case RT_NEW_GAME:
@@ -159,17 +155,13 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
         bSuccess = true;
         break;
     default:
-        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): unknown REQUEST TYPE ="
-                 << Type;
+        qCritical() << "unknown REQUEST TYPE =" << Type;
         bSuccess = false;
     }
 
     if (!bSuccess)
-    {
-        qDebug() << "ERROR: ChessConditions::isSenderAppropriate(): Type = " <<
-                    requestTypeAsQStr(Type) << ". bLogged =" << bLogged <<
-                    ", bSittingOnChair =" << bSittingOnChair << ", bInQueue =" << bInQueue;
-    }
+        qCritical() << "Type = " << requestTypeAsQStr(Type) << ". bLogged =" << bLogged
+                    << ", bSittingOnChair =" << bSittingOnChair << ", bInQueue =" << bInQueue;
 
     return bSuccess;
 }
@@ -179,8 +171,7 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
     switch(request.type)
     {
     case RT_NONE:
-        qDebug() << "ERROR: ChessConditions::isThereAnySpecialConditionBeenMet(): "
-                    "Type = RT_NONE";
+        qCritical() << "Type = RT_NONE";
         return false;
     case RT_MOVE:
     case RT_PROMOTE_TO:

@@ -18,20 +18,16 @@ void DobotGripper::checkPWMForErrors()
     PWMData.address = 0.f;
     PWMData.frequency = 0.f;
     PWMData.dutyCycle = 0.f;
-    if (PWMData.address != 0 && PWMData.frequency != 0 &&
-            PWMData.dutyCycle != 0)
+    if (PWMData.address != 0 && PWMData.frequency != 0 && PWMData.dutyCycle != 0)
     {
         GetIOPWM(&PWMData);
 
         if (PWMData.address!= 4 )
-            qDebug() << "ERROR: DobotGripper::checkPWM(): PWMData.address !="
-                        " 4. val =" << PWMData.address;
+            qCritical() << "PWMData.address != 4. val =" << PWMData.address;
         if (PWMData.frequency != 50)
-            qDebug() << "ERROR: DobotGripper::checkPWM(): PWMData.frequency !="
-                        " 50. val =" << PWMData.address;
+            qCritical() << "PWMData.frequency != 50. val =" << PWMData.address;
         if (PWMData.dutyCycle != _fGripOpened && PWMData.dutyCycle != _fGripClosed)
-            qDebug() << "ERROR: DobotGripper::checkPWM(): PWMData.dutyCycle!= 4"
-                        " && !=7.40f. val =" << PWMData.dutyCycle;
+            qCritical() << "wrong PWMData.dutyCycle val. it's =" << PWMData.dutyCycle;
     }
 }
 
@@ -39,7 +35,7 @@ void DobotGripper::changeGripperAngle(float fDutyCycle)
 {
     if (fDutyCycle != 0)
         _gripper.dutyCycle = fDutyCycle;
-    qDebug() << "_gripper.dutyCycle = " << fDutyCycle;
+    qInfo() << "_gripper.dutyCycle = " << fDutyCycle;
     isArmReceivedCorrectCmd(SetIOPWM(&_gripper, false, NULL), SHOW_ERRORS); //unqueued
 }
 

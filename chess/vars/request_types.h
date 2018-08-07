@@ -45,7 +45,7 @@ inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = fa
     else
     {
         if (bErrorLog)
-            qDebug() << "ERROR: requestTypeFromQStr(): not a valid type. QStrRequest =" << QStrRequest;
+            qCritical() << "not a valid type. QStrRequest =" << QStrRequest;
 
         return RT_NONE;
     }
@@ -66,7 +66,7 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     case RT_LEAVE_QUEUE: return "leaveQueue";
     case RT_CLIENT_LEFT: return "clientLeft";
     default:
-        qDebug() << "ERROR: requestTypeAsQStr(): wrong arg =" << RT;
+        qCritical() << "wrong arg =" << RT;
         return "";
     }
 }

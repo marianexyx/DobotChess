@@ -43,8 +43,7 @@ inline LETTER pieceLetterPos(QString QStrLetter)
     else if (QStrLetter == "h" || QStrLetter == "H") return L_H;
     else
     {
-        qDebug() << "ERROR: pieceLetterPos(QString QStrLetter): "
-                     "Unknown QStrLetter value =" << QStrLetter;
+        qCritical() << "Unknown QStrLetter value =" << QStrLetter;
         return L_X;
     }
 }
@@ -63,8 +62,7 @@ inline QString pieceLetterPosAsQStr(LETTER Letter)
     case L_G: return "g";
     case L_H: return "h";
     default:
-        qDebug() << "ERROR: pieceLetterPosAsQStr(LETTER letter): "
-                    "Unknown letter value =" << Letter;
+        qCritical() << "Unknown letter value =" << Letter;
         return "";
     }
 }

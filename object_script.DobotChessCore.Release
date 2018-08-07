@@ -19,6 +19,7 @@ INPUT(
 ./release\xml_reader.o
 ./release\position_on_board.o
 ./release\dobot_gripper.o
+./release\errors.o
 ./release\moc_chess_status.o
 ./release\moc_chess_timers.o
 ./release\moc_dobot_queue.o
