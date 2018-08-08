@@ -5,7 +5,7 @@
 #include "QDebug"
 #include "QString"
 #include "vars/players_types.h"
-#include "vars/position_on_board.h"
+#include "chessboard/vars/position_on_board.h"
 
 enum PIECE_TYPE
 {

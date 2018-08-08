@@ -2,7 +2,7 @@
 #define PIECE_SET_H
 
 #pragma once
-#include "piece.h"
+#include "chessboard/piece.h"
 #include "vars/basic_vars.h"
 
 class PieceSet

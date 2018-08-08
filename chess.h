@@ -4,9 +4,7 @@
 #pragma once
 #include <QScrollBar>
 #include <QRegularExpression>
-#include "vars/board_axis.h"
 #include "vars/board_data_labels.h"
-#include "vars/board_types.h"
 #include "vars/table_data_types.h"
 #include "tcpmsgs.h"
 #include "websockets.h"

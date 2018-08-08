@@ -3,7 +3,7 @@
 
 #pragma once
 #include "QString"
-#include "vars/board_axis.h"
+#include "chessboard/vars/board_axis.h"
 
 struct PosOnBoard
 {

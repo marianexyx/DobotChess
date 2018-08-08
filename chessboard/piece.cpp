@@ -24,21 +24,16 @@ Piece::Piece(short sPieceID)
 
 /*static*/ PLAYER_TYPE Piece::Color(char chFENSign)
 {
-    PLAYER_TYPE PlayerType;
-
     switch(chFENSign)
     {
     case 'p': case 'r': case 'n': case 'b': case 'k': case 'q':
-        PlayerType = PT_BLACK; break;
+        return PT_BLACK;
     case 'P': case 'R': case 'N': case 'B': case 'K': case 'Q':
-        PlayerType = PT_WHITE; break;
+        return PT_WHITE;
     default:
         qCritical() << "unknown FENSign val =" << chFENSign;
-        PlayerType = PT_NONE;
-        break;
+        return PT_NONE;
     }
-
-    return PlayerType;
 }
 
 /*static*/ PLAYER_TYPE Piece::Color(short sPieceNr)
@@ -53,20 +48,18 @@ Piece::Piece(short sPieceID)
 {
     if (Piece::Color(chFENSign) == PT_NONE) return P_ERROR;
 
-    PIECE_TYPE Type;
-
     switch(chFENSign)
     {
-    case 'p': case 'P': Type = P_PAWN; break;
-    case 'r': case 'R': Type = P_ROOK; break;
-    case 'n': case 'N': Type = P_KNIGHT; break;
-    case 'b': case 'B': Type = P_BISHOP; break;
-    case 'k': case 'K': Type = P_KING; break;
-    case 'q': case 'Q': Type = P_QUEEN; break;
-    default: break;
+    case 'p': case 'P': return P_PAWN;
+    case 'r': case 'R': return P_ROOK;
+    case 'n': case 'N': return P_KNIGHT;
+    case 'b': case 'B': return P_BISHOP;
+    case 'k': case 'K': return P_KING;
+    case 'q': case 'Q': return P_QUEEN;
+    default:
+        qCritical() << "unknown chFENSign =" << chFENSign;
+        return P_ERROR;
     }
-
-    return Type;
 }
 
 /*static*/ PIECE_TYPE Piece::Type(QString QStrFENSign)
@@ -77,45 +70,32 @@ Piece::Piece(short sPieceID)
         return P_ERROR;
     }
 
-    PIECE_TYPE Type;
-    if (QStrFENSign == "p" || QStrFENSign == "P") Type = P_PAWN;
-    else if (QStrFENSign == "r" || QStrFENSign == "R") Type = P_ROOK;
-    else if (QStrFENSign == "n" || QStrFENSign == "N")  Type = P_KNIGHT;
-    else if (QStrFENSign == "b" || QStrFENSign == "B")  Type = P_BISHOP;
-    else if (QStrFENSign == "k" || QStrFENSign == "K")  Type = P_KING;
-    else if (QStrFENSign == "q" || QStrFENSign == "Q")  Type = P_QUEEN;
+    if (QStrFENSign == "p" || QStrFENSign == "P") return P_PAWN;
+    else if (QStrFENSign == "r" || QStrFENSign == "R") return P_ROOK;
+    else if (QStrFENSign == "n" || QStrFENSign == "N") return P_KNIGHT;
+    else if (QStrFENSign == "b" || QStrFENSign == "B") return P_BISHOP;
+    else if (QStrFENSign == "k" || QStrFENSign == "K") return P_KING;
+    else if (QStrFENSign == "q" || QStrFENSign == "Q") return P_QUEEN;
     else
     {
         qCritical() << "unknown QStrFENSign =" << QStrFENSign;
-        Type = P_ERROR;
+        return P_ERROR;
     }
-
-    return Type;
 }
 
 /*static*/ PIECE_TYPE Piece::Type(short sPieceNr)
 {
     if (!Piece::isInRange(sPieceNr)) return P_ERROR;
 
-    PIECE_TYPE PieceType;
-
     switch(sPieceNr)
     {
-    case 1: case 8: case 25: case 32:
-        PieceType = P_ROOK; break;
-    case 2: case 7: case 26: case 31:
-        PieceType = P_KNIGHT; break;
-    case 3: case 6: case 27: case 30:
-        PieceType = P_BISHOP; break;
-    case 4: case 28:
-        PieceType = P_QUEEN; break;
-    case 5: case 29:
-        PieceType = P_KING; break;
-    default:
-        PieceType = P_PAWN; break;
+    case 1: case 8: case 25: case 32: return P_ROOK;
+    case 2: case 7: case 26: case 31: return P_KNIGHT;
+    case 3: case 6: case 27: case 30: return P_BISHOP;
+    case 4: case 28: return P_QUEEN;
+    case 5: case 29: return P_KING;
+    default: return P_PAWN;
     }
-
-    return PieceType;
 }
 
 /*static*/ short Piece::nr(PosOnBoard pieceLines)
@@ -160,8 +140,8 @@ void Piece::setPromotedType(PIECE_TYPE promotedType)
 {
     if (_pieceType != P_PAWN)
     {
-        qCritical() << "only pawn can be promoted. (this is '" <<  (char)_pieceType
-                    << "' piece char type)";
+        qCritical() << "only pawn can be promoted. (this is '"
+                    << (char)_pieceType << "' piece char type)";
         return;
     }
 

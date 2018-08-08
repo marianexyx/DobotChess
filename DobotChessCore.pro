@@ -22,24 +22,24 @@ SOURCES += main.cpp\
     chess/chess_movements.cpp \
     chess/chess_status.cpp \
     chess/chess_timers.cpp \
-    dobot/dobot_queue.cpp \
     chess.cpp \
-    chessboard.cpp \
     client.cpp \
     dobot.cpp \
-    field.cpp \
+    errors.cpp \
     mainwindow.cpp \
-    piece.cpp \
     piece_controller.cpp \
     sql.cpp \
     tcpmsgs.cpp \
     websockets.cpp \
     xml_reader.cpp \
-    vars/position_on_board.cpp \
+    chessboard/vars/position_on_board.cpp \
+    chessboard/chessboard.cpp \
+    chessboard/field.cpp \
+    chessboard/piece.cpp \
     dobot/dobot_gripper.cpp \
-    errors.cpp
+    dobot/dobot_queue.cpp
 
-HEADERS  +=  \
+HEADERS  += \
     chess/vars/action_types.h \
     chess/vars/chenard_io_msgs.h \
     chess/vars/end_of_game_types.h \
@@ -51,24 +51,16 @@ HEADERS  +=  \
     chess/chess_movements.h \
     chess/chess_status.h \
     chess/chess_timers.h \
-    dobot/dobot_queue.h \
-    DobotDll/DobotDll.h \
-    DobotDll/DobotType.h \
     vars/basic_vars.h \
-    vars/board_axis.h \
     vars/board_data_labels.h \
-    vars/board_types.h \
     vars/log.h \
     vars/players_types.h \
-    vars/position_on_board.h \
     vars/table_data_types.h \
     chess.h \
-    chessboard.h \
     client.h \
     dobot.h \
-    field.h \
+    errors.h \
     mainwindow.h \
-    piece.h \
     piece_set.h \
     piece_controller.h \
     sql.h \
@@ -76,9 +68,17 @@ HEADERS  +=  \
     ui_mainwindow.h \
     websockets.h \
     xml_reader.h \
+    chessboard/vars/board_axis.h \
+    chessboard/vars/board_types.h \
+    chessboard/vars/position_on_board.h \
+    chessboard/chessboard.h \
+    chessboard/field.h \
+    chessboard/piece.h \
     dobot/vars/dobot_move_types.h \
     dobot/dobot_gripper.h \
-    errors.h
+    dobot/dobot_queue.h \
+    DobotDll/DobotDll.h \
+    DobotDll/DobotType.h
 
 FORMS    += mainwindow.ui
 

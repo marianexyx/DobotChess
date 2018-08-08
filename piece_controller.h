@@ -5,7 +5,7 @@
 #include "vars/log.h"
 #include "dobot.h"
 #include "piece_set.h"
-#include "chessboard.h"
+#include "chessboard/chessboard.h"
 #include "ctype.h"
 
 class PieceController: public QObject

@@ -14,7 +14,6 @@
 #include "DobotDll/DobotType.h"
 #include "vars/log.h"
 #include "vars/basic_vars.h"
-#include "vars/board_axis.h"
 #include "xml_reader.h"
 #include "dobot/vars/dobot_move_types.h"
 #include "dobot/dobot_gripper.h"
