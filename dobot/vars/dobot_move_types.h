@@ -3,7 +3,8 @@
 
 #pragma once
 #include <QString>
-#include "vars/basic_vars.h"
+#include "vars/const_flags.h"
+#include "vars/point3d.h"
 #include "DobotDll/DobotDll.h"
 #include "DobotDll/DobotType.h"
 

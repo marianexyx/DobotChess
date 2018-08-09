@@ -9,7 +9,7 @@
 #include "vars/players_types.h"
 #include "vars/log.h"
 #include "vars/board_data_labels.h"
-#include "vars/basic_vars.h"
+#include "vars/const_flags.h"
 #include "typeinfo"
 #include "sql.h"
 
@@ -48,7 +48,7 @@ public:
 
     Clients(): _clients() {}
 
-    void newClient(QWebSocket& clientSocket);
+    void newClient(QWebSocket* const clientSocket);
     void setClientSqlID(const Client& client, int64_t sqlID);
     void clearClientSqlID(const Client& client);
     void setPlayerType(const Client& client, PLAYER_TYPE Type);

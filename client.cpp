@@ -1,13 +1,11 @@
 #include "client.h"
 
-//future: class can be shortened highly, cuz most of funtions are pretty the same
-void Clients::newClient(QWebSocket& clientSocket)
+void Clients::newClient(QWebSocket* const clientSocket)
 {
     Client newClient;
     newClient._ID = this->getNextAvailableClientID();
     newClient._sqlID = 0;
-    newClient._socket = &clientSocket; //todo: if this param is const, then...
-    //...this won't work? why?
+    newClient._socket = clientSocket;
     newClient._queue = 0;
     newClient._isStartClickedByPlayer = false;
     newClient._type = PT_NONE;
@@ -17,7 +15,7 @@ void Clients::newClient(QWebSocket& clientSocket)
 
 void Clients::setClientSqlID(const Client& client, int64_t sqlID)
 {
-    Q_FOREACH (Client cl, _clients) //todo: just use "foreach"?
+    foreach (Client cl, _clients)
     {
         if (cl._sqlID == sqlID && cl._sqlID > 0)
         {
@@ -26,7 +24,7 @@ void Clients::setClientSqlID(const Client& client, int64_t sqlID)
         }
     }
 
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -56,7 +54,7 @@ void Clients::clearClientSqlID(const Client& client)
 
 void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -96,7 +94,7 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
 {
     if (Type != PT_NONE)
     {
-        Q_FOREACH (Client client, _clients)
+        foreach (Client client, _clients)
         {
             if (client._type == Type)
             {
@@ -122,7 +120,7 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
 
 void Clients::setClientStartConfirmation(const Client& client, bool bState)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -148,7 +146,7 @@ void Clients::setClientStartConfirmation(const Client& client, bool bState)
 
 void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._type == Type)
         {
@@ -176,7 +174,7 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
 
 void Clients::addClientToQueue(const Client& client)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -194,12 +192,12 @@ void Clients::addClientToQueue(const Client& client)
     }
 
     int64_t maxQueue = 0;
-    Q_FOREACH (Client cl, _clients) //find max client queue
+    foreach (Client cl, _clients) //find max client queue
     {
         if (cl._queue > maxQueue)
             maxQueue = cl._queue;
     }
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -230,7 +228,7 @@ void Clients::removeClientFromList(const Client& client)
 
     if (!this->isClientInList(client)) return;
 
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -247,7 +245,7 @@ void Clients::removeClientFromList(const Client& client)
 
 void Clients::removeClientFromQueue(const Client &client)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
         {
@@ -309,7 +307,7 @@ void Clients::putOnChairNextQueuedClient(PLAYER_TYPE Chair)
 
 bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._ID == client._ID)
             return true;
@@ -323,7 +321,7 @@ bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
 
 bool Clients::isClientInList(QWebSocket* pClientSocket, bool bErrorLog /*= false*/)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl.socket() == pClientSocket)
             return true;
@@ -337,7 +335,7 @@ bool Clients::isClientInList(QWebSocket* pClientSocket, bool bErrorLog /*= false
 
 Client Clients::getClient(QWebSocket* pClientSocket)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._socket == pClientSocket)
         {
@@ -354,7 +352,7 @@ Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */
 {
     if (IdType == CID_CORE)
     {
-        Q_FOREACH (Client cl, _clients)
+        foreach (Client cl, _clients)
         {
             if (cl._ID == n64ClientID)
             {
@@ -365,7 +363,7 @@ Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */
     }
     else if (IdType == CID_SQL)
     {
-        Q_FOREACH (Client cl, _clients)
+        foreach (Client cl, _clients)
         {
             if (cl._sqlID == n64ClientID)
             {
@@ -377,18 +375,16 @@ Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */
     else
     {
         qCritical() << "unknown CLIENT_ID type =" << IdType;
-        Client errorClient;
-        return errorClient;
+        return *new Client;
     }
 
     qCritical() << "client not found. ID =" << n64ClientID;
-    Client errorClient;
-    return errorClient;
+    return *new Client;
 }
 
 Client Clients::getPlayer(PLAYER_TYPE Type)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._type == Type)
             return cl;
@@ -402,13 +398,13 @@ Client Clients::getPlayer(PLAYER_TYPE Type)
 Client Clients::getNextQueuedClient()
 {
     int64_t minQueue = std::numeric_limits<int64_t>::max();
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (minQueue > cl._queue && cl._queue > 0)
             minQueue = cl._queue;
     }
     qInfo() << "minQueue =" << minQueue;
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._queue == minQueue)
         {
@@ -427,7 +423,7 @@ QString Clients::getQueuedClientsList()
     int64_t maxQueue = 0;
     int64_t minQueue = std::numeric_limits<int64_t>::max();
     int64_t lastBiggestQueue = std::numeric_limits<int64_t>::max();
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (minQueue > cl._queue && cl._queue > 0)
             minQueue = cl._queue;
@@ -440,7 +436,7 @@ QString Clients::getQueuedClientsList()
         do
         {
             //find biggest queued nr, but smaller then last one
-            Q_FOREACH (Client cl, _clients)
+            foreach (Client cl, _clients)
             {
                 if (cl._queue > maxQueue && cl._queue < lastBiggestQueue)
                     maxQueue = cl._queue;
@@ -450,7 +446,7 @@ QString Clients::getQueuedClientsList()
             lastBiggestQueue = maxQueue;
 
             //add last biggest found queued client sqlID to string for return
-            Q_FOREACH (Client cl, _clients)
+            foreach (Client cl, _clients)
             {
                 if (cl._queue == maxQueue)
                     QStrQueuedClients = QString::number(cl._sqlID) + " " + QStrQueuedClients;
@@ -477,7 +473,7 @@ QString Clients::getQueuedClientsList()
 
 bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._type == Type)
             return false;
@@ -505,7 +501,7 @@ bool Clients::isWholeGameTableOccupied()
 
 int64_t Clients::getClientPosInQueue(const Client &client)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
             return cl._queue;
@@ -518,7 +514,7 @@ QWebSocket* Clients::getPlayerSocket(PLAYER_TYPE Type)
 {
     if (Type != PT_NONE)
     {
-        Q_FOREACH (Client cl, _clients)
+        foreach (Client cl, _clients)
         {
             if (cl._type == Type)
                 return cl._socket;
@@ -536,7 +532,7 @@ bool Clients::isStartClickedByPlayer(PLAYER_TYPE Type)
 {
     if (Type != PT_NONE)
     {
-        Q_FOREACH (Client cl, _clients)
+        foreach (Client cl, _clients)
         {
             if (cl._type == Type)
                 return cl._isStartClickedByPlayer;
@@ -566,7 +562,7 @@ QString Clients::getPlayerName(PLAYER_TYPE Type)
         return playerTypeAsQStr(PT_BLACK);
     else
     {
-        Q_FOREACH (Client cl, _clients)
+        foreach (Client cl, _clients)
         {
             if (cl._type == Type)
                 return cl.name();
@@ -578,7 +574,7 @@ QString Clients::getPlayerName(PLAYER_TYPE Type)
 
 bool Clients::isClientInQueue(const Client &client)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._ID == client._ID)
         {
@@ -593,7 +589,7 @@ bool Clients::isClientInQueue(const Client &client)
 
 bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
 {   
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl._sqlID == n64ID)
             return true;
@@ -608,7 +604,7 @@ bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
 int Clients::getAmountOfQueuedClients()
 {
     int64_t maxQueue = 0;
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (maxQueue < cl._queue && cl._queue > 0)
             maxQueue = cl._queue;
@@ -617,7 +613,7 @@ int Clients::getAmountOfQueuedClients()
     if (maxQueue > 0)
     {
         int64_t minQueue = std::numeric_limits<int64_t>::max();
-        Q_FOREACH (Client cl, _clients)
+        foreach (Client cl, _clients)
         {
             if (minQueue > cl._queue && cl._queue > 0)
                 minQueue = cl._queue;
@@ -644,7 +640,7 @@ bool Clients::isClientAPlayer(const Client &client, bool bErrorLog /*= false*/)
 
 bool Clients::isClientIDExists(int64_t n64ID)
 {
-    Q_FOREACH (Client client, _clients)
+    foreach (Client client, _clients)
     {
         if (client._ID == n64ID)
             return true;
@@ -654,7 +650,7 @@ bool Clients::isClientIDExists(int64_t n64ID)
 
 int64_t Clients::getClientID(const Client &client)
 {
-    Q_FOREACH (Client cl, _clients)
+    foreach (Client cl, _clients)
     {
         if (cl == client)
             return cl._ID;
@@ -667,7 +663,7 @@ int64_t Clients::getNextAvailableClientID()
 {
     int64_t maxID = 0;
 
-    Q_FOREACH (Client client, _clients) //find max queued ID
+    foreach (Client client, _clients) //find max queued ID
     {
         if (client._ID > maxID)
             maxID = client._ID;

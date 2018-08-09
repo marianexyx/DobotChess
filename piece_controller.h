@@ -2,11 +2,12 @@
 #define PIECE_CONTROLLER_H
 
 #pragma once
+#include "ctype.h"
 #include "vars/log.h"
-#include "dobot.h"
+#include "dobot/dobot.h"
 #include "piece_set.h"
 #include "chessboard/chessboard.h"
-#include "ctype.h"
+#include "vars/vertical_move.h"
 
 class PieceController: public QObject
 {

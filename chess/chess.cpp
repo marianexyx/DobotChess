@@ -365,7 +365,7 @@ void Chess::changePlayersOnChairs()
 
 void Chess::playerLeftChair(PLAYER_TYPE PT)
 {
-    emit this->addTextToLogPTE(playerTypeAsQStr(PT) + " player disconnected\n", LOG_CORE);
+    emit this->addTextToLogPTE(playerTypeAsQStr(PT) + " player left chair\n", LOG_CORE);
 
     if (whoseTurnFromGameStatus(_ChessGameStatus) == NO_TURN)
     {

@@ -3,7 +3,8 @@
 
 #pragma once
 #include "chessboard/piece.h"
-#include "vars/basic_vars.h"
+#include "vars/const_flags.h"
+#include "vars/point3d.h"
 
 class Field
 {

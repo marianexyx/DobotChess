@@ -11,6 +11,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
 
     _pChess = pChess;
     _pDobot = _pChess->getDobotPointer();
+    _pIntermediatePoints = _pDobot->getIntermediatePoints();
     _pWebSockets = _pChess->getWebsocketsPointer();
     _pPieceController = _pChess->getPieceControllerPointer();
     _pBoardMain = _pChess->getBoardMainPointer();
@@ -483,25 +484,23 @@ void MainWindow::on_closeGripperBtn_clicked()
 void MainWindow::on_middleAboveBtn_clicked()
 {
     _pPieceController->clearLastPos();
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->middleAbove);
 }
 
 void MainWindow::on_startGmPosBtn_clicked()
 {
-    if (qAbs(qAbs(ui->xLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().x)) < 3 &&
-            qAbs(qAbs(ui->yLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().y)) < 3 &&
-            qAbs(qAbs(ui->zLabel->text().toInt())-qAbs((int)_pDobot->getHomePos().z)) < 3)
-    { //if actual point is +/-3 near home point //todo: not working (?)
+    Point3D labelPoint(ui->xLabel->text().toInt(), ui->yLabel->text().toInt(),
+                       ui->zLabel->text().toInt());
+    //todo: test condition
+    if (Point3D::isPointCloseToAnother(labelPoint, _pDobot->getHomePos()))
+    {
         _pPieceController->clearLastPos();
 
-        //todo: not cool code below
         this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
-        Point3D homeToMiddleTopPoint = _pDobot->getHomeToMiddleAbovePoint();
-        homeToMiddleTopPoint.z = _pBoardMain->getBoardPoint3D(BP_MIDDLE).z;
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, homeToMiddleTopPoint);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerBelow);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerAbove);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->middleAbove);
     }
     else
         qWarning() << "Dobot not in home positions";
@@ -512,12 +511,9 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pPieceController->clearLastPos();
 
     this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
-
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_MIDDLE));
-    Point3D homeToMiddleTopPoint = _pDobot->getHomeToMiddleAbovePoint();
-    homeToMiddleTopPoint.z = _pBoardMain->getBoardPoint3D(BP_MIDDLE).z;
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, homeToMiddleTopPoint);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomeToMiddleAbovePoint());
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->middleAbove);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerAbove);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerBelow);
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
 }
 
@@ -782,14 +778,13 @@ void MainWindow::on_zPTPEdit_textChanged(const QString& QStrTextChanged)
 
 void MainWindow::on_retreatLeftBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_RETREAT_LEFT));
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->retreatLeft);
 }
 
 void MainWindow::on_retreatRightBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pBoardMain->getBoardPoint3D(BP_RETREAT_RIGHT));
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->retreatRight);
 }
-
 
 void MainWindow::changeWindowTitle()
 {

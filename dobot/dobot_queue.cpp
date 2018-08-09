@@ -1,6 +1,6 @@
 #include "dobot_queue.h"
 
-DobotQueue::DobotQueue(Point3D escape1, Point3D escape2)
+DobotQueue::DobotQueue(IntermediatePoints *pIntermediatePoints)
 {
     _un64CoreQueuedCmdID = 1; //set 1st ID
     _unQueuedCmdLeftSpace = std::numeric_limits<uint>::max(); //future:
@@ -8,8 +8,8 @@ DobotQueue::DobotQueue(Point3D escape1, Point3D escape2)
     _un64RetreatID = 0;
     _un64LastDobotIDShownInUI = 0;
     _lowestIDMoveInList = 0;
-    _escape1 = escape1;
-    _escape2 = escape2;
+    _escapeLeft = pIntermediatePoints->retreatLeft;
+    _escapeRight = pIntermediatePoints->retreatRight;
     _bRetreat = false;
 }
 
@@ -86,9 +86,8 @@ DobotMove DobotQueue::getNextMoveToSendToArm()
         }
     }
 
-    DobotMove errorMove;
     qCritical() << "reached artificially created anty-error return (shouldn't be possible)";
-    return errorMove;
+    return *new DobotMove;
 }
 
 void DobotQueue::showLastExecutedArmMoveInUI()
@@ -126,9 +125,8 @@ DobotMove DobotQueue::getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID)
             return move;
     }
 
-    DobotMove errorMove;
     qCritical() << "move with ID nr" << un64ID << "doesn't exists";
-    return errorMove;
+    return *new DobotMove;
 }
 
 bool DobotQueue::isArmCoveringGame()
@@ -141,9 +139,9 @@ bool DobotQueue::isArmCoveringGame()
 
 void DobotQueue::retreat(Point3D lastPoint)
 {
-    if (qAbs(lastPoint.y - _escape1.y) > qAbs(lastPoint.y - _escape2.y))
-        this->addArmMoveToQueue(DM_TO_POINT, _escape2);
-    else this->addArmMoveToQueue(DM_TO_POINT, _escape1);
+    if (qAbs(lastPoint.y - _escapeLeft.y) > qAbs(lastPoint.y - _escapeRight.y))
+        this->addArmMoveToQueue(DM_TO_POINT, _escapeRight);
+    else this->addArmMoveToQueue(DM_TO_POINT, _escapeLeft);
 
     _un64RetreatID = _un64CoreQueuedCmdID;
     _bRetreat = false; //prevent unwanted retreats

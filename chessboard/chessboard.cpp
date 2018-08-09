@@ -21,7 +21,7 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
 
             _dSquareWidth = ((_a1.y - _h1.y)/7.f + (_a8.x - _h1.x)/7.f)/2.f;
 
-            this->calculateFields3DLocationsOnMainBoard(_a1, _a8, _h1, _h8);
+            this->calculateFieldsPointsOnMainBoard(_a1, _a8, _h1, _h8);
         }
         else if (BoardType == B_REMOVED)
         {
@@ -33,13 +33,9 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
             _dSquareWidth = (((_remWhiteFurtherInner.x + _remBlackFurtherInner.x)/2.f) -
                     ((_remWhiteCloserOuter.x + _remBlackCloserOuter.x)/2.f))/7.f;
 
-            this->calculateFields3DLocationsOnRemovedBoard(_remWhiteCloserOuter,
+            this->calculateFieldsPointsOnRemovedBoard(_remWhiteCloserOuter,
                   _remWhiteFurtherInner, _remBlackCloserOuter, _remBlackFurtherInner);
         }
-
-        this->calculateMarginal3DValues();
-        this->calculateMiddleAbovePoint();
-        this->calculateRetreatPoints(gameConfigVars);
     }
 }
 
@@ -52,7 +48,7 @@ Chessboard::~Chessboard()
     }
 }
 
-void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
+void Chessboard::calculateFieldsPointsOnMainBoard(Point3D A1, Point3D A8,
                                                        Point3D H1, Point3D H8)
 {
     for (int digit=0; digit<=7; ++digit)
@@ -85,7 +81,7 @@ void Chessboard::calculateFields3DLocationsOnMainBoard(Point3D A1, Point3D A8,
     }
 }
 
-void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOuter,
+void Chessboard::calculateFieldsPointsOnRemovedBoard(Point3D whiteCloserOuter,
       Point3D whiteFutherInner, Point3D blackCloserOuter, Point3D blackFutherInner)
 {
     for (int column=0; column<=1; column++)
@@ -123,48 +119,7 @@ void Chessboard::calculateFields3DLocationsOnRemovedBoard(Point3D whiteCloserOut
     }
 }
 
-void Chessboard::calculateMarginal3DValues()
-{
-    _minBoard.x = _minBoard.y = _minBoard.z = std::numeric_limits<double>::max();
-    _maxBoard.x = _maxBoard.y = _maxBoard.z = -1000; //big number to start comparing
 
-    for (int i=0; i<=63; ++i)
-    {
-        if (_boardType == B_REMOVED && i>=32)
-            break;
-
-        if (_pField[i]->getLocation3D().x < _minBoard.x)
-            _minBoard.x = _pField[i]->getLocation3D().x;
-        if (_pField[i]->getLocation3D().y < _minBoard.y)
-            _minBoard.y = _pField[i]->getLocation3D().y;
-        if (_pField[i]->getLocation3D().z < _minBoard.z)
-            _minBoard.z = _pField[i]->getLocation3D().z;
-
-        if (_pField[i]->getLocation3D().x > _maxBoard.x)
-            _maxBoard.x = _pField[i]->getLocation3D().x;
-        if (_pField[i]->getLocation3D().y > _maxBoard.y)
-            _maxBoard.y = _pField[i]->getLocation3D().y;
-        //fMaxPieceHeight on two sides of the equation is shortened:
-        if (_pField[i]->getLocation3D().z > _maxBoard.z)
-            _maxBoard.z = _pField[i]->getLocation3D().z;
-    }
-    _maxBoard.z += (double)fMaxPieceHeight;
-}
-
-void Chessboard::calculateMiddleAbovePoint()
-{
-    _middleAbove.x = (_minBoard.x + _maxBoard.x)/2;
-    _middleAbove.y = (_minBoard.y + _maxBoard.y)/2;
-    _middleAbove.z = _maxBoard.z;
-}
-
-void Chessboard::calculateRetreatPoints(RealVars RV)
-{
-    _retreatLeft.x = _retreatRight.x = _middleAbove.x;
-    _retreatLeft.y = RV.retreatLeft.y;
-    _retreatRight.y = RV.retreatRight.y;
-    _retreatLeft.z = _retreatRight.z = _maxBoard.z;
-}
 
 void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*= false*/)
 {
@@ -235,20 +190,6 @@ Field* Chessboard::getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog 
         qCritical() << "field not found. return nullptr";
 
     return nullptr;
-}
-
-Point3D Chessboard::getBoardPoint3D(BOARD_POINTS BP) const
-{
-    switch(BP)
-    {
-    case BP_MIN: return _minBoard; break;
-    case BP_MAX: return _maxBoard; break;
-    case BP_MIDDLE: return _middleAbove; break;
-    case BP_RETREAT_LEFT: return _retreatLeft; break;
-    case BP_RETREAT_RIGHT: return _retreatRight; break;
-    default: qCritical() << "unknown bp:" << BP;
-        return _middleAbove;
-    }
 }
 
 Field* Chessboard::getField(short sFieldNr) const

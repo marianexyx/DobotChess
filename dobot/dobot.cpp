@@ -1,10 +1,11 @@
 #include "dobot.h"
 
-Dobot::Dobot(RealVars gameConfigVars, Point3D escape1, Point3D escape2):
-    _ARM_MAX_VELOCITY(300), //todo: wha't the max val? 200? 300?
+Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints *pIntermediatePoints):
+    _ARM_MAX_VELOCITY(300), //todo: what's the max val? 200? 300?
     _ARM_MAX_ACCELERATION(300)
 {
-    _pQueue = new DobotQueue(escape1, escape2);
+    _pIntermediatePoints = pIntermediatePoints;
+    _pQueue = new DobotQueue(pIntermediatePoints);
     _pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
@@ -16,14 +17,6 @@ Dobot::Dobot(RealVars gameConfigVars, Point3D escape1, Point3D escape2):
     _home.y = gameConfigVars.home.y;
     _home.z = gameConfigVars.home.z;
     _home.r = 0;
-
-    _homeToMiddleAbove = gameConfigVars.homeToMiddleAbove;
-
-    //todo: this below shows that we r using chessboard. it may be wiped, only if...
-    //...it's passed, but it's not efficient. better way might be passing whole object.
-    _dSafeAxisZ = qMin(qMin(gameConfigVars.A1.z, gameConfigVars.A8.z),
-                       qMin(gameConfigVars.H1.z, gameConfigVars.H8.z)) +
-            gameConfigVars.fPieceHeight;
 
     connect(_pQueue, SIGNAL(sendMoveToArm(DobotMove)),
             this, SLOT(sendMoveToArm(DobotMove)));
@@ -121,7 +114,7 @@ void Dobot::clearGripper()
     _sItemIDInGripper = 0;
 }
 
-Point3D Dobot::getHomePos()
+Point3D Dobot::getHomePos() //todo: check if its necessary
 {
     Point3D home(_home.x, _home.y, _home.z);
     return home;
@@ -330,11 +323,12 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
 
 bool Dobot::isMoveSafe(Point3D point)
 {
-    if (point.z <= _dSafeAxisZ && point.x != _lastGivenPoint.x &&
-            point.y != _lastGivenPoint.y)
+    if (point.z <= _pIntermediatePoints->safeAxisZ.z
+            && point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y)
     {
-        qCritical() << "it's not. given point =" << point.getAsQStr() << ", _lastGivenPoint ="
-                    << _lastGivenPoint.getAsQStr() << ", _dSafeAxisZ =" << _dSafeAxisZ;
+        qCritical() << "it's not. given point =" << point.getAsQStr()
+                    << ", _lastGivenPoint =" << _lastGivenPoint.getAsQStr()
+                    << ", _fSafeAxisZ =" << _pIntermediatePoints->safeAxisZ.z;
         return false;
     }
     else return true;

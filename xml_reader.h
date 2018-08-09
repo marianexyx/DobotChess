@@ -7,10 +7,12 @@
 #include <QDebug>
 #include <QFile>
 #include <QString>
-#include "vars/basic_vars.h"
+#include "vars/const_flags.h"
+#include "vars/point3d.h"
 
 enum XML_FILE_TYPE { XFT_GAME_LIMITS, XFT_GAME_CONFIG, XFT_DATABASE };
 
+//future: make game vars dir for those structs + some other ones
 struct LimitsVars
 {
     float fPieceHeightMin, fPieceHeightMax;
@@ -21,7 +23,7 @@ struct LimitsVars
 struct RealVars
 {
     float fPieceHeight;
-    Point3D home, homeToMiddleAbove;
+    Point3D home;
     Point3D A1, A8, H1, H8;
     Point3D remWhiteCloserOuter, remWhiteFurtherInner;
     Point3D remBlackCloserOuter, remBlackFurtherInner;

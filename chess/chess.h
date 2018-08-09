@@ -18,7 +18,7 @@
 #include "chess/chess_timers.h"
 #include "chess/chess_conditions.h" //must be included as last chess...
 //...file, because chess_status.h is included in this one
-#include "dobot.h"
+#include "dobot/dobot.h"
 
 class Chess: public QObject
 {

@@ -3,12 +3,13 @@
 
 #pragma once
 #include <QDebug>
-#include "vars/basic_vars.h"
+#include "vars/const_flags.h"
 #include "vars/log.h"
 #include "DobotDll/DobotDll.h"
 #include "DobotDll/DobotType.h"
 #include "xml_reader.h"
 #include "dobot/vars/dobot_move_types.h"
+#include "vars/intermediate_points.h"
 
 class DobotQueue: public QObject
 {
@@ -25,7 +26,7 @@ private:
     uint64_t _lowestIDMoveInList;
     uint64_t _un64LastDobotIDShownInUI;
     uint64_t _un64RetreatID;
-    Point3D _escape1, _escape2;
+    Point3D _escapeLeft, _escapeRight;
     bool _bRetreat;
 
     void parseNextMoveToArmIfPossible();
@@ -42,7 +43,7 @@ private:
 
     void setRetreat(bool bRetreat) { _bRetreat = bRetreat; }
 
-    DobotQueue(Point3D escape1, Point3D escape2);
+    DobotQueue(IntermediatePoints* pIntermediatePoints);
 
 public:
     QList<DobotMove> getQueuedArmCmds () const { return _queuedArmCmdsOnCore; }

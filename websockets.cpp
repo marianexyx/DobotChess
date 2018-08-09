@@ -37,14 +37,10 @@ void Websockets::onNewConnection()
 
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
-    _pClientsList->newClient(*pSocket);
+    _pClientsList->newClient(pSocket);
     emit this->addTextToLogPTE("New connection \n", LOG_WEBSOCKET);
     _pClientsList->showClientsInUI();
 }
-
-//todo: Q_FOREACH (QWebSocket *pNextClient, _pClientsList) will be depreciated...
-//...to: "for (QWebSocket *pClient : qAsConst(_pClientsList))".
-//it can be this way in old QT. or try change all to "foreach" maybe?
 
 void Websockets::receivedMsg(QString QStrMsg)
 {    

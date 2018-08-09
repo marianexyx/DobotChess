@@ -151,8 +151,6 @@ void XmlReader::readGameConfigNodes()
             this->getPointParam(_xmlDocConfig, "points", "point", "remBlackFurtherInner");
     _gameConfigVars.home =
             this->getPointParam(_xmlDocConfig, "points", "point", "home");
-    _gameConfigVars.homeToMiddleAbove =
-            this->getPointParam(_xmlDocConfig, "points", "point", "homeToMiddleAbove");
     _gameConfigVars.retreatLeft =
             this->getPointParam(_xmlDocConfig, "points", "point", "retreatLeft");
     _gameConfigVars.retreatRight =
@@ -185,7 +183,6 @@ bool XmlReader::isVarsStructInLimits()
 {
     if (this->isPieceHeightInLimits(_gameConfigVars.fPieceHeight) &&
             isPointInLimits(_gameConfigVars.home) &&
-            isPointInLimits(_gameConfigVars.homeToMiddleAbove) &&
             isPointInLimits(_gameConfigVars.A1) &&
             isPointInLimits(_gameConfigVars.A8) &&
             isPointInLimits(_gameConfigVars.H1) &&

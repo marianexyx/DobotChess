@@ -31,7 +31,7 @@ QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Typ
     {
         QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
 
-        qCritical() << "extracted param =" << QStrParam;
+        qInfo() << "extracted param =" << QStrParam;
 
         clientRequest r;
         r.type = Type;

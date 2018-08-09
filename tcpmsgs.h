@@ -5,7 +5,7 @@
 #include <QTcpSocket>
 #include <QString>
 #include "vars/log.h"
-#include "vars/basic_vars.h"
+#include "vars/const_flags.h"
 
 struct TcpMsgMetadata
 {

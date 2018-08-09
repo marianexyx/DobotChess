@@ -14,10 +14,11 @@
 #include "DobotDll/DobotType.h"
 #include "xml_reader.h"
 #include "websockets.h"
-#include "dobot.h"
-#include "chess.h"
+#include "dobot/dobot.h"
+#include "chess/chess.h"
 #include "client.h"
 #include "piece_controller.h"
+#include "intermediate_points_calculator.h"
 
 namespace Ui
 {
@@ -37,6 +38,7 @@ private:
     Ui::MainWindow *ui;
 
     Dobot* _pDobot;
+    IntermediatePoints* _pIntermediatePoints;
     PieceController* _pPieceController;
     Websockets* _pWebSockets;
     Chessboard* _pBoardMain;
