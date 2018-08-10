@@ -26,6 +26,7 @@ private:
     const long _lTimersStartQueue;
 
     void stopBoardTimers();
+    QString dumpAllData();
 
 private slots:
     void whiteTimeOut() { emit this->timeOutPlayer(PT_WHITE); }

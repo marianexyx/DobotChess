@@ -45,7 +45,7 @@ private:
     void createAndStartPoseTimer();
 
 public:
-    //future: don't add whole RealVars do dobot
+    //future: don't add whole RealVars to dobot
     Dobot(RealVars gameConfigVars, IntermediatePoints* pIntermediatePoints);
     ~Dobot();
 
@@ -69,11 +69,11 @@ public:
     short getItemInGripper() const { return _sItemIDInGripper; }
     Point3D getHomePos();
     Point3D getLastGivenPoint() const { return _lastGivenPoint; }
+    QString dumpAllData();
 
     IntermediatePoints* getIntermediatePoints() const { return _pIntermediatePoints; }
     DobotGripper* getServoPointer() const { return _pGripper; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
-
 
 
 public slots:
@@ -84,8 +84,8 @@ public slots:
     void showQueueLabelsInUI(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
                              int nCoreIdLeft, uint64_t un64CoreNextId);
     void addTextToLogPTEInUI(QString QStrTxt, LOG log);
-    void showQueuedArmCmdsOnCorePTE() { emit this->showQueuedArmCmdsOnCore(); }
-    void showSentArmCmdsToDobotPTE() { emit this->showSentArmCmdsToDobot(); }
+    void showQueuedArmCmdsOnCorePTE(QString QStrList) { emit this->showQueuedArmCmdsOnCore(QStrList); }
+    void showSentArmCmdsToDobotPTE(QString QStrList) { emit this->showSentArmCmdsToDobot(QStrList); }
 
 signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);
@@ -96,8 +96,8 @@ signals: //GUI mainWindow
     void DobotErrorMsgBox();
     void queueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
                      int nCoreIdLeft, uint64_t un64CoreNextId);
-    void showQueuedArmCmdsOnCore();
-    void showSentArmCmdsToDobot();
+    void showQueuedArmCmdsOnCore(QString);
+    void showSentArmCmdsToDobot(QString);
 };
 
 #endif // DOBOT_H

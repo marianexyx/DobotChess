@@ -23,8 +23,8 @@ void DobotQueue::parseNextMoveToArmIfPossible()
     {
         emit this->sendMoveToArm(this->getNextMoveToSendToArm());
         this->removeOldQueuedMovesFromCore();
-        emit this->showQueuedArmCmdsOnCore();
-        emit this->showSentArmCmdsToDobot();
+        emit this->showQueuedArmCmdsOnCore(this->getQueuedArmCmds());
+        emit this->showSentArmCmdsToDobot(this->getSentArmCmds());
     }
 }
 
@@ -102,7 +102,7 @@ void DobotQueue::showLastExecutedArmMoveInUI()
         QStrDobotMove = dobotMoveAsQstr(Move.type);
         emit this->addTextToLogPTEInUI("Executed move ID = " + QStrMoveID +
                                        ", type = " + QStrDobotMove + "\n", LOG_DOBOT);
-        emit this->showSentArmCmdsToDobot();
+        emit this->showSentArmCmdsToDobot(this->getSentArmCmds());
     }
 
     _un64LastDobotIDShownInUI = _un64RealTimeDobotActualID;
@@ -113,7 +113,7 @@ void DobotQueue::removeOldQueuedMovesFromCore()
     if (!_sentArmCmdsToDobot.empty() && _un64RealTimeDobotActualID > _sentArmCmdsToDobot.first().ID)
     {
         _sentArmCmdsToDobot.removeFirst();
-        emit this->showSentArmCmdsToDobot();
+        emit this->showSentArmCmdsToDobot(this->getSentArmCmds());
     }
 }
 
@@ -170,7 +170,7 @@ void DobotQueue::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
     _un64CoreQueuedCmdID++;
     DobotMove cmdToQueue(_un64CoreQueuedCmdID, Type, point);
     _queuedArmCmdsOnCore << cmdToQueue;
-    emit this->showQueuedArmCmdsOnCore();
+    emit this->showQueuedArmCmdsOnCore(this->getQueuedArmCmds());
 }
 
 void DobotQueue::saveIDFromConnectedDobot()
@@ -184,4 +184,56 @@ void DobotQueue::saveIDFromConnectedDobot()
    }
 
     _un64RetreatID = _un64CoreQueuedCmdID = _un64RealTimeDobotActualID;
+}
+
+QString DobotQueue::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[dobot_queue.h]\n";
+    QStrData += "_un64CoreQueuedCmdID: " + QString::number(_un64CoreQueuedCmdID) + "\n";
+    QStrData += ", _un64RealTimeDobotActualID: "
+            + QString::number(_un64RealTimeDobotActualID) + "\n";
+    QStrData += ", _unQueuedCmdLeftSpace: " + QString::number(_unQueuedCmdLeftSpace) + "\n";
+    QStrData += ", _queuedArmCmdsOnCore: " + this->getQueuedArmCmds() + "\n";
+    QStrData += ", _sentArmCmdsToDobot: " + this->getSentArmCmds() + "\n";
+    QStrData += ", _lowestIDMoveInList: " + QString::number(_lowestIDMoveInList) + "\n";
+    QStrData += ", _un64LastDobotIDShownInUI: "
+            + QString::number(_un64LastDobotIDShownInUI) + "\n";
+    QStrData += ", _un64RetreatID: " + QString::number(_un64RetreatID) + "\n";
+    QStrData += ", _bRetreat: " + QString::number(_bRetreat) + "\n";
+
+    return QStrData;
+}
+
+QString DobotQueue::getQueuedArmCmds()
+{
+    QString QStrQueuedList;
+    DobotMove item;
+
+    for(int i=0; i<_queuedArmCmdsOnCore.count(); ++i)
+    {
+       item = _queuedArmCmdsOnCore.at(i);
+       QStrQueuedList += QString::number(item.ID) + ". " + dobotMoveAsQstr(item.type)
+               + ": " + item.xyz.getAsQStr() + "\n";
+    }
+
+    return QStrQueuedList;
+}
+
+QString DobotQueue::getSentArmCmds()
+{
+    QString QStrQueuedList;
+    DobotMove item;
+
+    for(int i=0; i<_sentArmCmdsToDobot.count(); ++i)
+    {
+       item = _sentArmCmdsToDobot.at(i);
+       if (_un64RealTimeDobotActualID == item.ID)
+           QStrQueuedList += ">";
+       QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
+               + ": " + item.xyz.getAsQStr() + "\n";
+    }
+
+    return QStrQueuedList;
 }

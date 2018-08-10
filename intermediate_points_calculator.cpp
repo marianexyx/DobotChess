@@ -102,3 +102,20 @@ Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(RealVars RV)
     safeAxisZPoint.z = qMin(qMin(RV.A1.z, RV.A8.z), qMin(RV.H1.z, RV.H8.z)) + RV.fPieceHeight;
     return safeAxisZPoint;
 }
+
+QString IntermediatePointsCalc::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[intermediate_points_calc.h]\n";
+    QStrData += ", minGame: " + _IP.minGame.getAsQStr() + "\n";
+    QStrData += ", maxGame: " + _IP.maxGame.getAsQStr() + "\n";
+    QStrData += ", middleAbove: " + _IP.middleAbove.getAsQStr() + "\n";
+    QStrData += ", cournerBelow: " + _IP.cournerBelow.getAsQStr() + "\n";
+    QStrData += ", cournerAbove: " + _IP.cournerAbove.getAsQStr() + "\n";
+    QStrData += ", retreatLeft: " + _IP.retreatLeft.getAsQStr() + "\n";
+    QStrData += ", retreatRight: " + _IP.retreatRight.getAsQStr() + "\n";
+    QStrData += ", safeAxisZ: " + _IP.safeAxisZ.getAsQStr() + "\n";
+
+    return QStrData;
+}

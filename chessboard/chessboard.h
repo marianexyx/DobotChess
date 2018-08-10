@@ -23,20 +23,18 @@ class Chessboard: public QObject
 private:
     BOARD _boardType;
     bool _bBoardIsReal;
-    Field* _pField[64];
     Point3D  _a1, _a8, _h1, _h8;
     Point3D _remWhiteCloserOuter, _remWhiteFurtherInner;
     Point3D _remBlackCloserOuter, _remBlackFurtherInner;
     double _dSquareWidth;
+    Field* _pField[64];
 
     void calculateFieldsPointsOnMainBoard(Point3D A1, Point3D A8, Point3D H1, Point3D H8);
     void calculateFieldsPointsOnRemovedBoard(Point3D whiteCloserOuter,
           Point3D whiteFutherInner, Point3D blackCloserOuter, Point3D blackFutherInner);
 
-
-
     void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
-    void clearField(Field* pField, bool bErrorLog = false);
+    void clearField(Field* pField, bool bErrorLog = false) { pField->clearField(bErrorLog); }
 
 public:
     Chessboard(BOARD BoardType, bool bBoardIsReal = true,
@@ -54,6 +52,7 @@ public:
     Field* getField(short sFieldNr) const;
     Field* getField(PosOnBoard Pos) const;
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);
+    QString dumpAllData();
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);

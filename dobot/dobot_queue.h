@@ -40,18 +40,19 @@ private:
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void saveIDFromConnectedDobot();
     //bool isDobotCmdsLeftSpaceEmpty();
+    QString dumpAllData();
 
     void setRetreat(bool bRetreat) { _bRetreat = bRetreat; }
 
     DobotQueue(IntermediatePoints* pIntermediatePoints);
 
 public:
-    QList<DobotMove> getQueuedArmCmds () const { return _queuedArmCmdsOnCore; }
-    QList<DobotMove> getSentArmCmds () const { return _sentArmCmdsToDobot; }
+    QString getQueuedArmCmds();
+    QString getSentArmCmds();
 
 signals:
-    void showQueuedArmCmdsOnCore();
-    void showSentArmCmdsToDobot();
+    void showQueuedArmCmdsOnCore(QString);
+    void showSentArmCmdsToDobot(QString);
     void sendMoveToArm(DobotMove);
     void showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t);
     void addTextToLogPTEInUI(QString, LOG);

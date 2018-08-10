@@ -7,7 +7,7 @@
 #include "vars/log.h"
 #include "vars/const_flags.h"
 
-struct TcpMsgMetadata
+struct TcpMsgMetaData
 {
     int64_t n64TcpID;
     QString QStrMsgForTcp;
@@ -19,10 +19,10 @@ class TCPMsgs: public QObject
 
 private:
     QTcpSocket* socket;
-    QList<TcpMsgMetadata> TCPMsgsList;
+    QList<TcpMsgMetaData> TCPMsgsList;
 
-    bool _bWaitingForReadyRead;  //this flag blocks sending next msg to tcp from...
-    //...queue, if previous msg hasn't been processed
+    bool _bWaitingForReadyRead; //this flag blocks sending next msg...
+    //...to tcp from queue, if previous msg hasn't been processed
     int64_t _n64CmdID;
     void doTcpConnect();
 

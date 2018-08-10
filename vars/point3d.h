@@ -10,10 +10,8 @@ struct Point3D
 
     bool operator==(const struct Point3D& p)
     { return (x == p.x && y == p.y && z == p.z); }
-
     bool operator!=(const struct Point3D& p)
     { return (x != p.x || y != p.y || z != p.z); }
-
     Point3D &operator=(const Point3D &p)
     { x = p.x; y = p.y; z = p.z; return *this; }
 

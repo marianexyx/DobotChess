@@ -78,10 +78,10 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
             this, SLOT(setQueueLabels(uint, uint64_t, uint64_t, int, uint64_t)));
     connect(_pPieceController, SIGNAL(showRealBoardInUI()),
             this, SLOT(showRealBoardInUI()));
-    connect(_pDobot, SIGNAL(showQueuedArmCmdsOnCore()),
-            this, SLOT(showQueuedArmCmdsOnCore()));
-    connect(_pDobot, SIGNAL(showSentArmCmdsToDobot()),
-            this, SLOT(showSentArmCmdsToDobot()));
+    connect(_pDobot, SIGNAL(showQueuedArmCmdsOnCore(QString)),
+            this, SLOT(showQueuedArmCmdsOnCore(QString)));
+    connect(_pDobot, SIGNAL(showSentArmCmdsToDobot(QString)),
+            this, SLOT(showSentArmCmdsToDobot(QString)));
 
     this->initControl(); //init dobot JOG control from form
     _pWebSockets->listenOnPort(1234);
@@ -526,40 +526,16 @@ void MainWindow::on_sendTcpBtn_clicked()
     }
 }
 
-void MainWindow::showQueuedArmCmdsOnCore()
+void MainWindow::showQueuedArmCmdsOnCore(QString QStrList)
 {
-    QString QStrQueuedList;
-    DobotMove item;
-    QList<DobotMove> list = _pDobot->getQueuePointer()->getQueuedArmCmds();
-
-    for(int i=0; i<list.count(); ++i)
-    {
-       item = list.at(i);
-       QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
-               + ": " + item.xyz.getAsQStr() + "\n";
-    }
-
     ui->queuedOnCore->clear();
-    ui->queuedOnCore->setPlainText(QStrQueuedList);
+    ui->queuedOnCore->setPlainText(QStrList);
 }
 
-void MainWindow::showSentArmCmdsToDobot()
+void MainWindow::showSentArmCmdsToDobot(QString QStrList)
 {
-    QString QStrQueuedList;
-    DobotMove item;
-    QList<DobotMove> list = _pDobot->getQueuePointer()->getSentArmCmds();
-
-    for(int i=0; i<list.count(); ++i)
-    {
-       item = list.at(i);
-       if (ui->DobotQueuedIndexLabel->text().toUInt() == item.ID)
-           QStrQueuedList += ">";
-       QStrQueuedList += QString::number(item.ID) + ". " +  dobotMoveAsQstr(item.type)
-               + ": " + item.xyz.getAsQStr() + "\n";
-    }
-
     ui->queuedOnDobot->clear();
-    ui->queuedOnDobot->setPlainText(QStrQueuedList);
+    ui->queuedOnDobot->setPlainText(QStrList);
 }
 
 void MainWindow::showClientsListInUI(QList<Client> list)

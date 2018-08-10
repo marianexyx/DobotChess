@@ -84,6 +84,7 @@ public:
     bool isClientIDExists(int64_t n64ID);
     int64_t getClientID(const Client& client);
     int64_t getNextAvailableClientID();
+    QString dumpAllData();
 
 public slots:
     void showClientsInUI();

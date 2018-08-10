@@ -671,6 +671,24 @@ int64_t Clients::getNextAvailableClientID()
     return ++maxID;
 }
 
+QString Clients::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[client.h]\n";
+    foreach (Client cl, _clients)
+    {
+        QStrData += "client: _ID: " + QString::number(cl.ID()) +
+                ", _sqlID:" + QString::number(cl.sqlID())
+                + ", _type: " + playerTypeAsQStr(cl.type())
+                + ", _isStartClickedByPlayer: " + QString::number(cl.isStartClickedByPlayer())
+                + ", _queue: " + QString::number(cl.queue())
+                + ", name: " + cl.name() + "\n";
+    }
+
+    return QStrData;
+}
+
 void Clients::showClientsInUI()
 {
     emit this->showClientsListInUI(_clients);

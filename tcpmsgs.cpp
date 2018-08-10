@@ -12,7 +12,7 @@ void TCPMsgs::queueCmd(QString QStrCmd)
 {
     qInfo() << "cmd =" << QStrCmd;
 
-    TcpMsgMetadata QStrReceivedData;
+    TcpMsgMetaData QStrReceivedData;
     QStrReceivedData.n64TcpID = ++_n64CmdID;
     QStrReceivedData.QStrMsgForTcp = QStrCmd;
     TCPMsgsList << QStrReceivedData;
@@ -73,7 +73,7 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
 
 void TCPMsgs::connected()
 {
-    TcpMsgMetadata QStrData;
+    TcpMsgMetaData QStrData;
     if (!TCPMsgsList.isEmpty())
     {
         QStrData = TCPMsgsList.last();
@@ -133,7 +133,7 @@ void TCPMsgs::readyRead()
 
         emit this->addTextToLogPTE("tcp answer: " + QStrMsgFromTcp, LOG_TCP);
 
-        TcpMsgMetadata QStrData;
+        TcpMsgMetaData QStrData;
         if (!TCPMsgsList.isEmpty())
             QStrData = TCPMsgsList.takeLast();
         else

@@ -61,6 +61,16 @@ void ChessTimers::stopBoardTimers()
     _updateLabelTimer->stop();
 }
 
+QString ChessTimers::dumpAllData()
+{
+    QString QStrData;
+    QStrData = "[chess_timers.h]\n";
+    QStrData += "_nRemainingWhiteTime: " + QString::number(this->getWhiteTimeLeft()) + "\n";
+    QStrData += ", _nRemainingBlackTime: " + QString::number(this->getBlackTimeLeft()) + "\n";
+    QStrData += ", _nRemainingBlackTime: " + QString::number(this->getStartTimeLeft()) + "\n";
+    return QStrData;
+}
+
 void ChessTimers::resetGameTimers()
 {
     this->stopBoardTimers();

@@ -24,10 +24,10 @@ Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints *pIntermediatePoints):
             this, SLOT(showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t)));
     connect(_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
             this, SLOT(addTextToLogPTEInUI(QString, LOG)));
-    connect(_pQueue, SIGNAL(showQueuedArmCmdsOnCore()),
-            this, SLOT(showQueuedArmCmdsOnCorePTE()));
-    connect(_pQueue, SIGNAL(showSentArmCmdsToDobot()),
-            this, SLOT(showSentArmCmdsToDobotPTE()));
+    connect(_pQueue, SIGNAL(showQueuedArmCmdsOnCore(QString)),
+            this, SLOT(showQueuedArmCmdsOnCorePTE(QString)));
+    connect(_pQueue, SIGNAL(showSentArmCmdsToDobot(QString)),
+            this, SLOT(showSentArmCmdsToDobotPTE(QString)));
 }
 
 Dobot::~Dobot()
@@ -118,6 +118,22 @@ Point3D Dobot::getHomePos() //todo: check if its necessary
 {
     Point3D home(_home.x, _home.y, _home.z);
     return home;
+}
+
+QString Dobot::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[dobot.h]\n";
+    QStrData += "_sItemIDInGripper: " + QString::number(_sItemIDInGripper) + "\n";
+    QStrData += ", _bConnectedToDobot: " + QString::number(_bConnectedToDobot) + "\n";
+    QStrData += ", _bFirstMoveIsDone: " + QString::number(_bFirstMoveIsDone) + "\n";
+    QStrData += ", _realTimePoint: " + _realTimePoint.getAsQStr() + "\n";
+    QStrData += ", _lastGivenPoint: " + _lastGivenPoint.getAsQStr() + "\n";
+    QStrData += "\n";
+    QStrData += _pQueue->dumpAllData();
+
+    return QStrData;
 }
 
 void Dobot::onConnectDobot()

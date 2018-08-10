@@ -133,11 +133,6 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
                  << pField->getNrAsQStr() << "on" << boardTypeAsQstr(_boardType) ;
 }
 
-void Chessboard::clearField(Field* pField, bool bErrorLog /*= false*/)
-{
-    pField->clearField(bErrorLog);
-}
-
 bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
 {
     for (int i=0; i<=63; ++i)
@@ -203,3 +198,26 @@ Field* Chessboard::getField(PosOnBoard Pos) const
     if (Pos.isPosSet(SHOW_ERRORS)) return _pField[Field::nr(Pos)-1];
     else return nullptr;
 }
+
+QString Chessboard::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[chessboard.h]\n";
+    QStrData += "_boardType: " + boardTypeAsQstr(_boardType) + "\n";
+    QStrData += ", _bBoardIsReal: " + QString::number(_bBoardIsReal) + "\n";
+    QStrData += ", _a1: " + _a1.getAsQStr() + "\n";
+    QStrData += ", _a8: " + _a8.getAsQStr() + "\n";
+    QStrData += ", _h1: " + _h1.getAsQStr() + "\n";
+    QStrData += ", _h8: " + _h8.getAsQStr() + "\n";
+    QStrData += ", _remWhiteCloserOuter: " + _remWhiteCloserOuter.getAsQStr() + "\n";
+    QStrData += ", _remWhiteFurtherInner: " + _remWhiteFurtherInner.getAsQStr() + "\n";
+    QStrData += ", _remBlackCloserOuter: " + _remBlackCloserOuter.getAsQStr() + "\n";
+    QStrData += ", _remBlackFurtherInner: " + _remBlackFurtherInner.getAsQStr() + "\n";
+    QStrData += ", _dSquareWidth: " + QString::number(_dSquareWidth) + "\n";
+    for (int i=0; i<=63; ++i)
+        QStrData += _pField[i]->dumpAllData() + "\n";
+
+    return QStrData;
+}
+

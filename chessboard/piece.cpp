@@ -180,3 +180,12 @@ QString Piece::getName()
 
     return QStrName;
 }
+
+QString Piece::dumpAllData()
+{
+    return "[piece.h]: _sPieceID: " + QString::number(_sPieceID)
+            + ", _pieceType: " + QString::number(_pieceType)
+            + ", _pieceColor: " + playerTypeAsQStr(_pieceColor)
+            + ", _sStartFieldID: " + QString::number(_sStartFieldID)
+            + ", _promotedType: " + QString::number(_promotedType);
+}

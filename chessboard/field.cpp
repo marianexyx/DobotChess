@@ -126,3 +126,12 @@ Piece* Field::getPieceOnField(bool bErrorLog /*= false*/) const
 
     return _pPieceOnField;
 }
+
+QString Field::dumpAllData()
+{
+    return "[field.h]: _sNr: " + QString::number(_sNr)
+            //todo: can i check _pPieceOnField->getNr() against nullptr?
+            + ", _pPieceOnField->nr: " + _pPieceOnField->getNr()
+            + ", _sStartPieceNrOnField: " + QString::number(_sStartPieceNrOnField)
+            + ", _location3D: " + _location3D.getAsQStr();
+}

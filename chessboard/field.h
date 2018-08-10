@@ -37,6 +37,7 @@ public:
     QString getNrAsQStr() const { return Field::nrAsQStr(_sNr); }
     Piece* getPieceOnField(bool bErrorLog = false) const;
     short getStartPieceNrOnField() const { return _sStartPieceNrOnField; }
+    QString dumpAllData();
 };
 
 #endif // FIELD_H

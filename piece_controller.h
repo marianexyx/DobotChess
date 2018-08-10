@@ -33,11 +33,12 @@ public:
 
     void clearLastPos() { _lastPos.Letter = L_X; _lastPos.Digit = D_X; }
     void clearPawnsPromotions();
-    PosOnBoard getLastPos() const { return _lastPos; }
+    PosOnBoard getLastPos() const { return _lastPos; } //dumpAllData
     QString getPromotedPawnsPositions();
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
 
     Dobot* getDobotPointer() const { return _pDobot; }
+    PieceSet* getPieceSetPointer() const { return _pPieceSet; }
     Chessboard* getBoardMainPointer() const { return _pBoardMain; }
     Chessboard* getBoardRemovedPointer() const { return _pBoardRemoved; }
 

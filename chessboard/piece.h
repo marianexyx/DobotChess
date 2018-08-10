@@ -53,6 +53,7 @@ public:
     short getStartFieldNr() const { return _sStartFieldID; }
     PosOnBoard getStartFieldPos() const { return Piece::startFieldPos(_sPieceID); }
     PIECE_TYPE getPromotedType() const { return _promotedType; }
+    QString dumpAllData();
 };
 
 #endif // PIECE_H

@@ -84,6 +84,7 @@ public:
     Websockets* getWebsocketsPointer() const { return _pWebsockets; }
     PieceController* getPieceControllerPointer() const { return _pPieceController; }
     TCPMsgs* getTCPMsgsPointer() const { return _pTCPMsgs; }
+    QString dumpAllData();
 
 public slots:
     void checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID, bool bService = false);

@@ -78,8 +78,8 @@ private slots:
     void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
                         int nCoreIdLeft, uint64_t un64CoreNextId);
-    void showQueuedArmCmdsOnCore();
-    void showSentArmCmdsToDobot();
+    void showQueuedArmCmdsOnCore(QString QStrList);
+    void showSentArmCmdsToDobot(QString QStrList);
 
     //websocket slots
     void on_calibrateBtn_clicked();

@@ -59,7 +59,8 @@ inline bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bo
     case CMT_LEGAL:
         bReturn = true; //always ok
         break;
-    case CMT_MOVE: //BAD_FORMAT ans is an error, because it shouldn't be possible
+    case CMT_MOVE:
+        //BAD_FORMAT answer it this case is an error, because it shouldn't be possible
         bReturn = (QStrAns.left(4) == "OK 1") ? true : false; //"OK 1" and "OK 1\n"
         break;
     default:

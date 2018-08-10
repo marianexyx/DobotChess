@@ -187,6 +187,23 @@ void ChessStatus::promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoTy
     else pPawnToPromote->setPromotedType(Piece::Type(QStrPromoType));
 }
 
+QString ChessStatus::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[chess_status.h]\n";
+    QStrData += "_FENGameState: " + endTypeAsQstr(_FENGameState) + "\n";
+    QStrData += ", _WhoseTurn: " + turnTypeAsQstr(_WhoseTurn) + "\n";
+    QStrData += ", _QStrCastlings: " + _QStrCastlings + "\n";
+    QStrData += ", _QStrEnpassant: " + _QStrEnpassant + "\n";
+    QStrData += ", _legalMoves: " + _legalMoves.join(",") + "\n";
+    QStrData += ", _historyMoves: " + _historyMoves.join(",") + "\n";
+    QStrData += ", _PosMove: " + _PosMove.asQStr() + "\n";
+    QStrData += ", _MoveType: " + sequenceTypeAsQstr(_MoveType) + "\n";
+
+    return QStrData;
+}
+
 void ChessStatus::setMove(QString QStrMove)
 {
     _MoveType = this->findMoveType(QStrMove);

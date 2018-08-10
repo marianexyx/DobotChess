@@ -31,6 +31,7 @@ private:
     void resetStatusData();
     WHOSE_TURN whoseTurnFromFENStatus(QString QStrWhoseTurn);
     void promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType);
+    QString dumpAllData();
 
     void setMove(QString QStrMove);
     void setLegalMoves(QString QStrMsg);

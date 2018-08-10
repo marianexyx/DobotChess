@@ -45,6 +45,22 @@ Chess::~Chess()
     delete _pConditions;
 }
 
+QString Chess::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[chess.h]\n";
+    QStrData += "_ChessGameStatus: " + gameStatusAsQStr(_ChessGameStatus) + "\n";
+    QStrData += ", _request.type: " + requestTypeAsQStr(_request.type) + "\n";
+    QStrData += ", _request.param: " + _request.param + "\n";
+    QStrData += "\n";
+    QStrData += _pStatus->dumpAllData();
+    QStrData += "\n";
+    QStrData += _pTimers->dumpAllData();
+
+    return QStrData;
+}
+
 void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
                                    bool bService /*= false*/)
 {
