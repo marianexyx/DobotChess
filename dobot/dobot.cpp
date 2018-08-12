@@ -1,15 +1,13 @@
 #include "dobot.h"
 
-Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints *pIntermediatePoints):
+Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints):
     _ARM_MAX_VELOCITY(300), //todo: what's the max val? 200? 300?
     _ARM_MAX_ACCELERATION(300)
 {
-    _pIntermediatePoints = pIntermediatePoints;
-    _pQueue = new DobotQueue(pIntermediatePoints);
+    _pQueue = new DobotQueue(intermediatePoints);
     _pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
     _sItemIDInGripper = 0;
-    
     _bConnectedToDobot = false;
     _bFirstMoveIsDone = false;
 
@@ -53,8 +51,8 @@ void Dobot::onGetPoseTimer()
         this->saveActualDobotPosition();
         _pQueue->parseNextMoveToArmIfPossible();
         _pQueue->showLastExecutedArmMoveInUI();
-        if (_pQueue->isArmCoveringGame() && _bFirstMoveIsDone)
-            _pQueue->retreat(_lastGivenPoint);
+        if (_pQueue->isArmCoveringView() && _bFirstMoveIsDone)
+            _pQueue->escape(_lastGivenPoint);
     }
 
     getPoseTimer->start(); //auto restart timer
@@ -95,8 +93,8 @@ void Dobot::setItemInGripper(short sGrippersItemID)
 {
     if (!this->isGripperEmpty())
     {
-        qCritical() << "it isn't. item nr in gripper:" << _sItemIDInGripper
-                    << ". passed item nr as param:" << sGrippersItemID;
+        qCritical() << "gripper isn't empty. item nr in it:" << QString::number(_sItemIDInGripper)
+                    << ". given item nr:" << QString::number(sGrippersItemID);
         return;
     }
 
@@ -114,7 +112,7 @@ void Dobot::clearGripper()
     _sItemIDInGripper = 0;
 }
 
-Point3D Dobot::getHomePos() //todo: check if its necessary
+Point3D Dobot::getHomePos()
 {
     Point3D home(_home.x, _home.y, _home.z);
     return home;
@@ -126,10 +124,10 @@ QString Dobot::dumpAllData()
 
     QStrData = "[dobot.h]\n";
     QStrData += "_sItemIDInGripper: " + QString::number(_sItemIDInGripper) + "\n";
-    QStrData += ", _bConnectedToDobot: " + QString::number(_bConnectedToDobot) + "\n";
-    QStrData += ", _bFirstMoveIsDone: " + QString::number(_bFirstMoveIsDone) + "\n";
-    QStrData += ", _realTimePoint: " + _realTimePoint.getAsQStr() + "\n";
-    QStrData += ", _lastGivenPoint: " + _lastGivenPoint.getAsQStr() + "\n";
+    QStrData += "_bConnectedToDobot: " + QString::number(_bConnectedToDobot) + "\n";
+    QStrData += "_bFirstMoveIsDone: " + QString::number(_bFirstMoveIsDone) + "\n";
+    QStrData += "_realTimePoint: " + _realTimePoint.getAsQStr() + "\n";
+    QStrData += "_lastGivenPoint: " + _lastGivenPoint.getAsQStr() + "\n";
     QStrData += "\n";
     QStrData += _pQueue->dumpAllData();
 
@@ -207,7 +205,7 @@ void Dobot::initDobot()
     
     EndEffectorParams endEffectorParams;
     memset(&endEffectorParams, 0, sizeof(endEffectorParams));
-    endEffectorParams.xBias = 40.f; //determined experimentally for gripper
+    endEffectorParams.xBias = 40.f; //determined experimentally for my gripper
     SetEndEffectorParams(&endEffectorParams, false, NULL);
     
     JOGJointParams jogJointParams;
@@ -246,13 +244,9 @@ void Dobot::initDobot()
     ptpCoordinateParams.rAcceleration = _ARM_MAX_ACCELERATION;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
     
-    PTPJumpParams ptpJumpParams;
-    ptpJumpParams.jumpHeight = 20;
-    ptpJumpParams.zLimit = 150;
-    SetPTPJumpParams(&ptpJumpParams, false, NULL);
-    
     SetHOMEParams(&_home, false, NULL);
 
+    //set PWM adress on servo pin to make gripper work properly
     IOMultiplexing iom;
     iom.address = 4;
     iom.multiplex = IOFunctionPWM;
@@ -262,7 +256,7 @@ void Dobot::initDobot()
 void Dobot::sendMoveToArm(DobotMove move)
 {
     qInfo() << "move type =" << dobotMoveAsQstr(move.type) << ", ID ="
-            << move.ID << ", xyz =" << move.xyz.getAsQStr();
+            << QString::number(move.ID) << ", xyz =" << move.xyz.getAsQStr();
 
     switch(move.type)
     {
@@ -294,18 +288,18 @@ void Dobot::sendMoveToArm(DobotMove move)
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
         HOMECmd calibrateCmd;
-        //future: I dont get this "1" ID. seen somewhere propably. ask of forum?...
+        //todo: I dont get this "1" ID. seen somewhere propably. ask of forum?...
         //... maybe remove it, and see if anything would change (might be useless)
         calibrateCmd.reserved = 1;
         isArmReceivedCorrectCmd(SetHOMECmd(&calibrateCmd, true, &move.ID), SHOW_ERRORS);
     }
         break;
-    default: qCritical() << "wrong move type:" << move.type;
+    default: qCritical() << "wrong move type:" << QString::number(move.type);
     }
 }
 
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
-                              /*= VM_NONE*/, bool bRetreat /*= false*/)
+                              /*= VM_NONE*/, bool bEscape /*= false*/)
 {
     if (!_bConnectedToDobot)
     {
@@ -319,12 +313,12 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
     dest3D.z += dJump;
     this->addArmMoveToQueue(DM_TO_POINT, dest3D);
 
-    _pQueue->setRetreat(bRetreat);
+    _pQueue->setescape(bEscape);
 
     if (VertMove == VM_NONE) return;
 
     if (!this->isPointDiffrentOnlyInZAxis(dest3D)) return;
-    this->armUpDown(DM_DOWN, dest3D.z - dJump);
+    this->moveArmUpOrDown(DM_DOWN, dest3D.z - dJump);
 
     if (VertMove == VM_PUT)
         this->addArmMoveToQueue(DM_OPEN);
@@ -334,17 +328,17 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
         this->addArmMoveToQueue(DM_WAIT);
     }
 
-    this->armUpDown(DM_UP, dest3D.z);
+    this->moveArmUpOrDown(DM_UP, dest3D.z);
 }
 
 bool Dobot::isMoveSafe(Point3D point)
 {
-    if (point.z <= _pIntermediatePoints->safeAxisZ.z
+    if (point.z <= _intermediatePoints.safeAxisZ.z
             && point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y)
     {
         qCritical() << "it's not. given point =" << point.getAsQStr()
                     << ", _lastGivenPoint =" << _lastGivenPoint.getAsQStr()
-                    << ", _fSafeAxisZ =" << _pIntermediatePoints->safeAxisZ.z;
+                    << ", _fSafeAxisZ =" << _intermediatePoints.safeAxisZ.z;
         return false;
     }
     else return true;
@@ -354,8 +348,10 @@ bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
 {
     if (point.x != _lastGivenPoint.x || point.y != _lastGivenPoint.y)
     {
-        qCritical() << "tried to move Z axis with X or Y axis. point xy =" << point.x << point.y
-                    << "_lastGivenPoint xy =" << _lastGivenPoint.x << _lastGivenPoint.y;
+        qCritical() << "tried to move Z axis with X or Y axis. point xy ="
+                    << QString::number(point.x) << QString::number(point.y)
+                    << "_lastGivenPoint xy =" << QString::number(_lastGivenPoint.x)
+                    << QString::number(_lastGivenPoint.y);
         return false;
     }
     else return true;
@@ -383,7 +379,7 @@ void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
     _pQueue->addArmMoveToQueue(Type, point);
 }
 
-void Dobot::armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
+void Dobot::moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
 {
     if (!_bFirstMoveIsDone)
     {

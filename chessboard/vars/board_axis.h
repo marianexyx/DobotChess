@@ -62,7 +62,7 @@ inline QString pieceLetterPosAsQStr(LETTER Letter)
     case L_G: return "g";
     case L_H: return "h";
     default:
-        qCritical() << "Unknown letter value =" << Letter;
+        qCritical() << "Unknown letter value =" << QString::number(Letter);
         return "";
     }
 }

@@ -17,7 +17,7 @@ inline QString boardTypeAsQstr(BOARD Board)
     case B_MAIN: return "mainBoard";
     case B_REMOVED: return "removedBoard";
     default:
-        qCritical() << "wrong arg = " << Board;
+        qCritical() << "wrong arg = " << QString::number(Board);
         return "";
     }
 }

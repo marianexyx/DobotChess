@@ -24,7 +24,8 @@ Field* ChessMovements::findRookFieldInCastling(Field* pField, VERTICAL_MOVE Move
         RookFieldDest.Letter = (MoveStage == VM_GRAB ? L_A : L_D);
     else if (pField->getPos().Letter == L_G)
         RookFieldDest.Letter = (MoveStage == VM_GRAB ? L_H : L_F);
-    else qCritical() << "wrong FieldDest.Letter val =" << pField->getPos().Letter;
+    else qCritical() << "wrong FieldDest.Letter val ="
+                     << pieceLetterPosAsQStr(pField->getPos().Letter);
 
     return _pBoardMain->getField(RookFieldDest);
 }
@@ -137,8 +138,8 @@ void ChessMovements::promoteWithRemoveMoveSequence(Field* pFrom, Field* pTo)
     this->regularMoveSequence(pFrom, pTo);
 }
 
-//todo: although it works, i was somewhere still able to get error...
-//...msg (in last scenario? check it)
+//todo: although it looks like it works, but I still was somewhere able to...
+//...get an error msg (in last scenario propably? test it)
 bool ChessMovements::resetPiecePositions()
 {
     qInfo();

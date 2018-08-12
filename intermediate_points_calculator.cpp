@@ -1,22 +1,26 @@
 #include "intermediate_points_calculator.h"
 
-IntermediatePointsCalc::IntermediatePointsCalc(RealVars RV, Chessboard *pBoard)
+/*static*/ IntermediatePoints IntermediatePointsCalc::calculate(RealVars RV, Chessboard* pBoard)
 {
-    //don't change calculations order
-    _IP.minGame = calculateMarginalGamePoint(IP_MIN_GAME, pBoard);
-    _IP.maxGame = calculateMarginalGamePoint(IP_MAX_GAME, pBoard);
-    _IP.middleAbove = calculateMiddleAbovePoint(_IP.minGame, _IP.maxGame);
-    _IP.retreatLeft = calculateRetreatPoint(IP_RETREAT_LEFT, _IP.middleAbove,
-                                           RV.retreatLeft, _IP.maxGame);
-    _IP.retreatRight = calculateRetreatPoint(IP_RETREAT_RIGHT, _IP.middleAbove,
-                                            RV.retreatRight, _IP.maxGame);
-    _IP.cournerBelow = calculateCournerPoint(IP_COURNER_BELOW, RV);
-    _IP.cournerAbove = calculateCournerPoint(IP_COURNER_ABOVE, RV);
-    _IP.safeAxisZ = calculateSafeAxisZPoint(RV);
+    IntermediatePoints IP;
 
+    //don't change calculations order
+    IP.minGame = calculateMarginalGamePoint(IP_MIN_GAME, pBoard);
+    IP.maxGame = calculateMarginalGamePoint(IP_MAX_GAME, pBoard);
+    IP.middleAbove = calculateMiddleAbovePoint(IP.minGame, IP.maxGame);
+    IP.retreatLeft = calculateRetreatPoint(IP_RETREAT_LEFT, IP.middleAbove,
+                                           RV.retreatLeft, IP.maxGame);
+    IP.retreatRight = calculateRetreatPoint(IP_RETREAT_RIGHT, IP.middleAbove,
+                                            RV.retreatRight, IP.maxGame);
+    IP.cournerBelow = calculateCournerPoint(IP_COURNER_BELOW, RV);
+    IP.cournerAbove = calculateCournerPoint(IP_COURNER_ABOVE, RV);
+    IP.safeAxisZ = calculateSafeAxisZPoint(RV);
+
+    return IP;
 }
 
-Point3D IntermediatePointsCalc::calculateMarginalGamePoint(INTERMEDIATE_POINTS IP,
+
+/*static*/ Point3D IntermediatePointsCalc::calculateMarginalGamePoint(INTERMEDIATE_POINTS IP,
                                                            Chessboard* pBoard)
 {
     if (IP == IP_MIN_GAME)
@@ -62,7 +66,7 @@ Point3D IntermediatePointsCalc::calculateMarginalGamePoint(INTERMEDIATE_POINTS I
     }
 }
 
-Point3D IntermediatePointsCalc::calculateMiddleAbovePoint(Point3D min, Point3D max)
+/*static*/ Point3D IntermediatePointsCalc::calculateMiddleAbovePoint(Point3D min, Point3D max)
 {
     Point3D middleAbove;
     middleAbove.x = (min.x + max.x)/2;
@@ -71,7 +75,7 @@ Point3D IntermediatePointsCalc::calculateMiddleAbovePoint(Point3D min, Point3D m
     return middleAbove;
 }
 
-Point3D IntermediatePointsCalc::calculateRetreatPoint(INTERMEDIATE_POINTS IP, Point3D midAbove,
+/*static*/ Point3D IntermediatePointsCalc::calculateRetreatPoint(INTERMEDIATE_POINTS IP, Point3D midAbove,
                                                       Point3D retreat, Point3D max)
 {
     if (IP == IP_RETREAT_LEFT || IP == IP_RETREAT_RIGHT)
@@ -83,7 +87,7 @@ Point3D IntermediatePointsCalc::calculateRetreatPoint(INTERMEDIATE_POINTS IP, Po
     }
 }
 
-Point3D IntermediatePointsCalc::calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV)
+/*static*/ Point3D IntermediatePointsCalc::calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV)
 {
     if (IP == IP_COURNER_BELOW)
         return *new Point3D(RV.home.x, RV.retreatLeft.y, RV.home.z);
@@ -96,26 +100,9 @@ Point3D IntermediatePointsCalc::calculateCournerPoint(INTERMEDIATE_POINTS IP, Re
     }
 }
 
-Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(RealVars RV)
+/*static*/ Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(RealVars RV)
 {
     Point3D safeAxisZPoint;
     safeAxisZPoint.z = qMin(qMin(RV.A1.z, RV.A8.z), qMin(RV.H1.z, RV.H8.z)) + RV.fPieceHeight;
     return safeAxisZPoint;
-}
-
-QString IntermediatePointsCalc::dumpAllData()
-{
-    QString QStrData;
-
-    QStrData = "[intermediate_points_calc.h]\n";
-    QStrData += ", minGame: " + _IP.minGame.getAsQStr() + "\n";
-    QStrData += ", maxGame: " + _IP.maxGame.getAsQStr() + "\n";
-    QStrData += ", middleAbove: " + _IP.middleAbove.getAsQStr() + "\n";
-    QStrData += ", cournerBelow: " + _IP.cournerBelow.getAsQStr() + "\n";
-    QStrData += ", cournerAbove: " + _IP.cournerAbove.getAsQStr() + "\n";
-    QStrData += ", retreatLeft: " + _IP.retreatLeft.getAsQStr() + "\n";
-    QStrData += ", retreatRight: " + _IP.retreatRight.getAsQStr() + "\n";
-    QStrData += ", safeAxisZ: " + _IP.safeAxisZ.getAsQStr() + "\n";
-
-    return QStrData;
 }

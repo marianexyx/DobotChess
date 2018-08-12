@@ -129,8 +129,8 @@ void Chessboard::setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog /*
     pField->setPieceOnField(pPiece);
 
     if (bDebugLog)
-        qInfo() << "new pieceNr:" << (pPiece == nullptr ? 0 : pPiece->getNr()) << "on fieldNr:"
-                 << pField->getNrAsQStr() << "on" << boardTypeAsQstr(_boardType) ;
+        qInfo() << "new pieceNr:" << (pPiece == nullptr ? "0" : QString::number(pPiece->getNr()))
+                << "on fieldNr:" << pField->getNrAsQStr() << "on" << boardTypeAsQstr(_boardType);
 }
 
 bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= false*/)
@@ -143,8 +143,9 @@ bool Chessboard::isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog /*= f
         if (pPiece != nullptr && pPiece->getNr() == sPieceNr)
         {
             if (bErrorLog)
-                qCritical() << "this piece already exist on board. piece =" << pPiece->getNr()
-                            << "on field =" << _pField[i]->getNrAsQStr();
+                qCritical() << "this piece already exist on board. piece ="
+                            << QString::number(pPiece->getNr()) << "on field ="
+                            << _pField[i]->getNrAsQStr();
             return true;
         }
     }
@@ -205,17 +206,18 @@ QString Chessboard::dumpAllData()
 
     QStrData = "[chessboard.h]\n";
     QStrData += "_boardType: " + boardTypeAsQstr(_boardType) + "\n";
-    QStrData += ", _bBoardIsReal: " + QString::number(_bBoardIsReal) + "\n";
-    QStrData += ", _a1: " + _a1.getAsQStr() + "\n";
-    QStrData += ", _a8: " + _a8.getAsQStr() + "\n";
-    QStrData += ", _h1: " + _h1.getAsQStr() + "\n";
-    QStrData += ", _h8: " + _h8.getAsQStr() + "\n";
-    QStrData += ", _remWhiteCloserOuter: " + _remWhiteCloserOuter.getAsQStr() + "\n";
-    QStrData += ", _remWhiteFurtherInner: " + _remWhiteFurtherInner.getAsQStr() + "\n";
-    QStrData += ", _remBlackCloserOuter: " + _remBlackCloserOuter.getAsQStr() + "\n";
-    QStrData += ", _remBlackFurtherInner: " + _remBlackFurtherInner.getAsQStr() + "\n";
-    QStrData += ", _dSquareWidth: " + QString::number(_dSquareWidth) + "\n";
-    for (int i=0; i<=63; ++i)
+    QStrData += "_bBoardIsReal: " + QString::number(_bBoardIsReal) + "\n";
+    QStrData += "_a1: " + _a1.getAsQStr() + "\n";
+    QStrData += "_a8: " + _a8.getAsQStr() + "\n";
+    QStrData += "_h1: " + _h1.getAsQStr() + "\n";
+    QStrData += "_h8: " + _h8.getAsQStr() + "\n";
+    QStrData += "_remWhiteCloserOuter: " + _remWhiteCloserOuter.getAsQStr() + "\n";
+    QStrData += "_remWhiteFurtherInner: " + _remWhiteFurtherInner.getAsQStr() + "\n";
+    QStrData += "_remBlackCloserOuter: " + _remBlackCloserOuter.getAsQStr() + "\n";
+    QStrData += "_remBlackFurtherInner: " + _remBlackFurtherInner.getAsQStr() + "\n";
+    QStrData += "_dSquareWidth: " + QString::number(_dSquareWidth) + "\n";
+    short sFieldsAmount = _boardType == B_MAIN ? 64 : 32;
+    for (int i=0; i<=sFieldsAmount-1; ++i)
         QStrData += _pField[i]->dumpAllData() + "\n";
 
     return QStrData;

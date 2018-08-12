@@ -1,16 +1,15 @@
 #include "chess.h"
 
-Chess::Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
-             Websockets* pWebsockets, TCPMsgs* pTCPMsgs)
+Chess::Chess(PieceController* pPieceController)
 {
     _pPieceController = pPieceController;
     _pDobot = _pPieceController->getDobotPointer();
     _pBoardMain = _pPieceController->getBoardMainPointer();
     _pBoardRemoved = _pPieceController->getBoardRemovedPointer();
-    _pBoardChenard = pBoardChenard;
-    _pWebsockets = pWebsockets;
+    _pBoardChenard = new Chessboard(B_MAIN, IMAGINARY);
+    _pWebsockets = new Websockets();
     _pClientsList = _pWebsockets->getClientsListPointer();
-    _pTCPMsgs = pTCPMsgs;
+    _pTCPMsgs = new TCPMsgs();
 
     _pStatus = new ChessStatus(_pPieceController, _pBoardMain, _pClientsList);
     _pMovements = new ChessMovements(_pPieceController, _pBoardMain, _pBoardRemoved);
@@ -51,8 +50,8 @@ QString Chess::dumpAllData()
 
     QStrData = "[chess.h]\n";
     QStrData += "_ChessGameStatus: " + gameStatusAsQStr(_ChessGameStatus) + "\n";
-    QStrData += ", _request.type: " + requestTypeAsQStr(_request.type) + "\n";
-    QStrData += ", _request.param: " + _request.param + "\n";
+    QStrData += "_request.type: " + requestTypeAsQStr(_request.type) + "\n";
+    QStrData += "_request.param: " + _request.param + "\n";
     QStrData += "\n";
     QStrData += _pStatus->dumpAllData();
     QStrData += "\n";
@@ -133,7 +132,7 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
         this->updateClientsInUI();
         break;
     default:
-        qCritical() << "received _request.type:" << _request.type;
+        qCritical() << "received _request.type:" << QString::number(_request.type);
     }
 
     _pClientsList->showClientsInUI();
@@ -173,7 +172,8 @@ void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
         _pStatus->setLegalMoves(QStrTcpRespond);
         this->continueGameplay();
         break;
-    default: qCritical() << "unknown ProcessedChenardMsgType:" << ProcessedChenardMsgType;
+    default: qCritical() << "unknown ProcessedChenardMsgType:"
+                         << QString::number(ProcessedChenardMsgType);
     }
 }
 
@@ -227,8 +227,7 @@ void Chess::newClientLogged(Client& client, int64_t sqlID)
 {    
     if (!_pClientsList->isClientSqlIDExists(sqlID))
     {
-        _pClientsList->setClientSqlID(client, sqlID);
-        qInfo() << "ID =" << sqlID << ", name =" << Sql::getClientName(sqlID);
+        _pClientsList->setClientSqlIDAndName(client, sqlID);
         this->sendDataToClient(client);
     }
     else
@@ -236,9 +235,10 @@ void Chess::newClientLogged(Client& client, int64_t sqlID)
         if (client.sqlID() > 0 && client.sqlID() != sqlID)
         {
             qCritical() << "client has a sqlID, and he sent another diffrent one (hacker?). "
-                           "his ID =" << client.sqlID() << ", new ID =" << sqlID;
+                           "his ID =" << QString::number(client.sqlID())
+                        << ", new ID =" << QString::number(sqlID);
             this->restorateGameIfDisconnectedClientAffectIt(client);
-            //future: F5 his page
+            //todo: F5 his page
             _pClientsList->removeClientFromList(client);
             this->updateClientsInUI();
         }

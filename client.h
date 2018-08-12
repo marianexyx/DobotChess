@@ -14,6 +14,7 @@
 #include "sql.h"
 
 enum CLIENT_ID { CID_CORE, CID_SQL };
+inline QString clientIDAsQStr(CLIENT_ID CID) { return CID == CID_CORE ? "coreID" : "sqlID"; }
 
 class Client
 {
@@ -26,6 +27,7 @@ private:
     PLAYER_TYPE _type;
     bool _isStartClickedByPlayer;
     int64_t _queue;
+    QString _name;
 
 public:
     bool operator ==(const struct Client& cl) { return _ID == cl._ID; }
@@ -36,7 +38,12 @@ public:
     PLAYER_TYPE type() const { return _type; }
     bool isStartClickedByPlayer() const { return _isStartClickedByPlayer; }
     int64_t queue() const { return _queue; }
-    QString name() const { return Sql::getClientName(_sqlID); }
+    QString name(bool bShowErrors = true) const
+    {
+        if (bShowErrors && _sqlID == 0)
+            qCritical() << "tried to access client's name without setting his sqlID 1st";
+        return _name;
+    }
 };
 
 class Clients: public QObject
@@ -49,7 +56,7 @@ public:
     Clients(): _clients() {}
 
     void newClient(QWebSocket* const clientSocket);
-    void setClientSqlID(const Client& client, int64_t sqlID);
+    void setClientSqlIDAndName(const Client& client, int64_t sqlID);
     void clearClientSqlID(const Client& client);
     void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void clearPlayerType(PLAYER_TYPE Type);

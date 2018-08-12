@@ -25,7 +25,8 @@ struct PosOnBoard
         if (Letter != L_X && Digit != D_X) return true;
         else
         {
-            if (bErrorLog) qCritical() << "pos isn't false";
+            if (bErrorLog)
+                qCritical() << "pos isn't false";
             return false;
         }
     }

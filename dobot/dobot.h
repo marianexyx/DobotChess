@@ -21,22 +21,21 @@
 #include "dobot/dobot_gripper.h"
 #include "dobot/dobot_queue.h"
 
+//todo: add force stop arm methods
 class Dobot: public QObject
 {
     Q_OBJECT
 
 private:
-    IntermediatePoints* _pIntermediatePoints;
     DobotGripper* _pGripper;
     DobotQueue* _pQueue;
 
     const int _ARM_MAX_VELOCITY, _ARM_MAX_ACCELERATION;
-
     short _sItemIDInGripper;
-
     bool _bConnectedToDobot;
     bool _bFirstMoveIsDone;
 
+    IntermediatePoints _intermediatePoints;
     HOMEParams _home;
     Point3D _realTimePoint;
     Point3D _lastGivenPoint;
@@ -46,7 +45,7 @@ private:
 
 public:
     //future: don't add whole RealVars to dobot
-    Dobot(RealVars gameConfigVars, IntermediatePoints* pIntermediatePoints);
+    Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints);
     ~Dobot();
 
     void saveActualDobotPosition();
@@ -54,24 +53,23 @@ public:
     void onPTPsendBtnClicked();
 
     void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove =
-            VM_NONE, bool bRetreat = false);
+            VM_NONE, bool bEscape = false);
     bool isMoveSafe(Point3D point);
     bool isPointDiffrentOnlyInZAxis(Point3D point);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
-    void armUpDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
-    bool bIsArmConnected() const { return _bConnectedToDobot; }
+    void moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
 
     void setItemInGripper(short sGrippersItemID);
     void clearGripper();
 
     bool isGripperEmpty() const { return _sItemIDInGripper == 0 ? true : false; }
     short getItemInGripper() const { return _sItemIDInGripper; }
+    IntermediatePoints getIntermediatePoints() const { return _intermediatePoints; }
     Point3D getHomePos();
     Point3D getLastGivenPoint() const { return _lastGivenPoint; }
     QString dumpAllData();
 
-    IntermediatePoints* getIntermediatePoints() const { return _pIntermediatePoints; }
     DobotGripper* getServoPointer() const { return _pGripper; }
     DobotQueue* getQueuePointer() const { return _pQueue; }
 

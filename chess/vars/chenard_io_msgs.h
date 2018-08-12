@@ -40,7 +40,7 @@ inline QString chenardMsgTypeAsQStr(CHENARD_MSG_TYPE CMT)
     case CMT_HISTORY: return "history pgn";
     case CMT_MOVE: return "move";
     default:
-        qCritical() << "wrong arg =" << CMT;
+        qCritical() << "wrong arg =" << QString::number(CMT);
         return "";
     }
 }
@@ -64,7 +64,7 @@ inline bool isChenardAnswerCorrect(CHENARD_MSG_TYPE Command, QString QStrAns, bo
         bReturn = (QStrAns.left(4) == "OK 1") ? true : false; //"OK 1" and "OK 1\n"
         break;
     default:
-        qCritical() << "wrong arg =" << Command;
+        qCritical() << "wrong arg =" << QString::number(Command);
         bReturn = false;
     }
 

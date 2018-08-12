@@ -2,23 +2,16 @@
 
 Chess *Errors::pChess = nullptr; //static pointer
 
-Errors::Errors()
-{
-    //_pIntermediatePointsCalc = pIntermediatePointsCalc; //todo:
-}
-
 void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                          const QString &msg)
 {
-    //QMutexLocker locker(&mutex);
+    //QMutexLocker locker(&mutex); //todo: need to be done with threads in TCPs
 
     QDateTime dateTime(QDateTime::currentDateTime());
-    QString timeStr(dateTime.toString("HH:mm:ss:z"));
-    QByteArray QBaTime = timeStr.toLocal8Bit();
+    QString QStrTime(dateTime.toString("HH:mm:ss:z"));
+    QByteArray QBaTime = QStrTime.toLocal8Bit();
 
     QByteArray localMsg = msg.toLocal8Bit();
-
-    //QString QStrErrorMsg = errorMsg(type, context, msg, timeStr, )
 
     switch (type)
     {
@@ -31,42 +24,48 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
         break;
     case QtWarningMsg:
-        fprintf(stderr, C_PURPLE "WARNING: [%s %s:%u] %s\n" C_BLACK,
+        fprintf(stderr, C_PURPLE "WARNING: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
         if (Errors::pChess != nullptr)
-            Errors::saveErrorInFile(Errors::errorMsg(type, context, msg, timeStr));
+            Errors::saveErrorInFile(type, context, msg, QStrTime);
         break;
     case QtCriticalMsg:
-        fprintf(stderr, C_RED "ERROR: [%s %s:%u] %s\n" C_BLACK,
+        fprintf(stderr, C_RED "ERROR: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
         if (Errors::pChess != nullptr)
-            Errors::saveErrorInFile(Errors::errorMsg(type, context, msg, timeStr));
+            Errors::saveErrorInFile(type, context, msg, QStrTime);
         break;
     case QtFatalMsg:
-        fprintf(stderr, CB_RED "FATAL ERROR: [%s %s:%u] %s\n" C_BLACK,
+        fprintf(stderr, CB_RED "FATAL ERROR: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
+        if (Errors::pChess != nullptr)
+            Errors::saveErrorInFile(type, context, msg, QStrTime);
         abort();
     }
     fflush(stderr);
 }
 
 /*static*/ QString Errors::errorMsg(QtMsgType msgType, const QMessageLogContext &context,
-                                    const QString &QStrMsg, QString QStrTime)
+                                    const QString &QStrErrorMsg, QString QStrTime)
 {
-    QString QStrErrorType;
+    QString QStrFunction = QString::fromUtf8(context.function);
+
+    QString QStrFullErrorMsg = "<ERROR TYPE>: " + Errors::errorTypeAsQStr(msgType) + "\n"
+            + "<TIME>: " + QStrTime + "\n"
+            + "<FUNCTION>: " + QStrFunction + ":" + QString::number(context.line) + "\n"
+            + "<ERROR MSG>: " + QStrErrorMsg + "\n"
+            + "<APPLICATION ALL DUMPED DATA>:\n" + Errors::getAppDumpData();
+
+    return QStrFullErrorMsg;
+}
+
+/*static*/ QString Errors::errorTypeAsQStr(QtMsgType msgType)
+{
+    QString QStrErrorType = "ERROR: UNKNOWN_ERROR_TYPE";
     if (msgType == QtWarningMsg) QStrErrorType = "WARNING";
     else if (msgType == QtCriticalMsg) QStrErrorType = "ERROR";
     else if (msgType == QtFatalMsg) QStrErrorType = "FATAL ERROR";
-
-    QString QStrFunction = QString::fromUtf8(context.function);
-
-    QString QStrErrorMsg = "ERROR TYPE: " + QStrErrorType + "\n"
-            + "TIME: " + QStrTime + "\n"
-            + "FUNCTION" + QStrFunction + ":" + QString::number(context.line) + "\n"
-            + "ERROR MSG: " + QStrMsg + "\n"
-            + "APPLICATION ALL DUMPED DATA:\n" + Errors::getAppDumpData();
-
-    return QStrErrorMsg;
+    return QStrErrorType;
 }
 
 /*static*/ QString Errors::getAppDumpData()
@@ -77,25 +76,33 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
     QStrAppAllData = Errors::pChess->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getBoardMainPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getBoardRemovedPointer()->dumpAllData() + "\n\n";
-    QStrAppAllData += Errors::pChess->getBoardRemovedPointer()->dumpAllData() + "\n\n";
-    //piece
     QStrAppAllData += Errors::pChess->getClientsPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getDobotPointer()->dumpAllData() + "\n\n";
-    //QStrAppAllData += _pIntermediatePointsCalc->dumpAllData() + "\n\n"; //todo:
-    QStrAppAllData += Errors::pChess->getPieceControllerPointer()
-            ->getLastPos().getAsQStr() + "\n\n";
+    QStrAppAllData += Errors::pChess->getDobotPointer()
+            ->getIntermediatePoints().dumpAllData() + "\n\n";
+    QStrAppAllData += Errors::pChess->getPieceControllerPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getPieceControllerPointer()
             ->getPieceSetPointer()->dumpAllData() + "\n\n";
 
     return QStrAppAllData;
 }
 
-/*static*/ void Errors::saveErrorInFile(QString QStrErrorMsg)
+/*static*/ void Errors::saveErrorInFile(QtMsgType msgType, const QMessageLogContext &context,
+                                        const QString &QStrErrorMsg, QString QStrTime)
 {
-    QFile errorLogFile("logFile.txt");
-    errorLogFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    QString QStrFullErrorMsg = Errors::errorMsg(msgType, context, QStrErrorMsg, QStrTime);
 
+    QDateTime dateTime(QDateTime::currentDateTime());
+    QString QStrFileTime(dateTime.toString("dd.MM.yyyy HH:mm:ss"));
+    QStrFileTime.replace(".", "_"); //dots can't be in file name
+    QStrFileTime.replace(QStrFileTime.indexOf(":"), 1, "h");
+    QStrFileTime.replace(QStrFileTime.indexOf(":"), 1, "m");
+    QStrFileTime += "s";
+
+    QString QStrFileName = QStrFileTime + " " + Errors::errorTypeAsQStr(msgType);
+    QFile errorLogFile("errorLogs/" + QStrFileName + ".txt");
+    errorLogFile.open(QFile::Append | QFile::Text);
     QTextStream stream(&errorLogFile);
-    stream << QStrErrorMsg << endl;
+    stream << QStrFullErrorMsg;
+    errorLogFile.close();
 }
-

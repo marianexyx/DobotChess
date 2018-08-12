@@ -10,21 +10,17 @@
 class IntermediatePointsCalc
 {
 private:
-    IntermediatePoints _IP; //todo: this class shouldnt have its own IP. it...
-    //...should only returns calculated vars based on given vars
-
-    Point3D calculateMarginalGamePoint(INTERMEDIATE_POINTS IP, Chessboard* pBoard);
-    Point3D calculateMiddleAbovePoint(Point3D min, Point3D max);
-    Point3D calculateRetreatPoint(INTERMEDIATE_POINTS IP, Point3D midAbove,
-                                  Point3D retreat, Point3D max);
-    Point3D calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV);
-    Point3D calculateSafeAxisZPoint(RealVars RV);
+    static Point3D calculateMarginalGamePoint(INTERMEDIATE_POINTS IP, Chessboard* pBoard);
+    static Point3D calculateMiddleAbovePoint(Point3D min, Point3D max);
+    static Point3D calculateRetreatPoint(INTERMEDIATE_POINTS IP, Point3D midAbove,
+                                         Point3D retreat, Point3D max);
+    static Point3D calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV);
+    static Point3D calculateSafeAxisZPoint(RealVars RV);
 
 public:
-    IntermediatePointsCalc(RealVars RV, Chessboard *pBoard);
+    IntermediatePointsCalc() {}
 
-    IntermediatePoints getIntermediatePoints() const { return _IP; }
-    QString dumpAllData();
+    static IntermediatePoints calculate(RealVars RV, Chessboard* pBoard);
 };
 
 #endif // INTERMEDIATE_POINTS_CALCULATOR_H

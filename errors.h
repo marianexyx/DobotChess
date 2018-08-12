@@ -21,19 +21,18 @@
 
 class Errors
 {
-private:
-    //IntermediatePointsCalc* _pIntermediatePointsCalc; todo
-
 public:
-    Errors();
+    Errors() {}
 
-    static Chess* pChess; //overloadDebugOutput can work only on statics
+    static Chess* pChess; //overloadDebugOutput can work only as static
 
     static void overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                                     const QString &msg);
     static QString errorMsg(QtMsgType msgType, const QMessageLogContext &context,
                             const QString &QStrMsg, QString QStrTime);
-    static void saveErrorInFile(QString QStrErrorMsg);
+    static QString errorTypeAsQStr(QtMsgType msgType);
+    static void saveErrorInFile(QtMsgType msgType, const QMessageLogContext &context,
+                                const QString &QStrErrorMsg, QString QStrTime);
     static QString getAppDumpData();
 };
 

@@ -36,7 +36,8 @@ QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Typ
         clientRequest r;
         r.type = Type;
         r.param = QStrParam;
-        if (this->isRequestParameterInProperFormat(r)) return QStrParam;
+        if (this->isRequestParameterInProperFormat(r)) //clients cannot make errors in here
+            return QStrParam;
         else return "";
     }
     else return "";
@@ -155,13 +156,15 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
         bSuccess = true;
         break;
     default:
-        qCritical() << "unknown REQUEST TYPE =" << Type;
+        qCritical() << "unknown REQUEST_TYPE =" << QString::number(Type);
         bSuccess = false;
     }
 
     if (!bSuccess)
-        qCritical() << "Type = " << requestTypeAsQStr(Type) << ". bLogged =" << bLogged
-                    << ", bSittingOnChair =" << bSittingOnChair << ", bInQueue =" << bInQueue;
+        qCritical() << "Type = " << requestTypeAsQStr(Type) << ". bLogged ="
+                    << QString::number(bLogged) << ", bSittingOnChair ="
+                    <<QString::number(bSittingOnChair) << ", bInQueue ="
+                   << QString::number(bInQueue);
 
     return bSuccess;
 }
@@ -187,7 +190,7 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
             return true;
         else return false;
     }
-    case RT_IM: //sql hash is ok && (name == empty || name == actual name)
+    case RT_IM: //sql hash is ok && (sqlID == empty || sqlID == actual name)
         if ((pSender->sqlID() == request.param.left(request.param.indexOf("&")).toInt()
              || pSender->sqlID() == 0) && Sql::isClientHashOk(request.param))
             return true;

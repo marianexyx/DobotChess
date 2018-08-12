@@ -28,7 +28,7 @@ private Q_SLOTS: //Q_SLOTS is for 3rd party mechanisms, that want use slots
     void socketDisconnected();
 
 public:
-    Websockets(Clients* pClientsList, QObject* parent = Q_NULLPTR);
+    Websockets(QObject* parent = Q_NULLPTR);
     ~Websockets();
 
     void listenOnPort(quint16 port);

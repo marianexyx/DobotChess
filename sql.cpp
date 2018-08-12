@@ -18,10 +18,10 @@
 {    
     if (n64sqlId < 1)
     {
-        qCritical() << "ID param cannot be below 1. it's ==" << n64sqlId;
+        qCritical() << "ID param cannot be below 1. it's ==" << QString::number(n64sqlId);
         return false;
     }
-    qInfo() << "n64sqlId =" << n64sqlId;
+    qInfo() << "n64sqlId =" << QString::number(n64sqlId);
 
     if (sqlDB.open())
     {
@@ -37,7 +37,7 @@
 
         if (query.size() != 1)
         {
-            qCritical() << "query.size() != 1. it's =" << query.size();
+            qCritical() << "query.size() != 1. it's =" << QString::number(query.size());
             return false;
         }
 
@@ -70,13 +70,11 @@
     return Sql::isClientHashOk(n64ID, QStrHash);
 }
 
-//todo: it must be checked only once per client, when he gives his sqlId, because...
-//...I think this slow the communication with players
-/*static*/ QString Sql::getClientName(int64_t n64sqlId)
+/*static*/ QString Sql::getClientNameFromDB(int64_t n64sqlId)
 {
     if (n64sqlId <= 0)
     {
-        qCritical() << "given ID < 1. its =" << n64sqlId;
+        qCritical() << "given sqlID <= 0. its =" << QString::number(n64sqlId);
         return "";
     }
 
@@ -94,7 +92,7 @@
 
         if (query.size() != 1)
         {
-            qCritical() << "query.size() != 1. it's =" << query.size();
+            qCritical() << "query.size() != 1. it's =" << QString::number(query.size());
             return "";
         }
 

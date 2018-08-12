@@ -12,7 +12,8 @@ PosOnBoard::PosOnBoard(int nL, int nD)
     {
         Letter = L_X;
         Digit = D_X;
-        qCritical() << "parameters out of range: nL =" << nL << ", nD =" << nD;
+        qCritical() << "parameters out of range: nL =" << QString::number(nL)
+                    << ", nD =" << QString::number(nD);
     }
 }
 
@@ -21,7 +22,8 @@ PosOnBoard::PosOnBoard(QString QStrL, DIGIT D)
     Letter = pieceLetterPos(QStrL);
     Digit = D;
     if (Letter == L_X || Digit == D_X)
-        qCritical() << "parameter is X: Letter =" << Letter << ", Digit =" << Digit;
+        qCritical() << "parameter is X: Letter =" << QString::number(Letter)
+                    << ", Digit =" << QString::number(Digit);
 }
 
 PosOnBoard::PosOnBoard(QString QStrL, int nD)
@@ -29,7 +31,8 @@ PosOnBoard::PosOnBoard(QString QStrL, int nD)
     Letter = pieceLetterPos(QStrL);
     Digit = static_cast<DIGIT>(nD);
     if (Letter == L_X || Digit == D_X)
-        qCritical() << "parameter is X: Letter =" << Letter << ", Digit =" << Digit;
+        qCritical() << "parameter is X: Letter =" << QString::number(Letter)
+                    << ", Digit =" << QString::number(Digit);
 }
 PosOnBoard::PosOnBoard(QString QStrBoardPos)
 {
@@ -45,7 +48,8 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
         Digit = static_cast<DIGIT>(QStrBoardPos.right(1).toInt());
     }
     if (Letter == L_X || Digit == D_X)
-        qWarning() << "parameter is X: Letter =" << Letter << ", Digit =" << Digit;
+        qWarning() << "parameter is X: Letter =" << QString::number(Letter)
+                   << ", Digit =" << QString::number(Digit);
 }
 
 ///PosFromTo:
@@ -88,8 +92,8 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
                 static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt()) > D_8)
         {
             qCritical() << "pieceFromDigit is out of range <1, 8>. it's ="
-                        << static_cast<DIGIT>(QStrMoveFromTo.mid(1,1).toInt())
-                        << ", QStrMoveFromTo.mid(2,1) =" << QStrMoveFromTo.mid(1,1);
+                        << QStrMoveFromTo.mid(1,1) << ", QStrMoveFromTo.mid(2,1) ="
+                        << QStrMoveFromTo.mid(2,1);
             return false;
         }
 
@@ -100,14 +104,14 @@ PosFromTo::PosFromTo(QString QStrMoveFromTo)
                 static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt()) > D_8)
         {
             qCritical() << "pieceToDigit is out of range <1, 8>. it's ="
-                        << static_cast<DIGIT>(QStrMoveFromTo.right(1).toInt())
-                        << ", QStrMoveFromTo.right(1) =" << QStrMoveFromTo.right(1);
+                        << QStrMoveFromTo.right(1) << ", QStrMoveFromTo.right(1) ="
+                        << QStrMoveFromTo.right(1);
             return false;
         }
     }
     else
     {
-        qCritical() << "wrong length:" << QStrMoveFromTo.length()
+        qCritical() << "wrong length:" << QString::number(QStrMoveFromTo.length())
                     << ". full string =" << QStrMoveFromTo;
         return false;
     }

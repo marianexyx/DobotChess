@@ -30,7 +30,7 @@ inline QString sequenceTypeAsQstr(SEQUENCE_TYPE ST)
     case ST_REMOVING: return "removing";
     case ST_PROMOTION_WITH_REMOVING: return "promotionWithRemoving";
     default:
-        qCritical() << "wrong arg =" << ST;
+        qCritical() << "wrong arg =" << QString::number(ST);
         return "";
     }
 }

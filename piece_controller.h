@@ -36,6 +36,7 @@ public:
     PosOnBoard getLastPos() const { return _lastPos; } //dumpAllData
     QString getPromotedPawnsPositions();
     Piece* getPiece(short sPieceNr) const { return _pPieceSet->getPiece(sPieceNr); }
+    QString dumpAllData();
 
     Dobot* getDobotPointer() const { return _pDobot; }
     PieceSet* getPieceSetPointer() const { return _pPieceSet; }

@@ -37,7 +37,7 @@ inline QString tableDataTypeAsQstr(TABLE_DATA_TYPE TD)
     case TD_HISTORY: return "history";
     case TD_PROMOTIONS: return "promotions";
     default:
-        qCritical() << "wrong arg =" << TD;
+        qCritical() << "wrong arg =" << QString::number(TD);
         return "";
     }
 }

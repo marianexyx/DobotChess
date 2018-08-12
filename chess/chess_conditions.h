@@ -8,8 +8,6 @@
 #include "chess/chess_status.h"
 #include "sql.h"
 
-//todo: save all errors in log file with all necessary data (make class for debugs)
-
 class ChessConditions
 {
     friend class Chess;

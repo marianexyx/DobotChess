@@ -7,7 +7,9 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
     _pClientsList = pClientsList;
     _pPieceController = pPieceController;
 
+    _FENGameState = ET_NONE;
     _WhoseTurn = NO_TURN;
+    _MoveType = ST_NONE;
 }
 
 /*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign,
@@ -193,13 +195,13 @@ QString ChessStatus::dumpAllData()
 
     QStrData = "[chess_status.h]\n";
     QStrData += "_FENGameState: " + endTypeAsQstr(_FENGameState) + "\n";
-    QStrData += ", _WhoseTurn: " + turnTypeAsQstr(_WhoseTurn) + "\n";
-    QStrData += ", _QStrCastlings: " + _QStrCastlings + "\n";
-    QStrData += ", _QStrEnpassant: " + _QStrEnpassant + "\n";
-    QStrData += ", _legalMoves: " + _legalMoves.join(",") + "\n";
-    QStrData += ", _historyMoves: " + _historyMoves.join(",") + "\n";
-    QStrData += ", _PosMove: " + _PosMove.asQStr() + "\n";
-    QStrData += ", _MoveType: " + sequenceTypeAsQstr(_MoveType) + "\n";
+    QStrData += "_WhoseTurn: " + turnTypeAsQstr(_WhoseTurn) + "\n";
+    QStrData += "_QStrCastlings: " + _QStrCastlings + "\n";
+    QStrData += "_QStrEnpassant: " + _QStrEnpassant + "\n";
+    QStrData += "_legalMoves: " + _legalMoves.join(",") + "\n";
+    QStrData += "_historyMoves: " + _historyMoves.join(",") + "\n";
+    QStrData += "_PosMove: " + _PosMove.asQStr() + "\n";
+    QStrData += "_MoveType: " + sequenceTypeAsQstr(_MoveType) + "\n";
 
     return QStrData;
 }
@@ -223,7 +225,7 @@ void ChessStatus::setLegalMoves(QString QStrMsg)
     {
         QString QStrLastLegalMove = legalMoves.last();
         QStrLastLegalMove = QStrLastLegalMove.simplified();
-        QStrLastLegalMove = QStrLastLegalMove.replace( " ", "" ); //remove np. "\n"
+        QStrLastLegalMove = QStrLastLegalMove.replace(" ", "" ); //remove np. "\n"
         legalMoves.last() = QStrLastLegalMove;
     }
     this->setLegalMoves(legalMoves);

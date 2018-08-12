@@ -68,8 +68,7 @@ private:
     void resetTableData();
 
 public:
-    Chess(PieceController* pPieceController, Chessboard* pBoardChenard,
-          Websockets* pWebsockets, TCPMsgs* pTCPMsgs);
+    Chess(PieceController* pPieceController);
     ~Chess();
 
     void setGameStatus(GAME_STATUS Status) { _ChessGameStatus = Status; }

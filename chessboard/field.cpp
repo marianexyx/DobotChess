@@ -15,7 +15,7 @@ Field::Field(short sFieldNr)
 {
     if (sFieldNr < 1 || sFieldNr > 64)
     {
-        qCritical() << " out of range. nr =" << sFieldNr;
+        qCritical() << " out of range. nr =" << QString::number(sFieldNr);
         return false;
     }
     else return true;
@@ -38,7 +38,8 @@ Field::Field(short sFieldNr)
     }
 
     if (!Field::isInRange(Field::nr(FieldLines)))
-        qCritical() << "field" << Field::nr(FieldLines) << "isn't in range after convertation";
+        qCritical() << "field" << Field::nrAsQStr(Field::nr(FieldLines))
+                    << "isn't in range after convertation";
 
     return FieldLines;
 }
@@ -114,7 +115,8 @@ bool Field::isFieldOccupied(bool bErrorLog /*= false*/)
         return true;
         if (bErrorLog)
             qCritical() << "field is already occupied by another piece, field ="
-                        << _sNr << ", piece =" << _pPieceOnField->getNr();
+                        << Field::nrAsQStr(_sNr) << ", piece ="
+                        << QString::number(_pPieceOnField->getNr());
     }
     else return false;
 }
@@ -129,9 +131,14 @@ Piece* Field::getPieceOnField(bool bErrorLog /*= false*/) const
 
 QString Field::dumpAllData()
 {
-    return "[field.h]: _sNr: " + QString::number(_sNr)
-            //todo: can i check _pPieceOnField->getNr() against nullptr?
-            + ", _pPieceOnField->nr: " + _pPieceOnField->getNr()
-            + ", _sStartPieceNrOnField: " + QString::number(_sStartPieceNrOnField)
-            + ", _location3D: " + _location3D.getAsQStr();
+    QString QStrData;
+
+    QStrData = "[field.h] _sNr: " + QString::number(_sNr);
+    QString QStrPieceOnField = _pPieceOnField == nullptr ?
+                "0" : QString::number(_pPieceOnField->getNr());
+    QStrData += ", _pPieceOnField->nr: " + QStrPieceOnField;
+    QStrData += ", _sStartPieceNrOnField: " + QString::number(_sStartPieceNrOnField);
+    QStrData += ", _location3D: " + _location3D.getAsQStr();
+
+    return QStrData;
 }

@@ -24,6 +24,7 @@ inline QString endTypeAsQstr(END_TYPE ET)
 {
     switch(ET)
     {
+    case ET_NONE: return "none";
     case ET_NORMAL_WIN_WHITE: return "normalWinWhite";
     case ET_NORMAL_WIN_BLACK: return "normalWinBlack";
     case ET_DRAW: return "draw";
@@ -34,7 +35,7 @@ inline QString endTypeAsQstr(END_TYPE ET)
     case ET_TIMEOUT_GAME_WHITE: return "timeOutWhite";
     case ET_TIMEOUT_GAME_BLACK: return "timeOutBlack";
     default:
-        qCritical() << "wrong arg =" << ET;
+        qCritical() << "wrong arg =" << QString::number(ET);
         return "";
     }
 }

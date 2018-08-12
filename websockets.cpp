@@ -1,10 +1,9 @@
 #include "websockets.h"
 
-Websockets::Websockets(Clients* pClientsList,  QObject* parent):
-    QObject(parent),
-    _pClientsList()
+Websockets::Websockets(QObject* parent):
+    QObject(parent)
 {
-    _pClientsList = pClientsList;
+    _pClientsList = new Clients();
 }
 
 Websockets::~Websockets()
@@ -21,7 +20,7 @@ void Websockets::listenOnPort(quint16 port)
                                               QWebSocketServer::NonSecureMode, this);
     if (_pWebSocketServer->listen(QHostAddress::Any, port))
     {
-        qInfo() << "connecting to port:" << port;
+        qInfo() << "connecting to port:" << QString::number(port);
 
         connect(_pWebSocketServer, &QWebSocketServer::newConnection,
                 this, &Websockets::onNewConnection);
@@ -44,7 +43,7 @@ void Websockets::onNewConnection()
 
 void Websockets::receivedMsg(QString QStrMsg)
 {    
-    if (QStrMsg != "keepConnected")
+    if (QStrMsg != "keepConnected") //future: also keep connect on server side
         qInfo() << QStrMsg;
     else return;
 
@@ -64,7 +63,7 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 
     if (n64ReceiverID < 1)
     {
-        qCritical() << "receiver ID < 1. it's =" << n64ReceiverID;
+        qCritical() << "receiver ID < 1. it's =" << QString::number(n64ReceiverID);
         return;
     }
     else
@@ -81,7 +80,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
     emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
-    Q_FOREACH (Client client, _pClientsList->getClientsList())
+    foreach (Client client, _pClientsList->getClientsList())
     {
         qInfo() << "client name =" << client.name();
         client.socket()->sendTextMessage(QStrMsg);

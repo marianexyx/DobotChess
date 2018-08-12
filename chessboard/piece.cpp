@@ -16,7 +16,7 @@ Piece::Piece(short sPieceID)
 {
     if (sPieceNr < 1 || sPieceNr > 32)
     {
-        qCritical() << "pieceNr out of range 1-32:" << sPieceNr;
+        qCritical() << "pieceNr out of range 1-32:" << QString::number(sPieceNr);
         return false;
     }
     else return true;
@@ -31,7 +31,7 @@ Piece::Piece(short sPieceID)
     case 'P': case 'R': case 'N': case 'B': case 'K': case 'Q':
         return PT_WHITE;
     default:
-        qCritical() << "unknown FENSign val =" << chFENSign;
+        qCritical() << "unknown FENSign val =" << QString::number(chFENSign);
         return PT_NONE;
     }
 }
@@ -57,7 +57,7 @@ Piece::Piece(short sPieceID)
     case 'k': case 'K': return P_KING;
     case 'q': case 'Q': return P_QUEEN;
     default:
-        qCritical() << "unknown chFENSign =" << chFENSign;
+        qCritical() << "unknown chFENSign =" << QString::number(chFENSign);
         return P_ERROR;
     }
 }
@@ -141,14 +141,14 @@ void Piece::setPromotedType(PIECE_TYPE promotedType)
     if (_pieceType != P_PAWN)
     {
         qCritical() << "only pawn can be promoted. (this is '"
-                    << (char)_pieceType << "' piece char type)";
+                    << QString::number(_pieceType) << "' piece char type)";
         return;
     }
 
     if (promotedType == P_QUEEN || promotedType == P_KNIGHT ||
             promotedType == P_ROOK || promotedType == P_BISHOP)
         _promotedType = promotedType;
-    else qCritical() << "wrong promotion type:" << (char)promotedType;
+    else qCritical() << "wrong promotion type:" << QString::number(promotedType);
 }
 
 QString Piece::getAsFENSign()

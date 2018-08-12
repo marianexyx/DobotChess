@@ -38,7 +38,7 @@ inline QString boardDataLabelsAsQstr(BOARD_DATA_LABEL BDL)
     case BDL_QUEUE_PLAYERS: return "queuePlayers";
     case BDL_QUEUE_TIME: return "queueTime";
     default:
-        qCritical() << "wrong arg =" << BDL;
+        qCritical() << "wrong arg =" << QString::number(BDL);
         break;
     }
 }

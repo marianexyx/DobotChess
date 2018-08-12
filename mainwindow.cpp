@@ -11,7 +11,6 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
 
     _pChess = pChess;
     _pDobot = _pChess->getDobotPointer();
-    _pIntermediatePoints = _pDobot->getIntermediatePoints();
     _pWebSockets = _pChess->getWebsocketsPointer();
     _pPieceController = _pChess->getPieceControllerPointer();
     _pBoardMain = _pChess->getBoardMainPointer();
@@ -444,8 +443,8 @@ void MainWindow::on_upBtn_clicked()
     {
         double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
                 ->getLocation3D().z + (double)_pBoardMain->fMaxPieceHeight;
-        qInfo() << "dZAxisVal =" << dZAxisVal;
-        _pDobot->armUpDown(DM_DOWN, dZAxisVal);
+        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
+        _pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
     }
     else
         qWarning() << "move isn't set";
@@ -457,8 +456,8 @@ void MainWindow::on_downBtn_clicked()
     {
         double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
                 ->getLocation3D().z;
-        qInfo() << "dZAxisVal =" << dZAxisVal;
-        _pDobot->armUpDown(DM_DOWN, dZAxisVal);
+        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
+        _pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
     }
     else
         qWarning() << "move isn't set";
@@ -484,7 +483,7 @@ void MainWindow::on_closeGripperBtn_clicked()
 void MainWindow::on_middleAboveBtn_clicked()
 {
     _pPieceController->clearLastPos();
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->middleAbove);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().middleAbove);
 }
 
 void MainWindow::on_startGmPosBtn_clicked()
@@ -498,9 +497,9 @@ void MainWindow::on_startGmPosBtn_clicked()
 
         this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
         _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerBelow);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerAbove);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->middleAbove);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerBelow);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerAbove);
+        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().middleAbove);
     }
     else
         qWarning() << "Dobot not in home positions";
@@ -511,9 +510,9 @@ void MainWindow::on_startDtPosBtn_clicked()
     _pPieceController->clearLastPos();
 
     this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->middleAbove);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerAbove);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->cournerBelow);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().middleAbove);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerAbove);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerBelow);
     _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
 }
 
@@ -584,7 +583,7 @@ void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType
     case BDL_BLACK_TIME: ui->blackTimeLbl->setText(QStrLabel); break;
     case BDL_QUEUE_PLAYERS: ui->queuedPlayersLbl->setText(QStrLabel); break;
     case BDL_QUEUE_TIME: ui->queueTimeLbl->setText(QStrLabel); break;
-    default: qWarning() << "unknown labelType:" << LabelType;
+    default: qWarning() << "unknown labelType:" << QString::number(LabelType);
     }
 }
 
@@ -617,7 +616,7 @@ void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
                 {
                     QStrBoardArray[nColumn][nRow] = QStrFENSign;
                     if (nColumn > D_8)
-                        qWarning() << "nColumn > 8 =" << nColumn;
+                        qWarning() << "nColumn > 8 =" << QString::number(nColumn);
                     ++nColumn;
                 }
                 else //digits
@@ -626,7 +625,7 @@ void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
                     {
                         QStrBoardArray[nColumn][nRow] = ".";
                         if (nColumn > D_8)
-                            qWarning() << "nColumn > 8 =" << nColumn;
+                            qWarning() << "nColumn > 8 =" << QString::number(nColumn);
                         ++nColumn;
                     }
                 }
@@ -635,9 +634,10 @@ void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
     }
     else
     {
-        qWarning() << "boardRows.size() != 8. size =" << QStrFENBoardRows.size();
+        qWarning() << "boardRows.size() != 8. size =" << QString::number(QStrFENBoardRows.size());
         for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
-            qInfo() << "QStrFENBoardRows at" << i << "=" << QStrFENBoardRows.at(i);
+            qInfo() << "QStrFENBoardRows at" << QString::number(i)
+                    << "=" << QStrFENBoardRows.at(i);
     }
 
     QString QStrBoardPTE;
@@ -754,12 +754,12 @@ void MainWindow::on_zPTPEdit_textChanged(const QString& QStrTextChanged)
 
 void MainWindow::on_retreatLeftBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->retreatLeft);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().retreatLeft);
 }
 
 void MainWindow::on_retreatRightBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pIntermediatePoints->retreatRight);
+    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().retreatRight);
 }
 
 void MainWindow::changeWindowTitle()

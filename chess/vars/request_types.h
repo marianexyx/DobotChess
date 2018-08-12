@@ -45,7 +45,7 @@ inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = fa
     else
     {
         if (bErrorLog)
-            qCritical() << "not a valid type. QStrRequest =" << QStrRequest;
+            qWarning() << "not a valid type. QStrRequest =" << QStrRequest;
 
         return RT_NONE;
     }
@@ -55,6 +55,7 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
 {
     switch(RT)
     {
+    case RT_NONE: return "none";
     case RT_NEW_GAME: return "newGame";
     case RT_MOVE: return "move";
     case RT_GET_TABLE_DATA: return "getTableDataAsJSON";
@@ -66,7 +67,7 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     case RT_LEAVE_QUEUE: return "leaveQueue";
     case RT_CLIENT_LEFT: return "clientLeft";
     default:
-        qCritical() << "wrong arg =" << RT;
+        qCritical() << "wrong arg =" << QString::number(RT);
         return "";
     }
 }

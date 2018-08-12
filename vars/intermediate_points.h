@@ -15,6 +15,23 @@ struct IntermediatePoints
     Point3D retreatLeft;
     Point3D retreatRight;
     Point3D safeAxisZ; //only Z axis is used
+
+    QString dumpAllData()
+    {
+        QString QStrData;
+
+        QStrData = "[intermediate_points_calc.h]\n";
+        QStrData += "minGame: " + minGame.getAsQStr() + "\n";
+        QStrData += "maxGame: " + maxGame.getAsQStr() + "\n";
+        QStrData += "middleAbove: " + middleAbove.getAsQStr() + "\n";
+        QStrData += "cournerBelow: " + cournerBelow.getAsQStr() + "\n";
+        QStrData += "cournerAbove: " + cournerAbove.getAsQStr() + "\n";
+        QStrData += "retreatLeft: " + retreatLeft.getAsQStr() + "\n";
+        QStrData += "retreatRight: " + retreatRight.getAsQStr() + "\n";
+        QStrData += "safeAxisZ: " + safeAxisZ.getAsQStr() + "\n";
+
+        return QStrData;
+    }
 };
 
 enum INTERMEDIATE_POINTS
@@ -42,7 +59,7 @@ inline QString intermediatePointTypeAsQstr(INTERMEDIATE_POINTS IP)
     case IP_RETREAT_RIGHT: return "retreatRight";
     case IP_SAFE_AXIS_Z: return "safeAxisZ";
     default:
-        qCritical() << "wrong arg =" << IP;
+        qCritical() << "wrong arg =" << QString::number(IP);
         return "";
     }
 }

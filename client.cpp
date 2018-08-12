@@ -9,17 +9,18 @@ void Clients::newClient(QWebSocket* const clientSocket)
     newClient._queue = 0;
     newClient._isStartClickedByPlayer = false;
     newClient._type = PT_NONE;
+    newClient._name = "";
 
     _clients << newClient;
 }
 
-void Clients::setClientSqlID(const Client& client, int64_t sqlID)
+void Clients::setClientSqlIDAndName(const Client& client, int64_t sqlID)
 {
     foreach (Client cl, _clients)
     {
         if (cl._sqlID == sqlID && cl._sqlID > 0)
         {
-            qCritical() << "name" << cl.name() << "already exists.";
+            qCritical() << "sqlID" << QString::number(sqlID) << "already exists";
             return;
         }
     }
@@ -30,14 +31,16 @@ void Clients::setClientSqlID(const Client& client, int64_t sqlID)
         {
             Client changedClient = cl;
             changedClient._sqlID = sqlID;
+            changedClient._name = sqlID == 0 ? "" : Sql::getClientNameFromDB(sqlID);
 
             int nClientPos = _clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qInfo() << "new sqlID =" << _clients.at(nClientPos)._sqlID;
+                qInfo() << "new sqlID =" << QString::number(_clients.at(nClientPos)._sqlID)
+                        << "and name =" << _clients.at(nClientPos)._name;
             }
-            else qCritical() << "iteration error. ter val ="  << nClientPos;
+            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             return;
         }
@@ -49,7 +52,7 @@ void Clients::setClientSqlID(const Client& client, int64_t sqlID)
 void Clients::clearClientSqlID(const Client& client)
 {
     qInfo();
-    this->setClientSqlID(client, 0);
+    this->setClientSqlIDAndName(client, 0);
 }
 
 void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
@@ -61,7 +64,8 @@ void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
             if (Type != PT_NONE && client._queue > 0)
             {
                 qCritical() << "client" << client.name() << "in queue can't sit on chair. PT ="
-                         << playerTypeAsQStr(Type) << ", client.queue =" << client._queue;
+                         << playerTypeAsQStr(Type) << ", client.queue ="
+                         << QString::number(client._queue);
                 return;
             }
 
@@ -81,7 +85,7 @@ void Clients::setPlayerType(const Client& client, PLAYER_TYPE Type)
                                         Type == PT_WHITE ? BDL_WHITE_NAME : BDL_BLACK_NAME);
             }
             else
-                qCritical() << "iteration error. iter val =" << nClientPos;
+                qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             return;
         }
@@ -108,7 +112,7 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
                     qInfo() << playerTypeAsQStr(Type);
                     _clients.replace(nClientPos, changedClient);
                 }
-                else qCritical() << "iteration error. iter val =" << nClientPos;
+                else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
                 return;
             }
@@ -134,9 +138,10 @@ void Clients::setClientStartConfirmation(const Client& client, bool bState)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qInfo() << "new state =" << _clients.at(nClientPos)._isStartClickedByPlayer;
+                qInfo() << "new state ="
+                        << QString::number(_clients.at(nClientPos)._isStartClickedByPlayer);
             }
-            else qCritical() << "iteration error. iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             return;
         }
@@ -160,9 +165,10 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
             if (nClientPos >= 0 && nClientPos < _clients.size())
             {
                 _clients.replace(nClientPos, changedClient);
-                qInfo() << "new state =" << _clients.at(nClientPos)._isStartClickedByPlayer;
+                qInfo() << "new state ="
+                        << QString::number(_clients.at(nClientPos)._isStartClickedByPlayer);
             }
-            else qCritical() << "iteration error. iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             this->showClientsInUI();
 
@@ -180,7 +186,7 @@ void Clients::addClientToQueue(const Client& client)
         {
             if (cl._queue > 0)
             {
-                qCritical() << "client already in queue:" << cl._queue;
+                qCritical() << "client already in queue:" << QString::number(cl._queue);
                 return;
             }
             if (cl._type != PT_NONE)
@@ -209,9 +215,10 @@ void Clients::addClientToQueue(const Client& client)
             {
                 _clients.replace(nClientPos, changedClient);
                 qInfo() << "client named =" << _clients.at(nClientPos).name()
-                        << "queued in list with nr =" << _clients.at(nClientPos)._queue;
+                        << "queued in list with nr ="
+                        << QString::number(_clients.at(nClientPos)._queue);
             }
-            else qCritical() << "iteration error. iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
@@ -257,7 +264,7 @@ void Clients::removeClientFromQueue(const Client &client)
             {
                 _clients.replace(nClientPos, changedClient);
             }
-            else qCritical() << "iteration error. iter val =" << nClientPos;
+            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
@@ -350,6 +357,13 @@ Client Clients::getClient(QWebSocket* pClientSocket)
 
 Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */)
 {
+    if (n64ClientID <= 0)
+    {
+        qCritical() << "tried to find client with " << clientIDAsQStr(IdType)
+                    << "<= 0:" << QString::number(n64ClientID);
+        return *new Client;
+    }
+
     if (IdType == CID_CORE)
     {
         foreach (Client cl, _clients)
@@ -374,11 +388,11 @@ Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */
     }
     else
     {
-        qCritical() << "unknown CLIENT_ID type =" << IdType;
+        qCritical() << "unknown CLIENT_ID type =" << QString::number(IdType);
         return *new Client;
     }
 
-    qCritical() << "client not found. ID =" << n64ClientID;
+    qCritical() << "client not found. ID =" << QString::number(n64ClientID);
     return *new Client;
 }
 
@@ -403,7 +417,7 @@ Client Clients::getNextQueuedClient()
         if (minQueue > cl._queue && cl._queue > 0)
             minQueue = cl._queue;
     }
-    qInfo() << "minQueue =" << minQueue;
+    qInfo() << "minQueue =" << QString::number(minQueue);
     foreach (Client cl, _clients)
     {
         if (cl._queue == minQueue)
@@ -442,8 +456,7 @@ QString Clients::getQueuedClientsList()
                     maxQueue = cl._queue;
             }
 
-            //remember last biggest client for next iteration
-            lastBiggestQueue = maxQueue;
+            lastBiggestQueue = maxQueue; //remember last biggest client for next iteration
 
             //add last biggest found queued client sqlID to string for return
             foreach (Client cl, _clients)
@@ -455,8 +468,9 @@ QString Clients::getQueuedClientsList()
 
             if (nLoopBreakingCounter > nNumberOfClients + 1)
             {
-                qCritical() << "incorrect loop break. counter =" << nLoopBreakingCounter
-                            << ", nNumberOfClients =" << nNumberOfClients+1;
+                qCritical() << "incorrect loop break. counter ="
+                            << QString::number(nLoopBreakingCounter)
+                            << ", nNumberOfClients =" << QString::number(nNumberOfClients+1);
                 return "ERROR";
             }
             nLoopBreakingCounter++;
@@ -523,7 +537,7 @@ QWebSocket* Clients::getPlayerSocket(PLAYER_TYPE Type)
     }
     else
     {
-        qCritical() << "wrong parameter:" << Type;
+        qCritical() << "wrong parameter:" << QString::number(Type);
         return nullptr;
     }
 }
@@ -541,7 +555,7 @@ bool Clients::isStartClickedByPlayer(PLAYER_TYPE Type)
     }
     else
     {
-        qCritical() << "wrong parameter:" << Type;
+        qCritical() << "wrong parameter:" << QString::number(Type);
         return false;
     }
 }
@@ -596,7 +610,7 @@ bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
     }
 
     if (bErrorLog)
-        qCritical() << "ID:" << n64ID << "already exists";
+        qCritical() << "ID:" << QString::number(n64ID) << "already exists";
 
     return false;
 }
@@ -675,15 +689,18 @@ QString Clients::dumpAllData()
 {
     QString QStrData;
 
-    QStrData = "[client.h]\n";
     foreach (Client cl, _clients)
     {
-        QStrData += "client: _ID: " + QString::number(cl.ID()) +
-                ", _sqlID:" + QString::number(cl.sqlID())
+        QStrData += "[client.h] _ID: " + QString::number(cl.ID())
+                + ", _sqlID:" + QString::number(cl.sqlID())
+                + ", _socket->localAddress():" + cl.socket()->localAddress().toString()
+                + ", _socket->origin():" + cl.socket()->origin()
+                + ", _socket->peerAddress():" + cl.socket()->peerAddress().toString()
+                + ", _socket->peerName():" + cl.socket()->peerName()
                 + ", _type: " + playerTypeAsQStr(cl.type())
                 + ", _isStartClickedByPlayer: " + QString::number(cl.isStartClickedByPlayer())
                 + ", _queue: " + QString::number(cl.queue())
-                + ", name: " + cl.name() + "\n";
+                + ", name: " + cl.name(DONT_SHOW_ERRORS) + "\n";
     }
 
     return QStrData;

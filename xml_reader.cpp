@@ -35,7 +35,7 @@ bool XmlReader::openFile(XML_FILE_TYPE XFT)
         xmlDoc = &_xmlDocDatabase;
         break;
     default:
-        qCritical() << "unknown file type =" << XFT;
+        qCritical() << "unknown file type =" << QString::number(XFT);
         return false;
     }
 
@@ -58,7 +58,7 @@ bool XmlReader::openFile(XML_FILE_TYPE XFT)
         if(!xmlDoc->setContent(xmlFile, false, &errorStr, &errorLine, &errorColumn))
         {
             qCritical() << "failed to load document. error:" << errorStr << "at line"
-                        << errorLine << "column" << errorColumn;
+                        << QString::number(errorLine) << "column" << QString::number(errorColumn);
             xmlFile->close();
             return false;
         }
@@ -207,8 +207,8 @@ bool XmlReader::isVarsStructInLimits()
         return true;
     else
     {
-        qCritical() << "pieceHeight out of scope range(" << fHmin << ","
-                    << fHmax << "):" << fPieceHeight;
+        qCritical() << "pieceHeight out of scope range(" << QString::number(fHmin) << ","
+                    << QString::number(fHmax) << "):" << QString::number(fPieceHeight);
         return false;
     }
 }
@@ -238,8 +238,8 @@ bool XmlReader::isVarsStructInLimits()
         return true;
     else
     {
-        qCritical() << "one of the gripper vals is out of scope range(" << fGmin
-                    << "," << fGmax << "):" << fGripperPar;
+        qCritical() << "one of the gripper vals is out of scope range(" << QString::number(fGmin)
+                    << "," << QString::number(fGmax) << "):" << QString::number(fGripperPar);
         return false;
     }
 }

@@ -4,6 +4,8 @@
 #pragma once
 
 const bool SHOW_ERRORS = true;
+const bool DONT_SHOW_ERRORS = false;
+
 const bool PRINT_DEBUG = true;
 const bool INFORM_CLIENTS = true;
 const bool SERVICE = true;

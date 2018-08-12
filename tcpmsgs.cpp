@@ -61,7 +61,7 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
     case QAbstractSocket::RemoteHostClosedError:
         break; //server protocol ends with the server closing the connection
     case QAbstractSocket::HostNotFoundError:
-        qCritical() << "The host was not found. Check the host name and port settings." ;
+        qCritical() << "The host was not found. Check the host name and port settings.";
         break;
     case QAbstractSocket::ConnectionRefusedError:
         qCritical() << "The connection was refused by the peer. Make sure the server is running,"
@@ -142,8 +142,8 @@ void TCPMsgs::readyRead()
             return;
         }
 
-        qInfo() << "ID =" << QStrData.n64TcpID << ", msgForTcp =" << QStrData.QStrMsgForTcp
-                << ", msgFromTcp =" << QStrMsgFromTcp;
+        qInfo() << "ID =" << QString::number(QStrData.n64TcpID) << ", msgForTcp ="
+                << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
     }

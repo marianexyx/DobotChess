@@ -78,8 +78,9 @@ bool PieceController::isPieceSetOk()
         }
         if (!bPieceExists)
         {
-            qCritical() << "it isn't, missing piece nr:" << sPiece
-                        << ". item (piece) nr in gripper =" << _pDobot->getItemInGripper();
+            qCritical() << "it isn't, missing piece nr:" << QString::number(sPiece)
+                        << ". item (piece) nr in gripper ="
+                        << QString::number(_pDobot->getItemInGripper());
             return false;
         }
     }
@@ -168,4 +169,14 @@ QString PieceController::getPromotedPawnsPositions()
     else QStrPromotedPawnsPositions = "0";
 
     return QStrPromotedPawnsPositions; //f.e.: "b2_Q c7_q g5_N e1_R d4_b"
+}
+
+QString PieceController::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[piece_controller.h]\n";
+    QStrData += "_lastPos: " + _lastPos.getAsQStr() + "\n";
+
+    return QStrData;
 }
