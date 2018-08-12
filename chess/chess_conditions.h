@@ -17,13 +17,15 @@ private:
     ChessStatus* _pStatus;
 
     bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
-                                      GAME_STATUS GS);
-    QString extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg);
+                                      GAME_STATUS GS, REJECTED_REQUEST_REACTION& RRR);
+    QString extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
+                                                   REJECTED_REQUEST_REACTION& RRR);
     bool isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog = false);
     bool isRequestParameterInProperFormat(clientRequest request);
     bool isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_STATUS Status);
     bool isSenderAppropriate(Client *pSender, REQUEST_TYPE Type);
-    bool isThereAnySpecialConditionBeenMet(Client *pSender, clientRequest request);
+    bool isThereAnySpecialConditionBeenMet(Client *pSender, clientRequest request,
+                                           REJECTED_REQUEST_REACTION& RRR);
 
     ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 };

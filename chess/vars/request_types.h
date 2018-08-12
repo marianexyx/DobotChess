@@ -72,4 +72,26 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     }
 }
 
+enum REJECTED_REQUEST_REACTION
+{
+    RRR_NONE,
+    RRR_RESEND_TABLE_DATA,
+    RRR_DOUBLE_LOGIN,
+    RRR_REMOVE_AND_REFRESH_CLIENT
+};
+
+inline QString rejectedRequestReactionAsQStr(REJECTED_REQUEST_REACTION RRR)
+{
+    switch(RRR)
+    {
+    case RRR_NONE: return "none";
+    case RRR_RESEND_TABLE_DATA: return "resendTableData";
+    case RRR_DOUBLE_LOGIN: "doubleLogin";
+    case RRR_REMOVE_AND_REFRESH_CLIENT: return "removeAndRefreshClient";
+    default:
+        qCritical() << "wrong arg =" << QString::number(RRR);
+        return "";
+    }
+}
+
 #endif // REQUEST_TYPES_H

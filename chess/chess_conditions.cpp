@@ -7,38 +7,54 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 }
 
 bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
-                                                   GAME_STATUS GS)
+                                                   GAME_STATUS GS, REJECTED_REQUEST_REACTION& RRR)
 {
-    clientRequest r;
+    clientRequest request;
 
-    if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;
+    if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE)
+    {
+        //todo: if return == false, and RRR == none, then just auto set it to...
+        //...RRR_RESEND_TABLE_DATA? i could then remove it everywhere from here
+        RRR = RRR_RESEND_TABLE_DATA;
+        return false;
+    }
 
-    r.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
-    r.param = this->extractParameterIfTypeIsInProperFormat(r.type, QStrMsg);
+    request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
+    request.param = this->extractParameterIfTypeIsInProperFormat(request.type, QStrMsg, RRR);
 
-    if (!this->isRequestAppropriateToGameStatus(r.type, GS)) return false;
-    if (!this->isSenderAppropriate(pSender, r.type)) return false;
-    if (!this->isThereAnySpecialConditionBeenMet(pSender, r)) return false;
+    if (!this->isRequestAppropriateToGameStatus(request.type, GS))
+    {
+        RRR = RRR_RESEND_TABLE_DATA;
+        return false;
+    }
+    if (!this->isSenderAppropriate(pSender, request.type))
+    {
+        RRR = RRR_RESEND_TABLE_DATA;
+        return false;
+    }
+    if (!this->isThereAnySpecialConditionBeenMet(pSender, request, RRR)) return false;
 
     return true;
 }
 
-QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type,
-                                                                QString QStrMsg)
+QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
+                                                                REJECTED_REQUEST_REACTION& RRR)
 {
-    QString QStrParam;
     if (this->isRequestAParameterType(Type))
     {
-        QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
-
+        QString QStrParam; = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
         qInfo() << "extracted param =" << QStrParam;
 
-        clientRequest r;
-        r.type = Type;
-        r.param = QStrParam;
-        if (this->isRequestParameterInProperFormat(r)) //clients cannot make errors in here
+        clientRequest request;
+        request.type = Type;
+        request.param = QStrParam;
+        if (this->isRequestParameterInProperFormat(request))
             return QStrParam;
-        else return "";
+        else
+        {
+            RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
+            return "";
+        }
     }
     else return "";
 }
@@ -78,21 +94,27 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
         else bReturn = true;
         break;
     case RT_IM:
-        if (!request.param.isEmpty() && request.param.contains("&"))
+    {
+        QRegExp reg("\\d+"); //a digit (\d), one or more times (+)
+        QString QStrSqlId = request.param.left(request.param.indexOf("&"));
+        QString QStrHash = request.param.mid(request.param.indexOf("&")+1);
+        if (!request.param.isEmpty() && request.param.contains("&")
+                && reg.exactMatch(QStrSqlId) && QStrHash.length() == 20)
             bReturn = true;
         else bReturn = false;
         break;
+    }
     case RT_PROMOTE_TO:
         if (ChessStatus::isSignProperPromotionType(request.param))
             bReturn = true;
         else bReturn = false;
         break;
     default:
-        qCritical() << "unknown request.type:" << requestTypeAsQStr(request.type);
+        qCritical() << "unknown request.type:" << QString::number(request.type);
     }
 
     if (!bReturn)
-        qCritical() << "requirements not met (==0) in:" << requestTypeAsQStr(request.type);
+        qWarning() << "requirements not met (== false) in:" << requestTypeAsQStr(request.type);
 
     return bReturn;
 }
@@ -161,52 +183,97 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
     }
 
     if (!bSuccess)
-        qCritical() << "Type = " << requestTypeAsQStr(Type) << ". bLogged ="
+        qWarning() << "Type = " << requestTypeAsQStr(Type) << ". bLogged ="
                     << QString::number(bLogged) << ", bSittingOnChair ="
-                    <<QString::number(bSittingOnChair) << ", bInQueue ="
-                   << QString::number(bInQueue);
+                    << QString::number(bSittingOnChair) << ", bInQueue ="
+                    << QString::number(bInQueue);
 
     return bSuccess;
 }
 
-bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request)
+bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request,
+                                                        REJECTED_REQUEST_REACTION& RRR)
 {
+    bool bSuccess = false;
+
     switch(request.type)
     {
     case RT_NONE:
         qCritical() << "Type = RT_NONE";
-        return false;
+        bSuccess = false;
+        break;
     case RT_MOVE:
     case RT_PROMOTE_TO:
         if ((pSender->type() == PT_WHITE && _pStatus->getWhoseTurn() == WHITE_TURN) ||
                 (pSender->type() == PT_BLACK && _pStatus->getWhoseTurn() == BLACK_TURN))
-            return true;
-        else return false;
+            bSuccess = true;
+        else bSuccess = false;
+        break;
     case RT_SIT_ON:
     {
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
         if (_pClientsList->isPlayerChairEmpty(PlayerChair) &&
                 !_pClientsList->isClientAPlayer(*pSender))
-            return true;
-        else return false;
+            bSuccess = true;
+        else bSuccess = false;
+        break;
     }
+        //todo:
     case RT_IM: //sql hash is ok && (sqlID == empty || sqlID == actual name)
-        if ((pSender->sqlID() == request.param.left(request.param.indexOf("&")).toInt()
-             || pSender->sqlID() == 0) && Sql::isClientHashOk(request.param))
-            return true;
-        else return false;
+    {
+        //info: remember that functions execiution is in chess class
+        if (Sql::isClientHashOk(request.param))
+        {
+            int nSqlId = request.param.left(request.param.indexOf("&")).toInt();
+            if (pSender->sqlID() == 0) bSuccess = true; //new name
+            else if (pSender->sqlID() == nSqlId) bSuccess = true; //todo: RRR:double login
+            else bSuccess = false; //todo: RRR_REMOVE_AND_REFRESH_CLIENT
+        }
+        else bSuccess = false;
+        break;
+    }
     case RT_QUEUE_ME:
         if (_pClientsList->isWholeGameTableOccupied())
-            return true;
-        else return false;
+            bSuccess = true;
+        else bSuccess = false;
+        break;
     case RT_LEAVE_QUEUE:
         if (_pClientsList->isClientInQueue(*pSender))
-            return true;
-        else return false;
+            bSuccess = true;
+        else bSuccess = false;
+        break;
     case RT_CLIENT_LEFT:
         if (_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
-            return true;
-        else return false;
-    default: return true;
+            bSuccess = true;
+        else bSuccess = false;
+        break;
+    default: bSuccess = true;
     }
+
+    if (!bSuccess)
+    {
+        qWarning() << "bSuccess = false";
+
+        RRR = RRR_RESEND_TABLE_DATA;
+        switch(request.type)
+        {
+        case RT_NONE:
+        case RT_CLIENT_LEFT:
+            RRR = RRR_NONE;
+            break;
+        case RT_IM:
+            RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
+            break;
+        case RT_MOVE:
+        case RT_PROMOTE_TO:
+        case RT_SIT_ON:
+        case RT_QUEUE_ME:
+        case RT_LEAVE_QUEUE:
+            RRR = RRR_RESEND_TABLE_DATA;
+            break;
+        default: RRR = RRR_NONE;
+        }
+    }
+
+    return bSuccess;
 }

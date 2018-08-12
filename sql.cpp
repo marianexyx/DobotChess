@@ -23,6 +23,12 @@
     }
     qInfo() << "n64sqlId =" << QString::number(n64sqlId);
 
+    if (QStrHash.length() != 20)
+    {
+        qWarning() << "QStrHash.length() != 20. lenght =" << QStrHash.length();
+        return false;
+    }
+
     if (sqlDB.open())
     {
         QString QStrQuery = "SELECT * FROM users WHERE id = "
@@ -62,7 +68,7 @@
     }
 }
 
-/*static*/ bool Sql::isClientHashOk(QString QStrIDandHash)
+/*static*/ bool Sql::isClientHashOk(QString QStrIDandHash) //todo: name: isClientSqlIdAndHashOk
 {
     int64_t n64ID = QStrIDandHash.left(QStrIDandHash.indexOf("&")).toInt();
     QString QStrHash = QStrIDandHash.mid(QStrIDandHash.indexOf("&")+1);

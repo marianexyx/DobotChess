@@ -50,6 +50,7 @@ private:
     void tellPlayerThatHeGaveBadMove(QString QStrMsg);
     void sendMsgToTcp(QString QStrMsg);
     void newClientLogged(Client& client, int64_t sqlID);
+    void killClient(Client& client, REJECTED_REQUEST_REACTION RRR);
     void sendDataToClient(Client client, ACTION_TYPE AT = AT_NONE,
                           END_TYPE ET = ET_NONE);
     void sendDataToAllClients(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
@@ -64,7 +65,7 @@ private:
     void changePlayersOnChairs();
     void playerLeftChair(PLAYER_TYPE PT);
     void fillTableWithNextQueuedClientsIfTheyExist();
-    void restorateGameIfDisconnectedClientAffectIt(Client& client);
+    void restorateGameIfDisconnectedClientAffectIt(Client& clientToDisconnect);
     void resetTableData();
 
 public:

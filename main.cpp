@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 
 //future: change all private members names from "_" to "m_"?
+//future: check which vals can be unsigned
 
 int main(int argc, char *argv[])
 {

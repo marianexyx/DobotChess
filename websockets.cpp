@@ -41,6 +41,7 @@ void Websockets::onNewConnection()
     _pClientsList->showClientsInUI();
 }
 
+//todo: make a container of incomming msgs
 void Websockets::receivedMsg(QString QStrMsg)
 {    
     if (QStrMsg != "keepConnected") //future: also keep connect on server side
