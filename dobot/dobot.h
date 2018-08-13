@@ -59,6 +59,8 @@ public:
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
+    //future: GetAlarmsState, ClearAllAlarmsState- react on them somehow
+    void forceStopArm();
 
     void setItemInGripper(short sGrippersItemID);
     void clearGripper();

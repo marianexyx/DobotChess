@@ -313,7 +313,7 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
     dest3D.z += dJump;
     this->addArmMoveToQueue(DM_TO_POINT, dest3D);
 
-    _pQueue->setescape(bEscape);
+    _pQueue->setEscape(bEscape);
 
     if (VertMove == VM_NONE) return;
 
@@ -397,4 +397,11 @@ void Dobot::moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
     dest3D.z = dHeight;
 
     this->addArmMoveToQueue(ArmDestination, dest3D);
+}
+
+void Dobot::forceStopArm() //todo: control through arduino, and dobot alarms
+{
+    _pQueue->_queuedArmCmdsOnCore.clear();
+    isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS);
+    isArmReceivedCorrectCmd(SetQueuedCmdForceStopExec(), SHOW_ERRORS);
 }

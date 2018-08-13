@@ -16,8 +16,7 @@ DobotQueue::DobotQueue(IntermediatePoints intermediatePoints)
 void DobotQueue::parseNextMoveToArmIfPossible()
 {
     //if (this->isDobotCmdsLeftSpaceEmpty()) return; //future:
-    isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID),
-                            SHOW_ERRORS);
+    isArmReceivedCorrectCmd(GetQueuedCmdCurrentIndex(&_un64RealTimeDobotActualID), SHOW_ERRORS);
 
     if (this->isNextPhysicalMoveToQueueOnArmAvailable())
     {

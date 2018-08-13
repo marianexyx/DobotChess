@@ -11,38 +11,24 @@ bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSen
 {
     clientRequest request;
 
-    if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE)
-    {
-        //todo: if return == false, and RRR == none, then just auto set it to...
-        //...RRR_RESEND_TABLE_DATA? i could then remove it everywhere from here
-        RRR = RRR_RESEND_TABLE_DATA;
-        return false;
-    }
+    if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;
 
     request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
-    request.param = this->extractParameterIfTypeIsInProperFormat(request.type, QStrMsg, RRR);
+    request.param = this->extractParamIfTypeIsInProperFormat(request.type, QStrMsg, RRR);
 
-    if (!this->isRequestAppropriateToGameStatus(request.type, GS))
-    {
-        RRR = RRR_RESEND_TABLE_DATA;
-        return false;
-    }
-    if (!this->isSenderAppropriate(pSender, request.type))
-    {
-        RRR = RRR_RESEND_TABLE_DATA;
-        return false;
-    }
+    if (!this->isRequestAppropriateToGameStatus(request.type, GS)) return false;
+    if (!this->isSenderAppropriate(pSender, request.type)) return false;
     if (!this->isThereAnySpecialConditionBeenMet(pSender, request, RRR)) return false;
 
     return true;
 }
 
-QString ChessConditions::extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
-                                                                REJECTED_REQUEST_REACTION& RRR)
+QString ChessConditions::extractParamIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
+                                                            REJECTED_REQUEST_REACTION& RRR)
 {
     if (this->isRequestAParameterType(Type))
     {
-        QString QStrParam; = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
+        QString QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
         qInfo() << "extracted param =" << QStrParam;
 
         clientRequest request;
@@ -218,16 +204,18 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         else bSuccess = false;
         break;
     }
-        //todo:
-    case RT_IM: //sql hash is ok && (sqlID == empty || sqlID == actual name)
+    case RT_IM:
     {
-        //info: remember that functions execiution is in chess class
         if (Sql::isClientHashOk(request.param))
         {
             int nSqlId = request.param.left(request.param.indexOf("&")).toInt();
-            if (pSender->sqlID() == 0) bSuccess = true; //new name
-            else if (pSender->sqlID() == nSqlId) bSuccess = true; //todo: RRR:double login
-            else bSuccess = false; //todo: RRR_REMOVE_AND_REFRESH_CLIENT
+            if (pSender->sqlID() == 0 || pSender->sqlID() == nSqlId)
+                bSuccess = true;
+            else
+            {
+                RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
+                bSuccess = false;
+            }
         }
         else bSuccess = false;
         break;
@@ -251,29 +239,7 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
     }
 
     if (!bSuccess)
-    {
         qWarning() << "bSuccess = false";
-
-        RRR = RRR_RESEND_TABLE_DATA;
-        switch(request.type)
-        {
-        case RT_NONE:
-        case RT_CLIENT_LEFT:
-            RRR = RRR_NONE;
-            break;
-        case RT_IM:
-            RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
-            break;
-        case RT_MOVE:
-        case RT_PROMOTE_TO:
-        case RT_SIT_ON:
-        case RT_QUEUE_ME:
-        case RT_LEAVE_QUEUE:
-            RRR = RRR_RESEND_TABLE_DATA;
-            break;
-        default: RRR = RRR_NONE;
-        }
-    }
 
     return bSuccess;
 }

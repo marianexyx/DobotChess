@@ -14,11 +14,19 @@
     sqlDB.setPassword(DBV.QStrPassword);
 }
 
+/*static*/ bool Sql::isClientHashOk(QString QStrIDandHash)
+{
+    int64_t n64ID = QStrIDandHash.left(QStrIDandHash.indexOf("&")).toInt();
+    QString QStrHash = QStrIDandHash.mid(QStrIDandHash.indexOf("&")+1);
+
+    return Sql::isClientHashOk(n64ID, QStrHash);
+}
+
 /*static*/ bool Sql::isClientHashOk(int64_t n64sqlId, QString QStrHash)
 {    
     if (n64sqlId < 1)
     {
-        qCritical() << "ID param cannot be below 1. it's ==" << QString::number(n64sqlId);
+        qWarning() << "ID param cannot be below 1. it's ==" << QString::number(n64sqlId);
         return false;
     }
     qInfo() << "n64sqlId =" << QString::number(n64sqlId);
@@ -66,14 +74,6 @@
         qCritical() << "failed to connect with SQL DB. err =" << sqlDB.lastError().text();
         return false;
     }
-}
-
-/*static*/ bool Sql::isClientHashOk(QString QStrIDandHash) //todo: name: isClientSqlIdAndHashOk
-{
-    int64_t n64ID = QStrIDandHash.left(QStrIDandHash.indexOf("&")).toInt();
-    QString QStrHash = QStrIDandHash.mid(QStrIDandHash.indexOf("&")+1);
-
-    return Sql::isClientHashOk(n64ID, QStrHash);
 }
 
 /*static*/ QString Sql::getClientNameFromDB(int64_t n64sqlId)

@@ -72,26 +72,34 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
                                                    BadRequestFromClient) || bService)
     {
         _request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
-        _request.param = _pConditions->extractParameterIfTypeIsInProperFormat(_request.type,
-                                                                              QStrMsg);
+        _request.param = _pConditions->extractParamIfTypeIsInProperFormat(_request.type, QStrMsg,
+                                                                          BadRequestFromClient);
         qInfo() << "accepted client request type =" << requestTypeAsQStr(_request.type)
                 << ", param =" << _request.param << ", rejectedRequestReaction type ="
                 << rejectedRequestReactionAsQStr(BadRequestFromClient);
     }
     else
     {
-        if (BadRequestFromClient != RRR_NONE)
-        {
-            //BadRequestFromClient was set up in isClientRequestCanBeAccepted()- passed by &(ref)
-            if (BadRequestFromClient == RRR_RESEND_TABLE_DATA)
-                this->sendDataToClient(client);
-            else if (BadRequestFromClient == RRR_REMOVE_AND_REFRESH_CLIENT)
-                ;
-        }
-        qWarning() << "client request can't be accepted"; //todo: react somehow on player
+        if (_pClientsList->isClientInList(client)) return;
+
+        //BadRequestFromClient was set up in isClientRequestCanBeAccepted()- passed by &(ref)
+        if (BadRequestFromClient == RRR_NONE)
+            BadRequestFromClient = RRR_RESEND_TABLE_DATA;
+
+        if (BadRequestFromClient == RRR_RESEND_TABLE_DATA)
+            this->sendDataToClient(client);
+        else if (BadRequestFromClient == RRR_REMOVE_AND_REFRESH_CLIENT)
+            this->killClient(client, RRR_REMOVE_AND_REFRESH_CLIENT);
+
+        qWarning() << "client request can't be accepted";
         return;
     }
 
+    this->executeClientRequest(client, bService);
+}
+
+void Chess::executeClientRequest(Client &client, bool bService /*= false*/)
+{
     switch(_request.type)
     {
     case RT_NEW_GAME:
@@ -126,9 +134,14 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
         this->playerLeftChair(client.type());
         break;
     case RT_IM:
-        //todo:
-        this->newClientLogged(client, _request.param.left(_request.param.indexOf("&")).toInt());
+    {
+        int nSqlID = _request.param.left(_request.param.indexOf("&")).toInt();
+        if (_pClientsList->isClientSqlIDExists(nSqlID)) //double login- kill old client
+            this->killClient(_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
+        _pClientsList->setClientSqlIDAndName(client, nSqlID);
+        this->sendDataToClient(client);
         break;
+    }
     case RT_QUEUE_ME:
         _pClientsList->addClientToQueue(client);
         this->sendDataToAllClients();
@@ -140,13 +153,12 @@ void Chess::checkMsgFromWebsockets(QString QStrMsg, int64_t n64SenderID,
     case RT_CLIENT_LEFT:
         this->restorateGameIfDisconnectedClientAffectIt(client);
         _pClientsList->removeClientFromList(client);
-        this->updateClientsInUI();
         break;
     default:
         qCritical() << "received _request.type:" << QString::number(_request.type);
     }
 
-    _pClientsList->showClientsInUI();
+    this->updateClientsInUI();
 }
 
 void Chess::checkMsgFromChenard(QString QStrTcpMsgType, QString QStrTcpRespond)
@@ -230,36 +242,11 @@ void Chess::tellPlayerThatHeGaveBadMove(QString QStrMsg) //move not included in 
 void Chess::sendMsgToTcp(QString QStrMsg)
 {
     emit this->addTextToLogPTE("Sending to tcp: " + QStrMsg + "\n", LOG_CORE);
-
     _pTCPMsgs->queueCmd(QStrMsg);
 }
 
-void Chess::newClientLogged(Client& client, int64_t sqlID)
-{    
-    if (!_pClientsList->isClientSqlIDExists(sqlID))
-    {
-        _pClientsList->setClientSqlIDAndName(client, sqlID);
-        this->sendDataToClient(client);
-    }
-    else //client is already in list
-    {
-        //todo: why it must be checked here, but not in conditions?
-        if (client.sqlID() > 0 && client.sqlID() != sqlID)
-            this->killClient(client, RRR_REMOVE_AND_REFRESH_CLIENT); //todo: F5 his page
-        //todo: test it again, and is everything done with 2nd client?
-        else this->killClient(client, RRR_DOUBLE_LOGIN); //"logout:doubleLogin"
-    }
-
-    this->updateClientsInUI();
-}
-
-void Chess::killClient(Client& client, REJECTED_REQUEST_REACTION RRR)
+void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
 {
-    if (RRR == RRR_REMOVE_AND_REFRESH_CLIENT)
-        qWarning() << rejectedRequestReactionAsQStr(RRR);
-    else
-        qInfo() << rejectedRequestReactionAsQStr(RRR);
-
     this->restorateGameIfDisconnectedClientAffectIt(client);
     _pClientsList->clearClientSqlID(client);
     client.socket()->sendTextMessage(rejectedRequestReactionAsQStr(RRR));
@@ -283,7 +270,7 @@ void Chess::resetTableData()
     _pStatus->resetStatusData();
 }
 
-void Chess::restorateGameIfDisconnectedClientAffectIt(Client& clientToDisconnect)
+void Chess::restorateGameIfDisconnectedClientAffectIt(const Client &clientToDisconnect)
 {
     qInfo();
 

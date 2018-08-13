@@ -15,8 +15,8 @@ struct Sql
     static QSqlDatabase sqlDB;
 
     static void setDbConnectionData(DatabaseVars DBV);
-    static bool isClientHashOk(int64_t n64sqlId, QString QStrHash);
     static bool isClientHashOk(QString QStrIDandHash);
+    static bool isClientHashOk(int64_t n64sqlId, QString QStrHash);
     static QString getClientNameFromDB(int64_t n64sqlId);
 };
 

@@ -42,7 +42,7 @@ private:
     //bool isDobotCmdsLeftSpaceEmpty();
     QString dumpAllData();
 
-    void setescape(bool bEscape) { _bEscape = bEscape; }
+    void setEscape(bool bEscape) { _bEscape = bEscape; }
 
     DobotQueue(IntermediatePoints intermediatePoints);
 

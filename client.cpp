@@ -603,6 +603,13 @@ bool Clients::isClientInQueue(const Client &client)
 
 bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
 {   
+    if (n64ID == 0)
+    {
+        if (bErrorLog)
+            qCritical() << "sqlID == 0";
+        return false;
+    }
+
     foreach (Client cl, _clients)
     {
         if (cl._sqlID == n64ID)
@@ -610,7 +617,7 @@ bool Clients::isClientSqlIDExists(int64_t n64ID, bool bErrorLog /*= false*/)
     }
 
     if (bErrorLog)
-        qCritical() << "ID:" << QString::number(n64ID) << "already exists";
+        qCritical() << "sqlID:" << QString::number(n64ID) << "not found in clients list";
 
     return false;
 }

@@ -86,7 +86,7 @@ inline QString rejectedRequestReactionAsQStr(REJECTED_REQUEST_REACTION RRR)
     {
     case RRR_NONE: return "none";
     case RRR_RESEND_TABLE_DATA: return "resendTableData";
-    case RRR_DOUBLE_LOGIN: "doubleLogin";
+    case RRR_DOUBLE_LOGIN: return "doubleLogin";
     case RRR_REMOVE_AND_REFRESH_CLIENT: return "removeAndRefreshClient";
     default:
         qCritical() << "wrong arg =" << QString::number(RRR);

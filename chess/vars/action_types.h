@@ -13,6 +13,8 @@ enum ACTION_TYPE
     AT_NEW_GAME_STARTED,
     AT_BAD_MOVE,
     AT_RESET_COMPLITED,
+    AT_DOUBLE_LOGIN,
+    AT_REMOVE_AND_REFRESH_CLIENT,
     AT_END_GAME, //must be last, cuz END_TYPE is added, when this type is sent to WWW
     AT_ERROR = 99 //big number prevent this type from covering diffrent AT_END_GAME
 };

@@ -18,7 +18,7 @@ private:
 
     bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
                                       GAME_STATUS GS, REJECTED_REQUEST_REACTION& RRR);
-    QString extractParameterIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
+    QString extractParamIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
                                                    REJECTED_REQUEST_REACTION& RRR);
     bool isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog = false);
     bool isRequestParameterInProperFormat(clientRequest request);
