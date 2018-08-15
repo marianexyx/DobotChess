@@ -250,7 +250,7 @@ void Dobot::initDobot()
     IOMultiplexing iom;
     iom.address = 4;
     iom.multiplex = IOFunctionPWM;
-    isArmReceivedCorrectCmd(SetIOMultiplexing(&iom, false, NULL), SHOW_ERRORS);
+    SetIOMultiplexing(&iom, false, NULL);
 }
 
 void Dobot::sendMoveToArm(DobotMove move)
@@ -303,7 +303,9 @@ void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMo
 {
     if (!_bConnectedToDobot)
     {
-        qWarning() << "dobot not connected";
+        //if this will be error debug, then I will be spammed with...
+        //...connecting errors all the time, while testing
+        qInfo() << "dobot not connected";
         return;
     }
 

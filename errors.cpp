@@ -5,8 +5,6 @@ Chess *Errors::pChess = nullptr; //static pointer
 void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                          const QString &msg)
 {
-    //QMutexLocker locker(&mutex); //todo: need to be done with threads in TCPs
-
     QDateTime dateTime(QDateTime::currentDateTime());
     QString QStrTime(dateTime.toString("HH:mm:ss:z"));
     QByteArray QBaTime = QStrTime.toLocal8Bit();
@@ -88,7 +86,7 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
 }
 
 /*static*/ void Errors::saveErrorInFile(QtMsgType msgType, const QMessageLogContext &context,
-                                        const QString &QStrErrorMsg, QString QStrTime)
+                                        QString QStrErrorMsg, QString QStrTime)
 {
     QString QStrFullErrorMsg = Errors::errorMsg(msgType, context, QStrErrorMsg, QStrTime);
 
@@ -99,7 +97,10 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
     QStrFileTime.replace(QStrFileTime.indexOf(":"), 1, "m");
     QStrFileTime += "s";
 
-    QString QStrFileName = QStrFileTime + " " + Errors::errorTypeAsQStr(msgType);
+    QStrErrorMsg.replace(QRegularExpression("[-`~!@#$%^&*()_—+=|:;<>«»,.?/\[\\]\{}\"\']"), "");
+
+    QString QStrFileName = QStrFileTime + " " + Errors::errorTypeAsQStr(msgType)
+            + " " + QStrErrorMsg;
     QFile errorLogFile("errorLogs/" + QStrFileName + ".txt");
     errorLogFile.open(QFile::Append | QFile::Text);
     QTextStream stream(&errorLogFile);

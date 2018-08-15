@@ -29,15 +29,13 @@ private:
 private slots:
     void displayError(QAbstractSocket::SocketError socketError);
     void connected();
-    void disconnected();
-    void bytesWritten(qint64 bytes);
     void readyRead();
 
 public:
     TCPMsgs();
 
 public slots:
-    void queueCmd(QString QStrCmd); //todo: thread this
+    void queueCmd(QString QStrCmd);
 
 signals:
     void addTextToLogPTE(QString, LOG);

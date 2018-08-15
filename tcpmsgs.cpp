@@ -7,7 +7,6 @@ TCPMsgs::TCPMsgs()
     _n64CmdID = 0;
 }
 
-//todo: make queue as seperate thread
 void TCPMsgs::queueCmd(QString QStrCmd)
 {
     qInfo() << "cmd =" << QStrCmd;
@@ -21,11 +20,9 @@ void TCPMsgs::queueCmd(QString QStrCmd)
         //wait with next TCP command execution from container, till earlier one isn't ended
         this->doTcpConnect(); //execute oldest command in container
     }
-    //todo: else kill this thread
 }
 
-//conversation with tcp. every 1 command create 1 tcp instation
-void TCPMsgs::doTcpConnect()
+void TCPMsgs::doTcpConnect() //every 1 command create 1 tcp instation
 {
     _bWaitingForReadyRead = true;
 
@@ -33,9 +30,6 @@ void TCPMsgs::doTcpConnect()
 
     //every new command is new connection
     connect(socket, SIGNAL(connected()),this, SLOT(connected()));
-    connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
-    //bytesWritten is quite useless for me, but looks like it's necessary for tcp to work
-    connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64)));
     connect(socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
@@ -43,15 +37,12 @@ void TCPMsgs::doTcpConnect()
 
     qInfo() << "connecting...";
 
-    socket->abort();
-    //this allow to end old connection, if it wasn't closed yet, making a place for new one
-    //future: make a warning here
+    //abort allow to end old connection, if it wasn't closed yet, making a place for new one
+    socket->abort(); //future: make a warning here, if there was an old connection
 
-    // this is not blocking call
     socket->connectToHost("localhost", 22222); //will emit signal "connected"
-
-    if(!socket->waitForConnected(5000))
-        qCritical() << socket->errorString();
+    //future: add additional connectToHost reaction, when it doesn't respond for...
+    //...too long (use timer, not "waitForConnect" function)
 }
 
 void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
@@ -94,16 +85,6 @@ void TCPMsgs::connected()
         qCritical() << "TCPMsgsList is empty";
         return;
     }
-}
-
-void TCPMsgs::disconnected()
-{
-    qInfo();
-}
-
-void TCPMsgs::bytesWritten(qint64 bytes)
-{
-    qInfo() << QString::number(bytes) << "bytes written...";
 }
 
 void TCPMsgs::readyRead()
@@ -160,7 +141,5 @@ void TCPMsgs::readyRead()
     _bWaitingForReadyRead = false;
 
     if (!TCPMsgsList.isEmpty())
-    {
         this->doTcpConnect();
-    }
 }

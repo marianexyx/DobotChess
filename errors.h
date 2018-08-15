@@ -32,7 +32,7 @@ public:
                             const QString &QStrMsg, QString QStrTime);
     static QString errorTypeAsQStr(QtMsgType msgType);
     static void saveErrorInFile(QtMsgType msgType, const QMessageLogContext &context,
-                                const QString &QStrErrorMsg, QString QStrTime);
+                                QString QStrErrorMsg, QString QStrTime);
     static QString getAppDumpData();
 };
 

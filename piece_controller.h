@@ -9,6 +9,10 @@
 #include "chessboard/chessboard.h"
 #include "vars/vertical_move.h"
 
+//future: I don't control where pieces are in real time- information is lost when...
+//...converting to Dobot list of 3D points. Chessboards calculate end position ...
+//...immadietely assuming that real moves has been done in no time. Make app knows...
+//...the actual position of pieces in real time (lot of work)
 class PieceController: public QObject
 {
     Q_OBJECT

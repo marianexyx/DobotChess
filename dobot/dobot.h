@@ -21,7 +21,6 @@
 #include "dobot/dobot_gripper.h"
 #include "dobot/dobot_queue.h"
 
-//todo: add force stop arm methods
 class Dobot: public QObject
 {
     Q_OBJECT
