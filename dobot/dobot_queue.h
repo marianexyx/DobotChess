@@ -18,23 +18,21 @@ class DobotQueue: public QObject
     friend class Dobot;
 
 private:
-    uint64_t _un64CoreQueuedCmdID;
-    uint64_t _un64RealTimeDobotActualID;
-    uint _unQueuedCmdLeftSpace;
-    QList<DobotMove> _queuedArmCmdsOnCore;
-    QList<DobotMove> _sentArmCmdsToDobot;
-    uint64_t _lowestIDMoveInCoreList;
-    uint64_t _un64LastDobotIDShownInUI;
-    uint64_t _un64EscapeID;
-    Point3D _escapeLeft, _escapeRight;
-    bool _bEscape;
+    uint64_t m_un64CoreQueuedCmdID;
+    uint64_t m_un64RealTimeDobotActualID;
+    uint m_unQueuedCmdLeftSpace;
+    QList<DobotMove> m_queuedArmCmdsOnCore;
+    QList<DobotMove> m_sentArmCmdsToDobot;
+    uint64_t m_lowestIDMoveInCoreList;
+    uint64_t m_un64LastDobotIDShownInUI;
+    uint64_t m_un64EscapeID;
+    Point3D m_escapeLeft, m_escapeRight;
+    bool m_bEscape;
 
     void parseNextMoveToArmIfPossible();
     bool isNextPhysicalMoveToQueueOnArmAvailable();
     DobotMove getNextMoveToSendToArm();
-    void showLastExecutedArmMoveInUI();
     void removeOldQueuedMovesFromCore();
-    DobotMove getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID);
     bool isArmCoveringView();
     void escape(Point3D lastPoint);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
@@ -42,7 +40,11 @@ private:
     //bool isDobotCmdsLeftSpaceEmpty();
     QString dumpAllData();
 
-    void setEscape(bool bEscape) { _bEscape = bEscape; }
+    void showLastExecutedArmMoveInUI();
+    DobotMove getQueuedMove(QList<DobotMove>& cmdsList, uint64_t un64ID);
+
+
+    void setEscape(bool bEscape) { m_bEscape = bEscape; }
 
     DobotQueue(IntermediatePoints intermediatePoints);
 

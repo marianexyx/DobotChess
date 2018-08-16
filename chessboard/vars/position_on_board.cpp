@@ -52,15 +52,19 @@ PosOnBoard::PosOnBoard(QString QStrBoardPos)
                    << ", Digit =" << QString::number(Digit);
 }
 
-///PosFromTo:
-PosFromTo::PosFromTo()
+bool PosOnBoard::isPosSet(bool bErrorLog /*= false*/)
 {
-    from.Letter = L_X;
-    from.Digit = D_X;
-    to.Letter = L_X;
-    to.Digit = D_X;
+    if (Letter != L_X && Digit != D_X) return true;
+    else
+    {
+        if (bErrorLog)
+            qCritical() << "pos isn't false";
+        return false;
+    }
 }
 
+
+///PosFromTo:
 PosFromTo::PosFromTo(LETTER FromL, DIGIT FromD, LETTER ToL, DIGIT ToD)
 {
     from.Letter = FromL;

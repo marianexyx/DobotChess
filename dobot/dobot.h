@@ -26,65 +26,63 @@ class Dobot: public QObject
     Q_OBJECT
 
 private:
-    DobotGripper* _pGripper;
-    DobotQueue* _pQueue;
+    DobotGripper* m_pGripper;
+    DobotQueue* m_pQueue;
 
-    const int _ARM_MAX_VELOCITY, _ARM_MAX_ACCELERATION;
-    short _sItemIDInGripper;
-    bool _bConnectedToDobot;
-    bool _bFirstMoveIsDone;
-
-    IntermediatePoints _intermediatePoints;
-    HOMEParams _home;
-    Point3D _realTimePoint;
-    Point3D _lastGivenPoint;
+    const int m_ARM_MAX_VELOCITY, m_ARM_MAX_ACCELERATION;
+    ushort m_usItemIDInGripper;
+    bool m_bConnectedToDobot;
+    bool m_bFirstMoveIsDone;
+    IntermediatePoints m_intermediatePoints;
+    HOMEParams m_home;
+    Point3D m_realTimePoint;
+    Point3D m_lastGivenPoint;
 
     void createAndStartPeriodicTimer();
     void createAndStartPoseTimer();
+    void initDobot();
+    void saveActualDobotPosition();
+    bool isMoveSafe(Point3D point);
+    bool isPointDiffrentOnlyInZAxis(Point3D point);
+    bool isGripperEmpty() const { return m_usItemIDInGripper == 0 ? true : false; }
+
+private slots:
+    void onPeriodicTaskTimer();
+    void onGetPoseTimer();
 
 public:
-    //future: don't add whole RealVars to dobot
+    //todo: don't add whole RealVars struct to dobot
     Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints);
     ~Dobot();
 
-    void saveActualDobotPosition();
-    void initDobot();
-    void onPTPsendBtnClicked();
-
     void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove =
             VM_NONE, bool bEscape = false);
-    bool isMoveSafe(Point3D point);
-    bool isPointDiffrentOnlyInZAxis(Point3D point);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type);
     void addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point);
     void moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
-    //future: GetAlarmsState, ClearAllAlarmsState- react on them somehow
-    void forceStopArm();
-
     void setItemInGripper(short sGrippersItemID);
     void clearGripper();
+    //todo: GetAlarmsState, ClearAllAlarmsState- react on them somehow
+    void forceStopArm();
 
-    bool isGripperEmpty() const { return _sItemIDInGripper == 0 ? true : false; }
-    short getItemInGripper() const { return _sItemIDInGripper; }
-    IntermediatePoints getIntermediatePoints() const { return _intermediatePoints; }
+    ushort getItemInGripper() const { return m_usItemIDInGripper; }
+    IntermediatePoints getIntermediatePoints() const { return m_intermediatePoints; }
     Point3D getHomePos();
-    Point3D getLastGivenPoint() const { return _lastGivenPoint; }
+    Point3D getLastGivenPoint() const { return m_lastGivenPoint; }
     QString dumpAllData();
 
-    DobotGripper* getServoPointer() const { return _pGripper; }
-    DobotQueue* getQueuePointer() const { return _pQueue; }
-
+    DobotGripper* getServoPointer() const { return m_pGripper; }
 
 public slots:
-    void sendMoveToArm(DobotMove move);
     void onConnectDobot();
-    void onPeriodicTaskTimer();
-    void onGetPoseTimer();
+    void sendMoveToArm(DobotMove move);
     void showQueueLabelsInUI(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
                              int nCoreIdLeft, uint64_t un64CoreNextId);
     void addTextToLogPTEInUI(QString QStrTxt, LOG log);
-    void showQueuedArmCmdsOnCorePTE(QString QStrList) { emit this->showQueuedArmCmdsOnCore(QStrList); }
-    void showSentArmCmdsToDobotPTE(QString QStrList) { emit this->showSentArmCmdsToDobot(QStrList); }
+    void showQueuedArmCmdsOnCorePTE(QString QStrList)
+    { emit this->showQueuedArmCmdsOnCore(QStrList); }
+    void showSentArmCmdsToDobotPTE(QString QStrList)
+    { emit this->showSentArmCmdsToDobot(QStrList); }
 
 signals: //GUI mainWindow
     void addTextToLogPTE(QString, LOG);

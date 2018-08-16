@@ -9,34 +9,34 @@
 class Field
 {
 private:
-    short _sNr;
-    Piece* _pPieceOnField;
-    short _sStartPieceNrOnField;
-    Point3D _location3D;
+    ushort m_usNr;
+    Piece* m_pPieceOnField;
+    ushort m_usStartPieceNrOnField;
+    Point3D m_location3D;
 
 public:
-    Field(short sFieldID);
+    Field(ushort usFieldID);
     ~Field() {}
 
-    static bool isInRange(short sFieldNr);
-    static PosOnBoard Pos(short sFieldNr);
-    static short nr(PosOnBoard fieldLines);
-    static short nr(LETTER L, DIGIT D);
-    static QString nrAsQStr(short sFieldNr);
-    static short startPieceNrOnField(short sFieldNr);
-    static short startPieceNrOnField(PosOnBoard fieldLines);
+    static bool isInRange(ushort usFieldNr);
+    static PosOnBoard Pos(ushort usFieldNr);
+    static ushort nr(PosOnBoard fieldLines);
+    static ushort nr(LETTER L, DIGIT D);
+    static QString nrAsQStr(ushort usFieldNr);
+    static ushort startPieceNrOnField(ushort usFieldNr);
+    static ushort startPieceNrOnField(PosOnBoard fieldLines);
 
-    void set3DLocation(Point3D p) {_location3D = p; }
+    void set3DLocation(Point3D p) { m_location3D = p; }
     void setPieceOnField(Piece* pPiece);
+    bool isFieldOccupied(bool bErrorLog = false);
     void clearField(bool bErrorLog = false);
 
-    Point3D getLocation3D();
-    bool isFieldOccupied(bool bErrorLog = false);
-    short getNr() const { return _sNr; }
-    PosOnBoard getPos() const { return Field::Pos(_sNr); }
-    QString getNrAsQStr() const { return Field::nrAsQStr(_sNr); }
+    ushort getNr() const { return m_usNr; }
+    PosOnBoard getPos() const { return Field::Pos(m_usNr); }
+    QString getNrAsQStr() const { return Field::nrAsQStr(m_usNr); }
     Piece* getPieceOnField(bool bErrorLog = false) const;
-    short getStartPieceNrOnField() const { return _sStartPieceNrOnField; }
+    ushort getStartPieceNrOnField() const { return m_usStartPieceNrOnField; }
+    Point3D getLocation3D();
     QString dumpAllData();
 };
 

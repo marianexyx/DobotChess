@@ -3,17 +3,56 @@
 PieceController::PieceController(Dobot* pDobot, Chessboard* pBoardMain,
                                  Chessboard* pBoardRemoved)
 {
-    _pPieceSet = new PieceSet();
-    _pDobot = pDobot;
-    _pBoardMain = pBoardMain;
-    _pBoardRemoved = pBoardRemoved;
+    m_pPieceSet = new PieceSet();
+    m_pDobot = pDobot;
+    m_pBoardMain = pBoardMain;
+    m_pBoardRemoved = pBoardRemoved;
 
     for (int i=0; i<=63; ++i) //fill board with pieces on their start positions
     {
-        short sStartPieceNr = _pBoardMain->getField(i+1)->getStartPieceNrOnField();
+        short sStartPieceNr = m_pBoardMain->getField(i+1)->getStartPieceNrOnField();
         if (sStartPieceNr > 0)
-            _pBoardMain->getField(i+1)->setPieceOnField(this->getPiece(sStartPieceNr));
+            m_pBoardMain->getField(i+1)->setPieceOnField(this->getPiece(sStartPieceNr));
     }
+}
+
+bool PieceController::isPieceSetOk()
+{
+    for (short sPiece=1; sPiece<=32; ++sPiece)
+    {
+        bool bPieceExists = false;
+        for (short sField=1; sField<=64; ++sField)
+        {
+            if (m_pBoardMain->getField(sField)->getPieceOnField() == m_pPieceSet->getPiece(sPiece)
+                    || m_pBoardRemoved->getField(sField)->getPieceOnField() ==
+                    m_pPieceSet->getPiece(sPiece) || m_pDobot->getItemInGripper() == sPiece)
+            {
+                bPieceExists = true;
+                break;
+            }
+        }
+        if (!bPieceExists)
+        {
+            qCritical() << "it isn't, missing piece nr:" << QString::number(sPiece)
+                        << ". item (piece) nr in gripper ="
+                        << QString::number(m_pDobot->getItemInGripper());
+            return false;
+        }
+    }
+    return true;
+}
+
+bool PieceController::isAnyPawnPromoted()
+{
+    for (short sPiece=1; sPiece<=32; ++sPiece)
+    {
+        Piece* pPiece = this->getPiece(sPiece);
+        Field* pField = m_pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+        if (pPiece->getType() == P_PAWN && pPiece->getPromotedType() != P_ERROR &&
+                 pField != nullptr)
+            return true;
+    }
+    return false;
 }
 
 void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pField,
@@ -33,7 +72,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
                 QString::number(pField->getNr()) + "(" + pField->getNrAsQStr() + ")\n";
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
-        _pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
+        m_pDobot->setItemInGripper(pField->getPieceOnField()->getNr());
         pRealBoard->clearField(pField, SHOW_ERRORS);
 
         if (!this->isPieceSetOk()) return;
@@ -43,83 +82,22 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         if (!this->isPieceSetOk()) return;
 
         QString QStrMsg = "Queue: put piece "
-                + _pPieceSet->getPiece(_pDobot->getItemInGripper())->getName()
+                + m_pPieceSet->getPiece(m_pDobot->getItemInGripper())->getName()
                 + " on " + boardTypeAsQstr(pRealBoard->getBoardType())
                 + " on field " + pField->getNrAsQStr() + "\n";
         emit this->addTextToLogPTE(QStrMsg, LOG_CORE);
 
-        pRealBoard->setPieceOnField(_pPieceSet->getPiece(_pDobot->getItemInGripper()),
+        pRealBoard->setPieceOnField(m_pPieceSet->getPiece(m_pDobot->getItemInGripper()),
                                     pField, PRINT_DEBUG);
-        _pDobot->clearGripper();
+        m_pDobot->clearGripper();
 
         if (!this->isPieceSetOk()) return;
     }
 
-    _lastPos = pField->getPos();
+    m_lastPos = pField->getPos();
     Point3D xyz = pField->getLocation3D();
-    _pDobot->queueMoveSequence(xyz, (double)_pBoardMain->fMaxPieceHeight, VertMove, bRetreat);
+    m_pDobot->queueMoveSequence(xyz, m_pBoardMain->dMaxPieceHeight, VertMove, bRetreat);
     emit this->showRealBoardInUI();
-}
-
-bool PieceController::isPieceSetOk()
-{
-    for (short sPiece=1; sPiece<=32; ++sPiece)
-    {
-        bool bPieceExists = false;
-        for (short sField=1; sField<=64; ++sField)
-        {
-            if (_pBoardMain->getField(sField)->getPieceOnField() == _pPieceSet->getPiece(sPiece)
-                    || _pBoardRemoved->getField(sField)->getPieceOnField() ==
-                    _pPieceSet->getPiece(sPiece) || _pDobot->getItemInGripper() == sPiece)
-            {
-                bPieceExists = true;
-                break;
-            }
-        }
-        if (!bPieceExists)
-        {
-            qCritical() << "it isn't, missing piece nr:" << QString::number(sPiece)
-                        << ". item (piece) nr in gripper ="
-                        << QString::number(_pDobot->getItemInGripper());
-            return false;
-        }
-    }
-    return true;
-}
-
-bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog /*= false*/)
-{
-    if (pPiece == nullptr)
-    {
-        if (bErrorLog)
-            qCritical() << "piece can't be nullptr";
-        return false;
-    }
-
-    Field* pActualFieldOfGIvenPiece = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
-    if (pActualFieldOfGIvenPiece == nullptr) return false;
-    if (pPiece->getStartFieldNr() == pActualFieldOfGIvenPiece->getNr()) return true;
-    else return false;
-}
-
-bool PieceController::isMoveSet()
-{
-    if (_lastPos.Letter == L_X || _lastPos.Digit == D_X)
-        return false;
-    else return true;
-}
-
-bool PieceController::isAnyPawnPromoted()
-{
-    for (short sPiece=1; sPiece<=32; ++sPiece)
-    {
-        Piece* pPiece = this->getPiece(sPiece);
-        Field* pField = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
-        if (pPiece->getType() == P_PAWN && pPiece->getPromotedType() != P_ERROR &&
-                 pField != nullptr)
-            return true;
-    }
-    return false;
 }
 
 Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Piece* pPiece)
@@ -140,6 +118,28 @@ Field* PieceController::searchForPieceActualFieldOnBoard(Chessboard* pBoard, Pie
     return nullptr;
 }
 
+bool PieceController::isPieceStayOnItsStartingField(Piece* pPiece, bool bErrorLog /*= false*/)
+{
+    if (pPiece == nullptr)
+    {
+        if (bErrorLog)
+            qCritical() << "piece can't be nullptr";
+        return false;
+    }
+
+    Field* pActualFieldOfGIvenPiece = m_pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+    if (pActualFieldOfGIvenPiece == nullptr) return false;
+    if (pPiece->getStartFieldNr() == pActualFieldOfGIvenPiece->getNr()) return true;
+    else return false;
+}
+
+bool PieceController::isMoveSet()
+{
+    if (m_lastPos.Letter == L_X || m_lastPos.Digit == D_X)
+        return false;
+    else return true;
+}
+
 void PieceController::clearPawnsPromotions()
 {
     for (short sPiece=1; sPiece<=32; ++sPiece)
@@ -152,7 +152,7 @@ QString PieceController::getPromotedPawnsPositions()
     for (short sPiece=1; sPiece<=32; ++sPiece)
     {
         Piece* pPiece = this->getPiece(sPiece);
-        Field* pField = _pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
+        Field* pField = m_pBoardMain->getFieldWithGivenPieceIfExists(pPiece);
         if (pPiece->getType() == P_PAWN && pPiece->getPromotedType() != P_ERROR &&
                  pField != nullptr)
         {
@@ -176,7 +176,7 @@ QString PieceController::dumpAllData()
     QString QStrData;
 
     QStrData = "[piece_controller.h]\n";
-    QStrData += "_lastPos: " + _lastPos.getAsQStr() + "\n";
+    QStrData += "m_lastPos: " + m_lastPos.getAsQStr() + "\n";
 
     return QStrData;
 }

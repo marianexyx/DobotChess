@@ -34,58 +34,54 @@ public:
     virtual ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
 
-    Dobot* _pDobot;
-    PieceController* _pPieceController;
-    Websockets* _pWebSockets;
-    Chessboard* _pBoardMain;
-    Chessboard* _pBoardRemoved;
-    Chessboard* _pBoardChenard;
-    TCPMsgs* _pTCPMsg;
-    Clients* _pClientsList;
-    Chess* _pChess;
+    Dobot* m_pDobot;
+    PieceController* m_pPieceController;
+    Websockets* m_pWebsockets;
+    Chessboard* m_pBoardMain;
+    Chessboard* m_pBoardRemoved;
+    Chessboard* m_pBoardChenard;
+    TCPMsgs* m_pTCPMsgs;
+    Clients* m_pClientsList;
+    Chess* m_pChess;
 
-    QTimer* _titleFormTimer;
+    QTimer* m_titleFormTimer;
 
-    void initControl();
+    void initDobotsBasicButtonsControl();
+    void setDobotPTEValidatorsInUI();
 
 private slots:
-    //slots for GUI MainWindow
-    void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
+     void writeInConsole(QString QStrMsg, LOG TypeOfMsg);
+
+    //board data slots
+    void changeWindowTitle();
     void setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showImaginaryBoardInUI(QString QStrBoard);
     void showRealBoardInUI();
     void clearBoardInUI();
     void showLegalMovesInUI(QStringList legalMoves);
     void showHistoryMovesInUI(QStringList historyMoves);
-    void changeWindowTitle();
 
     //dobot slots
     void onChangedMode();
     void onJOGCtrlBtnPressed(int nID);
     void onJOGCtrlBtnReleased();
-    void setDobotPTEValidatorsInUI();
     void setJointLabelText(QString QStrJointLabelText, short sJoint);
     void setAxisLabelText(QString QStrAxisLabelText, char chAxis);
     void setDobotButtonsStates(bool bDobotButtonsStates);
     void setDeviceLabels(QString QStrDeviceSN, QString QStrDeviceName,
                          QString QStrDeviceVersion);
     void showDobotErrorMsgBox();
-    void on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged);
-    void on_sendSimulatedMsgBtn_clicked();
     void setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
                         int nCoreIdLeft, uint64_t un64CoreNextId);
     void showQueuedArmCmdsOnCore(QString QStrList);
     void showSentArmCmdsToDobot(QString QStrList);
 
-    //websocket slots
-    void on_calibrateBtn_clicked();
-    void on_upBtn_clicked();
-    void on_downBtn_clicked();
-    void on_resetDobotIndexBtn_clicked();
+    //clients slots
     void showClientsListInUI(QList<Client> list);
 
+    //GUI slots
     void on_openGripperBtn_clicked();
     void on_closeGripperBtn_clicked();
     void on_startGmPosBtn_clicked();
@@ -100,6 +96,12 @@ private slots:
     void on_zPTPEdit_textChanged(const QString& QStrTextChanged);
     void on_retreatLeftBtn_clicked();
     void on_retreatRightBtn_clicked();
+    void on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged);
+    void on_sendSimulatedMsgBtn_clicked();
+    void on_calibrateBtn_clicked();
+    void on_upBtn_clicked();
+    void on_downBtn_clicked();
+    void on_resetDobotIndexBtn_clicked();
 };
 
 #endif // MAINWINDOW_H

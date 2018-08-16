@@ -3,64 +3,35 @@
 ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
                          Clients* pClientsList)
 {
-    _pBoardMain = pBoardMain;
-    _pClientsList = pClientsList;
-    _pPieceController = pPieceController;
+    m_pBoardMain = pBoardMain;
+    m_pClientsList = pClientsList;
+    m_pPieceController = pPieceController;
 
-    _FENGameState = ET_NONE;
-    _WhoseTurn = NO_TURN;
-    _MoveType = ST_NONE;
+    m_FENGameState = ET_NONE;
+    m_WhoseTurn = NO_TURN;
+    m_MoveType = ST_NONE;
 }
 
-/*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign,
-                                                      bool bErrorLog /*= false*/)
+void ChessStatus::setMove(QString QStrMove)
 {
-    if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "n" ||
-            QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "N")
-        return true;
-    else
-    {
-        if (bErrorLog)
-            qCritical() << "it's not. Sign =" << QStrSign;
-        return false;
-    }
-}
-
-/*static*/ bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog /*= false*/)
-{
-    if (ChessStatus::isSignProperPromotionType(QStrMove.right(1)) && QStrMove.length() == 5)
-        return true;
-    else
-    {
-        if (bErrorLog)
-            qCritical() << "it's not. Move =" << QStrMove;
-        return false;
-    }
-}
-
-/*static*/ bool ChessStatus::isMoveInProperFormat(QString QStrMove, bool bErrorLog /*= false*/)
-{
-    if (PosFromTo::isMoveInProperFormat(QStrMove.left(4))
-            || ChessStatus::isMovePromotion(QStrMove))
-        return true;
-    else
-    {
-        if (bErrorLog)
-            qCritical() << "it's not. it =" << QStrMove;
-        return false;
-    }
+    m_MoveType = this->findMoveType(QStrMove);
+    qInfo() << "found move type =" << sequenceTypeAsQstr(m_MoveType);
+    if (m_MoveType == ST_PROMOTION || m_MoveType == ST_PROMOTION_WITH_REMOVING)
+        QStrMove = QStrMove.left(4);
+    m_PosMove = PosFromTo::fromQStr(QStrMove);
 }
 
 SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 {
-    if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promo autotest
+    //don't mix conditions order
+    if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promotion autotest
     else if (this->isMoveLegal(QStrMove))
     {
         if (this->isMoveEnpassant(QStrMove)) return ST_ENPASSANT;
         else if (this->isMoveCastling(QStrMove)) return ST_CASTLING;
         else if (this->isMovePromotionWithRemoving(QStrMove)) return ST_PROMOTION_WITH_REMOVING;
         else if (this->isMoveRemoving(QStrMove)) return ST_REMOVING;
-        else if (this->isMovePromotion(QStrMove)) return ST_PROMOTION;
+        else if (ChessStatus::isMovePromotion(QStrMove)) return ST_PROMOTION;
         else return ST_REGULAR;
     }
     else
@@ -70,12 +41,42 @@ SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
     }
 }
 
-bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
+bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
 {
     if (QStrMoveToTest.length() != 4) return false;
 
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
-    if (_pBoardMain->getField(move.to)->getPieceOnField() != nullptr)
+    Piece* piece = m_pBoardMain->getField(move.from)->getPieceOnField();
+
+    if (piece == nullptr) return false;
+
+    if (QStrMoveToTest.right(2) == m_QStrEnpassant && (piece->getType() == P_PAWN &&
+         ((Piece::Color(piece->getNr()) == PT_WHITE && m_WhoseTurn == WHITE_TURN)
+            || (Piece::Color(piece->getNr()) == PT_BLACK && m_WhoseTurn == BLACK_TURN))))
+        return true;
+    else
+        return false;
+}
+
+bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
+{
+    if (QStrMoveToTest.length() != 4) return false;
+
+    PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
+    PosOnBoard BlackKingStartFieldPos(L_E, D_8);
+
+    Piece* pWhiteKing =
+            m_pPieceController->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
+    Piece* pBlackKing =
+            m_pPieceController->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
+
+    if ((m_pPieceController->isPieceStayOnItsStartingField(pWhiteKing) &&
+         ((QStrMoveToTest == "e1c1" && m_QStrCastlings.contains("Q")) ||
+            (QStrMoveToTest == "e1g1" && m_QStrCastlings.contains("K"))))
+            ||
+            (m_pPieceController->isPieceStayOnItsStartingField(pBlackKing) &&
+            ((QStrMoveToTest == "e8c8" && m_QStrCastlings.contains("q")) ||
+            (QStrMoveToTest == "e8g8" && m_QStrCastlings.contains("k")))))
         return true;
     else return false;
 }
@@ -90,44 +91,26 @@ bool ChessStatus::isMovePromotionWithRemoving(QString QStrMoveToTest)
     else return false;
 }
 
-bool ChessStatus::isMoveCastling(QString QStrMoveToTest)
+/*static*/ bool ChessStatus::isMovePromotion(QString QStrMove, bool bErrorLog /*= false*/)
 {
-    if (QStrMoveToTest.length() != 4) return false;
-
-    PosOnBoard WhiteKingStartFieldPos(L_E, D_1);
-    PosOnBoard BlackKingStartFieldPos(L_E, D_8);
-
-    Piece* pWhiteKing =
-            _pPieceController->getPiece(Field::startPieceNrOnField(WhiteKingStartFieldPos));
-    Piece* pBlackKing =
-            _pPieceController->getPiece(Field::startPieceNrOnField(BlackKingStartFieldPos));
-
-    if ((_pPieceController->isPieceStayOnItsStartingField(pWhiteKing) &&
-         ((QStrMoveToTest == "e1c1" && _QStrCastlings.contains("Q")) ||
-            (QStrMoveToTest == "e1g1" && _QStrCastlings.contains("K"))))
-            ||
-            (_pPieceController->isPieceStayOnItsStartingField(pBlackKing) &&
-            ((QStrMoveToTest == "e8c8" && _QStrCastlings.contains("q")) ||
-            (QStrMoveToTest == "e8g8" && _QStrCastlings.contains("k")))))
+    if (ChessStatus::isSignProperPromotionType(QStrMove.right(1)) && QStrMove.length() == 5)
         return true;
-    else return false;
+    else
+    {
+        if (bErrorLog)
+            qCritical() << "it's not. Move =" << QStrMove;
+        return false;
+    }
 }
 
-bool ChessStatus::isMoveEnpassant(QString QStrMoveToTest)
+bool ChessStatus::isMoveRemoving(QString QStrMoveToTest)
 {
     if (QStrMoveToTest.length() != 4) return false;
 
     PosFromTo move = PosFromTo::fromQStr(QStrMoveToTest);
-    Piece* piece = _pBoardMain->getField(move.from)->getPieceOnField();
-
-    if (piece == nullptr) return false;
-
-    if (QStrMoveToTest.right(2) == _QStrEnpassant && (piece->getType() == P_PAWN &&
-         ((Piece::Color(piece->getNr()) == PT_WHITE && _WhoseTurn == WHITE_TURN)
-            || (Piece::Color(piece->getNr()) == PT_BLACK && _WhoseTurn == BLACK_TURN))))
+    if (m_pBoardMain->getField(move.to)->getPieceOnField() != nullptr)
         return true;
-    else
-        return false;
+    else return false;
 }
 
 void ChessStatus::saveStatusData(QString QStrStatus)
@@ -137,26 +120,26 @@ void ChessStatus::saveStatusData(QString QStrStatus)
 
     if (QStrFENRecord.size() == 7)
     {
-        _FENGameState = FENGameState(QStrFENRecord.at(0));
+        m_FENGameState = FENGameState(QStrFENRecord.at(0));
         qInfo() << "FEN game state =" << QStrFENRecord.at(0);
         emit this->setBoardDataLabel(QStrFENRecord.at(0), BDL_GAME_STATUS);
 
         QString QStrFENBoard = QStrFENRecord.at(1);
         qInfo() << "QStrFENBoard =" << QStrFENBoard;
-        emit _pBoardMain->showImaginaryBoardInUI(QStrFENBoard);
+        emit m_pBoardMain->showImaginaryBoardInUI(QStrFENBoard);
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
         qInfo() << "CQStrWhoseTurn =" << QStrWhoseTurn;
-        _WhoseTurn = this->whoseTurnFromFENStatus(QStrWhoseTurn);
-        emit this->setBoardDataLabel(turnTypeAsQstr(_WhoseTurn), BDL_TURN);
+        m_WhoseTurn = this->whoseTurnFromFENStatus(QStrWhoseTurn);
+        emit this->setBoardDataLabel(turnTypeAsQstr(m_WhoseTurn), BDL_TURN);
 
-        _QStrCastlings = QStrFENRecord.at(3);
-        qInfo() << "QStrCastlings =" << _QStrCastlings;
-        emit this->setBoardDataLabel(_QStrCastlings, BDL_CASTLINGS);
+        m_QStrCastlings = QStrFENRecord.at(3);
+        qInfo() << "QStrCastlings =" << m_QStrCastlings;
+        emit this->setBoardDataLabel(m_QStrCastlings, BDL_CASTLINGS);
 
-        _QStrEnpassant = QStrFENRecord.at(4);
-        qInfo() << "QStrEnpassant =" << _QStrEnpassant;
-        emit this->setBoardDataLabel(_QStrEnpassant, BDL_ENPASSANT);
+        m_QStrEnpassant = QStrFENRecord.at(4);
+        qInfo() << "QStrEnpassant =" << m_QStrEnpassant;
+        emit this->setBoardDataLabel(m_QStrEnpassant, BDL_ENPASSANT);
 
         QString QStrHalfMoveClock = QStrFENRecord.at(5); //future:
         QString QStrFullMoveNr = QStrFENRecord.at(6); //future:
@@ -166,19 +149,30 @@ void ChessStatus::saveStatusData(QString QStrStatus)
         qCritical() << "wrong QStrFENRecord size =" << QStrFENRecord.size();
 }
 
+WHOSE_TURN ChessStatus::whoseTurnFromFENStatus(QString QStrWhoseTurn)
+{
+    if (QStrWhoseTurn == "w") return WHITE_TURN;
+    else if (QStrWhoseTurn == "b") return BLACK_TURN;
+    else
+    {
+        return NO_TURN;
+        qCritical() << "unknown parameter:" << QStrWhoseTurn;
+    }
+}
+
 void ChessStatus::resetStatusData()
 {
-    _WhoseTurn = NO_TURN;
+    m_WhoseTurn = NO_TURN;
     this->clearLegalMoves();
     this->clearHistoryMoves();
-    _pPieceController->clearPawnsPromotions();
-    emit _pBoardMain->clearBoardInUI();
+    m_pPieceController->clearPawnsPromotions();
+    emit m_pBoardMain->clearBoardInUI();
 }
 
 void ChessStatus::promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType)
 {
     if (!posOfPawnToPromote.isPosSet(SHOW_ERRORS)) return;
-    Field* pFieldWithPawnToPromote = _pBoardMain->getField(posOfPawnToPromote);
+    Field* pFieldWithPawnToPromote = m_pBoardMain->getField(posOfPawnToPromote);
     Piece* pPawnToPromote = pFieldWithPawnToPromote->getPieceOnField(SHOW_ERRORS);
     if (pPawnToPromote == nullptr)
     {
@@ -194,25 +188,16 @@ QString ChessStatus::dumpAllData()
     QString QStrData;
 
     QStrData = "[chess_status.h]\n";
-    QStrData += "_FENGameState: " + endTypeAsQstr(_FENGameState) + "\n";
-    QStrData += "_WhoseTurn: " + turnTypeAsQstr(_WhoseTurn) + "\n";
-    QStrData += "_QStrCastlings: " + _QStrCastlings + "\n";
-    QStrData += "_QStrEnpassant: " + _QStrEnpassant + "\n";
-    QStrData += "_legalMoves: " + _legalMoves.join(",") + "\n";
-    QStrData += "_historyMoves: " + _historyMoves.join(",") + "\n";
-    QStrData += "_PosMove: " + _PosMove.asQStr() + "\n";
-    QStrData += "_MoveType: " + sequenceTypeAsQstr(_MoveType) + "\n";
+    QStrData += "m_FENGameState: " + endTypeAsQstr(m_FENGameState) + "\n";
+    QStrData += "m_WhoseTurn: " + turnTypeAsQstr(m_WhoseTurn) + "\n";
+    QStrData += "m_QStrCastlings: " + m_QStrCastlings + "\n";
+    QStrData += "m_QStrEnpassant: " + m_QStrEnpassant + "\n";
+    QStrData += "m_legalMoves: " + m_legalMoves.join(",") + "\n";
+    QStrData += "m_historyMoves: " + m_historyMoves.join(",") + "\n";
+    QStrData += "m_PosMove: " + m_PosMove.asQStr() + "\n";
+    QStrData += "m_MoveType: " + sequenceTypeAsQstr(m_MoveType) + "\n";
 
     return QStrData;
-}
-
-void ChessStatus::setMove(QString QStrMove)
-{
-    _MoveType = this->findMoveType(QStrMove);
-    qInfo() << "found move type =" << sequenceTypeAsQstr(_MoveType);
-    if (_MoveType == ST_PROMOTION || _MoveType == ST_PROMOTION_WITH_REMOVING)
-        QStrMove = QStrMove.left(4);
-    _PosMove = PosFromTo::fromQStr(QStrMove);
 }
 
 void ChessStatus::setLegalMoves(QString QStrMsg)
@@ -233,8 +218,8 @@ void ChessStatus::setLegalMoves(QString QStrMsg)
 
 void ChessStatus::setLegalMoves(QStringList moves)
 {
-    _legalMoves = moves;
-    emit this->showLegalMoves(_legalMoves);
+    m_legalMoves = moves;
+    emit this->showLegalMoves(m_legalMoves);
 }
 
 void ChessStatus::setHistoryMoves(QString QStrMsg)
@@ -256,44 +241,60 @@ void ChessStatus::setHistoryMoves(QString QStrMsg)
 
 void ChessStatus::setHistoryMoves(QStringList moves)
 {
-    _historyMoves = moves;
-    emit this->showHistoryMoves(_historyMoves);
+    m_historyMoves = moves;
+    emit this->showHistoryMoves(m_historyMoves);
 }
 
-WHOSE_TURN ChessStatus::whoseTurnFromFENStatus(QString QStrWhoseTurn)
+void ChessStatus::clearLegalMoves()
 {
-    if (QStrWhoseTurn == "w") return WHITE_TURN;
-    else if (QStrWhoseTurn == "b") return BLACK_TURN;
+    m_legalMoves.clear();
+    emit this->showLegalMoves(m_legalMoves);
+}
+
+void ChessStatus::clearHistoryMoves()
+{
+    m_historyMoves.clear();
+    emit this->showHistoryMoves(m_legalMoves);
+}
+
+/*static*/ bool ChessStatus::isMoveInProperFormat(QString QStrMove, bool bErrorLog /*= false*/)
+{
+    if (PosFromTo::isMoveInProperFormat(QStrMove.left(4))
+            || ChessStatus::isMovePromotion(QStrMove))
+        return true;
     else
     {
-        return NO_TURN;
-        qCritical() << "unknown parameter:" << QStrWhoseTurn;
+        if (bErrorLog)
+            qCritical() << "it's not. it =" << QStrMove;
+        return false;
+    }
+}
+
+/*static*/ bool ChessStatus::isSignProperPromotionType(QString QStrSign,
+                                                      bool bErrorLog /*= false*/)
+{
+    if (QStrSign == "q" || QStrSign == "b" || QStrSign == "r" || QStrSign == "n" ||
+            QStrSign == "Q" || QStrSign == "B" || QStrSign == "R" || QStrSign == "N")
+        return true;
+    else
+    {
+        if (bErrorLog)
+            qCritical() << "it's not. Sign =" << QStrSign;
+        return false;
     }
 }
 
 PLAYER_TYPE ChessStatus::getActivePlayerType()
 {
-    if (_WhoseTurn == WHITE_TURN &&
-            _pClientsList->getPlayerSocket(PT_WHITE) != nullptr)
+    if (m_WhoseTurn == WHITE_TURN &&
+            m_pClientsList->getPlayerSocket(PT_WHITE) != nullptr)
         return PT_WHITE;
-    else if (_WhoseTurn == BLACK_TURN &&
-             _pClientsList->getPlayerSocket(PT_BLACK) != nullptr)
+    else if (m_WhoseTurn == BLACK_TURN &&
+             m_pClientsList->getPlayerSocket(PT_BLACK) != nullptr)
         return PT_BLACK;
     else
     {
-        qCritical() << "wrong turn:" << turnTypeAsQstr(_WhoseTurn);
+        qCritical() << "wrong turn:" << turnTypeAsQstr(m_WhoseTurn);
         return PT_NONE;
     }
-}
-
-void ChessStatus::clearLegalMoves()
-{
-    _legalMoves.clear();
-    emit this->showLegalMoves(_legalMoves);
-}
-
-void ChessStatus::clearHistoryMoves()
-{
-    _historyMoves.clear();
-    emit this->showHistoryMoves(_legalMoves);
 }

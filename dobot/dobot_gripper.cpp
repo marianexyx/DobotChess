@@ -1,12 +1,12 @@
 #include "dobot_gripper.h"
 
 DobotGripper::DobotGripper(float fGripperOpened, float fGripperClosed):
-    _fGripOpened(fGripperOpened),
-    _fGripClosed(fGripperClosed)
+    m_fGripOpened(fGripperOpened),
+    m_fGripClosed(fGripperClosed)
 {
-    _gripper.address = 4;
-    _gripper.dutyCycle = _fGripOpened;
-    _gripper.frequency = 50.f;
+    m_gripper.address = 4;
+    m_gripper.dutyCycle = m_fGripOpened;
+    m_gripper.frequency = 50.f;
 
     this->checkPWMForErrors();
 }
@@ -26,7 +26,7 @@ void DobotGripper::checkPWMForErrors()
             qCritical() << "PWMData.address != 4. val =" << QString::number(PWMData.address);
         if (PWMData.frequency != 50)
             qCritical() << "PWMData.frequency != 50. val =" << QString::number(PWMData.address);
-        if (PWMData.dutyCycle != _fGripOpened && PWMData.dutyCycle != _fGripClosed)
+        if (PWMData.dutyCycle != m_fGripOpened && PWMData.dutyCycle != m_fGripClosed)
             qCritical() << "wrong PWMData.dutyCycle val. it's ="
                         << QString::number(PWMData.dutyCycle);
     }
@@ -35,21 +35,21 @@ void DobotGripper::checkPWMForErrors()
 void DobotGripper::changeGripperAngle(float fDutyCycle)
 {
     if (fDutyCycle != 0)
-        _gripper.dutyCycle = fDutyCycle;
-    qInfo() << "_gripper.dutyCycle = " << QString::number(fDutyCycle);
-    isArmReceivedCorrectCmd(SetIOPWM(&_gripper, false, NULL), SHOW_ERRORS); //unqueued
+        m_gripper.dutyCycle = fDutyCycle;
+    qInfo() << "m_gripper.dutyCycle = " << QString::number(fDutyCycle);
+    isArmReceivedCorrectCmd(SetIOPWM(&m_gripper, false, NULL), SHOW_ERRORS); //unqueued
 }
 
 void DobotGripper::openGripper(uint64_t ID)
 {
-    _gripper.dutyCycle = _fGripOpened;
-    isArmReceivedCorrectCmd(SetIOPWM(&_gripper, true, &ID), SHOW_ERRORS);
+    m_gripper.dutyCycle = m_fGripOpened;
+    isArmReceivedCorrectCmd(SetIOPWM(&m_gripper, true, &ID), SHOW_ERRORS);
 }
 
 void DobotGripper::closeGripper(uint64_t ID)
 {
-    _gripper.dutyCycle = _fGripClosed;
-    isArmReceivedCorrectCmd(SetIOPWM(&_gripper, true, &ID), SHOW_ERRORS);
+    m_gripper.dutyCycle = m_fGripClosed;
+    isArmReceivedCorrectCmd(SetIOPWM(&m_gripper, true, &ID), SHOW_ERRORS);
 }
 
 void DobotGripper::wait(uint64_t ID)

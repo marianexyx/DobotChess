@@ -21,13 +21,13 @@ class Chessboard: public QObject
     friend class ChessMovements;
 
 private:
-    BOARD _boardType;
-    bool _bBoardIsReal;
-    Point3D  _a1, _a8, _h1, _h8;
-    Point3D _remWhiteCloserOuter, _remWhiteFurtherInner;
-    Point3D _remBlackCloserOuter, _remBlackFurtherInner;
-    double _dSquareWidth;
-    Field* _pField[64];
+    BOARD m_boardType;
+    bool m_bBoardIsReal;
+    Point3D  m_a1, m_a8, m_h1, m_h8;
+    Point3D m_remWhiteCloserOuter, m_remWhiteFurtherInner;
+    Point3D m_remBlackCloserOuter, m_remBlackFurtherInner;
+    double m_dSquareWidth;
+    Field* m_pField[64];
 
     void calculateFieldsPointsOnMainBoard(Point3D A1, Point3D A8, Point3D H1, Point3D H8);
     void calculateFieldsPointsOnRemovedBoard(Point3D whiteCloserOuter,
@@ -37,18 +37,15 @@ private:
     void clearField(Field* pField, bool bErrorLog = false) { pField->clearField(bErrorLog); }
 
 public:
-    Chessboard(BOARD BoardType, bool bBoardIsReal = true,
-               RealVars gameConfigVars = RealVars());
+    Chessboard(BOARD BoardType, bool bBoardIsReal = true, RealVars gameConfigVars = RealVars());
     ~Chessboard();
 
-    const float fMaxPieceHeight;
-
-    IntermediatePoints calculateIntermediatePoints(RealVars RV, Chessboard *pBoard);
+    const double dMaxPieceHeight;
 
     bool isBoardReal(bool bErrorLog = false);
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);
 
-    BOARD getBoardType() const { return _boardType; }
+    BOARD getBoardType() const { return m_boardType; }
     Field* getField(short sFieldNr) const;
     Field* getField(PosOnBoard Pos) const;
     Field* getFieldWithGivenPieceIfExists(Piece* pPiece, bool bErrorLog = false);

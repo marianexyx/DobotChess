@@ -5,8 +5,8 @@
 #include "errors.h"
 #include "mainwindow.h"
 
-//future: change all private members names from "_" to "m_"?
-//future: check which vals can be unsigned
+typedef unsigned short ushort;
+typedef unsigned long ulong;
 
 int main(int argc, char *argv[])
 {

@@ -9,81 +9,83 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
 {
     ui->setupUi(this);
 
-    _pChess = pChess;
-    _pDobot = _pChess->getDobotPointer();
-    _pWebSockets = _pChess->getWebsocketsPointer();
-    _pPieceController = _pChess->getPieceControllerPointer();
-    _pBoardMain = _pChess->getBoardMainPointer();
-    _pBoardRemoved = _pChess->getBoardRemovedPointer();
-    _pBoardChenard = _pChess->getBoardChenardPointer();
-    _pTCPMsg = _pChess->getTCPMsgsPointer();
-    _pClientsList = _pChess->getClientsPointer();
+    m_pChess = pChess;
+    m_pDobot = m_pChess->getDobotPointer();
+    m_pWebsockets = m_pChess->getWebsocketsPointer();
+    m_pPieceController = m_pChess->getPieceControllerPointer();
+    m_pBoardMain = m_pChess->getBoardMainPointer();
+    m_pBoardRemoved = m_pChess->getBoardRemovedPointer();
+    m_pBoardChenard = m_pChess->getBoardChenardPointer();
+    m_pTCPMsgs = m_pChess->getTCPMsgsPointer();
+    m_pClientsList = m_pChess->getClientsPointer();
 
-    _titleFormTimer = new QTimer();
-    _titleFormTimer->setInterval(200);
-    _titleFormTimer->setSingleShot(false);
-    connect(_titleFormTimer, SIGNAL(timeout()), this, SLOT(changeWindowTitle()));
-    _titleFormTimer->start();
+    m_titleFormTimer = new QTimer();
+    m_titleFormTimer->setInterval(200);
+    m_titleFormTimer->setSingleShot(false);
+    connect(m_titleFormTimer, SIGNAL(timeout()), this, SLOT(changeWindowTitle()));
+    m_titleFormTimer->start();
 
-    //ui signals to classes
+    ///GUI signals
     connect(ui->teachMode, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onChangedMode())); //endtype change
     connect(ui->connectBtn, SIGNAL(clicked(bool)),
-            _pDobot, SLOT(onConnectDobot())); //connect dobot
-    this->setDobotPTEValidatorsInUI();
+            m_pDobot, SLOT(onConnectDobot())); //connect dobot
 
-    //classes signals to ui
-    connect(_pDobot, SIGNAL(addTextToLogPTE(QString, LOG)),
+    ///classes signals
+    connect(m_pDobot, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pTCPMsg, SIGNAL(addTextToLogPTE(QString, LOG)),
+    connect(m_pTCPMsgs, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pWebSockets, SIGNAL(addTextToLogPTE(QString, LOG)),
+    connect(m_pWebsockets, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pChess, SIGNAL(addTextToLogPTE(QString, LOG)),
+    connect(m_pChess, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pPieceController, SIGNAL(addTextToLogPTE(QString, LOG)),
+    connect(m_pPieceController, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pClientsList, SIGNAL(addTextToLogPTE(QString, LOG)),
+    connect(m_pClientsList, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
-    connect(_pChess, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+
+    //board data signals
+    connect(m_pChess, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+    connect(m_pBoardMain, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardRemoved, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+    connect(m_pBoardRemoved, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pClientsList, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
+    connect(m_pClientsList, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
              this, SLOT(setBoardDataLabel(QString, BOARD_DATA_LABEL)));
-    connect(_pBoardMain, SIGNAL(clearBoardInUI()), //connect for removed board not needed
-            this, SLOT(clearBoardInUI()));
-    connect(_pBoardChenard, SIGNAL(showImaginaryBoardInUI(QString)),
+    connect(m_pBoardChenard, SIGNAL(showImaginaryBoardInUI(QString)),
             this, SLOT(showImaginaryBoardInUI(QString)));
-    connect(_pChess, SIGNAL(showLegalMovesInUI(QStringList)),
-            this, SLOT(showLegalMovesInUI(QStringList)));
-    connect(_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
-            this, SLOT(showHistoryMovesInUI(QStringList)));
-    connect(_pClientsList, SIGNAL(showClientsListInUI(QList<Client>)),
-            this, SLOT(showClientsListInUI(QList<Client>)));
-    connect(_pDobot, SIGNAL(JointLabelText(QString, short)),
-            this, SLOT(setJointLabelText(QString, short)));
-    connect(_pDobot, SIGNAL(AxisLabelText(QString, char)),
-            this, SLOT(setAxisLabelText(QString, char)));
-    connect(_pDobot, SIGNAL(deviceLabels(QString, QString, QString)),
-            this, SLOT(setDeviceLabels(QString, QString, QString)));
-    connect(_pDobot, SIGNAL(setDobotButtonsStates(bool)),
-            this, SLOT(setDobotButtonsStates(bool)));
-    connect(_pDobot, SIGNAL(DobotErrorMsgBox()),
-            this, SLOT(showDobotErrorMsgBox()));
-    connect(_pDobot, SIGNAL(queueLabels(uint, uint64_t, uint64_t, int, uint64_t)),
-            this, SLOT(setQueueLabels(uint, uint64_t, uint64_t, int, uint64_t)));
-    connect(_pPieceController, SIGNAL(showRealBoardInUI()),
+    connect(m_pPieceController, SIGNAL(showRealBoardInUI()),
             this, SLOT(showRealBoardInUI()));
-    connect(_pDobot, SIGNAL(showQueuedArmCmdsOnCore(QString)),
+    connect(m_pBoardMain, SIGNAL(clearBoardInUI()), //connect for removed board not needed
+            this, SLOT(clearBoardInUI()));
+    connect(m_pChess, SIGNAL(showLegalMovesInUI(QStringList)),
+            this, SLOT(showLegalMovesInUI(QStringList)));
+    connect(m_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
+            this, SLOT(showHistoryMovesInUI(QStringList)));
+
+    //dobot slots
+    connect(m_pDobot, SIGNAL(JointLabelText(QString, short)),
+            this, SLOT(setJointLabelText(QString, short)));
+    connect(m_pDobot, SIGNAL(AxisLabelText(QString, char)),
+            this, SLOT(setAxisLabelText(QString, char)));
+    connect(m_pDobot, SIGNAL(setDobotButtonsStates(bool)),
+            this, SLOT(setDobotButtonsStates(bool)));
+    connect(m_pDobot, SIGNAL(deviceLabels(QString, QString, QString)),
+            this, SLOT(setDeviceLabels(QString, QString, QString)));
+    connect(m_pDobot, SIGNAL(DobotErrorMsgBox()),
+            this, SLOT(showDobotErrorMsgBox()));
+    connect(m_pDobot, SIGNAL(queueLabels(uint, uint64_t, uint64_t, int, uint64_t)),
+            this, SLOT(setQueueLabels(uint, uint64_t, uint64_t, int, uint64_t)));
+    connect(m_pDobot, SIGNAL(showQueuedArmCmdsOnCore(QString)),
             this, SLOT(showQueuedArmCmdsOnCore(QString)));
-    connect(_pDobot, SIGNAL(showSentArmCmdsToDobot(QString)),
+    connect(m_pDobot, SIGNAL(showSentArmCmdsToDobot(QString)),
             this, SLOT(showSentArmCmdsToDobot(QString)));
 
-    this->initControl(); //init dobot JOG control from form
-    _pWebSockets->listenOnPort(1234);
+    //clients slots
+    connect(m_pClientsList, SIGNAL(showClientsListInUI(QList<Client>)),
+            this, SLOT(showClientsListInUI(QList<Client>)));
 
     ui->connectBtn->setToolTip("Connect with arm.");
     ui->homeBtn->setToolTip("Go to start position.");
@@ -115,11 +117,277 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     ui->resetDobotIndexBtn->setToolTip("Reset dobot (only) current ID.");
     ui->teachMode->setToolTip("Change manual arm control with buttons between "
                               "joint and axis buttons.");
+
+    this->initDobotsBasicButtonsControl(); //init dobot JOG control from form
+    this->setDobotPTEValidatorsInUI();
+    m_pWebsockets->listenOnPort(1234); //future: dont start it in here
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::initDobotsBasicButtonsControl()
+{
+    QSignalMapper* signalMapper  = new QSignalMapper(this);
+    connect(ui->baseAngleAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->baseAngleSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->longArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->longArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->shortArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->shortArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->rHeadAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+    connect(ui->rHeadSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
+
+    signalMapper->setMapping(ui->baseAngleAddBtn, 0);
+    signalMapper->setMapping(ui->baseAngleSubBtn, 1);
+    signalMapper->setMapping(ui->longArmAddBtn, 2);
+    signalMapper->setMapping(ui->longArmSubBtn, 3);
+    signalMapper->setMapping(ui->shortArmAddBtn, 4);
+    signalMapper->setMapping(ui->shortArmSubBtn, 5);
+    signalMapper->setMapping(ui->rHeadAddBtn, 6);
+    signalMapper->setMapping(ui->rHeadSubBtn, 7);
+
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(onJOGCtrlBtnPressed(int)));
+
+    connect(ui->baseAngleAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->baseAngleSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->longArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->longArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->shortArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->shortArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->rHeadAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+    connect(ui->rHeadSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
+}
+
+void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
+{
+    if(QStrMsg.isEmpty()) return;
+
+    if(QStrMsg == "/clear")
+    {
+        ui->logPTE->clear();
+        return;
+    }
+
+    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " +
+            logAsQstr(TypeOfMsg) + QStrMsg;
+
+    ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
+    qInfo() << QStrMsg;
+
+    //prevent big string data
+    int nMaximum = 30 * 1000;
+    ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
+
+    //auto scroll
+    QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
+    scroll_logPTE->setValue(scroll_logPTE->maximum());
+}
+
+///board data slots
+void MainWindow::changeWindowTitle()
+{
+    this->setWindowTitle(gameStatusAsQStr(m_pChess->getGameStatus()));
+}
+
+void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)
+{
+    switch(LabelType)
+    {
+    case BDL_SOCKETS_ONLINE: ui->socketsLbl->setText(QStrLabel); break;
+    case BDL_WHITE_NAME: ui->whiteNameLbl->setText(QStrLabel); break;
+    case BDL_BLACK_NAME: ui->blackNameLbl->setText(QStrLabel); break;
+    case BDL_TURN: ui->turnLbl->setText(QStrLabel); break;
+    case BDL_GAME_STATUS: ui->gameStatusLbl->setText(QStrLabel); break;
+    case BDL_MOVES: ui->movesLbl->setText(QStrLabel); break;
+    case BDL_CASTLINGS: ui->castlingsLbl->setText(QStrLabel); break;
+    case BDL_ENPASSANT: ui->enpassantLbl->setText(QStrLabel); break;
+    case BDL_WHITE_TIME: ui->whiteTimeLbl->setText(QStrLabel); break;
+    case BDL_BLACK_TIME: ui->blackTimeLbl->setText(QStrLabel); break;
+    case BDL_QUEUE_PLAYERS: ui->queuedPlayersLbl->setText(QStrLabel); break;
+    case BDL_QUEUE_TIME: ui->queueTimeLbl->setText(QStrLabel); break;
+    default: qWarning() << "unknown labelType:" << QString::number(LabelType);
+    }
+}
+
+void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
+{
+    QString QStrBoardArray[8][8];
+
+    QStringList QStrFENBoardRows = QStrBoard.split(QRegExp("/"));
+    std::reverse(QStrFENBoardRows.begin(), QStrFENBoardRows.end());
+    if (QStrFENBoardRows.size() == 8)
+    {
+        QRegExp rxEmpty("\\d");
+        for (int nRow=0; nRow<=7; ++nRow)
+        {
+            int nColumn = 0;
+            QString QStrFENBoardRow = QStrFENBoardRows.at(nRow);
+            QStringList FENSigns = QStrFENBoardRow.split("");
+            FENSigns.removeFirst();
+            FENSigns.removeLast();
+
+            for (int nFENSignPos=0; nFENSignPos<FENSigns.size(); ++nFENSignPos)
+            {
+                QString QStrFENSign = FENSigns.at(nFENSignPos);
+                if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
+                {
+                    QStrBoardArray[nColumn][nRow] = QStrFENSign;
+                    if (nColumn > D_8)
+                        qWarning() << "nColumn > 8 =" << QString::number(nColumn);
+                    ++nColumn;
+                }
+                else //digits
+                {
+                    for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
+                    {
+                        QStrBoardArray[nColumn][nRow] = ".";
+                        if (nColumn > D_8)
+                            qWarning() << "nColumn > 8 =" << QString::number(nColumn);
+                        ++nColumn;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        qWarning() << "boardRows.size() != 8. size =" << QString::number(QStrFENBoardRows.size());
+        for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
+            qInfo() << "QStrFENBoardRows at" << QString::number(i)
+                    << "=" << QStrFENBoardRows.at(i);
+    }
+
+    QString QStrBoardPTE;
+    for (int i=0; i<=7; ++i)
+    {
+        for (int j=0; j<=7; ++j)
+            QStrBoardPTE += QStrBoardArray[i][j] + " ";
+        QStrBoardPTE += "\n";
+    }
+    while (QStrBoardPTE.right(1) == "\n")
+        QStrBoardPTE.remove(QStrBoardPTE.length()-1,1);
+
+    ui->chenardBoardPTE->clear();
+    ui->chenardBoardPTE->setPlainText(QStrBoardPTE);
+}
+
+void MainWindow::showRealBoardInUI()
+{
+    QString QStrRealBoards;
+    for (int i=1; i<=64; ++i)
+    {
+        if (i % 8 == 1)
+        {
+            Field* pRemField1 = m_pChess->getBoardRemovedPointer()->getField((i/4)+1);
+            Piece* pRemPiece1 = pRemField1->getPieceOnField();
+            Field* pRemField2 = m_pChess->getBoardRemovedPointer()->getField((i/4)+2);
+            Piece* pRemPiece2 = pRemField2->getPieceOnField();
+            QStrRealBoards += (pRemPiece1 == nullptr ? "." : pRemPiece1->getAsFENSign())
+                    + " " + (pRemPiece2 == nullptr ? "." : pRemPiece2->getAsFENSign()) + "   ";
+        }
+
+        Field* pField = m_pChess->getBoardMainPointer()->getField(i);
+        Piece* pPiece = pField->getPieceOnField();
+        QStrRealBoards += (pPiece == nullptr ? "." : pPiece->getAsFENSign()) + " ";
+
+        if (i % 8 == 0)
+        {
+            Field* pRemField1 = m_pChess->getBoardRemovedPointer()->getField((i/4)+15);
+            Piece* pRemPiece1 = pRemField1->getPieceOnField();
+            Field* pRemField2 = m_pChess->getBoardRemovedPointer()->getField((i/4)+16);
+            Piece* pRemPiece2 = pRemField2->getPieceOnField();
+            QStrRealBoards += "  " + (pRemPiece1 == nullptr ? "." : pRemPiece1->getAsFENSign())
+                    + " " + (pRemPiece2 == nullptr ? "." : pRemPiece2->getAsFENSign()) + "\n";
+        }
+    }
+    while (QStrRealBoards.right(1) == "\n")
+        QStrRealBoards.remove(QStrRealBoards.length()-1,1);
+
+    ui->realBoardPTE->clear();
+    ui->realBoardPTE->setPlainText(QStrRealBoards);
+}
+
+void MainWindow::clearBoardInUI()
+{
+    ui->chenardBoardPTE->clear();
+}
+
+void MainWindow::showLegalMovesInUI(QStringList legalMoves)
+{
+    QString legal = "";
+    if (!legalMoves.isEmpty()) legal = legalMoves.join(" ");
+    ui->legalPTE->clear();
+    ui->legalPTE->setPlainText(legal);
+}
+
+void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
+{
+    QString history;
+    ui->historyPTE->clear();
+    if (!historyMoves.isEmpty())
+    {
+        int turn = 1;
+        do
+        {
+            if (!historyMoves.isEmpty())
+            {
+                history += QString::number(turn) + ". " + historyMoves.takeFirst();
+                if (!historyMoves.isEmpty()) history += "  " + historyMoves.takeFirst() + "\n";
+                ++turn;
+            }
+        } while (!historyMoves.isEmpty());
+    }
+
+    ui->historyPTE->setPlainText(history);
+}
+
+
+///dobot slots
+void MainWindow::onChangedMode()
+{
+    if (ui->teachMode->currentIndex() == 1)
+    {
+        ui->baseAngleAddBtn->setText(tr("X+"));
+        ui->baseAngleSubBtn->setText(tr("X-"));
+        ui->longArmAddBtn->setText(tr("Y+"));
+        ui->longArmSubBtn->setText(tr("Y-"));
+        ui->shortArmAddBtn->setText(tr("Z+"));
+        ui->shortArmSubBtn->setText(tr("Z-"));
+        ui->rHeadAddBtn->setText(tr("R+"));
+        ui->rHeadSubBtn->setText(tr("R-"));
+    }
+    else
+    {
+        ui->baseAngleAddBtn->setText(tr("J1+"));
+        ui->baseAngleSubBtn->setText(tr("J1-"));
+        ui->longArmAddBtn->setText(tr("J2+"));
+        ui->longArmSubBtn->setText(tr("J2-"));
+        ui->shortArmAddBtn->setText(tr("J3+"));
+        ui->shortArmSubBtn->setText(tr("J3-"));
+        ui->rHeadAddBtn->setText(tr("J4+"));
+        ui->rHeadSubBtn->setText(tr("J4-"));
+    }
+}
+
+void MainWindow::onJOGCtrlBtnPressed(int nID)
+{
+    m_pPieceController->clearLastPos();
+
+    JOGCmd jogCmd;
+    jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
+    jogCmd.cmd = nID + 1;
+    SetJOGCmd(&jogCmd, false, NULL);
+}
+
+void MainWindow::onJOGCtrlBtnReleased()
+{
+    JOGCmd jogCmd;
+    jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
+    jogCmd.cmd = JogIdle;
+    SetJOGCmd(&jogCmd, false, NULL);
 }
 
 void MainWindow::setDobotPTEValidatorsInUI()
@@ -146,19 +414,6 @@ void MainWindow::setAxisLabelText(QString QStrAxisLabelText, char chAxis)
     else if (chAxis == 'y') ui->yLabel->setText(QStrAxisLabelText);
     else if (chAxis == 'z') ui->zLabel->setText(QStrAxisLabelText);
     else if (chAxis == 'r') ui->rLabel->setText(QStrAxisLabelText);
-}
-
-void MainWindow::setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
-                                int nCoreIdLeft, uint64_t un64CoreNextId)
-{
-    if (unSpace == 0) unSpace = 1;  //future: it's only for temporary block...
-    //...warning about unused parameter, till I will not check this function
-    //ui->DobotQueuedCmdLeftSpaceLabel->
-    //setText(QString::number(nSpace)); //future: make it by myself, or wait for update
-    ui->DobotQueuedIndexLabel->setText(QString::number(un64DobotId));
-    ui->CoreMaxQueuedIndexLabel->setText(QString::number(un64CoreMaxId));
-    ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
-    ui->CoreNextIdLabel->setText(QString::number(un64CoreNextId));
 }
 
 void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
@@ -237,292 +492,23 @@ void MainWindow::setDeviceLabels(QString QStrDeviceSN, QString QStrDeviceName,
     ui->DeviceInfoLabel->setText(QStrDeviceVersion);
 }
 
-void MainWindow::on_sendPointBtn_clicked()
-{
-    _pChess->clearLastSavedMadeMove();
-
-    bool bConversionXOk, bConversionYOk, bConversionZOk;
-
-    Point3D point;
-    float xPTE = ui->xPTPEdit->text().toFloat(&bConversionXOk);
-    float yPTE = ui->yPTPEdit->text().toFloat(&bConversionYOk);
-    float zPTE = ui->zPTPEdit->text().toFloat(&bConversionZOk);
-
-    point.x = bConversionXOk ? xPTE : _pDobot->getLastGivenPoint().x;
-    point.y = bConversionYOk ? yPTE : _pDobot->getLastGivenPoint().y;
-    point.z = bConversionZOk ? zPTE : _pDobot->getLastGivenPoint().z;
-
-    _pPieceController->clearLastPos();
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, point);
-
-    //servo
-    bool bConversionServoOk;
-    float fServoDutyCycle = ui->servoGripperEdit->text().toFloat(&bConversionServoOk);
-    if (bConversionServoOk)
-        _pDobot->getServoPointer()->changeGripperAngle(fServoDutyCycle);
-}
-
 void MainWindow::showDobotErrorMsgBox()
 {
     QMessageBox::information(this, tr("error"), tr("Connect dobot error"), QMessageBox::Ok);
     return;
 }
 
-void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
+void MainWindow::setQueueLabels(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                                int nCoreIdLeft, uint64_t un64CoreNextId)
 {
-    if(QStrMsg.isEmpty()) return;
-
-    if(QStrMsg == "/clear")
-    {
-        ui->logPTE->clear();
-        return;
-    }
-
-    QStrMsg = QTime::currentTime().toString("hh:mm:ss") + " " +
-            logAsQstr(TypeOfMsg) + QStrMsg;
-
-    ui->logPTE->setPlainText(ui->logPTE->toPlainText() + QStrMsg);
-    qInfo() << QStrMsg;
-
-    //prevent big string data
-    int nMaximum = 30 * 1000;
-    ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
-
-    //auto scroll
-    QScrollBar *scroll_logPTE = ui->logPTE->verticalScrollBar();
-    scroll_logPTE->setValue(scroll_logPTE->maximum());
-}
-
-void MainWindow::initControl() {
-    QSignalMapper* signalMapper  = new QSignalMapper(this);
-    connect(ui->baseAngleAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->baseAngleSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->longArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->longArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->shortArmAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->shortArmSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->rHeadAddBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-    connect(ui->rHeadSubBtn, SIGNAL(pressed()), signalMapper, SLOT(map()));
-
-    signalMapper->setMapping(ui->baseAngleAddBtn, 0);
-    signalMapper->setMapping(ui->baseAngleSubBtn, 1);
-    signalMapper->setMapping(ui->longArmAddBtn, 2);
-    signalMapper->setMapping(ui->longArmSubBtn, 3);
-    signalMapper->setMapping(ui->shortArmAddBtn, 4);
-    signalMapper->setMapping(ui->shortArmSubBtn, 5);
-    signalMapper->setMapping(ui->rHeadAddBtn, 6);
-    signalMapper->setMapping(ui->rHeadSubBtn, 7);
-
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(onJOGCtrlBtnPressed(int)));
-
-    connect(ui->baseAngleAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->baseAngleSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->longArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->longArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->shortArmAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->shortArmSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->rHeadAddBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-    connect(ui->rHeadSubBtn, SIGNAL(released()), this, SLOT(onJOGCtrlBtnReleased()));
-}
-
-void MainWindow::onChangedMode()
-{
-    if (ui->teachMode->currentIndex() == 1)
-    {
-        ui->baseAngleAddBtn->setText(tr("X+"));
-        ui->baseAngleSubBtn->setText(tr("X-"));
-        ui->longArmAddBtn->setText(tr("Y+"));
-        ui->longArmSubBtn->setText(tr("Y-"));
-        ui->shortArmAddBtn->setText(tr("Z+"));
-        ui->shortArmSubBtn->setText(tr("Z-"));
-        ui->rHeadAddBtn->setText(tr("R+"));
-        ui->rHeadSubBtn->setText(tr("R-"));
-    }
-    else
-    {
-        ui->baseAngleAddBtn->setText(tr("J1+"));
-        ui->baseAngleSubBtn->setText(tr("J1-"));
-        ui->longArmAddBtn->setText(tr("J2+"));
-        ui->longArmSubBtn->setText(tr("J2-"));
-        ui->shortArmAddBtn->setText(tr("J3+"));
-        ui->shortArmSubBtn->setText(tr("J3-"));
-        ui->rHeadAddBtn->setText(tr("J4+"));
-        ui->rHeadSubBtn->setText(tr("J4-"));
-    }
-}
-
-void MainWindow::onJOGCtrlBtnPressed(int nID)
-{
-    _pPieceController->clearLastPos();
-
-    JOGCmd jogCmd;
-    jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
-    jogCmd.cmd = nID + 1;
-    SetJOGCmd(&jogCmd, false, NULL);
-}
-
-void MainWindow::onJOGCtrlBtnReleased()
-{
-    JOGCmd jogCmd;
-    jogCmd.isJoint = ui->teachMode->currentIndex() == 0;
-    jogCmd.cmd = JogIdle;
-    SetJOGCmd(&jogCmd, false, NULL);
-}
-
-void MainWindow::on_sendSimulatedMsgBtn_clicked()
-{
-    if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
-    {
-        QString QStrServiceMove = ui->emulatePlayerMsgLineEdit->text();
-
-        if (QStrServiceMove.length() == 2)
-        {
-            QStrServiceMove += "a1"; //walkaround
-            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
-            {                
-                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
-                Field* pFieldFrom = _pBoardMain->getField(fromTo.from);
-                _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldFrom);
-            }
-        }
-        else if (QStrServiceMove.length() == 3 && QStrServiceMove.right(1) == "r")
-        {
-            QStrServiceMove = QStrServiceMove.left(2) + "a1"; //walkaround
-            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
-            {
-                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
-                Field* pFieldFrom = _pBoardRemoved->getField(fromTo.from);
-                if ((int)fromTo.from.Digit > 4)
-                {
-                    qWarning() << "fromTo.from.Digit > 4";
-                    return;
-                }
-                _pPieceController->movePieceWithManipulator(_pBoardRemoved, pFieldFrom);
-            }
-        }
-        else if (QStrServiceMove.length() == 4)
-        {
-            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
-            {
-                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
-                Field* pFieldFrom = _pBoardMain->getField(fromTo.from);
-                Field* pFieldTo = _pBoardMain->getField(fromTo.to);
-                _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldFrom, VM_GRAB);
-                _pPieceController->movePieceWithManipulator(_pBoardMain, pFieldTo, VM_PUT);
-            }
-
-        }
-        else qWarning() << "QStrServiceMove msg =" << QStrServiceMove;
-    }
-
-    ui->emulatePlayerMsgLineEdit->clear();
-}
-
-void MainWindow::on_calibrateBtn_clicked()
-{
-    if (ui->xLabel->text().toInt() == (int)_pDobot->getHomePos().x &&
-            ui->yLabel->text().toInt() == (int)_pDobot->getHomePos().y &&
-            ui->zLabel->text().toInt() == (int)_pDobot->getHomePos().z)
-    {
-        _pPieceController->clearLastPos();
-        _pDobot->addArmMoveToQueue(DM_CALIBRATE);
-    }
-    else
-        qWarning() << "Dobot not in home positions";
-}
-
-void MainWindow::on_homeBtn_clicked()
-{
-    _pPieceController->clearLastPos();
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-}
-
-void MainWindow::on_upBtn_clicked()
-{
-    if (_pPieceController->isMoveSet())
-    {
-        double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
-                ->getLocation3D().z + (double)_pBoardMain->fMaxPieceHeight;
-        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
-        _pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
-    }
-    else
-        qWarning() << "move isn't set";
-}
-
-void MainWindow::on_downBtn_clicked()
-{
-    if (_pPieceController->isMoveSet())
-    {
-        double dZAxisVal = _pBoardMain->getField(_pPieceController->getLastPos())
-                ->getLocation3D().z;
-        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
-        _pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
-    }
-    else
-        qWarning() << "move isn't set";
-}
-
-void MainWindow::on_resetDobotIndexBtn_clicked()
-{
-    if (isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
-        this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
-}
-
-void MainWindow::on_openGripperBtn_clicked()
-{
-    _pDobot->addArmMoveToQueue(DM_OPEN);
-}
-
-void MainWindow::on_closeGripperBtn_clicked()
-{
-    _pDobot->addArmMoveToQueue(DM_CLOSE);
-    _pDobot->addArmMoveToQueue(DM_WAIT);
-}
-
-void MainWindow::on_middleAboveBtn_clicked()
-{
-    _pPieceController->clearLastPos();
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().middleAbove);
-}
-
-void MainWindow::on_startGmPosBtn_clicked()
-{
-    Point3D labelPoint(ui->xLabel->text().toInt(), ui->yLabel->text().toInt(),
-                       ui->zLabel->text().toInt());
-    //todo: test condition
-    if (Point3D::isPointCloseToAnother(labelPoint, _pDobot->getHomePos()))
-    {
-        _pPieceController->clearLastPos();
-
-        this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerBelow);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerAbove);
-        _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().middleAbove);
-    }
-    else
-        qWarning() << "Dobot not in home positions";
-}
-
-void MainWindow::on_startDtPosBtn_clicked()
-{
-    _pPieceController->clearLastPos();
-
-    this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().middleAbove);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerAbove);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().cournerBelow);
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getHomePos());
-}
-
-void MainWindow::on_sendTcpBtn_clicked()
-{
-    if (!ui->sendTcpLineEdit->text().isEmpty())
-    {
-        _pTCPMsg->queueCmd(ui->sendTcpLineEdit->text());
-        ui->sendTcpLineEdit->clear();
-    }
+    if (unSpace == 0) unSpace = 1;  //future: it's only for temporary block...
+    //...warning about unused parameter, till I will not check this function
+    //ui->DobotQueuedCmdLeftSpaceLabel->
+    //setText(QString::number(nSpace)); //future: make it by myself, or wait for update
+    ui->DobotQueuedIndexLabel->setText(QString::number(un64DobotId));
+    ui->CoreMaxQueuedIndexLabel->setText(QString::number(un64CoreMaxId));
+    ui->CoreIndexAmountlabel->setText(QString::number(nCoreIdLeft));
+    ui->CoreNextIdLabel->setText(QString::number(un64CoreNextId));
 }
 
 void MainWindow::showQueuedArmCmdsOnCore(QString QStrList)
@@ -537,6 +523,8 @@ void MainWindow::showSentArmCmdsToDobot(QString QStrList)
     ui->queuedOnDobot->setPlainText(QStrList);
 }
 
+
+///clients slots
 void MainWindow::showClientsListInUI(QList<Client> list)
 {
     QString QStrClientsList;
@@ -558,7 +546,7 @@ void MainWindow::showClientsListInUI(QList<Client> list)
            QString QStrStartState = client.isStartClickedByPlayer() ? "1" : "0";
            QStrClientsList += ", plr: " + QStrPlayerType + ", st:" + QStrStartState;
        }
-       else if (client.queue() != -1)
+       else if (client.queue() != 0)
            QStrClientsList += ", q:" + QString::number(client.queue());
 
        QStrClientsList += ", ID:" + QString::number(client.ID()) + "\n";
@@ -567,168 +555,99 @@ void MainWindow::showClientsListInUI(QList<Client> list)
     ui->clientsPTE->setPlainText(QStrClientsList);
 }
 
-void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)
+
+///GUI slots
+void MainWindow::on_openGripperBtn_clicked()
 {
-    switch(LabelType)
-    {
-    case BDL_SOCKETS_ONLINE: ui->socketsLbl->setText(QStrLabel); break;
-    case BDL_WHITE_NAME: ui->whiteNameLbl->setText(QStrLabel); break;
-    case BDL_BLACK_NAME: ui->blackNameLbl->setText(QStrLabel); break;
-    case BDL_TURN: ui->turnLbl->setText(QStrLabel); break;
-    case BDL_GAME_STATUS: ui->gameStatusLbl->setText(QStrLabel); break;
-    case BDL_MOVES: ui->movesLbl->setText(QStrLabel); break;
-    case BDL_CASTLINGS: ui->castlingsLbl->setText(QStrLabel); break;
-    case BDL_ENPASSANT: ui->enpassantLbl->setText(QStrLabel); break;
-    case BDL_WHITE_TIME: ui->whiteTimeLbl->setText(QStrLabel); break;
-    case BDL_BLACK_TIME: ui->blackTimeLbl->setText(QStrLabel); break;
-    case BDL_QUEUE_PLAYERS: ui->queuedPlayersLbl->setText(QStrLabel); break;
-    case BDL_QUEUE_TIME: ui->queueTimeLbl->setText(QStrLabel); break;
-    default: qWarning() << "unknown labelType:" << QString::number(LabelType);
-    }
+    m_pDobot->addArmMoveToQueue(DM_OPEN);
 }
 
-void MainWindow::clearBoardInUI()
+void MainWindow::on_closeGripperBtn_clicked()
 {
-    ui->chenardBoardPTE->clear();
+    m_pDobot->addArmMoveToQueue(DM_CLOSE);
+    m_pDobot->addArmMoveToQueue(DM_WAIT);
 }
 
-void MainWindow::showImaginaryBoardInUI(QString QStrBoard)
+void MainWindow::on_startGmPosBtn_clicked()
 {
-    QString QStrBoardArray[8][8];
-
-    QStringList QStrFENBoardRows = QStrBoard.split(QRegExp("/"));
-    std::reverse(QStrFENBoardRows.begin(), QStrFENBoardRows.end());
-    if (QStrFENBoardRows.size() == 8)
+    Point3D labelPoint(ui->xLabel->text().toInt(), ui->yLabel->text().toInt(),
+                       ui->zLabel->text().toInt());
+    //todo: test condition
+    if (Point3D::isPointCloseToAnother(labelPoint, m_pDobot->getHomePos()))
     {
-        QRegExp rxEmpty("\\d");
-        for (int nRow=0; nRow<=7; ++nRow)
-        {
-            int nColumn = 0;
-            QString QStrFENBoardRow = QStrFENBoardRows.at(nRow);
-            QStringList FENSigns = QStrFENBoardRow.split("");
-            FENSigns.removeFirst();
-            FENSigns.removeLast();
+        m_pPieceController->clearLastPos();
 
-            for (int nFENSignPos=0; nFENSignPos<FENSigns.size(); ++nFENSignPos)
-            {
-                QString QStrFENSign = FENSigns.at(nFENSignPos);
-                if (!rxEmpty.exactMatch(QStrFENSign)) //not digits
-                {
-                    QStrBoardArray[nColumn][nRow] = QStrFENSign;
-                    if (nColumn > D_8)
-                        qWarning() << "nColumn > 8 =" << QString::number(nColumn);
-                    ++nColumn;
-                }
-                else //digits
-                {
-                    for (int nEmptyFields=1; nEmptyFields<=QStrFENSign.toInt(); ++nEmptyFields)
-                    {
-                        QStrBoardArray[nColumn][nRow] = ".";
-                        if (nColumn > D_8)
-                            qWarning() << "nColumn > 8 =" << QString::number(nColumn);
-                        ++nColumn;
-                    }
-                }
-            }
-        }
+        this->writeInConsole("Placing arm above the chessboard.\n", LOG_DOBOT);
+        m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getHomePos());
+        m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().cournerBelow);
+        m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().cournerAbove);
+        m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().middleAbove);
     }
     else
-    {
-        qWarning() << "boardRows.size() != 8. size =" << QString::number(QStrFENBoardRows.size());
-        for (int i=0; i<=QStrFENBoardRows.size()-1; ++i)
-            qInfo() << "QStrFENBoardRows at" << QString::number(i)
-                    << "=" << QStrFENBoardRows.at(i);
-    }
-
-    QString QStrBoardPTE;
-    for (int i=0; i<=7; ++i)
-    {
-        for (int j=0; j<=7; ++j)
-            QStrBoardPTE += QStrBoardArray[i][j] + " ";
-        QStrBoardPTE += "\n";
-    }
-    while (QStrBoardPTE.right(1) == "\n")
-        QStrBoardPTE.remove(QStrBoardPTE.length()-1,1);
-
-    ui->chenardBoardPTE->clear();
-    ui->chenardBoardPTE->setPlainText(QStrBoardPTE);
+        qWarning() << "Dobot not in home positions";
 }
 
-void MainWindow::showRealBoardInUI()
-{   
-    QString QStrRealBoards;
-    for (int i=1; i<=64; ++i)
-    {
-        if (i % 8 == 1)
-        {
-            Field* pRemField1 = _pChess->getBoardRemovedPointer()->getField((i/4)+1);
-            Piece* pRemPiece1 = pRemField1->getPieceOnField();
-            Field* pRemField2 = _pChess->getBoardRemovedPointer()->getField((i/4)+2);
-            Piece* pRemPiece2 = pRemField2->getPieceOnField();
-            QStrRealBoards += (pRemPiece1 == nullptr ? "." : pRemPiece1->getAsFENSign())
-                    + " " + (pRemPiece2 == nullptr ? "." : pRemPiece2->getAsFENSign()) + "   ";
-        }
-
-        Field* pField = _pChess->getBoardMainPointer()->getField(i);
-        Piece* pPiece = pField->getPieceOnField();
-        QStrRealBoards += (pPiece == nullptr ? "." : pPiece->getAsFENSign()) + " ";
-
-        if (i % 8 == 0)
-        {
-            Field* pRemField1 = _pChess->getBoardRemovedPointer()->getField((i/4)+15);
-            Piece* pRemPiece1 = pRemField1->getPieceOnField();
-            Field* pRemField2 = _pChess->getBoardRemovedPointer()->getField((i/4)+16);
-            Piece* pRemPiece2 = pRemField2->getPieceOnField();
-            QStrRealBoards += "  " + (pRemPiece1 == nullptr ? "." : pRemPiece1->getAsFENSign())
-                    + " " + (pRemPiece2 == nullptr ? "." : pRemPiece2->getAsFENSign()) + "\n";
-        }
-    }
-    while (QStrRealBoards.right(1) == "\n")
-        QStrRealBoards.remove(QStrRealBoards.length()-1,1);
-
-    ui->realBoardPTE->clear();
-    ui->realBoardPTE->setPlainText(QStrRealBoards);
-}
-
-void MainWindow::showLegalMovesInUI(QStringList legalMoves)
+void MainWindow::on_startDtPosBtn_clicked()
 {
-    QString legal = "";
-    if (!legalMoves.isEmpty()) legal = legalMoves.join(" ");
-    ui->legalPTE->clear();
-    ui->legalPTE->setPlainText(legal);
+    m_pPieceController->clearLastPos();
+
+    this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().middleAbove);
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().cournerAbove);
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().cournerBelow);
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getHomePos());
 }
 
-void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
+void MainWindow::on_sendTcpBtn_clicked()
 {
-    QString history;
-    ui->historyPTE->clear();
-    if (!historyMoves.isEmpty())
+    if (!ui->sendTcpLineEdit->text().isEmpty())
     {
-        int turn = 1;
-        do
-        {
-            if (!historyMoves.isEmpty())
-            {
-                history += QString::number(turn) + ". " + historyMoves.takeFirst();
-                if (!historyMoves.isEmpty()) history += "  " + historyMoves.takeFirst() + "\n";
-                ++turn;
-            }
-        } while (!historyMoves.isEmpty());
+        m_pTCPMsgs->queueCmd(ui->sendTcpLineEdit->text());
+        ui->sendTcpLineEdit->clear();
     }
-
-    ui->historyPTE->setPlainText(history);
-}
-
-void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged)
-{
-    if (QStrTextChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
-    else ui->sendSimulatedMsgBtn->setEnabled(false);
 }
 
 void MainWindow::on_sendTcpLineEdit_textChanged(const QString& QStrTextChanged)
 {
     if (QStrTextChanged != NULL) ui->sendTcpBtn->setEnabled(true);
     else ui->sendTcpBtn->setEnabled(false);
+}
+
+void MainWindow::on_homeBtn_clicked()
+{
+    m_pPieceController->clearLastPos();
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getHomePos());
+}
+
+void MainWindow::on_middleAboveBtn_clicked()
+{
+    m_pPieceController->clearLastPos();
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().middleAbove);
+}
+
+void MainWindow::on_sendPointBtn_clicked()
+{
+    m_pChess->clearLastSavedMadeMove();
+
+    bool bConversionXOk, bConversionYOk, bConversionZOk;
+
+    Point3D point;
+    float xPTE = ui->xPTPEdit->text().toFloat(&bConversionXOk);
+    float yPTE = ui->yPTPEdit->text().toFloat(&bConversionYOk);
+    float zPTE = ui->zPTPEdit->text().toFloat(&bConversionZOk);
+
+    point.x = bConversionXOk ? xPTE : m_pDobot->getLastGivenPoint().x;
+    point.y = bConversionYOk ? yPTE : m_pDobot->getLastGivenPoint().y;
+    point.z = bConversionZOk ? zPTE : m_pDobot->getLastGivenPoint().z;
+
+    m_pPieceController->clearLastPos();
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, point);
+
+    //servo
+    bool bConversionServoOk;
+    float fServoDutyCycle = ui->servoGripperEdit->text().toFloat(&bConversionServoOk);
+    if (bConversionServoOk)
+        m_pDobot->getServoPointer()->changeGripperAngle(fServoDutyCycle);
 }
 
 void MainWindow::on_xPTPEdit_textChanged(const QString& QStrTextChanged)
@@ -754,15 +673,111 @@ void MainWindow::on_zPTPEdit_textChanged(const QString& QStrTextChanged)
 
 void MainWindow::on_retreatLeftBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().retreatLeft);
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().retreatLeft);
 }
 
 void MainWindow::on_retreatRightBtn_clicked()
 {
-    _pDobot->addArmMoveToQueue(DM_TO_POINT, _pDobot->getIntermediatePoints().retreatRight);
+    m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().retreatRight);
 }
 
-void MainWindow::changeWindowTitle()
+void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrTextChanged)
 {
-    this->setWindowTitle(gameStatusAsQStr(_pChess->getGameStatus()));
+    if (QStrTextChanged != NULL) ui->sendSimulatedMsgBtn->setEnabled(true);
+    else ui->sendSimulatedMsgBtn->setEnabled(false);
 }
+
+void MainWindow::on_sendSimulatedMsgBtn_clicked()
+{
+    if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
+    {
+        QString QStrServiceMove = ui->emulatePlayerMsgLineEdit->text();
+
+        if (QStrServiceMove.length() == 2)
+        {
+            QStrServiceMove += "a1"; //walkaround
+            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
+            {
+                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
+                Field* pFieldFrom = m_pBoardMain->getField(fromTo.from);
+                m_pPieceController->movePieceWithManipulator(m_pBoardMain, pFieldFrom);
+            }
+        }
+        else if (QStrServiceMove.length() == 3 && QStrServiceMove.right(1) == "r")
+        {
+            QStrServiceMove = QStrServiceMove.left(2) + "a1"; //walkaround
+            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
+            {
+                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
+                Field* pFieldFrom = m_pBoardRemoved->getField(fromTo.from);
+                if ((int)fromTo.from.Digit > 4)
+                {
+                    qWarning() << "fromTo.from.Digit > 4";
+                    return;
+                }
+                m_pPieceController->movePieceWithManipulator(m_pBoardRemoved, pFieldFrom);
+            }
+        }
+        else if (QStrServiceMove.length() == 4)
+        {
+            if (PosFromTo::isMoveInProperFormat(QStrServiceMove))
+            {
+                PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
+                Field* pFieldFrom = m_pBoardMain->getField(fromTo.from);
+                Field* pFieldTo = m_pBoardMain->getField(fromTo.to);
+                m_pPieceController->movePieceWithManipulator(m_pBoardMain, pFieldFrom, VM_GRAB);
+                m_pPieceController->movePieceWithManipulator(m_pBoardMain, pFieldTo, VM_PUT);
+            }
+
+        }
+        else qWarning() << "QStrServiceMove msg =" << QStrServiceMove;
+    }
+
+    ui->emulatePlayerMsgLineEdit->clear();
+}
+
+void MainWindow::on_calibrateBtn_clicked()
+{
+    if (ui->xLabel->text().toInt() == (int)m_pDobot->getHomePos().x &&
+            ui->yLabel->text().toInt() == (int)m_pDobot->getHomePos().y &&
+            ui->zLabel->text().toInt() == (int)m_pDobot->getHomePos().z)
+    {
+        m_pPieceController->clearLastPos();
+        m_pDobot->addArmMoveToQueue(DM_CALIBRATE);
+    }
+    else
+        qWarning() << "Dobot not in home positions";
+}
+
+void MainWindow::on_upBtn_clicked()
+{
+    if (m_pPieceController->isMoveSet())
+    {
+        double dZAxisVal = m_pBoardMain->getField(m_pPieceController->getLastPos())
+                ->getLocation3D().z + m_pBoardMain->dMaxPieceHeight;
+        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
+        m_pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
+    }
+    else
+        qWarning() << "move isn't set";
+}
+
+void MainWindow::on_downBtn_clicked()
+{
+    if (m_pPieceController->isMoveSet())
+    {
+        double dZAxisVal = m_pBoardMain->getField(m_pPieceController->getLastPos())
+                ->getLocation3D().z;
+        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
+        m_pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
+    }
+    else
+        qWarning() << "move isn't set";
+}
+
+void MainWindow::on_resetDobotIndexBtn_clicked()
+{
+    if (isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
+        this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
+}
+

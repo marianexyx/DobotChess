@@ -19,17 +19,7 @@ struct PosOnBoard
 
     static QString posAsQStr(PosOnBoard Pos)
     { return pieceLetterPosAsQStr(Pos.Letter) + QString::number(Pos.Digit); }
-
-    bool isPosSet(bool bErrorLog = false)
-    {
-        if (Letter != L_X && Digit != D_X) return true;
-        else
-        {
-            if (bErrorLog)
-                qCritical() << "pos isn't false";
-            return false;
-        }
-    }
+    bool isPosSet(bool bErrorLog = false);
     void setLetterFromQStr(QString QStrL) { Letter = pieceLetterPos(QStrL); }
     QString getAsQStr() { return pieceLetterPosAsQStr(Letter) + QString::number(Digit); }
 };
@@ -39,14 +29,13 @@ struct PosFromTo
     PosOnBoard from;
     PosOnBoard to;
 
-    PosFromTo();
-    PosFromTo(PosOnBoard PosFrom, PosOnBoard PosTo) { from = PosFrom, to = PosTo;}
+    PosFromTo(): from(), to() {}
+    PosFromTo(PosOnBoard PosFrom, PosOnBoard PosTo) { from = PosFrom, to = PosTo; }
     PosFromTo(LETTER FromL, DIGIT FromD, LETTER ToL, DIGIT ToD);
     PosFromTo(QString QStrMoveFromTo);
 
     static bool isMoveInProperFormat(QString QStrMoveFromTo);
     static PosFromTo fromQStr(QString QStrMoveFromTo);
-
     QString asQStr();
     void clear();
 };

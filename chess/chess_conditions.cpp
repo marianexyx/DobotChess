@@ -2,8 +2,8 @@
 
 ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 {
-    _pClientsList = pClientsList;
-    _pStatus = pStatus;
+    m_pClientsList = pClientsList;
+    m_pStatus = pStatus;
 }
 
 bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
@@ -129,11 +129,11 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
 
 bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
 {
-    if (!_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
+    if (!m_pClientsList->isClientInList(*pSender, SHOW_ERRORS)) return false;
 
     bool bLogged = pSender->sqlID() > 0 ? true : false;
-    bool bSittingOnChair = _pClientsList->isClientAPlayer(*pSender);
-    bool bInQueue = _pClientsList->isClientInQueue(*pSender);
+    bool bSittingOnChair = m_pClientsList->isClientAPlayer(*pSender);
+    bool bInQueue = m_pClientsList->isClientInQueue(*pSender);
 
     bool bSuccess = false;
     switch(Type)
@@ -190,16 +190,16 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         break;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((pSender->type() == PT_WHITE && _pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (pSender->type() == PT_BLACK && _pStatus->getWhoseTurn() == BLACK_TURN))
+        if ((pSender->type() == PT_WHITE && m_pStatus->getWhoseTurn() == WHITE_TURN) ||
+                (pSender->type() == PT_BLACK && m_pStatus->getWhoseTurn() == BLACK_TURN))
             bSuccess = true;
         else bSuccess = false;
         break;
     case RT_SIT_ON:
     {
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
-        if (_pClientsList->isPlayerChairEmpty(PlayerChair) &&
-                !_pClientsList->isClientAPlayer(*pSender))
+        if (m_pClientsList->isPlayerChairEmpty(PlayerChair) &&
+                !m_pClientsList->isClientAPlayer(*pSender))
             bSuccess = true;
         else bSuccess = false;
         break;
@@ -208,8 +208,8 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
     {
         if (Sql::isClientHashOk(request.param))
         {
-            int nSqlId = request.param.left(request.param.indexOf("&")).toInt();
-            if (pSender->sqlID() == 0 || pSender->sqlID() == nSqlId)
+            uint unSqlId = request.param.left(request.param.indexOf("&")).toInt();
+            if (pSender->sqlID() == 0 || pSender->sqlID() == unSqlId)
                 bSuccess = true;
             else
             {
@@ -221,17 +221,17 @@ bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientR
         break;
     }
     case RT_QUEUE_ME:
-        if (_pClientsList->isWholeGameTableOccupied())
+        if (m_pClientsList->isWholeGameTableOccupied())
             bSuccess = true;
         else bSuccess = false;
         break;
     case RT_LEAVE_QUEUE:
-        if (_pClientsList->isClientInQueue(*pSender))
+        if (m_pClientsList->isClientInQueue(*pSender))
             bSuccess = true;
         else bSuccess = false;
         break;
     case RT_CLIENT_LEFT:
-        if (_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
+        if (m_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
             bSuccess = true;
         else bSuccess = false;
         break;

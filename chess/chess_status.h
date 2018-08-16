@@ -14,64 +14,54 @@ class ChessStatus: public QObject
     friend class Chess;
 
 private:
-    Chessboard* _pBoardMain;
-    Clients* _pClientsList;
-    PieceController* _pPieceController;
+    Chessboard* m_pBoardMain;
+    Clients* m_pClientsList;
+    PieceController* m_pPieceController;
 
-    END_TYPE _FENGameState;
-    WHOSE_TURN _WhoseTurn;
-    QString _QStrCastlings;
-    QString _QStrEnpassant;
-    QStringList _legalMoves;
-    QStringList _historyMoves;
-    PosFromTo _PosMove;
-    SEQUENCE_TYPE _MoveType;
+    WHOSE_TURN m_WhoseTurn;
+    PosFromTo m_PosMove;
+    SEQUENCE_TYPE m_MoveType;
+    QStringList m_legalMoves;
+    QStringList m_historyMoves;
+    QString m_QStrCastlings;
+    QString m_QStrEnpassant;
+    END_TYPE m_FENGameState;
+
+    ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain, Clients* pClientsList);
+
+    void setMove(QString QStrMove);
+    SEQUENCE_TYPE findMoveType(QString QStrMove);
+    bool isMoveLegal(QString QStrMove) { return m_legalMoves.contains(QStrMove)? true : false; }
+    bool isMoveEnpassant(QString QStrMoveToTest);
+    bool isMoveCastling(QString QStrMoveToTest);
+    bool isMovePromotionWithRemoving(QString QStrMoveToTest);
+    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
+    bool isMoveRemoving(QString QStrMoveToTest);
 
     void saveStatusData(QString QStrStatus);
-    void resetStatusData();
     WHOSE_TURN whoseTurnFromFENStatus(QString QStrWhoseTurn);
+    void resetStatusData();
     void promotePawn(PosOnBoard posOfPawnToPromote, QString QStrPromoType);
     QString dumpAllData();
 
-    void setMove(QString QStrMove);
     void setLegalMoves(QString QStrMsg);
     void setLegalMoves(QStringList moves);
     void setHistoryMoves(QString QStrMsg);
     void setHistoryMoves(QStringList moves);
-
-    void clearMove() { _PosMove.clear(); }
+    void clearMove() { m_PosMove.clear(); }
     void clearLegalMoves();
     void clearHistoryMoves();
 
 public:
-    ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain,
-                Clients* pClientsList);
-    ~ChessStatus() {}
-
-    static bool isMovePromotion(QString QStrMove, bool bErrorLog = false);
     static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
+    bool isMoveARequestForPromotion(QString QStrMove)
+    { return m_legalMoves.contains(QStrMove + "q")? true : false; }
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
 
-    SEQUENCE_TYPE findMoveType(QString QStrMove);
-    bool isMoveLegal(QString QStrMove) { return _legalMoves.contains(QStrMove)? true : false; }
-    bool isMoveARequestForPromotion(QString QStrMove)
-    { return _legalMoves.contains(QStrMove + "q")? true : false; }
-    bool isMoveRemoving(QString QStrMoveToTest);
-    bool isMovePromotionWithRemoving(QString QStrMoveToTest);
-    bool isMoveCastling(QString QStrMoveToTest);
-    bool isMoveEnpassant(QString QStrMoveToTest);
-
-    END_TYPE getFENGameState() const { return _FENGameState; }
-    WHOSE_TURN getWhoseTurn() const { return _WhoseTurn; }
-    PosFromTo getMove() const { return _PosMove; }
-    SEQUENCE_TYPE getMoveType() const { return _MoveType; }
-    QStringList getLegalMoves() const { return _legalMoves; }
-    QStringList getHistoryMoves() const { return _historyMoves; }
-    QString getHistoryMovesAsQStr() const
-    { return (_historyMoves.size() ? _historyMoves.join(" ") : "0"); }
-    QString getCastlings() const { return _QStrCastlings; }
-    QString getEnpassant() const { return _QStrEnpassant; }
+    WHOSE_TURN getWhoseTurn() const { return m_WhoseTurn; }
     PLAYER_TYPE getActivePlayerType();
+    QString getHistoryMovesAsQStr() const
+    { return (m_historyMoves.size() ? m_historyMoves.join(" ") : "0"); }
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);

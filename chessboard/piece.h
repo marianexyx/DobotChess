@@ -21,38 +21,38 @@ enum PIECE_TYPE
 class Piece
 {
 private:
-    short _sPieceID;
-    PIECE_TYPE _pieceType;
-    PLAYER_TYPE _pieceColor;
-    short _sStartFieldID;
-    PIECE_TYPE _promotedType;
+    ushort m_usPieceID;
+    PIECE_TYPE m_pieceType;
+    PLAYER_TYPE m_PieceColor;
+    ushort m_usStartFieldID;
+    PIECE_TYPE m_PromotedType;
 
 public:
-    Piece(short sPieceID);
+    Piece(ushort usPieceID);
 
-    bool operator ==(const class Piece& p) { return _sPieceID == p.getNr(); }
+    bool operator ==(const class Piece& p) { return m_usPieceID == p.getNr(); }
 
-    static bool isInRange(short sPieceNr);
+    static bool isInRange(ushort usPieceNr);
     static PLAYER_TYPE Color(char chFENSign);
-    static PLAYER_TYPE Color(short sPieceNr);
+    static PLAYER_TYPE Color(ushort usPieceNr);
     static PIECE_TYPE Type(char chFENSign);
     static PIECE_TYPE Type(QString QStrFENSign);
-    static PIECE_TYPE Type(short sPieceNr);
-    static short nr(PosOnBoard pieceLines);
-    static short startFieldNr(short sPieceNr);
+    static PIECE_TYPE Type(ushort usPieceNr);
+    static ushort nr(PosOnBoard pieceLines);
+    static ushort startFieldNr(ushort usPieceNr);
     static PosOnBoard startFieldPos(short sPieceNr);
 
     void setPromotedType(PIECE_TYPE promotedType);
-    void clearPromotedType() { _promotedType = P_ERROR; }
+    void clearPromotedType() { m_PromotedType = P_ERROR; }
 
-    short getNr() const { return _sPieceID; }
-    QString getAsFENSign();
-    PIECE_TYPE getType() const { return _pieceType; }
-    PLAYER_TYPE getColor() const { return _pieceColor; }
+    ushort getNr() const { return m_usPieceID; }
+    PIECE_TYPE getType() const { return m_pieceType; }
+    PLAYER_TYPE getColor() const { return m_PieceColor; }
+    ushort getStartFieldNr() const { return m_usStartFieldID; }
+    PosOnBoard getStartFieldPos() const { return Piece::startFieldPos(m_usPieceID); }
+    PIECE_TYPE getPromotedType() const { return m_PromotedType; }
     QString getName();
-    short getStartFieldNr() const { return _sStartFieldID; }
-    PosOnBoard getStartFieldPos() const { return Piece::startFieldPos(_sPieceID); }
-    PIECE_TYPE getPromotedType() const { return _promotedType; }
+    QString getAsFENSign();
     QString dumpAllData();
 };
 

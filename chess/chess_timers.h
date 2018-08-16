@@ -14,40 +14,37 @@ class ChessTimers: public QObject
     friend class Chess;
 
 private:
-    Clients* _pClientsList;
+    Clients* m_pClientsList;
 
-    QTimer* _whiteTimer;
-    QTimer* _blackTimer;
-    QTimer* _updateLabelTimer;
-    QTimer* _startQueueTimer;
-    int _nRemainingWhiteTime;
-    int _nRemainingBlackTime;
-    const long _lTimersStartTime;
-    const long _lTimersStartQueue;
+    QTimer* m_whiteTimer;
+    QTimer* m_blackTimer;
+    QTimer* m_updateLabelTimer;
+    QTimer* m_startQueueTimer;
+    uint m_unRemainingWhiteTime;
+    uint m_unRemainingBlackTime;
+    const ulong m_ulTimersStartTime;
+    const ulong m_ulTimersStartQueue;
 
-    void stopBoardTimers();
-    QString dumpAllData();
-
-private slots:
-    void whiteTimeOut() { emit this->timeOutPlayer(PT_WHITE); }
-    void blackTimeOut() { emit this->timeOutPlayer(PT_BLACK); }
-    void updateTimeLabels();
-    void startTimeOut();
-
-public:
     ChessTimers(Clients* pClientsList);
 
-    void startGameTimer();
-    void resetGameTimers();
     QString milisecToClockTime(long lMilis);
+    void startGameTimer();
     void switchPlayersTimers(WHOSE_TURN Turn);
     GAME_STATUS startQueueTimer();
     void stopQueueTimer();
+    void stopBoardTimers();
+    void resetGameTimers();
+    QString dumpAllData();
 
-    int getWhiteTimeLeft(bool bSeconds = false);
-    int getBlackTimeLeft(bool bSeconds = false);
-    int getStartTimeLeft(bool bSeconds = false);
-    bool isStartTimerRunning() { return _startQueueTimer->isActive(); }
+    uint getWhiteTimeLeft(bool bSeconds = false);
+    uint getBlackTimeLeft(bool bSeconds = false);
+    uint getStartTimeLeft(bool bSeconds = false);
+
+private slots:
+    void startTimeOut();
+    void whiteTimeOut() { emit this->timeOutPlayer(PT_WHITE); }
+    void blackTimeOut() { emit this->timeOutPlayer(PT_BLACK); }
+    void updateTimeLabels();
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);

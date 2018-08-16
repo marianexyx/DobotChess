@@ -3,8 +3,8 @@
 
 TCPMsgs::TCPMsgs()
 {
-    _bWaitingForReadyRead = false;
-    _n64CmdID = 0;
+    m_bWaitingForReadyRead = false;
+    m_n64CmdID = 0;
 }
 
 void TCPMsgs::queueCmd(QString QStrCmd)
@@ -12,10 +12,10 @@ void TCPMsgs::queueCmd(QString QStrCmd)
     qInfo() << "cmd =" << QStrCmd;
 
     TcpMsgMetaData QStrReceivedData;
-    QStrReceivedData.n64TcpID = ++_n64CmdID;
+    QStrReceivedData.un64TcpID = ++m_n64CmdID;
     QStrReceivedData.QStrMsgForTcp = QStrCmd;
-    TCPMsgsList << QStrReceivedData;
-    if (!TCPMsgsList.isEmpty() && !_bWaitingForReadyRead)
+    m_TCPMsgsList << QStrReceivedData;
+    if (!m_TCPMsgsList.isEmpty() && !m_bWaitingForReadyRead)
     {
         //wait with next TCP command execution from container, till earlier one isn't ended
         this->doTcpConnect(); //execute oldest command in container
@@ -24,25 +24,25 @@ void TCPMsgs::queueCmd(QString QStrCmd)
 
 void TCPMsgs::doTcpConnect() //every 1 command create 1 tcp instation
 {
-    _bWaitingForReadyRead = true;
+    m_bWaitingForReadyRead = true;
 
-    socket = new QTcpSocket(this);
+    m_socket = new QTcpSocket(this);
 
     //every new command is new connection
-    connect(socket, SIGNAL(connected()),this, SLOT(connected()));
-    connect(socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
+    connect(m_socket, SIGNAL(connected()),this, SLOT(connected()));
+    connect(m_socket, &QIODevice::readyRead, this, &TCPMsgs::readyRead);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
-    connect(socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
+    connect(m_socket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error),
             this, displayError);
 
     qInfo() << "connecting...";
 
     //abort allow to end old connection, if it wasn't closed yet, making a place for new one
-    socket->abort(); //future: make a warning here, if there was an old connection
+    m_socket->abort(); //todo: make a warning here, if there was an old connection
 
-    socket->connectToHost("localhost", 22222); //will emit signal "connected"
+    m_socket->connectToHost("localhost", 22222); //will emit signal "connected"
     //future: add additional connectToHost reaction, when it doesn't respond for...
-    //...too long (use timer, not "waitForConnect" function)
+    //...too long (use timer, not "waitForConnect" function). edit: is it necessary?
 }
 
 void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
@@ -58,16 +58,16 @@ void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
         qCritical() << "The connection was refused by the peer. Make sure the server is running,"
                        " and check that the host name and port settings are correct.";
         break;
-    default: qCritical() << socket->errorString();
+    default: qCritical() << m_socket->errorString();
     }
 }
 
 void TCPMsgs::connected()
 {
     TcpMsgMetaData QStrData;
-    if (!TCPMsgsList.isEmpty())
+    if (!m_TCPMsgsList.isEmpty())
     {
-        QStrData = TCPMsgsList.last();
+        QStrData = m_TCPMsgsList.last();
 
         qInfo() << "Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 
@@ -76,13 +76,13 @@ void TCPMsgs::connected()
         QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n");
         //send msg to tcp from sender. chenard understand end of msg, when encounter "\n" msg
         //future: propably above warning "\n\n" messages are created?
-        socket->write(QabMsgArrayed);
+        m_socket->write(QabMsgArrayed);
 
         emit this->addTextToLogPTE("wrote to TCP: " + QabMsgArrayed, LOG_TCP);
     }
     else
     {
-        qCritical() << "TCPMsgsList is empty";
+        qCritical() << "m_TCPMsgsList is empty";
         return;
     }
 }
@@ -95,14 +95,14 @@ void TCPMsgs::readyRead()
     do
     {
         if (!QStrMsgFromTcp.isEmpty())
-            qWarning() << "needed to read data from socket 1 more time";
+            qWarning() << "needed to read data from m_socket 1 more time";
 
-        QStrMsgFromTcp += socket->readAll();
+        QStrMsgFromTcp += m_socket->readAll();
 
-        if (socket->bytesAvailable() > 0)
-            qWarning() << "socket->bytesAvailable() > 0 after 1st read";
+        if (m_socket->bytesAvailable() > 0)
+            qWarning() << "m_socket->bytesAvailable() > 0 after 1st read";
     }
-    while (socket->bytesAvailable() > 0);
+    while (m_socket->bytesAvailable() > 0);
 
     //future: sometimes im encountering bad end of messages, that will be catched as new answers.
     //... they manifest through additional whitespaces at the end of a msg, like """, or "/n".
@@ -115,15 +115,15 @@ void TCPMsgs::readyRead()
         emit this->addTextToLogPTE("tcp answer: " + QStrMsgFromTcp, LOG_TCP);
 
         TcpMsgMetaData QStrData;
-        if (!TCPMsgsList.isEmpty())
-            QStrData = TCPMsgsList.takeLast();
+        if (!m_TCPMsgsList.isEmpty())
+            QStrData = m_TCPMsgsList.takeLast();
         else
         {
-            qCritical() << "TCPMsgsList is empty";
+            qCritical() << "m_TCPMsgsList is empty";
             return;
         }
 
-        qInfo() << "ID =" << QString::number(QStrData.n64TcpID) << ", msgForTcp ="
+        qInfo() << "ID =" << QString::number(QStrData.un64TcpID) << ", msgForTcp ="
                 << QStrData.QStrMsgForTcp << ", msgFromTcp =" << QStrMsgFromTcp;
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
@@ -138,8 +138,8 @@ void TCPMsgs::readyRead()
     else
         qWarning() << "received:" << QStrMsgFromTcp;
 
-    _bWaitingForReadyRead = false;
+    m_bWaitingForReadyRead = false;
 
-    if (!TCPMsgsList.isEmpty())
+    if (!m_TCPMsgsList.isEmpty())
         this->doTcpConnect();
 }

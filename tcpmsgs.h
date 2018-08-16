@@ -9,7 +9,7 @@
 
 struct TcpMsgMetaData
 {
-    int64_t n64TcpID;
+    uint64_t un64TcpID;
     QString QStrMsgForTcp;
 };
 
@@ -18,12 +18,13 @@ class TCPMsgs: public QObject
     Q_OBJECT
 
 private:
-    QTcpSocket* socket;
-    QList<TcpMsgMetaData> TCPMsgsList;
+    QTcpSocket* m_socket;
+    QList<TcpMsgMetaData> m_TCPMsgsList;
 
-    bool _bWaitingForReadyRead; //this flag blocks sending next msg...
+    bool m_bWaitingForReadyRead; //this flag blocks sending next msg...
     //...to tcp from queue, if previous msg hasn't been processed
-    int64_t _n64CmdID;
+    int64_t m_n64CmdID;
+
     void doTcpConnect();
 
 private slots:

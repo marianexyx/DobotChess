@@ -1,11 +1,11 @@
 #include "xml_reader.h"
 
-/*static*/ LimitsVars XmlReader::_gameLimitsVars;
+/*static*/ LimitsVars XmlReader::m_gameLimitsVars;
 
 XmlReader::XmlReader():
-    _xmlFileLimits(QDir::currentPath() + "/limits.xml"),
-    _xmlFileConfig(QDir::currentPath() + "/gameConfig.xml"),
-    _xmlFileDatabase(QDir::currentPath() + "/../DobotChessDB/DBConnData.xml")
+    m_xmlFileLimits(QDir::currentPath() + "/limits.xml"),
+    m_xmlFileConfig(QDir::currentPath() + "/gameConfig.xml"),
+    m_xmlFileDatabase(QDir::currentPath() + "/../DobotChessDB/DBConnData.xml")
 {
     if (!this->openFile(XFT_GAME_LIMITS)) return;
     if (!this->openFile(XFT_GAME_CONFIG)) return;
@@ -16,6 +16,72 @@ XmlReader::XmlReader():
     this->readDatabaseNodes();
 }
 
+void XmlReader::readGameLimitsNodes()
+{
+    m_gameLimitsVars.fPieceHeightMin =
+            this->getParam(m_xmlDocLimits, "piece", "pieceParam", "heightMin", "value").toFloat();
+    m_gameLimitsVars.fPieceHeightMax =
+            this->getParam(m_xmlDocLimits, "piece", "pieceParam", "heightMax", "value").toFloat();
+    m_gameLimitsVars.minPoint =
+            this->getPointParam(m_xmlDocLimits, "points", "point", "pointMin");
+    m_gameLimitsVars.maxPoint =
+            this->getPointParam(m_xmlDocLimits, "points", "point", "pointMax");
+    m_gameLimitsVars.fGripperMin =
+            this->getParam(m_xmlDocLimits, "gripper", "gripperParam", "pwmMin", "value").toFloat();
+    m_gameLimitsVars.fGripperMax =
+            this->getParam(m_xmlDocLimits, "gripper", "gripperParam", "pwmMax", "value").toFloat();
+}
+
+void XmlReader::readGameConfigNodes()
+{
+    m_gameConfigVars.fPieceHeight =
+            this->getParam(m_xmlDocConfig, "piece", "param", "height", "value").toFloat();
+    m_gameConfigVars.A1 =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldA1");
+    m_gameConfigVars.A8 =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldA8");
+    m_gameConfigVars.H1 =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldH1");
+    m_gameConfigVars.H8 =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldH8");
+    m_gameConfigVars.remWhiteCloserOuter =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteCloserOuter");
+    m_gameConfigVars.remWhiteFurtherInner =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteFurtherInner");
+    m_gameConfigVars.remBlackCloserOuter =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackCloserOuter");
+    m_gameConfigVars.remBlackFurtherInner =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackFurtherInner");
+    m_gameConfigVars.home =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "home");
+    m_gameConfigVars.retreatLeft =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "retreatLeft");
+    m_gameConfigVars.retreatRight =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "retreatRight");
+    m_gameConfigVars.fGripperOpened =
+            this->getParam(m_xmlDocConfig, "gripper", "state", "open", "pwm").toFloat();
+    m_gameConfigVars.fGripperClosed =
+            this->getParam(m_xmlDocConfig, "gripper", "state", "close", "pwm").toFloat();
+
+    this->isVarsStructInLimits();
+}
+
+void XmlReader::readDatabaseNodes()
+{
+    QString elMain = "database";
+    QString node = "param";
+    QString val = "value";
+
+    m_databaseVars.QStrHostName =
+            this->getParam(m_xmlDocDatabase, elMain, node, "hostName", val);
+    m_databaseVars.QStrDatabaseName =
+            this->getParam(m_xmlDocDatabase, elMain, node, "databaseName", val);
+    m_databaseVars.QStrUserName =
+            this->getParam(m_xmlDocDatabase, elMain, node, "userName", val);
+    m_databaseVars.QStrPassword =
+            this->getParam(m_xmlDocDatabase, elMain, node, "password", val);
+}
+
 bool XmlReader::openFile(XML_FILE_TYPE XFT)
 {
     QFile* xmlFile;
@@ -23,16 +89,16 @@ bool XmlReader::openFile(XML_FILE_TYPE XFT)
     switch(XFT)
     {
     case XFT_GAME_LIMITS:
-        xmlFile = &_xmlFileLimits;
-        xmlDoc = &_xmlDocLimits;
+        xmlFile = &m_xmlFileLimits;
+        xmlDoc = &m_xmlDocLimits;
         break;
     case XFT_GAME_CONFIG:
-        xmlFile = &_xmlFileConfig;
-        xmlDoc = &_xmlDocConfig;
+        xmlFile = &m_xmlFileConfig;
+        xmlDoc = &m_xmlDocConfig;
         break;
     case XFT_DATABASE:
-        xmlFile = &_xmlFileDatabase;
-        xmlDoc = &_xmlDocDatabase;
+        xmlFile = &m_xmlFileDatabase;
+        xmlDoc = &m_xmlDocDatabase;
         break;
     default:
         qCritical() << "unknown file type =" << QString::number(XFT);
@@ -113,86 +179,20 @@ Point3D XmlReader::getPointParam(QDomDocument xmlDoc, QString QStrDomElMain,
     return p3d;
 }
 
-void XmlReader::readGameLimitsNodes()
-{
-    _gameLimitsVars.fPieceHeightMin =
-            this->getParam(_xmlDocLimits, "piece", "pieceParam", "heightMin", "value").toFloat();
-    _gameLimitsVars.fPieceHeightMax =
-            this->getParam(_xmlDocLimits, "piece", "pieceParam", "heightMax", "value").toFloat();
-    _gameLimitsVars.minPoint =
-            this->getPointParam(_xmlDocLimits, "points", "point", "pointMin");
-    _gameLimitsVars.maxPoint =
-            this->getPointParam(_xmlDocLimits, "points", "point", "pointMax");
-    _gameLimitsVars.fGripperMin =
-            this->getParam(_xmlDocLimits, "gripper", "gripperParam", "pwmMin", "value").toFloat();
-    _gameLimitsVars.fGripperMax =
-            this->getParam(_xmlDocLimits, "gripper", "gripperParam", "pwmMax", "value").toFloat();
-}
-
-void XmlReader::readGameConfigNodes()
-{
-    _gameConfigVars.fPieceHeight =
-            this->getParam(_xmlDocConfig, "piece", "param", "height", "value").toFloat();
-    _gameConfigVars.A1 =
-            this->getPointParam(_xmlDocConfig, "points", "point", "mainFieldA1");
-    _gameConfigVars.A8 =
-            this->getPointParam(_xmlDocConfig, "points", "point", "mainFieldA8");
-    _gameConfigVars.H1 =
-            this->getPointParam(_xmlDocConfig, "points", "point", "mainFieldH1");
-    _gameConfigVars.H8 =
-            this->getPointParam(_xmlDocConfig, "points", "point", "mainFieldH8");
-    _gameConfigVars.remWhiteCloserOuter =
-            this->getPointParam(_xmlDocConfig, "points", "point", "remWhiteCloserOuter");
-    _gameConfigVars.remWhiteFurtherInner =
-            this->getPointParam(_xmlDocConfig, "points", "point", "remWhiteFurtherInner");
-    _gameConfigVars.remBlackCloserOuter =
-            this->getPointParam(_xmlDocConfig, "points", "point", "remBlackCloserOuter");
-    _gameConfigVars.remBlackFurtherInner =
-            this->getPointParam(_xmlDocConfig, "points", "point", "remBlackFurtherInner");
-    _gameConfigVars.home =
-            this->getPointParam(_xmlDocConfig, "points", "point", "home");
-    _gameConfigVars.retreatLeft =
-            this->getPointParam(_xmlDocConfig, "points", "point", "retreatLeft");
-    _gameConfigVars.retreatRight =
-            this->getPointParam(_xmlDocConfig, "points", "point", "retreatRight");
-    _gameConfigVars.fGripperOpened =
-            this->getParam(_xmlDocConfig, "gripper", "state", "open", "pwm").toFloat();
-    _gameConfigVars.fGripperClosed =
-            this->getParam(_xmlDocConfig, "gripper", "state", "close", "pwm").toFloat();
-
-    this->isVarsStructInLimits();
-}
-
-void XmlReader::readDatabaseNodes()
-{
-    QString elMain = "database";
-    QString node = "param";
-    QString val = "value";
-
-    _databaseVars.QStrHostName =
-            this->getParam(_xmlDocDatabase, elMain, node, "hostName", val);
-    _databaseVars.QStrDatabaseName =
-            this->getParam(_xmlDocDatabase, elMain, node, "databaseName", val);
-    _databaseVars.QStrUserName =
-            this->getParam(_xmlDocDatabase, elMain, node, "userName", val);
-    _databaseVars.QStrPassword =
-            this->getParam(_xmlDocDatabase, elMain, node, "password", val);
-}
-
 bool XmlReader::isVarsStructInLimits()
 {
-    if (this->isPieceHeightInLimits(_gameConfigVars.fPieceHeight) &&
-            isPointInLimits(_gameConfigVars.home) &&
-            isPointInLimits(_gameConfigVars.A1) &&
-            isPointInLimits(_gameConfigVars.A8) &&
-            isPointInLimits(_gameConfigVars.H1) &&
-            isPointInLimits(_gameConfigVars.H8) &&
-            isPointInLimits(_gameConfigVars.remWhiteCloserOuter) &&
-            isPointInLimits(_gameConfigVars.remWhiteFurtherInner) &&
-            isPointInLimits(_gameConfigVars.remBlackCloserOuter) &&
-            isPointInLimits(_gameConfigVars.remBlackFurtherInner) &&
-            isGripperParamInLimits(_gameConfigVars.fGripperOpened) &&
-            isGripperParamInLimits(_gameConfigVars.fGripperClosed))
+    if (this->isPieceHeightInLimits(m_gameConfigVars.fPieceHeight) &&
+            isPointInLimits(m_gameConfigVars.home) &&
+            isPointInLimits(m_gameConfigVars.A1) &&
+            isPointInLimits(m_gameConfigVars.A8) &&
+            isPointInLimits(m_gameConfigVars.H1) &&
+            isPointInLimits(m_gameConfigVars.H8) &&
+            isPointInLimits(m_gameConfigVars.remWhiteCloserOuter) &&
+            isPointInLimits(m_gameConfigVars.remWhiteFurtherInner) &&
+            isPointInLimits(m_gameConfigVars.remBlackCloserOuter) &&
+            isPointInLimits(m_gameConfigVars.remBlackFurtherInner) &&
+            isGripperParamInLimits(m_gameConfigVars.fGripperOpened) &&
+            isGripperParamInLimits(m_gameConfigVars.fGripperClosed))
     {
         return true;
     }
@@ -201,8 +201,8 @@ bool XmlReader::isVarsStructInLimits()
 
 /*static*/ bool XmlReader::isPieceHeightInLimits(float fPieceHeight)
 {
-    float fHmin = XmlReader::_gameLimitsVars.fPieceHeightMin;
-    float fHmax = XmlReader::_gameLimitsVars.fPieceHeightMax;
+    float fHmin = XmlReader::m_gameLimitsVars.fPieceHeightMin;
+    float fHmax = XmlReader::m_gameLimitsVars.fPieceHeightMax;
     if (fPieceHeight > fHmin && fPieceHeight < fHmax)
         return true;
     else
@@ -215,8 +215,8 @@ bool XmlReader::isVarsStructInLimits()
 
 /*static*/ bool XmlReader::isPointInLimits(Point3D point)
 {
-    Point3D minErrorCorner = XmlReader::_gameLimitsVars.minPoint;
-    Point3D maxErrorCorner = XmlReader::_gameLimitsVars.maxPoint;
+    Point3D minErrorCorner = XmlReader::m_gameLimitsVars.minPoint;
+    Point3D maxErrorCorner = XmlReader::m_gameLimitsVars.maxPoint;
     if (point.x > minErrorCorner.x && point.x < maxErrorCorner.x &&
             point.y > minErrorCorner.y && point.y < maxErrorCorner.y &&
             point.z > minErrorCorner.z && point.z < maxErrorCorner.z)
@@ -232,8 +232,8 @@ bool XmlReader::isVarsStructInLimits()
 
 /*static*/ bool XmlReader::isGripperParamInLimits(float fGripperPar)
 {
-    float fGmin = XmlReader::_gameLimitsVars.fPieceHeightMin;
-    float fGmax = XmlReader::_gameLimitsVars.fPieceHeightMax;
+    float fGmin = XmlReader::m_gameLimitsVars.fPieceHeightMin;
+    float fGmax = XmlReader::m_gameLimitsVars.fPieceHeightMax;
     if (fGripperPar > fGmin && fGripperPar < fGmax)
         return true;
     else

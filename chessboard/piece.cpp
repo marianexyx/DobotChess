@@ -1,22 +1,22 @@
 #include "piece.h"
 
-Piece::Piece(short sPieceID)
+Piece::Piece(ushort usPieceID)
 {
-    if (Piece::isInRange(sPieceID))
-        _pieceType = Piece::Type(sPieceID);
+    if (Piece::isInRange(usPieceID))
+        m_pieceType = Piece::Type(usPieceID);
     else return;
 
-    _sPieceID = sPieceID;
-    _pieceColor = Piece::Color(sPieceID);
-    _sStartFieldID = Piece::startFieldNr(sPieceID);
-    _promotedType = P_ERROR;
+    m_usPieceID = usPieceID;
+    m_PieceColor = Piece::Color(usPieceID);
+    m_usStartFieldID = Piece::startFieldNr(usPieceID);
+    m_PromotedType = P_ERROR;
 }
 
-/*static*/ bool Piece::isInRange(short sPieceNr)
+/*static*/ bool Piece::isInRange(ushort usPieceNr)
 {
-    if (sPieceNr < 1 || sPieceNr > 32)
+    if (usPieceNr < 1 || usPieceNr > 32)
     {
-        qCritical() << "pieceNr out of range 1-32:" << QString::number(sPieceNr);
+        qCritical() << "pieceNr out of range 1-32:" << QString::number(usPieceNr);
         return false;
     }
     else return true;
@@ -36,11 +36,11 @@ Piece::Piece(short sPieceID)
     }
 }
 
-/*static*/ PLAYER_TYPE Piece::Color(short sPieceNr)
+/*static*/ PLAYER_TYPE Piece::Color(ushort usPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return PT_NONE;
+    if (!Piece::isInRange(usPieceNr)) return PT_NONE;
 
-    if (sPieceNr <= 16) return PT_WHITE;
+    if (usPieceNr <= 16) return PT_WHITE;
     else return PT_BLACK;
 }
 
@@ -83,11 +83,11 @@ Piece::Piece(short sPieceID)
     }
 }
 
-/*static*/ PIECE_TYPE Piece::Type(short sPieceNr)
+/*static*/ PIECE_TYPE Piece::Type(ushort usPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return P_ERROR;
+    if (!Piece::isInRange(usPieceNr)) return P_ERROR;
 
-    switch(sPieceNr)
+    switch(usPieceNr)
     {
     case 1: case 8: case 25: case 32: return P_ROOK;
     case 2: case 7: case 26: case 31: return P_KNIGHT;
@@ -98,21 +98,21 @@ Piece::Piece(short sPieceID)
     }
 }
 
-/*static*/ short Piece::nr(PosOnBoard pieceLines)
+/*static*/ ushort Piece::nr(PosOnBoard pieceLines)
 {
     short sPieceNr = static_cast<short>(pieceLines.Letter) +
             static_cast<short>(pieceLines.Digit - 1) * 8;
 
     if (Piece::isInRange(sPieceNr)) return sPieceNr;
-    else return -1;
+    else return 0;
 }
 
-/*static*/ short Piece::startFieldNr(short sPieceNr)
+/*static*/ ushort Piece::startFieldNr(ushort usPieceNr)
 {
-    if (!Piece::isInRange(sPieceNr)) return -1;
+    if (!Piece::isInRange(usPieceNr)) return 0;
 
-    if (sPieceNr <= 16) return sPieceNr;
-    else return sPieceNr + 32;
+    if (usPieceNr <= 16) return usPieceNr;
+    else return usPieceNr + 32;
 }
 
 /*static*/ PosOnBoard Piece::startFieldPos(short sPieceNr)
@@ -138,35 +138,24 @@ Piece::Piece(short sPieceID)
 
 void Piece::setPromotedType(PIECE_TYPE promotedType)
 {
-    if (_pieceType != P_PAWN)
+    if (m_pieceType != P_PAWN)
     {
         qCritical() << "only pawn can be promoted. (this is '"
-                    << QString::number(_pieceType) << "' piece char type)";
+                    << QString::number(m_pieceType) << "' piece char type)";
         return;
     }
 
     if (promotedType == P_QUEEN || promotedType == P_KNIGHT ||
             promotedType == P_ROOK || promotedType == P_BISHOP)
-        _promotedType = promotedType;
+        m_PromotedType = promotedType;
     else qCritical() << "wrong promotion type:" << QString::number(promotedType);
-}
-
-QString Piece::getAsFENSign()
-{
-    QString QStrFENSign = _promotedType == P_ERROR
-            ? QChar::fromLatin1(_pieceType) : QChar::fromLatin1(_promotedType);
-
-    if (_pieceColor == PT_WHITE)
-        QStrFENSign = QStrFENSign.toUpper();
-
-    return QStrFENSign;
 }
 
 QString Piece::getName()
 {
     QString QStrName = this->getAsFENSign();
 
-    switch(_sPieceID)
+    switch(m_usPieceID)
     {
     case 1: case 2: case 3: case 25: case 26: case 27:
         QStrName += "1"; break;
@@ -175,17 +164,28 @@ QString Piece::getName()
     case 4: case 5: case 28: case 29:
         break;
     default:
-        QStrName += QString::number(_sPieceID - static_cast<int>(_pieceColor)*8);
+        QStrName += QString::number(m_usPieceID - static_cast<int>(m_PieceColor)*8);
     }
 
     return QStrName;
 }
 
+QString Piece::getAsFENSign()
+{
+    QString QStrFENSign = m_PromotedType == P_ERROR
+            ? QChar::fromLatin1(m_pieceType) : QChar::fromLatin1(m_PromotedType);
+
+    if (m_PieceColor == PT_WHITE)
+        QStrFENSign = QStrFENSign.toUpper();
+
+    return QStrFENSign;
+}
+
 QString Piece::dumpAllData()
 {
-    return "[piece.h]: _sPieceID: " + QString::number(_sPieceID)
-            + ", _pieceType: " + QString::number(_pieceType)
-            + ", _pieceColor: " + playerTypeAsQStr(_pieceColor)
-            + ", _sStartFieldID: " + QString::number(_sStartFieldID)
-            + ", _promotedType: " + QString::number(_promotedType);
+    return "[piece.h]: m_usPieceID: " + QString::number(m_usPieceID)
+            + ", m_pieceType: " + QString::number(m_pieceType)
+            + ", m_PieceColor: " + playerTypeAsQStr(m_PieceColor)
+            + ", m_usStartFieldID: " + QString::number(m_usStartFieldID)
+            + ", m_PromotedType: " + QString::number(m_PromotedType);
 }

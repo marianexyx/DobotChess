@@ -21,28 +21,28 @@ class Client
     friend class Clients;
 
 private:
-    int64_t _ID;
-    int64_t _sqlID;
-    QWebSocket *_socket;
-    PLAYER_TYPE _type;
-    bool _isStartClickedByPlayer;
-    int64_t _queue;
-    QString _name;
+    uint64_t m_ID;
+    uint64_t m_sqlID;
+    QWebSocket *m_socket;
+    PLAYER_TYPE m_Type;
+    bool m_isStartClickedByPlayer;
+    uint64_t m_queue;
+    QString m_name;
 
 public:
-    bool operator ==(const struct Client& cl) { return _ID == cl._ID; }
+    bool operator ==(const struct Client& cl) { return m_ID == cl.m_ID; }
 
-    int64_t ID() const { return _ID; }
-    int64_t sqlID() const { return _sqlID; }
-    QWebSocket *socket() const { return _socket; }
-    PLAYER_TYPE type() const { return _type; }
-    bool isStartClickedByPlayer() const { return _isStartClickedByPlayer; }
-    int64_t queue() const { return _queue; }
+    uint64_t ID() const { return m_ID; }
+    uint64_t sqlID() const { return m_sqlID; }
+    QWebSocket *socket() const { return m_socket; }
+    PLAYER_TYPE type() const { return m_Type; }
+    bool isStartClickedByPlayer() const { return m_isStartClickedByPlayer; }
+    uint64_t queue() const { return m_queue; }
     QString name(bool bShowErrors = true) const
     {
-        if (bShowErrors && _sqlID == 0)
+        if (bShowErrors && m_sqlID == 0)
             qCritical() << "tried to access client's name without setting his sqlID 1st";
-        return _name;
+        return m_name;
     }
 };
 
@@ -51,46 +51,50 @@ class Clients: public QObject
     Q_OBJECT
 
 public:
-    QList<Client> _clients;
+    QList<Client> m_clients;
 
-    Clients(): _clients() {}
+    Clients(): m_clients() {}
 
     void newClient(QWebSocket* const clientSocket);
-    void setClientSqlIDAndName(const Client& client, int64_t sqlID);
-    void clearClientSqlID(const Client& client);
-    void setPlayerType(const Client& client, PLAYER_TYPE Type);
-    void clearPlayerType(PLAYER_TYPE Type);
-    void setClientStartConfirmation(const Client& client, bool bState);
-    void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
-    void addClientToQueue(const Client& client);
-    void removeClientFromList(const Client& client);
-    void removeClientFromQueue(const Client& client);
-    void resetPlayersStartConfirmInfo();
     void putOnChairNextQueuedClient(PLAYER_TYPE Chair);
+    void addClientToQueue(const Client& client);
 
-    QList<Client> getClientsList() const { return _clients; }
     bool isClientInList(const Client& client, bool bErrorLog = false);
     bool isClientInList(QWebSocket* pClientSocket, bool bErrorLog = false);
-    Client getClient(QWebSocket* pClientSocket);
-    Client getClient(int64_t n64ClientID, CLIENT_ID IdType = CID_CORE);
-    Client getPlayer(PLAYER_TYPE Type);
-    Client getNextQueuedClient();
-    QString getQueuedClientsList();
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
     bool isWholeGameTableEmpty();
     bool isWholeGameTableOccupied();
-    int64_t getClientPosInQueue(const Client& client);
-    QWebSocket* getPlayerSocket(PLAYER_TYPE Type);
+    bool isClientIDExists(uint64_t un64ID);
+    bool isClientSqlIDExists(uint64_t un64ID, bool bErrorLog = false);
+    bool isClientAPlayer(const Client& client, bool bErrorLog = false);
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
     bool isStartClickedByBothPlayers();
-    QString getPlayerName(PLAYER_TYPE Type);
     bool isClientInQueue(const Client& client);
-    bool isClientSqlIDExists(int64_t n64ID, bool bErrorLog = false);
-    int getAmountOfQueuedClients();
-    bool isClientAPlayer(const Client& client, bool bErrorLog = false);
-    bool isClientIDExists(int64_t n64ID);
-    int64_t getClientID(const Client& client);
-    int64_t getNextAvailableClientID();
+
+    void clearClientSqlID(const Client& client);
+    void clearPlayerType(PLAYER_TYPE Type);
+    void resetPlayersStartConfirmInfo();
+    void removeClientFromList(const Client& client);
+    void removeClientFromQueue(const Client& client);
+
+    void setClientSqlIDAndName(const Client& client, uint64_t un64SqlID);
+    void setPlayerType(const Client& client, PLAYER_TYPE Type);
+    void setClientStartConfirmation(const Client& client, bool bState);
+    void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
+
+    QList<Client> getClientsList() const { return m_clients; }
+    Client getClient(QWebSocket* pClientSocket);
+    Client getClient(uint64_t un64ClientID, CLIENT_ID IdType = CID_CORE);
+    Client getPlayer(PLAYER_TYPE Type);
+    Client getNextQueuedClient();
+    QString getQueuedClientsList();
+    uint64_t getClientPosInQueue(const Client& client);
+    QWebSocket* getPlayerSocket(PLAYER_TYPE Type);
+    QString getPlayerName(PLAYER_TYPE Type);
+    uint getAmountOfQueuedClients();
+    uint64_t getClientID(const Client& client);
+    uint64_t getNextAvailableClientID();
+
     QString dumpAllData();
 
 public slots:

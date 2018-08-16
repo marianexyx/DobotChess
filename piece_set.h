@@ -8,22 +8,22 @@
 class PieceSet
 {
 private:
-    Piece* _pPiece[32];
+    Piece* m_pPiece[32];
 
 public:
     PieceSet()
     {
         for (int i=0; i<=31; ++i)
-            _pPiece[i] = new Piece(i+1);
+            m_pPiece[i] = new Piece(i+1);
     }
 
-    Piece* getPiece(short sPieceNr) const { return _pPiece[sPieceNr-1]; }
+    Piece* getPiece(short sPieceNr) const { return m_pPiece[sPieceNr-1]; }
     QString dumpAllData()
     {
         QString QStrData;
         QStrData = "[piece_set.h]\n";
         for (int i=0; i<=31; ++i)
-            QStrData += _pPiece[i]->dumpAllData() + "\n";
+            QStrData += m_pPiece[i]->dumpAllData() + "\n";
         return QStrData;
     }
 };

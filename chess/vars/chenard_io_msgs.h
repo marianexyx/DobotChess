@@ -10,10 +10,10 @@ enum CHENARD_MSG_TYPE
 {
     CMT_ERROR,
     CMT_NEW,
+    CMT_MOVE,
     CMT_STATUS,
-    CMT_LEGAL,
     CMT_HISTORY,
-    CMT_MOVE
+    CMT_LEGAL
 };
 
 inline CHENARD_MSG_TYPE ChenardMsgType(QString QStrMsgType)

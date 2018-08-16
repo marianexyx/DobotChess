@@ -13,8 +13,8 @@ class DobotGripper
     friend class Dobot;
 
 private:
-    const float _fGripOpened, _fGripClosed;
-    IOPWM _gripper;
+    const float m_fGripOpened, m_fGripClosed;
+    IOPWM m_gripper;
 
     void checkPWMForErrors();
     void openGripper(uint64_t ID);

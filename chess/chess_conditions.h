@@ -13,8 +13,10 @@ class ChessConditions
     friend class Chess;
 
 private:
-    Clients* _pClientsList;
-    ChessStatus* _pStatus;
+    Clients* m_pClientsList;
+    ChessStatus* m_pStatus;
+
+    ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 
     bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
                                       GAME_STATUS GS, REJECTED_REQUEST_REACTION& RRR);
@@ -26,8 +28,6 @@ private:
     bool isSenderAppropriate(Client *pSender, REQUEST_TYPE Type);
     bool isThereAnySpecialConditionBeenMet(Client *pSender, clientRequest request,
                                            REJECTED_REQUEST_REACTION& RRR);
-
-    ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 };
 
 #endif // CHESS_CONDITIONS_H

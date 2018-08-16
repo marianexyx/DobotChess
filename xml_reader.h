@@ -42,20 +42,20 @@ struct DatabaseVars
 class XmlReader
 {
 private:
-    QFile _xmlFileLimits, _xmlFileConfig, _xmlFileDatabase;
-    QDomDocument _xmlDocLimits, _xmlDocConfig, _xmlDocDatabase;
-    static LimitsVars _gameLimitsVars;
-    RealVars _gameConfigVars;
-    DatabaseVars _databaseVars;
+    QFile m_xmlFileLimits, m_xmlFileConfig, m_xmlFileDatabase;
+    QDomDocument m_xmlDocLimits, m_xmlDocConfig, m_xmlDocDatabase;
+    static LimitsVars m_gameLimitsVars;
+    RealVars m_gameConfigVars;
+    DatabaseVars m_databaseVars;
 
+    void readGameLimitsNodes();
+    void readGameConfigNodes();
+    void readDatabaseNodes();
     bool openFile(XML_FILE_TYPE XFT);
     QString getParam(QDomDocument xmlDoc, QString QStrDomElMain, QString QStrDomNodeList,
                      QString QStrDomElName, QString QStrValue);
     Point3D getPointParam(QDomDocument xmlDoc, QString QStrDomElMain,
                           QString QStrDomNodeList, QString QStrDomElName);
-    void readGameLimitsNodes();
-    void readGameConfigNodes();
-    void readDatabaseNodes();
 
 public:
     XmlReader();
@@ -64,8 +64,8 @@ public:
     static bool isPieceHeightInLimits(float fPieceHeight);
     static bool isPointInLimits(Point3D point);
     static bool isGripperParamInLimits(float fGripperPar);
-    RealVars getRealVars() { this->isVarsStructInLimits(); return _gameConfigVars; }
-    DatabaseVars getDatabaseVars() const { return _databaseVars; }
+    RealVars getRealVars() { this->isVarsStructInLimits(); return m_gameConfigVars; }
+    DatabaseVars getDatabaseVars() const { return m_databaseVars; }
 };
 
 #endif // XML_READER_H

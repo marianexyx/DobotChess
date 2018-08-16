@@ -1,142 +1,42 @@
 #include "dobot.h"
 
 Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints):
-    _ARM_MAX_VELOCITY(300), //todo: what's the max val? 200? 300?
-    _ARM_MAX_ACCELERATION(300)
+    m_ARM_MAX_VELOCITY(300), //todo: what's the max val? 200? 300?
+    m_ARM_MAX_ACCELERATION(300)
 {
-    _pQueue = new DobotQueue(intermediatePoints);
-    _pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
+    m_pQueue = new DobotQueue(intermediatePoints);
+    m_pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
 
-    _sItemIDInGripper = 0;
-    _bConnectedToDobot = false;
-    _bFirstMoveIsDone = false;
+    m_usItemIDInGripper = 0;
+    m_bConnectedToDobot = false;
+    m_bFirstMoveIsDone = false;
 
-    _home.x = gameConfigVars.home.x;
-    _home.y = gameConfigVars.home.y;
-    _home.z = gameConfigVars.home.z;
-    _home.r = 0;
+    m_home.x = gameConfigVars.home.x;
+    m_home.y = gameConfigVars.home.y;
+    m_home.z = gameConfigVars.home.z;
+    m_home.r = 0;
 
-    connect(_pQueue, SIGNAL(sendMoveToArm(DobotMove)),
+    connect(m_pQueue, SIGNAL(sendMoveToArm(DobotMove)),
             this, SLOT(sendMoveToArm(DobotMove)));
-    connect(_pQueue, SIGNAL(showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t)),
+    connect(m_pQueue, SIGNAL(showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t)),
             this, SLOT(showQueueLabelsInUI(uint, uint64_t, uint64_t, int, uint64_t)));
-    connect(_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
+    connect(m_pQueue, SIGNAL(addTextToLogPTEInUI(QString, LOG)),
             this, SLOT(addTextToLogPTEInUI(QString, LOG)));
-    connect(_pQueue, SIGNAL(showQueuedArmCmdsOnCore(QString)),
+    connect(m_pQueue, SIGNAL(showQueuedArmCmdsOnCore(QString)),
             this, SLOT(showQueuedArmCmdsOnCorePTE(QString)));
-    connect(_pQueue, SIGNAL(showSentArmCmdsToDobot(QString)),
+    connect(m_pQueue, SIGNAL(showSentArmCmdsToDobot(QString)),
             this, SLOT(showSentArmCmdsToDobotPTE(QString)));
 }
 
 Dobot::~Dobot()
 {
-    delete _pQueue;
-    delete _pGripper;
-}
-
-void Dobot::onPeriodicTaskTimer()
-{
-    PeriodicTask(); //start arm task loop. non-return funcion
-    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
-    periodicTaskTimer->start(); //auto restart timer
-}
-
-void Dobot::onGetPoseTimer()
-{
-    //find timer by name:
-    QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer");
-
-    if (_bConnectedToDobot)
-    {
-        this->saveActualDobotPosition();
-        _pQueue->parseNextMoveToArmIfPossible();
-        _pQueue->showLastExecutedArmMoveInUI();
-        if (_pQueue->isArmCoveringView() && _bFirstMoveIsDone)
-            _pQueue->escape(_lastGivenPoint);
-    }
-
-    getPoseTimer->start(); //auto restart timer
-}
-
-void Dobot::showQueueLabelsInUI(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
-                                int nCoreIdLeft, uint64_t un64CoreNextId)
-{
-    emit this->queueLabels(unSpace, un64DobotId, un64CoreMaxId, nCoreIdLeft, un64CoreNextId);
-}
-
-void Dobot::addTextToLogPTEInUI(QString QStrTxt, LOG log)
-{
-    emit this->addTextToLogPTE(QStrTxt, log);
-}
-
-void Dobot::saveActualDobotPosition()
-{
-    Pose pose;
-    GetPose(&pose); //pose from arm
-
-    _realTimePoint.x = pose.x;
-    _realTimePoint.y = pose.y;
-    _realTimePoint.z = pose.z;
-
-    emit JointLabelText(QString::number(pose.jointAngle[0]), 1);
-    emit JointLabelText(QString::number(pose.jointAngle[1]), 2);
-    emit JointLabelText(QString::number(pose.jointAngle[2]), 3);
-    emit JointLabelText(QString::number(pose.jointAngle[3]), 4);
-
-    emit AxisLabelText(QString::number(pose.x), 'x');
-    emit AxisLabelText(QString::number(pose.y), 'y');
-    emit AxisLabelText(QString::number(pose.z), 'z');
-    emit AxisLabelText(QString::number(pose.r), 'r');
-}
-
-void Dobot::setItemInGripper(short sGrippersItemID)
-{
-    if (!this->isGripperEmpty())
-    {
-        qCritical() << "gripper isn't empty. item nr in it:" << QString::number(_sItemIDInGripper)
-                    << ". given item nr:" << QString::number(sGrippersItemID);
-        return;
-    }
-
-    _sItemIDInGripper = sGrippersItemID;
-}
-
-void Dobot::clearGripper()
-{
-    if (this->isGripperEmpty())
-    {
-        qCritical() << "gripper is already empty";
-        return;
-    }
-
-    _sItemIDInGripper = 0;
-}
-
-Point3D Dobot::getHomePos()
-{
-    Point3D home(_home.x, _home.y, _home.z);
-    return home;
-}
-
-QString Dobot::dumpAllData()
-{
-    QString QStrData;
-
-    QStrData = "[dobot.h]\n";
-    QStrData += "_sItemIDInGripper: " + QString::number(_sItemIDInGripper) + "\n";
-    QStrData += "_bConnectedToDobot: " + QString::number(_bConnectedToDobot) + "\n";
-    QStrData += "_bFirstMoveIsDone: " + QString::number(_bFirstMoveIsDone) + "\n";
-    QStrData += "_realTimePoint: " + _realTimePoint.getAsQStr() + "\n";
-    QStrData += "_lastGivenPoint: " + _lastGivenPoint.getAsQStr() + "\n";
-    QStrData += "\n";
-    QStrData += _pQueue->dumpAllData();
-
-    return QStrData;
+    delete m_pQueue;
+    delete m_pGripper;
 }
 
 void Dobot::onConnectDobot()
 {
-    if (!_bConnectedToDobot)
+    if (!m_bConnectedToDobot)
     {
         if (ConnectDobot(0, 115200) != DobotConnect_NoError)
             emit DobotErrorMsgBox();
@@ -146,19 +46,19 @@ void Dobot::onConnectDobot()
         this->createAndStartPeriodicTimer();
         this->createAndStartPoseTimer();
         this->initDobot();
-        _pQueue->saveIDFromConnectedDobot(); //1st check
+        m_pQueue->saveIDFromConnectedDobot(); //1st check
 
-        _bConnectedToDobot = true;
+        m_bConnectedToDobot = true;
     }
     else
     {
-        QTimer *getPoseTimer = findChild<QTimer *>("getPoseTimer");
+        QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer");
         getPoseTimer->stop();
-        _bConnectedToDobot = false;
+        m_bConnectedToDobot = false;
         DisconnectDobot();
     }
 
-    emit setDobotButtonsStates(_bConnectedToDobot);
+    emit this->setDobotButtonsStates(m_bConnectedToDobot);
 }
 
 void Dobot::createAndStartPeriodicTimer()
@@ -185,72 +85,218 @@ void Dobot::createAndStartPoseTimer()
 
 void Dobot::initDobot()
 {
-    //ClearAllAlarmsState() //future:
+    //ClearAllAlarmsState() //todo:
     SetCmdTimeout(3000); //command timeout
     SetQueuedCmdClear(); //clear commands queue on arm
     SetQueuedCmdStartExec(); //set the queued command running
-    
+
     char deviceSN[64];
     GetDeviceSN(deviceSN, sizeof(deviceSN));
-    
+
     char deviceName[64];
     GetDeviceName(deviceName, sizeof(deviceName));
-    
+
     uint8_t majorVersion, minorVersion, revision;
     GetDeviceVersion(&majorVersion, &minorVersion, &revision);
-        
+
     emit deviceLabels(deviceSN, deviceName, QString::number(majorVersion) + "." +
                       QString::number(minorVersion) + "." +
                       QString::number(revision));
-    
+
     EndEffectorParams endEffectorParams;
     memset(&endEffectorParams, 0, sizeof(endEffectorParams));
     endEffectorParams.xBias = 40.f; //determined experimentally for my gripper
     SetEndEffectorParams(&endEffectorParams, false, NULL);
-    
+
     JOGJointParams jogJointParams;
     for (int i=0; i<4; ++i)
     {
-        jogJointParams.velocity[i] = _ARM_MAX_VELOCITY;
-        jogJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
+        jogJointParams.velocity[i] = m_ARM_MAX_VELOCITY;
+        jogJointParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
     }
     SetJOGJointParams(&jogJointParams, false, NULL);
-    
+
     JOGCoordinateParams jogCoordinateParams;
     for (int i=0; i<4; ++i)
     {
-        jogCoordinateParams.velocity[i] = _ARM_MAX_VELOCITY;
-        jogCoordinateParams.acceleration[i] = _ARM_MAX_ACCELERATION;
+        jogCoordinateParams.velocity[i] = m_ARM_MAX_VELOCITY;
+        jogCoordinateParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
     }
     SetJOGCoordinateParams(&jogCoordinateParams, false, NULL);
-    
+
     JOGCommonParams jogCommonParams;
-    jogCommonParams.velocityRatio = _ARM_MAX_VELOCITY;
-    jogCommonParams.accelerationRatio = _ARM_MAX_ACCELERATION;
+    jogCommonParams.velocityRatio = m_ARM_MAX_VELOCITY;
+    jogCommonParams.accelerationRatio = m_ARM_MAX_ACCELERATION;
     SetJOGCommonParams(&jogCommonParams, false, NULL);
-    
+
     PTPJointParams ptpJointParams;
     for (int i=0; i<4; ++i)
     {
-        ptpJointParams.velocity[i] = _ARM_MAX_VELOCITY;
-        ptpJointParams.acceleration[i] = _ARM_MAX_ACCELERATION;
+        ptpJointParams.velocity[i] = m_ARM_MAX_VELOCITY;
+        ptpJointParams.acceleration[i] = m_ARM_MAX_ACCELERATION;
     }
     SetPTPJointParams(&ptpJointParams, false, NULL);
-    
+
     PTPCoordinateParams ptpCoordinateParams;
-    ptpCoordinateParams.xyzVelocity = _ARM_MAX_VELOCITY;
-    ptpCoordinateParams.xyzAcceleration = _ARM_MAX_ACCELERATION;
-    ptpCoordinateParams.rVelocity = _ARM_MAX_VELOCITY;
-    ptpCoordinateParams.rAcceleration = _ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.xyzVelocity = m_ARM_MAX_VELOCITY;
+    ptpCoordinateParams.xyzAcceleration = m_ARM_MAX_ACCELERATION;
+    ptpCoordinateParams.rVelocity = m_ARM_MAX_VELOCITY;
+    ptpCoordinateParams.rAcceleration = m_ARM_MAX_ACCELERATION;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
-    
-    SetHOMEParams(&_home, false, NULL);
+
+    SetHOMEParams(&m_home, false, NULL);
 
     //set PWM adress on servo pin to make gripper work properly
     IOMultiplexing iom;
     iom.address = 4;
     iom.multiplex = IOFunctionPWM;
     SetIOMultiplexing(&iom, false, NULL);
+}
+
+void Dobot::onPeriodicTaskTimer()
+{
+    PeriodicTask(); //start arm task loop. non-return funcion
+    QTimer* periodicTaskTimer = findChild<QTimer *>("periodicTaskTimer"); //find timer by name
+    periodicTaskTimer->start(); //auto restart timer
+}
+
+void Dobot::onGetPoseTimer()
+{
+    QTimer* getPoseTimer = findChild<QTimer *>("getPoseTimer"); //find timer by name
+
+    if (m_bConnectedToDobot)
+    {
+        this->saveActualDobotPosition();
+        m_pQueue->parseNextMoveToArmIfPossible();
+        m_pQueue->showLastExecutedArmMoveInUI();
+        if (m_pQueue->isArmCoveringView() && m_bFirstMoveIsDone)
+            m_pQueue->escape(m_lastGivenPoint);
+    }
+
+    getPoseTimer->start(); //auto restart timer
+}
+
+void Dobot::saveActualDobotPosition()
+{
+    Pose pose;
+    GetPose(&pose); //pose from arm
+
+    m_realTimePoint.x = pose.x;
+    m_realTimePoint.y = pose.y;
+    m_realTimePoint.z = pose.z;
+
+    emit JointLabelText(QString::number(pose.jointAngle[0]), 1);
+    emit JointLabelText(QString::number(pose.jointAngle[1]), 2);
+    emit JointLabelText(QString::number(pose.jointAngle[2]), 3);
+    emit JointLabelText(QString::number(pose.jointAngle[3]), 4);
+
+    emit AxisLabelText(QString::number(pose.x), 'x');
+    emit AxisLabelText(QString::number(pose.y), 'y');
+    emit AxisLabelText(QString::number(pose.z), 'z');
+    emit AxisLabelText(QString::number(pose.r), 'r');
+}
+
+void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
+                              /*= VM_NONE*/, bool bEscape /*= false*/)
+{
+    if (!m_bConnectedToDobot)
+    {
+        //if this will be error debug, then I will be spammed with...
+        //...connecting errors all the time, while testing
+        qInfo() << "dobot not connected";
+        return;
+    }
+
+    if (VertMove == VM_GRAB)
+        this->addArmMoveToQueue(DM_OPEN);
+
+    dest3D.z += dJump;
+    this->addArmMoveToQueue(DM_TO_POINT, dest3D);
+
+    m_pQueue->setEscape(bEscape);
+
+    if (VertMove == VM_NONE) return;
+
+    if (!this->isPointDiffrentOnlyInZAxis(dest3D)) return;
+    this->moveArmUpOrDown(DM_DOWN, dest3D.z - dJump);
+
+    if (VertMove == VM_PUT)
+        this->addArmMoveToQueue(DM_OPEN);
+    else if (VertMove == VM_GRAB)
+    {
+        this->addArmMoveToQueue(DM_CLOSE);
+        this->addArmMoveToQueue(DM_WAIT);
+    }
+
+    this->moveArmUpOrDown(DM_UP, dest3D.z);
+}
+
+void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
+{
+    if (!m_bFirstMoveIsDone && (Type == DM_TO_POINT || Type == DM_UP || Type == DM_DOWN))
+    {
+        qWarning() << "move type =" << dobotMoveAsQstr(Type) << "cannot be the first arm move";
+        return;
+    }
+
+    Point3D point = m_lastGivenPoint;
+    m_pQueue->addArmMoveToQueue(Type, point);
+}
+
+void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
+{
+    if (!this->isMoveSafe(point)) return;
+
+    if (!m_bFirstMoveIsDone) m_bFirstMoveIsDone = true;
+
+    m_lastGivenPoint = point;
+    m_pQueue->addArmMoveToQueue(Type, point);
+}
+
+bool Dobot::isMoveSafe(Point3D point)
+{
+    if (point.z <= m_intermediatePoints.safeAxisZ.z
+            && point.x != m_lastGivenPoint.x && point.y != m_lastGivenPoint.y)
+    {
+        qCritical() << "it's not. given point =" << point.getAsQStr()
+                    << ", m_lastGivenPoint =" << m_lastGivenPoint.getAsQStr()
+                    << ", _fSafeAxisZ =" << m_intermediatePoints.safeAxisZ.z;
+        return false;
+    }
+    else return true;
+}
+
+bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
+{
+    if (point.x != m_lastGivenPoint.x || point.y != m_lastGivenPoint.y)
+    {
+        qCritical() << "tried to move Z axis with X or Y axis. point xy ="
+                    << QString::number(point.x) << QString::number(point.y)
+                    << "m_lastGivenPoint xy =" << QString::number(m_lastGivenPoint.x)
+                    << QString::number(m_lastGivenPoint.y);
+        return false;
+    }
+    else return true;
+}
+
+void Dobot::moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
+{
+    if (!m_bFirstMoveIsDone)
+    {
+        qWarning() << "first move cannot be up/down type";
+        return;
+    }
+
+    if (ArmDestination != DM_UP && ArmDestination != DM_DOWN)
+    {
+        qCritical() << "wrong armDestination val =" << dobotMoveAsQstr(ArmDestination);
+        return;
+    }
+
+    Point3D dest3D = m_lastGivenPoint;
+    dest3D.z = dHeight;
+
+    this->addArmMoveToQueue(ArmDestination, dest3D);
 }
 
 void Dobot::sendMoveToArm(DobotMove move)
@@ -275,13 +321,13 @@ void Dobot::sendMoveToArm(DobotMove move)
         break;
     }
     case DM_OPEN:
-        _pGripper->openGripper(move.ID);
+        m_pGripper->openGripper(move.ID);
         break;
     case DM_CLOSE:
-        _pGripper->closeGripper(move.ID);
+        m_pGripper->closeGripper(move.ID);
         break;
     case DM_WAIT:
-        _pGripper->wait(move.ID);
+        m_pGripper->wait(move.ID);
         break;
     case DM_CALIBRATE:
     {
@@ -298,112 +344,65 @@ void Dobot::sendMoveToArm(DobotMove move)
     }
 }
 
-void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
-                              /*= VM_NONE*/, bool bEscape /*= false*/)
+void Dobot::setItemInGripper(short sGrippersItemID)
 {
-    if (!_bConnectedToDobot)
+    if (!this->isGripperEmpty())
     {
-        //if this will be error debug, then I will be spammed with...
-        //...connecting errors all the time, while testing
-        qInfo() << "dobot not connected";
+        qCritical() << "gripper isn't empty. item in it:" << QString::number(m_usItemIDInGripper)
+                    << ". given item nr:" << QString::number(sGrippersItemID);
         return;
     }
 
-    if (VertMove == VM_GRAB)
-        this->addArmMoveToQueue(DM_OPEN);
-
-    dest3D.z += dJump;
-    this->addArmMoveToQueue(DM_TO_POINT, dest3D);
-
-    _pQueue->setEscape(bEscape);
-
-    if (VertMove == VM_NONE) return;
-
-    if (!this->isPointDiffrentOnlyInZAxis(dest3D)) return;
-    this->moveArmUpOrDown(DM_DOWN, dest3D.z - dJump);
-
-    if (VertMove == VM_PUT)
-        this->addArmMoveToQueue(DM_OPEN);
-    else if (VertMove == VM_GRAB)
-    {
-        this->addArmMoveToQueue(DM_CLOSE);
-        this->addArmMoveToQueue(DM_WAIT);
-    }
-
-    this->moveArmUpOrDown(DM_UP, dest3D.z);
+    m_usItemIDInGripper = sGrippersItemID;
 }
 
-bool Dobot::isMoveSafe(Point3D point)
+void Dobot::clearGripper()
 {
-    if (point.z <= _intermediatePoints.safeAxisZ.z
-            && point.x != _lastGivenPoint.x && point.y != _lastGivenPoint.y)
+    if (this->isGripperEmpty())
     {
-        qCritical() << "it's not. given point =" << point.getAsQStr()
-                    << ", _lastGivenPoint =" << _lastGivenPoint.getAsQStr()
-                    << ", _fSafeAxisZ =" << _intermediatePoints.safeAxisZ.z;
-        return false;
-    }
-    else return true;
-}
-
-bool Dobot::isPointDiffrentOnlyInZAxis(Point3D point)
-{
-    if (point.x != _lastGivenPoint.x || point.y != _lastGivenPoint.y)
-    {
-        qCritical() << "tried to move Z axis with X or Y axis. point xy ="
-                    << QString::number(point.x) << QString::number(point.y)
-                    << "_lastGivenPoint xy =" << QString::number(_lastGivenPoint.x)
-                    << QString::number(_lastGivenPoint.y);
-        return false;
-    }
-    else return true;
-}
-
-void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type)
-{
-    if (!_bFirstMoveIsDone && (Type == DM_TO_POINT || Type == DM_UP || Type == DM_DOWN))
-    {
-        qWarning() << "move type =" << dobotMoveAsQstr(Type) << "cannot be the first arm move";
+        qCritical() << "gripper is already empty";
         return;
     }
 
-    Point3D point = _lastGivenPoint;
-    _pQueue->addArmMoveToQueue(Type, point);
-}
-
-void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
-{
-    if (!this->isMoveSafe(point)) return;
-
-    if (!_bFirstMoveIsDone) _bFirstMoveIsDone = true;
-
-    _lastGivenPoint = point;
-    _pQueue->addArmMoveToQueue(Type, point);
-}
-
-void Dobot::moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight)
-{
-    if (!_bFirstMoveIsDone)
-    {
-        qWarning() << "first move cannot be up/down type";
-        return;
-    }
-
-    if (ArmDestination != DM_UP && ArmDestination != DM_DOWN)
-    {
-        qCritical() << "wrong armDestination val =" << dobotMoveAsQstr(ArmDestination);
-        return;
-    }
-
-    Point3D dest3D = _lastGivenPoint;
-    dest3D.z = dHeight;
-
-    this->addArmMoveToQueue(ArmDestination, dest3D);
+    m_usItemIDInGripper = 0;
 }
 
 void Dobot::forceStopArm() //todo: control through arduino, and dobot alarms
 {
-    _pQueue->_queuedArmCmdsOnCore.clear();
+    m_pQueue->m_queuedArmCmdsOnCore.clear();
     isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS);
     isArmReceivedCorrectCmd(SetQueuedCmdForceStopExec(), SHOW_ERRORS);
+}
+
+Point3D Dobot::getHomePos()
+{
+    Point3D home(m_home.x, m_home.y, m_home.z);
+    return home;
+}
+
+QString Dobot::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[dobot.h]\n";
+    QStrData += "m_usItemIDInGripper: " + QString::number(m_usItemIDInGripper) + "\n";
+    QStrData += "m_bConnectedToDobot: " + QString::number(m_bConnectedToDobot) + "\n";
+    QStrData += "m_bFirstMoveIsDone: " + QString::number(m_bFirstMoveIsDone) + "\n";
+    QStrData += "m_realTimePoint: " + m_realTimePoint.getAsQStr() + "\n";
+    QStrData += "m_lastGivenPoint: " + m_lastGivenPoint.getAsQStr() + "\n";
+    QStrData += "\n";
+    QStrData += m_pQueue->dumpAllData();
+
+    return QStrData;
+}
+
+void Dobot::showQueueLabelsInUI(uint unSpace, uint64_t un64DobotId, uint64_t un64CoreMaxId,
+                                int nCoreIdLeft, uint64_t un64CoreNextId)
+{
+    emit this->queueLabels(unSpace, un64DobotId, un64CoreMaxId, nCoreIdLeft, un64CoreNextId);
+}
+
+void Dobot::addTextToLogPTEInUI(QString QStrTxt, LOG log)
+{
+    emit this->addTextToLogPTE(QStrTxt, log);
 }

@@ -56,7 +56,7 @@
             if (pBoard->getField(i)->getLocation3D().z > maxBoard.z)
                 maxBoard.z = pBoard->getField(i)->getLocation3D().z;
         }
-        maxBoard.z += (double)pBoard->fMaxPieceHeight;
+        maxBoard.z += pBoard->dMaxPieceHeight;
         return maxBoard;
     }
     else
