@@ -80,6 +80,7 @@ private slots:
 
     //clients slots
     void showClientsListInUI(QList<Client> list);
+    void showQueuedClientsListInUI(QString QStrList);
 
     //GUI slots
     void on_openGripperBtn_clicked();

@@ -38,7 +38,12 @@ void TCPMsgs::doTcpConnect() //every 1 command create 1 tcp instation
     qInfo() << "connecting...";
 
     //abort allow to end old connection, if it wasn't closed yet, making a place for new one
-    m_socket->abort(); //todo: make a warning here, if there was an old connection
+    if (m_socket->state() == QAbstractSocket::ConnectingState
+            || m_socket->state() == QAbstractSocket::ConnectingState)
+        qCritical() << "aborting established connection";
+
+    m_socket->abort();
+    m_socket->state();
 
     m_socket->connectToHost("localhost", 22222); //will emit signal "connected"
     //future: add additional connectToHost reaction, when it doesn't respond for...

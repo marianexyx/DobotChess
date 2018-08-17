@@ -82,6 +82,8 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
 
     QString QStrFileName = QStrFileTime + " " + Errors::errorTypeAsQStr(msgType)
             + " " + QStrErrorMsg;
+    if (QStrFileName.length() > 200)
+        QStrFileName = QStrFileName.left(200); //prevent too long file names
     QFile errorLogFile("errorLogs/" + QStrFileName + ".txt");
     errorLogFile.open(QFile::Append | QFile::Text);
     QTextStream stream(&errorLogFile);

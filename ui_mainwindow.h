@@ -116,7 +116,7 @@ public:
     QPushButton *sendTcpBtn;
     QGroupBox *groupBox_12;
     QGridLayout *gridLayout_22;
-    QPlainTextEdit *plainTextEdit_2;
+    QPlainTextEdit *queuedClientsPTE;
     QPlainTextEdit *clientsPTE;
     QLabel *label_20;
     QLabel *label_32;
@@ -671,12 +671,12 @@ public:
         gridLayout_22->setSpacing(6);
         gridLayout_22->setContentsMargins(11, 11, 11, 11);
         gridLayout_22->setObjectName(QStringLiteral("gridLayout_22"));
-        plainTextEdit_2 = new QPlainTextEdit(groupBox_12);
-        plainTextEdit_2->setObjectName(QStringLiteral("plainTextEdit_2"));
-        plainTextEdit_2->setEnabled(true);
-        plainTextEdit_2->setFont(font2);
+        queuedClientsPTE = new QPlainTextEdit(groupBox_12);
+        queuedClientsPTE->setObjectName(QStringLiteral("queuedClientsPTE"));
+        queuedClientsPTE->setEnabled(true);
+        queuedClientsPTE->setFont(font2);
 
-        gridLayout_22->addWidget(plainTextEdit_2, 1, 1, 1, 1);
+        gridLayout_22->addWidget(queuedClientsPTE, 1, 1, 1, 1);
 
         clientsPTE = new QPlainTextEdit(groupBox_12);
         clientsPTE->setObjectName(QStringLiteral("clientsPTE"));

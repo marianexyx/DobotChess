@@ -4,6 +4,7 @@ Websockets::Websockets(QObject* parent):
     QObject(parent)
 {
     m_pClientsList = new Clients();
+
 }
 
 Websockets::~Websockets()
@@ -44,7 +45,7 @@ void Websockets::onNewConnection()
 //future: make a container of incomming msgs (not easy task)
 void Websockets::receivedMsg(QString QStrMsg)
 {    
-    if (QStrMsg != "keepConnected") //todo: also keep connect on server side
+    if (QStrMsg != "keepConnected")
         qInfo() << QStrMsg;
     else return;
 
@@ -79,11 +80,12 @@ void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
 
 void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
-    emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
+    if (QStrMsg != "keepConnected")
+        emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
     foreach (Client client, m_pClientsList->getClientsList())
     {
-        qInfo() << "client name =" << client.name();
+        qInfo() << "client name =" << client.name(DONT_SHOW_ERRORS);
         client.socket()->sendTextMessage(QStrMsg);
     }
 }

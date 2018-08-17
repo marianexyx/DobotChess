@@ -41,6 +41,7 @@ private:
 
     GAME_STATUS m_ChessGameStatus;
     clientRequest m_request;
+    QTimer* m_keepConnectedTimer;
 
     //future: those 2 blocks below can be divided into classes (game+communication)
 
@@ -64,6 +65,9 @@ private:
     void continueGameplay();
     void restorateGameIfDisconnectedClientAffectIt(const Client& clientToDisconnect);
     void playerLeftChair(PLAYER_TYPE PT);
+
+private slots:
+    void keepConnectedTimeOut();
 
 public:
     Chess(PieceController* pPieceController);

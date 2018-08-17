@@ -22,7 +22,7 @@ void Clients::putOnChairNextQueuedClient(PLAYER_TYPE Chair)
         return;
     }
 
-    if (this->getQueuedClientsList() != "0")
+    if (this->getQueuedClientsSqlIDsList() != "0")
     {
         if (!this->isClientInList(this->getNextQueuedClient(), SHOW_ERRORS)) return;
 
@@ -68,6 +68,7 @@ void Clients::addClientToQueue(const Client& client)
         if (cl.m_queue > maxQueue)
             maxQueue = cl.m_queue;
     }
+
     foreach (Client cl, m_clients)
     {
         if (cl == client)
@@ -85,12 +86,16 @@ void Clients::addClientToQueue(const Client& client)
             }
             else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
-            emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
+            /*emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
-            return;
+            emit this->showQueuedClientsListInUI(this->getQueuedClientsNamesList());
+            return;*/
+            break; //todo: check it
         }
     }
+
     emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+    emit this->showQueuedClientsListInUI(this->getQueuedClientsNamesList());
 }
 
 bool Clients::isClientInList(const Client &client, bool bErrorLog /*= false*/)
@@ -304,7 +309,7 @@ void Clients::removeClientFromQueue(const Client &client)
         if (cl == client)
         {
             Client changedClient = cl;
-            changedClient.m_queue = -1;
+            changedClient.m_queue = 0;
 
             int nClientPos = m_clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < m_clients.size())
@@ -315,11 +320,12 @@ void Clients::removeClientFromQueue(const Client &client)
 
             emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
                                          BDL_QUEUE_PLAYERS);
+            emit this->showQueuedClientsListInUI(this->getQueuedClientsNamesList());
             return;
         }
     }
-    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()),
-                                 BDL_QUEUE_PLAYERS);
+    emit this->setBoardDataLabel(QString::number(getAmountOfQueuedClients()), BDL_QUEUE_PLAYERS);
+    emit this->showQueuedClientsListInUI(this->getQueuedClientsNamesList());
 }
 
 void Clients::setClientSqlIDAndName(const Client& client, uint64_t un64SqlID)
@@ -543,7 +549,7 @@ Client Clients::getNextQueuedClient()
     return client;
 }
 
-QString Clients::getQueuedClientsList()
+QString Clients::getQueuedClientsSqlIDsList()
 {
     QString QStrQueuedClients = "";
     uint64_t maxQueue = 0;
@@ -595,6 +601,29 @@ QString Clients::getQueuedClientsList()
     else QStrQueuedClients = "0";
 
     return QStrQueuedClients;
+}
+
+QString Clients::getQueuedClientsNamesList()
+{
+    QString QStrQueuedClientsNamesList;
+
+    QStringList list = this->getQueuedClientsSqlIDsList().split(" ");
+    QRegExp re("\\d*");  // a digit (\d), zero or more times (*)
+    foreach (QString QStrClientSqlId, list)
+    {
+        QStrClientSqlId = QStrClientSqlId.trimmed();
+        if (!re.exactMatch(QStrClientSqlId))
+        {
+           qCritical() << "QStrClientSqlId has something else than digits only:"
+                       << QStrClientSqlId;
+           return "";
+        }
+        else QStrQueuedClientsNamesList +=
+                this->getClient(QStrClientSqlId.toInt(), CID_SQL).name() + " ";
+    }
+    QStrQueuedClientsNamesList = QStrQueuedClientsNamesList.trimmed();
+
+    return QStrQueuedClientsNamesList;
 }
 
 uint64_t Clients::getClientPosInQueue(const Client &client)

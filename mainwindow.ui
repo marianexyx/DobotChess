@@ -734,15 +734,10 @@
           <string>Clients</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_22">
-          <item row="1" column="1">
-           <widget class="QPlainTextEdit" name="plainTextEdit_2">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>7</pointsize>
-             </font>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>Data</string>
             </property>
            </widget>
           </item>
@@ -770,17 +765,22 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_20">
-            <property name="text">
-             <string>Data</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <widget class="QLabel" name="label_32">
             <property name="text">
              <string>Queued</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPlainTextEdit" name="queuedClientsPTE">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>7</pointsize>
+             </font>
             </property>
            </widget>
           </item>

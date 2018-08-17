@@ -87,7 +87,8 @@ public:
     Client getClient(uint64_t un64ClientID, CLIENT_ID IdType = CID_CORE);
     Client getPlayer(PLAYER_TYPE Type);
     Client getNextQueuedClient();
-    QString getQueuedClientsList();
+    QString getQueuedClientsSqlIDsList();
+    QString getQueuedClientsNamesList();
     uint64_t getClientPosInQueue(const Client& client);
     QWebSocket* getPlayerSocket(PLAYER_TYPE Type);
     QString getPlayerName(PLAYER_TYPE Type);
@@ -103,6 +104,7 @@ public slots:
 signals:
     void addTextToLogPTE(QString, LOG);
     void showClientsListInUI(QList<Client>);
+    void showQueuedClientsListInUI(QString);
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
 };
 

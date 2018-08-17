@@ -19,6 +19,12 @@ Chess::Chess(PieceController* pPieceController)
     m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
     m_request.clear();
 
+    m_keepConnectedTimer = new QTimer();
+    m_keepConnectedTimer->setInterval(60*1000);
+    m_keepConnectedTimer->setSingleShot(true);
+    connect(m_keepConnectedTimer, SIGNAL(timeout()), this, SLOT(keepConnectedTimeOut()));
+    m_keepConnectedTimer->start(1000);
+
     connect(m_pTCPMsgs, SIGNAL(msgFromTcpToChess(QString, QString)),
             this, SLOT(checkMsgFromChessEngine(QString, QString)));
     connect(m_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, int64_t)),
@@ -77,7 +83,8 @@ void Chess::checkMsgFromClient(QString QStrMsg, int64_t n64SenderID,
         else if (BadRequestFromClient == RRR_REMOVE_AND_REFRESH_CLIENT)
             this->killClient(client, RRR_REMOVE_AND_REFRESH_CLIENT);
 
-        qWarning() << "client request can't be accepted";
+        qWarning() << "client request can't be accepted. client sqlID =" << client.sqlID()
+                   << ", client name =" << client.name(DONT_SHOW_ERRORS);
         return;
     }
 
@@ -402,6 +409,14 @@ void Chess::playerLeftChair(PLAYER_TYPE PT)
 }
 
 
+///private slots:
+void Chess::keepConnectedTimeOut()
+{
+    if (m_pClientsList->getAmountOfQueuedClients() > 0)
+        this->sendDataToAllClients();
+    this->m_keepConnectedTimer->start();
+}
+
 ///slots
 void Chess::timeOutStart()
 {
@@ -450,7 +465,7 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
             + QString::number(m_pTimers->getWhiteTimeLeft(true));
     TD += "," + QString::number(TD_BLACK_TYPE) + ":"
             + QString::number(m_pTimers->getBlackTimeLeft(true));
-    TD += "," + QString::number(TD_QUEUE) + ":" + m_pClientsList->getQueuedClientsList();
+    TD += "," + QString::number(TD_QUEUE) + ":" + m_pClientsList->getQueuedClientsSqlIDsList();
     if (m_ChessGameStatus == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS)
         TD += "," + QString::number(TD_START_TIME) + ":"
                 + QString::number(m_pTimers->getStartTimeLeft(true));

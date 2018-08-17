@@ -86,6 +86,8 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     //clients slots
     connect(m_pClientsList, SIGNAL(showClientsListInUI(QList<Client>)),
             this, SLOT(showClientsListInUI(QList<Client>)));
+    connect(m_pClientsList, SIGNAL(showQueuedClientsListInUI(QString)),
+            this, SLOT(showQueuedClientsListInUI(QString)));
 
     ui->connectBtn->setToolTip("Connect with arm.");
     ui->homeBtn->setToolTip("Go to start position.");
@@ -549,12 +551,29 @@ void MainWindow::showClientsListInUI(QList<Client> list)
        else if (client.queue() != 0)
            QStrClientsList += ", q:" + QString::number(client.queue());
 
+       QStrClientsList += ", sqlID:" + QString::number(client.sqlID());
        QStrClientsList += ", ID:" + QString::number(client.ID()) + "\n";
     }
     ui->clientsPTE->clear();
     ui->clientsPTE->setPlainText(QStrClientsList);
 }
 
+void MainWindow::showQueuedClientsListInUI(QString QStrList)
+{
+    qInfo();
+    QStringList list = QStrList.split(" ");
+    uint unNrInQueue = 0;
+    QString QStrQueuedPTE;
+    foreach (QString QStrQueuedClient, list)
+    {
+        ++unNrInQueue;
+        QStrQueuedPTE += QString::number(unNrInQueue) + ". " + QStrQueuedClient + "\n";
+    }
+    QStrQueuedPTE = QStrQueuedPTE.trimmed();
+    ui->queuedClientsPTE->clear();
+    ui->queuedClientsPTE->setPlainText(QStrQueuedPTE);
+    qInfo();
+}
 
 ///GUI slots
 void MainWindow::on_openGripperBtn_clicked()

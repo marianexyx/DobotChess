@@ -105,7 +105,7 @@ void Dobot::initDobot()
 
     EndEffectorParams endEffectorParams;
     memset(&endEffectorParams, 0, sizeof(endEffectorParams));
-    endEffectorParams.xBias = 40.f; //determined experimentally for my gripper
+    endEffectorParams.xBias = 40.f; //distance determined experimentally for my gripper
     SetEndEffectorParams(&endEffectorParams, false, NULL);
 
     JOGJointParams jogJointParams;

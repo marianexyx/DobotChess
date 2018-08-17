@@ -24,7 +24,7 @@ private:
     QWebSocketServer* m_pWebsocketserver;
     Clients* m_pClientsList;
 
-private Q_SLOTS: //Q_SLOTS is for 3rd party mechanisms, that want use slots
+private slots:
     void socketDisconnected();
 
 public:
@@ -34,11 +34,9 @@ public:
     void listenOnPort(quint16 port);
     Clients* getClientsListPointer() const { return m_pClientsList; }
 
-public Q_SLOTS:
+public slots:
     void onNewConnection();
     void receivedMsg(QString QStrMsg);
-
-public slots:
     void sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID);
     void sendMsgToAllClients(QString QStrMsg);
 
