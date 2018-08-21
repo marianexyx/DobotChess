@@ -29,7 +29,6 @@
         qWarning() << "ID param cannot be below 1. it's ==" << QString::number(n64sqlId);
         return false;
     }
-    qInfo() << "n64sqlId =" << QString::number(n64sqlId);
 
     if (QStrHash.length() != 20)
     {

@@ -13,8 +13,25 @@
     IP.retreatRight = calculateRetreatPoint(IP_RETREAT_RIGHT, IP.middleAbove,
                                             RV.retreatRight, IP.maxGame);
     IP.cournerBelow = calculateCournerPoint(IP_COURNER_BELOW, RV);
-    IP.cournerAbove = calculateCournerPoint(IP_COURNER_ABOVE, RV);
-    IP.safeAxisZ = calculateSafeAxisZPoint(RV);
+    IP.cournerAbove = calculateCournerPoint(IP_COURNER_ABOVE, RV, &IP.maxGame);
+    IP.safeAxisZ = calculateSafeAxisZPoint(RV, IP.middleAbove);
+
+    if (!XmlReader::isPointInLimits(IP.minGame))
+        qFatal("calulated minGame point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.maxGame))
+        qFatal("calulated maxGame point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.middleAbove))
+        qFatal("calulated middleAbove point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.retreatLeft))
+        qFatal("calulated retreatLeft point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.retreatRight))
+        qFatal("calulated retreatRight point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.cournerBelow))
+        qFatal("calulated cournerBelow point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.cournerAbove))
+        qFatal("calulated cournerAbove point out of working range");
+    else if (!XmlReader::isPointInLimits(IP.safeAxisZ))
+        qFatal("calulated safeAxisZ point out of working range");
 
     return IP;
 }
@@ -75,8 +92,9 @@
     return middleAbove;
 }
 
-/*static*/ Point3D IntermediatePointsCalc::calculateRetreatPoint(INTERMEDIATE_POINTS IP, Point3D midAbove,
-                                                      Point3D retreat, Point3D max)
+/*static*/ Point3D IntermediatePointsCalc::calculateRetreatPoint(INTERMEDIATE_POINTS IP,
+                                                                 Point3D midAbove,
+                                                                 Point3D retreat, Point3D max)
 {
     if (IP == IP_RETREAT_LEFT || IP == IP_RETREAT_RIGHT)
         return *new Point3D(midAbove.x, retreat.y, max.z);
@@ -87,12 +105,14 @@
     }
 }
 
-/*static*/ Point3D IntermediatePointsCalc::calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV)
+/*static*/ Point3D IntermediatePointsCalc::calculateCournerPoint(INTERMEDIATE_POINTS IP,
+                                                                 RealVars RV,
+                                                                 Point3D* pMax /* = nullptr */)
 {
     if (IP == IP_COURNER_BELOW)
         return *new Point3D(RV.home.x, RV.retreatLeft.y, RV.home.z);
     else if (IP == IP_COURNER_ABOVE)
-        return *new Point3D(RV.home.x, RV.retreatLeft.y, RV.home.z + RV.fPieceHeight);
+        return *new Point3D(RV.home.x, RV.retreatLeft.y, pMax->z);
     else
     {
         qCritical() << "wrong IP arg =" << QString::number(IP);
@@ -100,9 +120,12 @@
     }
 }
 
-/*static*/ Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(RealVars RV)
+/*static*/ Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(RealVars RV, Point3D midAbove)
 {
     Point3D safeAxisZPoint;
+    //x and y points are only for avoiding points limits errors
+    safeAxisZPoint.x = midAbove.x;
+    safeAxisZPoint.y = midAbove.y;
     safeAxisZPoint.z = qMin(qMin(RV.A1.z, RV.A8.z), qMin(RV.H1.z, RV.H8.z)) + RV.fPieceHeight;
     return safeAxisZPoint;
 }

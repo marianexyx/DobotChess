@@ -94,18 +94,20 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
 /*static*/ QString Errors::getAppDumpData()
 {
     QString QStrAppAllData;
-    if (Errors::pChess == nullptr) return "ERROR: Errors::pChess == nullptr";
+    if (Errors::pChess == nullptr)
+        return "ERROR: Errors::pChess == nullptr";
 
     QStrAppAllData = Errors::pChess->dumpAllData() + "\n\n";
-    QStrAppAllData += Errors::pChess->getBoardMainPointer()->dumpAllData() + "\n\n";
-    QStrAppAllData += Errors::pChess->getBoardRemovedPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getClientsPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getDobotPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getDobotPointer()
             ->getIntermediatePoints().dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getPieceControllerPointer()->dumpAllData() + "\n\n";
+    QStrAppAllData += Errors::pChess->getTCPMsgsPointer()->dumpAllData() + "\n\n";
     QStrAppAllData += Errors::pChess->getPieceControllerPointer()
             ->getPieceSetPointer()->dumpAllData() + "\n\n";
+    QStrAppAllData += Errors::pChess->getBoardMainPointer()->dumpAllData() + "\n\n";
+    QStrAppAllData += Errors::pChess->getBoardRemovedPointer()->dumpAllData() + "\n\n";
 
     return QStrAppAllData;
 }

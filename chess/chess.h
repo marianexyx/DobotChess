@@ -88,7 +88,7 @@ public:
     TCPMsgs* getTCPMsgsPointer() const { return m_pTCPMsgs; }
 
 public slots:
-    void checkMsgFromClient(QString QStrMsg, int64_t n64SenderID, bool bService = false);
+    void checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService = false);
     void checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespond);
     void timeOutStart();
     void timeOutPlayer(PLAYER_TYPE Player);

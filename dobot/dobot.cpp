@@ -11,6 +11,8 @@ Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints):
     m_bConnectedToDobot = false;
     m_bFirstMoveIsDone = false;
 
+    m_intermediatePoints = intermediatePoints;
+
     m_home.x = gameConfigVars.home.x;
     m_home.y = gameConfigVars.home.y;
     m_home.z = gameConfigVars.home.z;
@@ -143,6 +145,15 @@ void Dobot::initDobot()
     ptpCoordinateParams.rVelocity = m_ARM_MAX_VELOCITY;
     ptpCoordinateParams.rAcceleration = m_ARM_MAX_ACCELERATION;
     SetPTPCoordinateParams(&ptpCoordinateParams, false, NULL);
+
+    //values for CP copied from here:
+    //forum.dobot.cc/t/dobot-magician-taking-pause-when-moving-between-two-points/201/20
+    CPParams cpParams;
+    cpParams.acc = 100;
+    cpParams.juncitionVel = 100;
+    cpParams.period = 100; //for nice smoothness
+    cpParams.realTimeTrack = false;
+    SetCPParams(&cpParams, false, NULL);
 
     SetHOMEParams(&m_home, false, NULL);
 
@@ -311,13 +322,23 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_DOWN:
     {
         if (!XmlReader::isPointInLimits(move.xyz)) return;
-        PTPCmd moveAsPtpCmd;
-        moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian linear
+        /*PTPCmd moveAsPtpCmd;
+        moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian-linear
         //future: dobot may have better way of movemenst. maybe CPAbsoluteMode?
+        //todo: i've received mail with smooth way of controlling dobot with cool features
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
-        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
+        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);*/
+
+        //todo: tests
+        CPCmd cpCmd;
+        cpCmd.cpMode = CPAbsoluteMode;
+        cpCmd.velocity = 100;
+        cpCmd.x = move.xyz.x;
+        cpCmd.y = move.xyz.y;
+        cpCmd.z = move.xyz.z;
+        isArmReceivedCorrectCmd(SetCPCmd(&cpCmd, true, &move.ID), SHOW_ERRORS);
         break;
     }
     case DM_OPEN:
@@ -335,7 +356,11 @@ void Dobot::sendMoveToArm(DobotMove move)
 
         HOMECmd calibrateCmd;
         //todo: I dont get this "1" ID. seen somewhere propably. ask of forum?...
-        //... maybe remove it, and see if anything would change (might be useless)
+        //... maybe remove it, and see if anything would change (might be useless)...
+        //...  Info from documentation:
+        //queuedCmdIndex: If this command is added to the queue, queuedCmdIndex
+        //indicates the index of this command in the queue. Otherwise, it is invalid.
+        //...but it looks like this text is everywhere, where queue occurs
         calibrateCmd.reserved = 1;
         isArmReceivedCorrectCmd(SetHOMECmd(&calibrateCmd, true, &move.ID), SHOW_ERRORS);
     }

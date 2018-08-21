@@ -35,6 +35,8 @@ private slots:
 public:
     TCPMsgs();
 
+    QString dumpAllData();
+
 public slots:
     void queueCmd(QString QStrCmd);
 

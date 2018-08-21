@@ -14,8 +14,9 @@ private:
     static Point3D calculateMiddleAbovePoint(Point3D min, Point3D max);
     static Point3D calculateRetreatPoint(INTERMEDIATE_POINTS IP, Point3D midAbove,
                                          Point3D retreat, Point3D max);
-    static Point3D calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV);
-    static Point3D calculateSafeAxisZPoint(RealVars RV);
+    static Point3D calculateCournerPoint(INTERMEDIATE_POINTS IP, RealVars RV,
+                                         Point3D* pMax = nullptr);
+    static Point3D calculateSafeAxisZPoint(RealVars RV, Point3D midAbove);
 
 public:
     IntermediatePointsCalc() {}

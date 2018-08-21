@@ -15,7 +15,6 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
 void ChessStatus::setMove(QString QStrMove)
 {
     m_MoveType = this->findMoveType(QStrMove);
-    qInfo() << "found move type =" << sequenceTypeAsQstr(m_MoveType);
     if (m_MoveType == ST_PROMOTION || m_MoveType == ST_PROMOTION_WITH_REMOVING)
         QStrMove = QStrMove.left(4);
     m_PosMove = PosFromTo::fromQStr(QStrMove);
@@ -121,24 +120,19 @@ void ChessStatus::saveStatusData(QString QStrStatus)
     if (QStrFENRecord.size() == 7)
     {
         m_FENGameState = FENGameState(QStrFENRecord.at(0));
-        qInfo() << "FEN game state =" << QStrFENRecord.at(0);
         emit this->setBoardDataLabel(QStrFENRecord.at(0), BDL_GAME_STATUS);
 
         QString QStrFENBoard = QStrFENRecord.at(1);
-        qInfo() << "QStrFENBoard =" << QStrFENBoard;
         emit m_pBoardMain->showImaginaryBoardInUI(QStrFENBoard);
 
         QString QStrWhoseTurn = QStrFENRecord.at(2);
-        qInfo() << "CQStrWhoseTurn =" << QStrWhoseTurn;
         m_WhoseTurn = this->whoseTurnFromFENStatus(QStrWhoseTurn);
         emit this->setBoardDataLabel(turnTypeAsQstr(m_WhoseTurn), BDL_TURN);
 
         m_QStrCastlings = QStrFENRecord.at(3);
-        qInfo() << "QStrCastlings =" << m_QStrCastlings;
         emit this->setBoardDataLabel(m_QStrCastlings, BDL_CASTLINGS);
 
         m_QStrEnpassant = QStrFENRecord.at(4);
-        qInfo() << "QStrEnpassant =" << m_QStrEnpassant;
         emit this->setBoardDataLabel(m_QStrEnpassant, BDL_ENPASSANT);
 
         QString QStrHalfMoveClock = QStrFENRecord.at(5); //future:

@@ -19,12 +19,13 @@
 #define CB_BLACK "\e[1;30m"
 #define CB_RED "\e[1;31m"
 
+//todo: make timer who will check for new error files in err dir
 class Errors
 {
 public:
     Errors() {}
 
-    static Chess* pChess; //overloadDebugOutput can work only as static
+    static Chess* pChess; //overloadDebugOutput can work only on statics
 
     static void overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                                     const QString &msg);

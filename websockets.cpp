@@ -38,16 +38,17 @@ void Websockets::onNewConnection()
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
     m_pClientsList->newClient(pSocket);
-    emit this->addTextToLogPTE("New connection \n", LOG_WEBSOCKET);
+    emit this->addTextToLogPTE("New connection (new ID = "
+                               + QString::number(m_pClientsList->getClient(pSocket).ID())
+                               + ")\n", LOG_WEBSOCKET);
     m_pClientsList->showClientsInUI();
 }
 
 //future: make a container of incomming msgs (not easy task)
 void Websockets::receivedMsg(QString QStrMsg)
 {    
-    if (QStrMsg != "keepConnected")
-        qInfo() << QStrMsg;
-    else return;
+    if (QStrMsg == "keepConnected")
+        return;
 
     QWebSocket* pSocket = qobject_cast<QWebSocket*>(sender());
     if (!m_pClientsList->isClientInList(m_pClientsList->getClient(pSocket)))
@@ -55,22 +56,23 @@ void Websockets::receivedMsg(QString QStrMsg)
         qWarning() << "sender not in clients list";
         return;
     }
+    else qInfo() << "from client with ID ="
+                 << QString::number(m_pClientsList->getClient(pSocket).ID())
+                 << "; msg =" << QStrMsg;
 
     emit this->msgFromWebsocketsToChess(QStrMsg, m_pClientsList->getClient(pSocket).ID());
 }
 
-void Websockets::sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID)
+void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
 {
-    qInfo() << "received:" << QStrMsg;
-
-    if (n64ReceiverID < 1)
+    if (un64ReceiverID < 1)
     {
-        qCritical() << "receiver ID < 1. it's =" << QString::number(n64ReceiverID);
+        qCritical() << "receiver ID < 1. it's =" << QString::number(un64ReceiverID);
         return;
     }
     else
     {
-        Client receiver = m_pClientsList->getClient(n64ReceiverID);
+        Client receiver = m_pClientsList->getClient(un64ReceiverID);
         QString QStrReceiverName = receiver.sqlID() > 0 ? receiver.name() : "client";
         emit this->addTextToLogPTE("send to: " + QStrReceiverName + " : "
                                    + QStrMsg + "\n", LOG_WEBSOCKET);
@@ -84,10 +86,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
         emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
 
     foreach (Client client, m_pClientsList->getClientsList())
-    {
-        qInfo() << "client name =" << client.name(DONT_SHOW_ERRORS);
         client.socket()->sendTextMessage(QStrMsg);
-    }
 }
 
 void Websockets::socketDisconnected()

@@ -36,7 +36,6 @@ void DobotGripper::changeGripperAngle(float fDutyCycle)
 {
     if (fDutyCycle != 0)
         m_gripper.dutyCycle = fDutyCycle;
-    qInfo() << "m_gripper.dutyCycle = " << QString::number(fDutyCycle);
     isArmReceivedCorrectCmd(SetIOPWM(&m_gripper, false, NULL), SHOW_ERRORS); //unqueued
 }
 

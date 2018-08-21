@@ -122,7 +122,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
 
     this->initDobotsBasicButtonsControl(); //init dobot JOG control from form
     this->setDobotPTEValidatorsInUI();
-    m_pWebsockets->listenOnPort(1234); //future: dont start it in here
+    m_pWebsockets->listenOnPort(1234); //todo: dont start it in here
 }
 
 MainWindow::~MainWindow()
@@ -560,7 +560,13 @@ void MainWindow::showClientsListInUI(QList<Client> list)
 
 void MainWindow::showQueuedClientsListInUI(QString QStrList)
 {
-    qInfo();
+    if (QStrList.isEmpty() || QStrList == "0")
+    {
+        ui->queuedClientsPTE->clear();
+        ui->queuedClientsPTE->setPlainText("1. -");
+        return;
+    }
+
     QStringList list = QStrList.split(" ");
     uint unNrInQueue = 0;
     QString QStrQueuedPTE;
@@ -572,7 +578,6 @@ void MainWindow::showQueuedClientsListInUI(QString QStrList)
     QStrQueuedPTE = QStrQueuedPTE.trimmed();
     ui->queuedClientsPTE->clear();
     ui->queuedClientsPTE->setPlainText(QStrQueuedPTE);
-    qInfo();
 }
 
 ///GUI slots
@@ -589,9 +594,9 @@ void MainWindow::on_closeGripperBtn_clicked()
 
 void MainWindow::on_startGmPosBtn_clicked()
 {
-    Point3D labelPoint(ui->xLabel->text().toInt(), ui->yLabel->text().toInt(),
-                       ui->zLabel->text().toInt());
-    //todo: test condition
+    Point3D labelPoint(ui->xLabel->text().toDouble(), ui->yLabel->text().toDouble(),
+                       ui->zLabel->text().toDouble());
+
     if (Point3D::isPointCloseToAnother(labelPoint, m_pDobot->getHomePos()))
     {
         m_pPieceController->clearLastPos();
@@ -602,14 +607,14 @@ void MainWindow::on_startGmPosBtn_clicked()
         m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().cournerAbove);
         m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().middleAbove);
     }
-    else
-        qWarning() << "Dobot not in home positions";
+    else qWarning() << "Dobot not in home positions";
 }
 
 void MainWindow::on_startDtPosBtn_clicked()
 {
     m_pPieceController->clearLastPos();
 
+    qInfo() << "cournerBelow =" << m_pDobot->getIntermediatePoints().cournerAbove.getAsQStr();
     this->writeInConsole("Returning safely to the DM_HOME positions.\n", LOG_DOBOT);
     m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().middleAbove);
     m_pDobot->addArmMoveToQueue(DM_TO_POINT, m_pDobot->getIntermediatePoints().cournerAbove);
@@ -774,11 +779,9 @@ void MainWindow::on_upBtn_clicked()
     {
         double dZAxisVal = m_pBoardMain->getField(m_pPieceController->getLastPos())
                 ->getLocation3D().z + m_pBoardMain->dMaxPieceHeight;
-        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
         m_pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
     }
-    else
-        qWarning() << "move isn't set";
+    else qWarning() << "move isn't set";
 }
 
 void MainWindow::on_downBtn_clicked()
@@ -787,11 +790,9 @@ void MainWindow::on_downBtn_clicked()
     {
         double dZAxisVal = m_pBoardMain->getField(m_pPieceController->getLastPos())
                 ->getLocation3D().z;
-        qInfo() << "dZAxisVal =" << QString::number(dZAxisVal);
         m_pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
     }
-    else
-        qWarning() << "move isn't set";
+    else qWarning() << "move isn't set";
 }
 
 void MainWindow::on_resetDobotIndexBtn_clicked()

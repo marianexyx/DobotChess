@@ -21,6 +21,10 @@
 #include "dobot/dobot_gripper.h"
 #include "dobot/dobot_queue.h"
 
+//future: check this in documentation: SetAutoLevelingCmd, SetPTPPOCmd, SetLostStepParams,...
+//...SetAngleSensorStaticError(+few),
+
+
 class Dobot: public QObject
 {
     Q_OBJECT

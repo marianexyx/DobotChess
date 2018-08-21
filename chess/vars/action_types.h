@@ -4,6 +4,7 @@
 #pragma once
 #include <QString>
 #include <QDebug>
+#include "chess/vars/request_types.h"
 
 enum ACTION_TYPE
 {
@@ -31,6 +32,23 @@ inline QString actionTypeAsQstr(ACTION_TYPE AT)
     default:
         qCritical() << "wrong arg =" << QString::number(AT);
         return "";
+    }
+}
+
+inline ACTION_TYPE rejectedRequestAsActionType(REJECTED_REQUEST_REACTION RRR)
+{
+    switch(RRR)
+    {
+    case RRR_NONE:
+    case RRR_RESEND_TABLE_DATA:
+        return AT_NONE;
+    case RRR_DOUBLE_LOGIN:
+        return AT_DOUBLE_LOGIN;
+    case RRR_REMOVE_AND_REFRESH_CLIENT:
+        return AT_REMOVE_AND_REFRESH_CLIENT;
+    default:
+        qCritical() << "wrong arg =" << QString::number(RRR);
+        return AT_ERROR;
     }
 }
 

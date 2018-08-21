@@ -29,7 +29,6 @@ QString ChessConditions::extractParamIfTypeIsInProperFormat(REQUEST_TYPE Type, Q
     if (this->isRequestAParameterType(Type))
     {
         QString QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
-        qInfo() << "extracted param =" << QStrParam;
 
         clientRequest request;
         request.type = Type;

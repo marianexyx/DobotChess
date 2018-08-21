@@ -127,9 +127,9 @@ void ChessMovements::enpassantMoveSequence(Field* pFrom, Field* pTo)
     this->removeMoveSequence(m_pBoardMain->getField(PosOfPieceToRemoveInEnpassant));
 }
 
-//future:
 void ChessMovements::promoteMoveSequence(Field* pFrom, Field* pTo)
 {
+    //future: do something more then just showing text, that says which piece is promoted
     this->regularMoveSequence(pFrom, pTo);
 }
 

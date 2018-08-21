@@ -20,15 +20,14 @@ Chess::Chess(PieceController* pPieceController)
     m_request.clear();
 
     m_keepConnectedTimer = new QTimer();
-    m_keepConnectedTimer->setInterval(60*1000);
-    m_keepConnectedTimer->setSingleShot(true);
+    m_keepConnectedTimer->setSingleShot(false);
     connect(m_keepConnectedTimer, SIGNAL(timeout()), this, SLOT(keepConnectedTimeOut()));
-    m_keepConnectedTimer->start(1000);
+    m_keepConnectedTimer->start(60*1000);
 
     connect(m_pTCPMsgs, SIGNAL(msgFromTcpToChess(QString, QString)),
             this, SLOT(checkMsgFromChessEngine(QString, QString)));
-    connect(m_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, int64_t)),
-            this, SLOT(checkMsgFromClient(QString, int64_t)));
+    connect(m_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, uint64_t)),
+            this, SLOT(checkMsgFromClient(QString, uint64_t)));
     connect(m_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
             this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(m_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
@@ -52,12 +51,13 @@ Chess::~Chess()
 
 
 ///communication methods
-void Chess::checkMsgFromClient(QString QStrMsg, int64_t n64SenderID,
+void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID,
                                    bool bService /*= false*/)
 {
-    emit this->addTextToLogPTE("received: " + QStrMsg + "\n", LOG_CORE);
+    emit this->addTextToLogPTE("received msg (from client with id = " + QString::number(un64SenderID)
+                               + " ): " + QStrMsg + "\n", LOG_CORE);
 
-    Client client = m_pClientsList->getClient(n64SenderID);
+    Client client = m_pClientsList->getClient(un64SenderID);
     REJECTED_REQUEST_REACTION BadRequestFromClient = RRR_NONE;
 
     if (m_pConditions->isClientRequestCanBeAccepted(QStrMsg, &client, m_ChessGameStatus,
@@ -66,7 +66,8 @@ void Chess::checkMsgFromClient(QString QStrMsg, int64_t n64SenderID,
         m_request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
         m_request.param = m_pConditions->extractParamIfTypeIsInProperFormat(m_request.type, QStrMsg,
                                                                           BadRequestFromClient);
-        qInfo() << "accepted client request type =" << requestTypeAsQStr(m_request.type)
+        qInfo() << "accepted client's (with id =" <<  QString::number(client.ID())
+                << ") request type =" << requestTypeAsQStr(m_request.type)
                 << ", param =" << m_request.param << ", rejectedRequestReaction type ="
                 << rejectedRequestReactionAsQStr(BadRequestFromClient);
     }
@@ -112,6 +113,7 @@ void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
 {
     this->restorateGameIfDisconnectedClientAffectIt(client);
     m_pClientsList->clearClientSqlID(client);
+    this->sendDataToClient(client, rejectedRequestAsActionType(RRR));
     client.socket()->sendTextMessage(rejectedRequestReactionAsQStr(RRR));
     m_pClientsList->removeClientFromList(client);
     this->updateClientsInUI();
@@ -129,6 +131,7 @@ void Chess::executeClientRequest(Client &client, bool bService /*= false*/)
         int nSqlID = m_request.param.left(m_request.param.indexOf("&")).toInt();
         if (m_pClientsList->isClientSqlIDExists(nSqlID)) //double login- kill old client
             this->killClient(m_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
+        //todo: looks like it doesnt work (propably session isnt destroyed on site)
         m_pClientsList->setClientSqlIDAndName(client, nSqlID);
         this->sendDataToClient(client);
         break;
@@ -238,7 +241,6 @@ void Chess::updateClientsInUI()
 ///gameplay methods
 void Chess::checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespond)
 {
-    qInfo() << "QStrTcpMsgType=" << QStrTcpMsgType << ", QStrTcpRespond:" << QStrTcpRespond;
     CHENARD_MSG_TYPE ProcessedChenardMsgType = ChenardMsgType(QStrTcpMsgType);
     qInfo() << "ProcessedChenardMsgType =" << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
     if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpRespond, SHOW_ERRORS)) return;
@@ -316,7 +318,6 @@ void Chess::resetTableData()
 
 void Chess::changePlayersOnChairs()
 {
-    qInfo();
     m_pClientsList->clearPlayerType(PT_WHITE);
     this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
     m_pClientsList->clearPlayerType(PT_BLACK);
@@ -363,8 +364,6 @@ void Chess::fillTableWithNextQueuedClientsIfTheyExist()
 
 void Chess::makeCoreReadyForNewGame()
 {
-    qInfo();
-
     if (m_pClientsList->isWholeGameTableOccupied())
         m_ChessGameStatus = m_pTimers->startQueueTimer();
     else m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
@@ -381,7 +380,7 @@ void Chess::continueGameplay()
 
 void Chess::restorateGameIfDisconnectedClientAffectIt(const Client &clientToDisconnect)
 {
-    qInfo();
+    qInfo() << "client's ID =" << QString::number(clientToDisconnect.ID());
 
     if (m_pClientsList->isClientAPlayer(clientToDisconnect))
         this->playerLeftChair(clientToDisconnect.type());
@@ -390,7 +389,8 @@ void Chess::restorateGameIfDisconnectedClientAffectIt(const Client &clientToDisc
         m_pClientsList->removeClientFromQueue(clientToDisconnect);
         this->sendDataToAllClients(); //queued clients need to refreshed
     }
-    else emit this->addTextToLogPTE("client disconnected\n", LOG_CORE);
+    else emit this->addTextToLogPTE("disconnected client with ID = "
+                                    + QString::number(clientToDisconnect.ID()) + "\n", LOG_CORE);
 }
 
 void Chess::playerLeftChair(PLAYER_TYPE PT)
@@ -412,9 +412,8 @@ void Chess::playerLeftChair(PLAYER_TYPE PT)
 ///private slots:
 void Chess::keepConnectedTimeOut()
 {
-    if (m_pClientsList->getAmountOfQueuedClients() > 0)
+    if (m_pClientsList->getClientsList().size() > 0)
         this->sendDataToAllClients();
-    this->m_keepConnectedTimer->start();
 }
 
 ///slots
@@ -480,7 +479,6 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
 
     TD += "\"}";
 
-    qInfo() << "QStrTableData =" << TD;
     return TD;
 }
 

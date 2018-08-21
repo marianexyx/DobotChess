@@ -37,12 +37,12 @@ public:
 public slots:
     void onNewConnection();
     void receivedMsg(QString QStrMsg);
-    void sendMsgToClient(QString QStrMsg, int64_t n64ReceiverID);
+    void sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID);
     void sendMsgToAllClients(QString QStrMsg);
 
 signals:
     void addTextToLogPTE(QString, LOG);
-    void msgFromWebsocketsToChess(QString QStrMsg, int64_t n64SenderID);
+    void msgFromWebsocketsToChess(QString QStrMsg, uint64_t un64SenderID);
 };
 
 #endif // Websockets_H

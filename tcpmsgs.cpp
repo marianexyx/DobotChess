@@ -15,11 +15,10 @@ void TCPMsgs::queueCmd(QString QStrCmd)
     QStrReceivedData.un64TcpID = ++m_n64CmdID;
     QStrReceivedData.QStrMsgForTcp = QStrCmd;
     m_TCPMsgsList << QStrReceivedData;
+
+    //wait with next TCP command execution from container, till earlier one isn't ended
     if (!m_TCPMsgsList.isEmpty() && !m_bWaitingForReadyRead)
-    {
-        //wait with next TCP command execution from container, till earlier one isn't ended
         this->doTcpConnect(); //execute oldest command in container
-    }
 }
 
 void TCPMsgs::doTcpConnect() //every 1 command create 1 tcp instation
@@ -43,11 +42,9 @@ void TCPMsgs::doTcpConnect() //every 1 command create 1 tcp instation
         qCritical() << "aborting established connection";
 
     m_socket->abort();
-    m_socket->state();
 
-    m_socket->connectToHost("localhost", 22222); //will emit signal "connected"
-    //future: add additional connectToHost reaction, when it doesn't respond for...
-    //...too long (use timer, not "waitForConnect" function). edit: is it necessary?
+    //connectToHost will emit signal "connected", or error signal type, when an error occurs
+    m_socket->connectToHost("localhost", 22222);
 }
 
 void TCPMsgs::displayError(QAbstractSocket::SocketError socketError)
@@ -77,10 +74,11 @@ void TCPMsgs::connected()
         qInfo() << "Connected. Parsing msg to chenard:" << QStrData.QStrMsgForTcp;
 
         QByteArray QabMsgArrayed;
-        //prepare parameter for write() function
-        QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n");
+
+        //future: "\n\n" messages are created here?
+        QabMsgArrayed.append(QStrData.QStrMsgForTcp + "\n"); //prepare param for write() func
         //send msg to tcp from sender. chenard understand end of msg, when encounter "\n" msg
-        //future: propably above warning "\n\n" messages are created?
+
         m_socket->write(QabMsgArrayed);
 
         emit this->addTextToLogPTE("wrote to TCP: " + QabMsgArrayed, LOG_TCP);
@@ -133,18 +131,33 @@ void TCPMsgs::readyRead()
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
     }
+    //future: looks like i haven't seen this warning types for a longer while
     else if (QStrMsgFromTcp.isEmpty())
     {
         qWarning() << "received empty msg.";
         return;
     }
-    else if (QStrMsgFromTcp == "\n")
-        qWarning() << "received '\\n' msg.";
-    else
-        qWarning() << "received:" << QStrMsgFromTcp;
+    else if (QStrMsgFromTcp == "\n")  qWarning() << "received '\\n' msg.";
+    else qWarning() << "received:" << QStrMsgFromTcp;
 
     m_bWaitingForReadyRead = false;
 
     if (!m_TCPMsgsList.isEmpty())
         this->doTcpConnect();
+}
+
+QString TCPMsgs::dumpAllData()
+{
+    QString QStrData;
+
+    QStrData = "[tcpmsgs.h]";
+    QStrData += "m_bWaitingForReadyRead: " + QString::number(m_bWaitingForReadyRead) + "\n";
+    QStrData += "m_n64CmdID: " + QString::number(m_n64CmdID) + "\n";
+    foreach (TcpMsgMetaData tcpData, m_TCPMsgsList)
+    {
+        QStrData += "[m_TCPMsgsList] un64TcpID: " + QString::number(tcpData.un64TcpID)
+                + ", QStrMsgForTcp: " + tcpData.QStrMsgForTcp + "\n";
+    }
+
+    return QStrData;
 }

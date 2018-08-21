@@ -38,7 +38,7 @@ inline QString chenardMsgTypeAsQStr(CHENARD_MSG_TYPE CMT)
     case CMT_STATUS: return "status";
     case CMT_LEGAL: return "legal";
     case CMT_HISTORY: return "history pgn";
-    case CMT_MOVE: return "move";
+    case CMT_MOVE: return "move ";
     default:
         qCritical() << "wrong arg =" << QString::number(CMT);
         return "";
