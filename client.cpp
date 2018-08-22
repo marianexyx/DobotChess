@@ -150,13 +150,17 @@ bool Clients::isWholeGameTableOccupied()
     else return false;
 }
 
-bool Clients::isClientIDExists(uint64_t un64ID)
+bool Clients::isClientIDExists(uint64_t un64ID, bool bErrorLog /*= false*/)
 {
     foreach (Client client, m_clients)
     {
         if (client.m_ID == un64ID)
             return true;
     }
+
+    if (bErrorLog)
+        qCritical() << "client with ID =" << QString::number(un64ID) << "doesn't exists";
+
     return false;
 }
 
@@ -237,7 +241,7 @@ bool Clients::isClientInQueue(const Client &client)
 
 void Clients::clearClientSqlID(const Client& client)
 {
-    qInfo();
+    qInfo() << "client's ID =" << client.ID();
     this->setClientSqlIDAndName(client, 0);
 }
 
@@ -349,7 +353,7 @@ void Clients::setClientSqlIDAndName(const Client& client, uint64_t un64SqlID)
 
             return;
         }
-        else qDebug() << "cl.id != client.id:" << cl.ID() << "!=" << client.ID();
+        else qDebug() << "cl.id(" << cl.ID() << ") != client.id(" << client.ID() << ")";
     }
 
     qCritical() << "client not found";

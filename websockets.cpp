@@ -38,10 +38,11 @@ void Websockets::onNewConnection()
     connect(pSocket, &QWebSocket::textMessageReceived, this, &Websockets::receivedMsg);
     connect(pSocket, &QWebSocket::disconnected, this, &Websockets::socketDisconnected);
     m_pClientsList->newClient(pSocket);
-    emit this->addTextToLogPTE("New connection (new ID = "
-                               + QString::number(m_pClientsList->getClient(pSocket).ID())
-                               + ")\n", LOG_WEBSOCKET);
+    uint64_t clientID = m_pClientsList->getClient(pSocket).ID();
+    emit this->addTextToLogPTE("New connection (new ID = " + QString::number(clientID) + ")\n",
+                               LOG_WEBSOCKET);
     m_pClientsList->showClientsInUI();
+    emit this->msgFromWebsocketsToChess("getTableDataAsJSON", clientID);
 }
 
 //future: make a container of incomming msgs (not easy task)
@@ -65,19 +66,26 @@ void Websockets::receivedMsg(QString QStrMsg)
 
 void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
 {
-    if (un64ReceiverID < 1)
+    qInfo() << "client ID =" << QString::number(un64ReceiverID) << ", msg =" << QStrMsg;
+
+    if (un64ReceiverID >= 1)
     {
-        qCritical() << "receiver ID < 1. it's =" << QString::number(un64ReceiverID);
-        return;
-    }
-    else
-    {
+        qDebug() << "checkpoint1";
+        if (!m_pClientsList->isClientIDExists(un64ReceiverID, SHOW_ERRORS))
+            return;
+
+        qDebug() << "checkpoint2";
         Client receiver = m_pClientsList->getClient(un64ReceiverID);
+        qDebug() << "checkpoint3";
         QString QStrReceiverName = receiver.sqlID() > 0 ? receiver.name() : "client";
+        qDebug() << "checkpoint4";
         emit this->addTextToLogPTE("send to: " + QStrReceiverName + " : "
                                    + QStrMsg + "\n", LOG_WEBSOCKET);
+        qDebug() << "checkpoint5";
         receiver.socket()->sendTextMessage(QStrMsg);
+        qDebug() << "checkpoint6";
     }
+    else qCritical() << "receiver ID < 1. it's =" << QString::number(un64ReceiverID);
 }
 
 void Websockets::sendMsgToAllClients(QString QStrMsg)

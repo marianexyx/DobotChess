@@ -64,7 +64,7 @@ public:
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
     bool isWholeGameTableEmpty();
     bool isWholeGameTableOccupied();
-    bool isClientIDExists(uint64_t un64ID);
+    bool isClientIDExists(uint64_t un64ID, bool bErrorLog = false);
     bool isClientSqlIDExists(uint64_t un64ID, bool bErrorLog = false);
     bool isClientAPlayer(const Client& client, bool bErrorLog = false);
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
