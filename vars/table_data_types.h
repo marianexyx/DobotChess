@@ -7,8 +7,8 @@
 
 enum TABLE_DATA_TYPE
 {
-    TD_NONE,
-    TD_ACTION,
+    //0 is for info about synchronization
+    TD_ACTION = 1,
     TD_WHITE_PLAYER,
     TD_BLACK_PLAYER,
     TD_GAME_STATE,
@@ -25,7 +25,6 @@ inline QString tableDataTypeAsQstr(TABLE_DATA_TYPE TD)
 {
     switch(TD)
     {
-    case TD_NONE: return "none";
     case TD_ACTION: return "action";
     case TD_WHITE_PLAYER: return "whitePlayer";
     case TD_BLACK_PLAYER: return "blackPlayer";

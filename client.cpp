@@ -164,9 +164,22 @@ bool Clients::isClientIDExists(uint64_t un64ID, bool bErrorLog /*= false*/)
     return false;
 }
 
-bool Clients::isClientSqlIDExists(uint64_t un64ID, bool bErrorLog /*= false*/)
+bool Clients::isClientSqlIDExists(const Client& client, bool bErrorLog /*= false*/)
 {
-    if (un64ID == 0)
+    if (client.sqlID() > 0)
+        return true;
+    else
+    {
+        if (bErrorLog)
+            qCritical() << "client with ID =" << QString::number(client.ID()) << "doesn't exists";
+
+        return false;
+    }
+}
+
+bool Clients::isClientSqlIDExists(uint64_t un64sqlID, bool bErrorLog /*= false*/)
+{
+    if (un64sqlID == 0)
     {
         if (bErrorLog)
             qCritical() << "sqlID == 0";
@@ -175,12 +188,12 @@ bool Clients::isClientSqlIDExists(uint64_t un64ID, bool bErrorLog /*= false*/)
 
     foreach (Client cl, m_clients)
     {
-        if (cl.m_sqlID == un64ID)
+        if (cl.m_sqlID == un64sqlID)
             return true;
     }
 
     if (bErrorLog)
-        qCritical() << "sqlID:" << QString::number(un64ID) << "not found in clients list";
+        qCritical() << "sqlID:" << QString::number(un64sqlID) << "not found in clients list";
 
     return false;
 }
@@ -353,7 +366,6 @@ void Clients::setClientSqlIDAndName(const Client& client, uint64_t un64SqlID)
 
             return;
         }
-        else qDebug() << "cl.id(" << cl.ID() << ") != client.id(" << client.ID() << ")";
     }
 
     qCritical() << "client not found";

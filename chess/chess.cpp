@@ -95,13 +95,15 @@ void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID,
 void Chess::sendDataToClient(Client client, ACTION_TYPE AT /*= AT_NONE*/,
                              END_TYPE ET /*= ET_NONE*/)
 {
-    qInfo() << "client ID =" << QString::number(client.ID()) << ", ACTION_TYPE ="
+    qInfo() << "client ID =" << QString::number(client.ID()) << ", client sqlID ="
+            << QString::number(client.sqlID()) << ", ACTION_TYPE ="
             << actionTypeAsQstr(AT);
     m_pWebsockets->sendMsgToClient(this->getTableData(AT, ET), client.ID());
 }
 
 void Chess::sendDataToAllClients(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NONE*/)
 {
+    qInfo()<< "ACTION_TYPE =" << actionTypeAsQstr(AT);
     m_pWebsockets->sendMsgToAllClients(this->getTableData(AT, ET));
 }
 
@@ -113,15 +115,10 @@ void Chess::sendMsgToChessEngine(QString QStrMsg)
 
 void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
 {
-    qDebug() << "be4 restorateGameIfDisconnectedClientAffectIt";
     this->restorateGameIfDisconnectedClientAffectIt(client);
-    qDebug() << "be4 clearClientSqlID";
     m_pClientsList->clearClientSqlID(client);
-    qDebug() << "be4 sendDataToClient";
     this->sendDataToClient(client, rejectedRequestAsActionType(RRR));
-    qDebug() << "be4 removeClientFromList";
     m_pClientsList->removeClientFromList(client);
-    qDebug() << "be4 updateClientsInUI";
     this->updateClientsInUI();
 }
 
@@ -135,11 +132,19 @@ void Chess::executeClientRequest(Client &client, bool bService /*= false*/)
     case RT_IM:
     {
         int nSqlID = m_request.param.left(m_request.param.indexOf("&")).toInt();
+        //todo: if the same IP sent "im.." (from still connected client [or just still...
+        //...connected client sent it?]), then allow it (?)
         if (m_pClientsList->isClientSqlIDExists(nSqlID)) //double login- kill old client
+        {
+            Client clientToKill = m_pClientsList->getClient(nSqlID, CID_SQL);
+            qDebug() << "kill client: ID =" << clientToKill.ID() << ", sqlID = "
+                     << clientToKill.sqlID() << ", name =" << clientToKill.name()
+                     << ". new client: ID =" << client.ID() << ", sqlID = "
+                     << client.sqlID() << ", name =" << client.name(DONT_SHOW_ERRORS);
             this->killClient(m_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
-        //todo: looks like it doesnt work (propably session isnt destroyed on site)
+        }
         m_pClientsList->setClientSqlIDAndName(client, nSqlID);
-        this->sendDataToClient(client, AT_SYNCHRONIZED);
+        this->sendDataToClient(client);
         break;
     }
     case RT_SIT_ON:
@@ -462,7 +467,7 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
     if (m_pClientsList->isPlayerChairEmpty(PT_BLACK)) QStrBlackPlayerID = "0";
     else QStrBlackPlayerID = QString::number(m_pClientsList->getPlayer(PT_BLACK).sqlID());
 
-    QString TD = "{\"";
+    QString TD;
     //TD += QString::number(TD_ACTION) + ":6" /*+ QString::number(AT + ET)*/; //tests
     TD += QString::number(TD_ACTION) + ":" + QString::number(AT + ET);
     TD += "," + QString::number(TD_WHITE_PLAYER) + ":" + QStrWhitePlayerID;
@@ -480,12 +485,6 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
             + m_pStatus->getHistoryMovesAsQStr();
     TD += "," + QString::number(TD_PROMOTIONS) + ":"
             + m_pPieceController->getPromotedPawnsPositions();
-
-    //convert string to JSON format
-    TD.replace(":", "\":\"");
-    TD.replace(",", "\",\"");
-
-    TD += "\"}";
 
     return TD;
 }

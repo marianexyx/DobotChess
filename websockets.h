@@ -32,6 +32,7 @@ public:
     ~Websockets();
 
     void listenOnPort(quint16 port);
+    static QString toJSON(QString QStrData);
     Clients* getClientsListPointer() const { return m_pClientsList; }
 
 public slots:

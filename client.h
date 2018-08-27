@@ -65,7 +65,8 @@ public:
     bool isWholeGameTableEmpty();
     bool isWholeGameTableOccupied();
     bool isClientIDExists(uint64_t un64ID, bool bErrorLog = false);
-    bool isClientSqlIDExists(uint64_t un64ID, bool bErrorLog = false);
+    bool isClientSqlIDExists(const Client& client, bool bErrorLog = false);
+    bool isClientSqlIDExists(uint64_t un64sqlID, bool bErrorLog = false);
     bool isClientAPlayer(const Client& client, bool bErrorLog = false);
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
     bool isStartClickedByBothPlayers();

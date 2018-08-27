@@ -9,7 +9,6 @@
 enum ACTION_TYPE
 {
     AT_NONE,
-    AT_SYNCHRONIZED,
     AT_NEW_WHITE_PLAYER,
     AT_NEW_BLACK_PLAYER,
     AT_NEW_GAME_STARTED,
@@ -26,7 +25,6 @@ inline QString actionTypeAsQstr(ACTION_TYPE AT)
     switch(AT)
     {
     case AT_NONE: return "none";
-    case AT_SYNCHRONIZED: return "synchronized";
     case AT_NEW_WHITE_PLAYER: return "newWhitePlayer";
     case AT_NEW_BLACK_PLAYER: return "newBlackPlayer";
     case AT_NEW_GAME_STARTED: return "newOk";

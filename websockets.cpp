@@ -31,6 +31,15 @@ void Websockets::listenOnPort(quint16 port)
     }
 }
 
+/*static*/ QString Websockets::toJSON(QString QStrData)
+{
+    QStrData = "{\"" + QStrData;
+    QStrData.replace(":", "\":\"");
+    QStrData.replace(",", "\",\"");
+    QStrData += "\"}";
+    return QStrData;
+}
+
 void Websockets::onNewConnection()
 {
     QWebSocket* pSocket = m_pWebsocketserver->nextPendingConnection();
@@ -66,35 +75,39 @@ void Websockets::receivedMsg(QString QStrMsg)
 
 void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
 {
-    qInfo() << "client ID =" << QString::number(un64ReceiverID) << ", msg =" << QStrMsg;
-
     if (un64ReceiverID >= 1)
     {
-        qDebug() << "checkpoint1";
         if (!m_pClientsList->isClientIDExists(un64ReceiverID, SHOW_ERRORS))
             return;
 
-        qDebug() << "checkpoint2";
         Client receiver = m_pClientsList->getClient(un64ReceiverID);
-        qDebug() << "checkpoint3";
+        QString QStrSynchronization = "0:" +
+                QString::number(m_pClientsList->isClientSqlIDExists(receiver));
+        QStrMsg = QStrSynchronization + "," + QStrMsg;
+        QStrMsg = Websockets::toJSON(QStrMsg);
         QString QStrReceiverName = receiver.sqlID() > 0 ? receiver.name() : "client";
-        qDebug() << "checkpoint4";
         emit this->addTextToLogPTE("send to: " + QStrReceiverName + " : "
                                    + QStrMsg + "\n", LOG_WEBSOCKET);
-        qDebug() << "checkpoint5";
         receiver.socket()->sendTextMessage(QStrMsg);
-        qDebug() << "checkpoint6";
     }
     else qCritical() << "receiver ID < 1. it's =" << QString::number(un64ReceiverID);
 }
 
 void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
-    if (QStrMsg != "keepConnected")
-        emit this->addTextToLogPTE("send to all: " + QStrMsg + "\n", LOG_WEBSOCKET);
-
     foreach (Client client, m_pClientsList->getClientsList())
-        client.socket()->sendTextMessage(QStrMsg);
+    {
+        QString QStrSynchronization = "0:" +
+                QString::number(m_pClientsList->isClientSqlIDExists(client));
+        QString QStrFullInfo = QStrSynchronization + "," + QStrMsg;
+        QString QStrFullInfoJSON = Websockets::toJSON(QStrFullInfo);
+
+        if (QStrMsg != "keepConnected")
+            emit this->addTextToLogPTE("send to all (" + client.name(DONT_SHOW_ERRORS)
+                                       + "): "  + QStrFullInfoJSON + "\n", LOG_WEBSOCKET);
+
+        client.socket()->sendTextMessage(QStrFullInfoJSON);
+    }
 }
 
 void Websockets::socketDisconnected()
