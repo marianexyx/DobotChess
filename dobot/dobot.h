@@ -55,8 +55,7 @@ private slots:
     void onGetPoseTimer();
 
 public:
-    //todo: don't add whole RealVars struct to dobot
-    Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints);
+    Dobot(DobotRealVars realVars, IntermediatePoints intermediatePoints);
     ~Dobot();
 
     void queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove =

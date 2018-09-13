@@ -16,6 +16,25 @@
 enum CLIENT_ID { CID_CORE, CID_SQL };
 inline QString clientIDAsQStr(CLIENT_ID CID) { return CID == CID_CORE ? "coreID" : "sqlID"; }
 
+enum SYNCHRONIZED { SY_DESYNCHRONIZED,
+                    SY_SYNCHRONIZED,
+                    SY_DOUBLE_LOGIN,
+                    SY_REMOVE_AND_REFRESH_CLIENT };
+
+inline QString synchronizedAsQStr(SYNCHRONIZED SY)
+{
+    switch(SY)
+    {
+    case SY_DESYNCHRONIZED: return "desynchronized";
+    case SY_SYNCHRONIZED: return "synchronized";
+    case SY_DOUBLE_LOGIN: return "doubleLogin";
+    case SY_REMOVE_AND_REFRESH_CLIENT: return "removeAndRefreshClient";
+    default:
+        qCritical() << "wrong val =" << QString::number(SY);
+        return "ERROR";
+    }
+}
+
 class Client
 {
     friend class Clients;
@@ -23,7 +42,8 @@ class Client
 private:
     uint64_t m_ID;
     uint64_t m_sqlID;
-    QWebSocket *m_socket;
+    SYNCHRONIZED m_synchronized;
+    QWebSocket* m_socket;
     PLAYER_TYPE m_Type;
     bool m_isStartClickedByPlayer;
     uint64_t m_queue;
@@ -31,6 +51,7 @@ private:
 
 public:
     bool operator ==(const struct Client& cl) { return m_ID == cl.m_ID; }
+    bool operator !=(const struct Client& cl) { return m_ID != cl.m_ID; }
 
     uint64_t ID() const { return m_ID; }
     uint64_t sqlID() const { return m_sqlID; }
@@ -43,6 +64,17 @@ public:
         if (bShowErrors && m_sqlID == 0)
             qCritical() << "tried to access client's name without setting his sqlID 1st";
         return m_name;
+    }
+    SYNCHRONIZED synchronized() const
+    {
+        if (m_synchronized != SY_DOUBLE_LOGIN && m_synchronized != SY_REMOVE_AND_REFRESH_CLIENT)
+            return m_sqlID > 0 ? SY_SYNCHRONIZED : SY_DESYNCHRONIZED;
+        else return m_synchronized;
+    }
+    QString dumpCrucialData()
+    {
+        return "ID: " + QString::number(m_ID) + ", sqlID:" + QString::number(m_sqlID)
+                + ", name:" + m_name + "\n";
     }
 };
 
@@ -82,6 +114,7 @@ public:
     void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void setClientStartConfirmation(const Client& client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
+    void setClientSynchronization(const Client& client, SYNCHRONIZED sync);
 
     QList<Client> getClientsList() const { return m_clients; }
     Client getClient(QWebSocket* pClientSocket);

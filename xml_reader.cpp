@@ -34,33 +34,33 @@ void XmlReader::readGameLimitsNodes()
 
 void XmlReader::readGameConfigNodes()
 {
-    m_gameConfigVars.fPieceHeight =
+    m_gameConfigVars.boards.fPieceHeight =
             this->getParam(m_xmlDocConfig, "piece", "param", "height", "value").toFloat();
-    m_gameConfigVars.A1 =
+    m_gameConfigVars.boards.A1 =
             this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldA1");
-    m_gameConfigVars.A8 =
+    m_gameConfigVars.boards.A8 =
             this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldA8");
-    m_gameConfigVars.H1 =
+    m_gameConfigVars.boards.H1 =
             this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldH1");
-    m_gameConfigVars.H8 =
+    m_gameConfigVars.boards.H8 =
             this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldH8");
-    m_gameConfigVars.remWhiteCloserOuter =
+    m_gameConfigVars.boards.remWhiteCloserOuter =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteCloserOuter");
-    m_gameConfigVars.remWhiteFurtherInner =
+    m_gameConfigVars.boards.remWhiteFurtherInner =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteFurtherInner");
-    m_gameConfigVars.remBlackCloserOuter =
+    m_gameConfigVars.boards.remBlackCloserOuter =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackCloserOuter");
-    m_gameConfigVars.remBlackFurtherInner =
+    m_gameConfigVars.boards.remBlackFurtherInner =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackFurtherInner");
-    m_gameConfigVars.home =
+    m_gameConfigVars.dobot.home =
             this->getPointParam(m_xmlDocConfig, "points", "point", "home");
     m_gameConfigVars.retreatLeft =
             this->getPointParam(m_xmlDocConfig, "points", "point", "retreatLeft");
     m_gameConfigVars.retreatRight =
             this->getPointParam(m_xmlDocConfig, "points", "point", "retreatRight");
-    m_gameConfigVars.fGripperOpened =
+    m_gameConfigVars.dobot.fGripperOpened =
             this->getParam(m_xmlDocConfig, "gripper", "state", "open", "pwm").toFloat();
-    m_gameConfigVars.fGripperClosed =
+    m_gameConfigVars.dobot.fGripperClosed =
             this->getParam(m_xmlDocConfig, "gripper", "state", "close", "pwm").toFloat();
 
     this->isVarsStructInLimits();
@@ -181,18 +181,18 @@ Point3D XmlReader::getPointParam(QDomDocument xmlDoc, QString QStrDomElMain,
 
 bool XmlReader::isVarsStructInLimits()
 {
-    if (this->isPieceHeightInLimits(m_gameConfigVars.fPieceHeight) &&
-            isPointInLimits(m_gameConfigVars.home) &&
-            isPointInLimits(m_gameConfigVars.A1) &&
-            isPointInLimits(m_gameConfigVars.A8) &&
-            isPointInLimits(m_gameConfigVars.H1) &&
-            isPointInLimits(m_gameConfigVars.H8) &&
-            isPointInLimits(m_gameConfigVars.remWhiteCloserOuter) &&
-            isPointInLimits(m_gameConfigVars.remWhiteFurtherInner) &&
-            isPointInLimits(m_gameConfigVars.remBlackCloserOuter) &&
-            isPointInLimits(m_gameConfigVars.remBlackFurtherInner) &&
-            isGripperParamInLimits(m_gameConfigVars.fGripperOpened) &&
-            isGripperParamInLimits(m_gameConfigVars.fGripperClosed))
+    if (this->isPieceHeightInLimits(m_gameConfigVars.boards.fPieceHeight) &&
+            isPointInLimits(m_gameConfigVars.dobot.home) &&
+            isPointInLimits(m_gameConfigVars.boards.A1) &&
+            isPointInLimits(m_gameConfigVars.boards.A8) &&
+            isPointInLimits(m_gameConfigVars.boards.H1) &&
+            isPointInLimits(m_gameConfigVars.boards.H8) &&
+            isPointInLimits(m_gameConfigVars.boards.remWhiteCloserOuter) &&
+            isPointInLimits(m_gameConfigVars.boards.remWhiteFurtherInner) &&
+            isPointInLimits(m_gameConfigVars.boards.remBlackCloserOuter) &&
+            isPointInLimits(m_gameConfigVars.boards.remBlackFurtherInner) &&
+            isGripperParamInLimits(m_gameConfigVars.dobot.fGripperOpened) &&
+            isGripperParamInLimits(m_gameConfigVars.dobot.fGripperClosed))
     {
         return true;
     }

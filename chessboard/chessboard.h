@@ -37,7 +37,8 @@ private:
     void clearField(Field* pField, bool bErrorLog = false) { pField->clearField(bErrorLog); }
 
 public:
-    Chessboard(BOARD BoardType, bool bBoardIsReal = true, RealVars gameConfigVars = RealVars());
+    Chessboard(BOARD BoardType, bool bBoardIsReal = true,
+               BoardsRealVars realVars = BoardsRealVars());
     ~Chessboard();
 
     const double dMaxPieceHeight;

@@ -22,6 +22,8 @@ void ChessStatus::setMove(QString QStrMove)
 
 SEQUENCE_TYPE ChessStatus::findMoveType(QString QStrMove)
 {
+    qDebug();
+
     //don't mix conditions order
     if (this->isMoveLegal(QStrMove + "q")) return ST_PROMOTE_TO_WHAT; //promotion autotest
     else if (this->isMoveLegal(QStrMove))

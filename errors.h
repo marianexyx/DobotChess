@@ -2,11 +2,13 @@
 #define ERRORS_H
 
 #pragma once
+#include <QObject>
 #include <QString>
 #include <QDebug>
 #include <QDateTime>
 #include <QMutexLocker>
 #include <QFile>
+#include <QTimer>
 #include "chess/chess.h"
 #include "intermediate_points_calculator.h"
 
@@ -19,10 +21,15 @@
 #define CB_BLACK "\e[1;30m"
 #define CB_RED "\e[1;31m"
 
-//todo: make timer who will check for new error files in err dir
-class Errors
+class Errors: public QObject
 {
+    Q_OBJECT
+
+private:
+    static const QDir m_errorDir;
+
 public:
+    static uint newErrors;
     Errors() {}
 
     static Chess* pChess; //overloadDebugOutput can work only on statics

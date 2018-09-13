@@ -8,6 +8,7 @@
 #include "vars/table_data_types.h"
 #include "tcpmsgs.h"
 #include "websockets.h"
+#include "arduino_usb.h"
 #include "chess/vars/action_types.h"
 #include "chess/vars/game_status.h"
 #include "chess/vars/chenard_io_msgs.h"
@@ -33,6 +34,7 @@ private:
     Chessboard* m_pBoardChenard;
     Websockets* m_pWebsockets;
     TCPMsgs* m_pTCPMsgs;
+    ArduinoUsb* m_pUSB;
 
     ChessTimers* m_pTimers;
     ChessStatus* m_pStatus;
@@ -90,6 +92,7 @@ public:
 public slots:
     void checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService = false);
     void checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespond);
+    void checkMsgFromUSB(QString QStrMsg);
     void timeOutStart();
     void timeOutPlayer(PLAYER_TYPE Player);
     QString getTableData(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);

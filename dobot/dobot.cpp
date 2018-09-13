@@ -1,11 +1,11 @@
 #include "dobot.h"
 
-Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints):
+Dobot::Dobot(DobotRealVars realVars, IntermediatePoints intermediatePoints):
     m_ARM_MAX_VELOCITY(300), //todo: what's the max val? 200? 300?
     m_ARM_MAX_ACCELERATION(300)
 {
     m_pQueue = new DobotQueue(intermediatePoints);
-    m_pGripper = new DobotGripper(gameConfigVars.fGripperOpened, gameConfigVars.fGripperClosed);
+    m_pGripper = new DobotGripper(realVars.fGripperOpened, realVars.fGripperClosed);
 
     m_usItemIDInGripper = 0;
     m_bConnectedToDobot = false;
@@ -13,9 +13,9 @@ Dobot::Dobot(RealVars gameConfigVars, IntermediatePoints intermediatePoints):
 
     m_intermediatePoints = intermediatePoints;
 
-    m_home.x = gameConfigVars.home.x;
-    m_home.y = gameConfigVars.home.y;
-    m_home.z = gameConfigVars.home.z;
+    m_home.x = realVars.home.x;
+    m_home.y = realVars.home.y;
+    m_home.z = realVars.home.z;
     m_home.r = 0;
 
     connect(m_pQueue, SIGNAL(sendMoveToArm(DobotMove)),
@@ -322,23 +322,24 @@ void Dobot::sendMoveToArm(DobotMove move)
     case DM_DOWN:
     {
         if (!XmlReader::isPointInLimits(move.xyz)) return;
-        /*PTPCmd moveAsPtpCmd;
+        PTPCmd moveAsPtpCmd;
         moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian-linear
         //future: dobot may have better way of movemenst. maybe CPAbsoluteMode?
         //todo: i've received mail with smooth way of controlling dobot with cool features
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
-        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);*/
+        isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
 
-        //todo: tests
-        CPCmd cpCmd;
+        //todo: tests. propably i must figure it out from dobot app, or try to reach...
+        //...people on forum (search by nicks)
+        /*CPCmd cpCmd;
         cpCmd.cpMode = CPAbsoluteMode;
         cpCmd.velocity = 100;
         cpCmd.x = move.xyz.x;
         cpCmd.y = move.xyz.y;
         cpCmd.z = move.xyz.z;
-        isArmReceivedCorrectCmd(SetCPCmd(&cpCmd, true, &move.ID), SHOW_ERRORS);
+        isArmReceivedCorrectCmd(SetCPCmd(&cpCmd, true, &move.ID), SHOW_ERRORS);*/
         break;
     }
     case DM_OPEN:

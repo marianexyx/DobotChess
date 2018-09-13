@@ -20,15 +20,25 @@ struct LimitsVars
     float fGripperMin, fGripperMax;
 };
 
-struct RealVars
+struct BoardsRealVars
 {
     float fPieceHeight;
-    Point3D home;
     Point3D A1, A8, H1, H8;
     Point3D remWhiteCloserOuter, remWhiteFurtherInner;
     Point3D remBlackCloserOuter, remBlackFurtherInner;
-    Point3D retreatLeft, retreatRight;
+};
+
+struct DobotRealVars
+{
+    Point3D home;
     float fGripperOpened, fGripperClosed;
+};
+
+struct RealVars
+{
+    BoardsRealVars boards;
+    DobotRealVars dobot;
+    Point3D retreatLeft, retreatRight;
 };
 
 struct DatabaseVars

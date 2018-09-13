@@ -637,7 +637,7 @@ public:
         gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
         sendTcpLineEdit = new QLineEdit(groupBox_6);
         sendTcpLineEdit->setObjectName(QStringLiteral("sendTcpLineEdit"));
-        sendTcpLineEdit->setEnabled(false);
+        sendTcpLineEdit->setEnabled(true);
 
         gridLayout_6->addWidget(sendTcpLineEdit, 3, 0, 1, 3);
 
@@ -650,7 +650,7 @@ public:
 
         emulatePlayerMsgLineEdit = new QLineEdit(groupBox_6);
         emulatePlayerMsgLineEdit->setObjectName(QStringLiteral("emulatePlayerMsgLineEdit"));
-        emulatePlayerMsgLineEdit->setEnabled(false);
+        emulatePlayerMsgLineEdit->setEnabled(true);
 
         gridLayout_6->addWidget(emulatePlayerMsgLineEdit, 0, 0, 1, 3);
 

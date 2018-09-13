@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     chessboard/piece.cpp \
     dobot/dobot.cpp \
     dobot/dobot_gripper.cpp \
-    dobot/dobot_queue.cpp
+    dobot/dobot_queue.cpp \
+    arduino_usb.cpp
 
 
 HEADERS  += \
@@ -84,7 +85,8 @@ HEADERS  += \
     vars/point3d.h \
     vars/vertical_move.h \
     vars/const_flags.h \
-    vars/intermediate_points.h
+    vars/intermediate_points.h \
+    arduino_usb.h
 
 FORMS    += mainwindow.ui
 

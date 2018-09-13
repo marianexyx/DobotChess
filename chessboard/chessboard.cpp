@@ -1,8 +1,8 @@
 #include "chessboard.h"
 
 Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
-                       RealVars gameConfigVars /*= RealVars()*/):
-    dMaxPieceHeight(gameConfigVars.fPieceHeight)
+                       BoardsRealVars realVars /*= BoardsRealVars()*/):
+    dMaxPieceHeight(realVars.fPieceHeight)
 {
     m_boardType = BoardType;
     m_bBoardIsReal = bBoardIsReal;
@@ -14,10 +14,10 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
     {
         if (BoardType == B_MAIN)
         {
-            m_a1 = gameConfigVars.A1;
-            m_a8 = gameConfigVars.A8;
-            m_h1 = gameConfigVars.H1;
-            m_h8 = gameConfigVars.H8;
+            m_a1 = realVars.A1;
+            m_a8 = realVars.A8;
+            m_h1 = realVars.H1;
+            m_h8 = realVars.H8;
 
             m_dSquareWidth = ((m_a1.y - m_h1.y)/7.f + (m_a8.x - m_h1.x)/7.f)/2.f;
 
@@ -25,10 +25,10 @@ Chessboard::Chessboard(BOARD BoardType, bool bBoardIsReal /*= true*/,
         }
         else if (BoardType == B_REMOVED)
         {
-            m_remWhiteCloserOuter = gameConfigVars.remWhiteCloserOuter;
-            m_remWhiteFurtherInner = gameConfigVars.remWhiteFurtherInner;
-            m_remBlackCloserOuter = gameConfigVars.remBlackCloserOuter;
-            m_remBlackFurtherInner = gameConfigVars.remBlackFurtherInner;
+            m_remWhiteCloserOuter = realVars.remWhiteCloserOuter;
+            m_remWhiteFurtherInner = realVars.remWhiteFurtherInner;
+            m_remBlackCloserOuter = realVars.remBlackCloserOuter;
+            m_remBlackFurtherInner = realVars.remBlackFurtherInner;
 
             m_dSquareWidth = (((m_remWhiteFurtherInner.x + m_remBlackFurtherInner.x)/2.f) -
                     ((m_remWhiteCloserOuter.x + m_remBlackCloserOuter.x)/2.f))/7.f;

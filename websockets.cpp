@@ -55,6 +55,7 @@ void Websockets::onNewConnection()
 }
 
 //future: make a container of incomming msgs (not easy task)
+//todo: test bad request reactions, and site implementation for this reaction
 void Websockets::receivedMsg(QString QStrMsg)
 {    
     if (QStrMsg == "keepConnected")
@@ -70,7 +71,11 @@ void Websockets::receivedMsg(QString QStrMsg)
                  << QString::number(m_pClientsList->getClient(pSocket).ID())
                  << "; msg =" << QStrMsg;
 
-    emit this->msgFromWebsocketsToChess(QStrMsg, m_pClientsList->getClient(pSocket).ID());
+    Client cl = m_pClientsList->getClient(pSocket);
+    if (cl.synchronized() != SY_DOUBLE_LOGIN && cl.synchronized() != SY_REMOVE_AND_REFRESH_CLIENT)
+        emit this->msgFromWebsocketsToChess(QStrMsg, m_pClientsList->getClient(pSocket).ID());
+    else qWarning() << "incoming msg from client with forbidden synchronization type:"
+                    << synchronizedAsQStr(cl.synchronized()) << ", cl:" << cl.dumpCrucialData();
 }
 
 void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
@@ -81,8 +86,7 @@ void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
             return;
 
         Client receiver = m_pClientsList->getClient(un64ReceiverID);
-        QString QStrSynchronization = "0:" +
-                QString::number(m_pClientsList->isClientSqlIDExists(receiver));
+        QString QStrSynchronization = "0:" + QString::number(receiver.synchronized());
         QStrMsg = QStrSynchronization + "," + QStrMsg;
         QStrMsg = Websockets::toJSON(QStrMsg);
         QString QStrReceiverName = receiver.sqlID() > 0 ? receiver.name() : "client";
@@ -97,8 +101,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
     foreach (Client client, m_pClientsList->getClientsList())
     {
-        QString QStrSynchronization = "0:" +
-                QString::number(m_pClientsList->isClientSqlIDExists(client));
+        QString QStrSynchronization = "0:" + QString::number(client.synchronized());
         QString QStrFullInfo = QStrSynchronization + "," + QStrMsg;
         QString QStrFullInfoJSON = Websockets::toJSON(QStrFullInfo);
 

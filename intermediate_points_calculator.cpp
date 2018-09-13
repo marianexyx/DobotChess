@@ -110,9 +110,9 @@
                                                                  Point3D* pMax /* = nullptr */)
 {
     if (IP == IP_COURNER_BELOW)
-        return *new Point3D(RV.home.x, RV.retreatLeft.y, RV.home.z);
+        return *new Point3D(RV.dobot.home.x, RV.retreatLeft.y, RV.dobot.home.z);
     else if (IP == IP_COURNER_ABOVE)
-        return *new Point3D(RV.home.x, RV.retreatLeft.y, pMax->z);
+        return *new Point3D(RV.dobot.home.x, RV.retreatLeft.y, pMax->z);
     else
     {
         qCritical() << "wrong IP arg =" << QString::number(IP);
@@ -126,6 +126,7 @@
     //x and y points are only for avoiding points limits errors
     safeAxisZPoint.x = midAbove.x;
     safeAxisZPoint.y = midAbove.y;
-    safeAxisZPoint.z = qMin(qMin(RV.A1.z, RV.A8.z), qMin(RV.H1.z, RV.H8.z)) + RV.fPieceHeight;
+    safeAxisZPoint.z = qMin(qMin(RV.boards.A1.z, RV.boards.A8.z),
+                            qMin(RV.boards.H1.z, RV.boards.H8.z)) + RV.boards.fPieceHeight;
     return safeAxisZPoint;
 }

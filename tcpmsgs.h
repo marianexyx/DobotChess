@@ -4,6 +4,7 @@
 #pragma once
 #include <QTcpSocket>
 #include <QString>
+#include <QDataStream>
 #include "vars/log.h"
 #include "vars/const_flags.h"
 

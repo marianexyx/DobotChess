@@ -1,8 +1,10 @@
 #include "errors.h"
 
-Chess *Errors::pChess = nullptr; //static pointer
+/*static*/ Chess *Errors::pChess = nullptr;
+/*static*/ const QDir Errors::m_errorDir("errorLogs/");
+/*static*/ uint Errors::newErrors = 0;
 
-void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
+/*static*/ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                          const QString &msg)
 {
     QDateTime dateTime(QDateTime::currentDateTime());
@@ -24,18 +26,21 @@ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &conte
     case QtWarningMsg:
         fprintf(stderr, C_PURPLE "WARNING: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
+        ++newErrors;
         if (Errors::pChess != nullptr)
             Errors::saveErrorInFile(type, context, msg, QStrTime);
         break;
     case QtCriticalMsg:
         fprintf(stderr, C_RED "ERROR: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
+        ++newErrors;
         if (Errors::pChess != nullptr)
             Errors::saveErrorInFile(type, context, msg, QStrTime);
         break;
     case QtFatalMsg:
         fprintf(stderr, CB_RED "FATAL ERROR: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
+        ++newErrors;
         if (Errors::pChess != nullptr)
             Errors::saveErrorInFile(type, context, msg, QStrTime);
         abort();

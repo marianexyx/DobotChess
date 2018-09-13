@@ -5,6 +5,7 @@ void Clients::newClient(QWebSocket* const clientSocket)
     Client newClient;
     newClient.m_ID = this->getNextAvailableClientID();
     newClient.m_sqlID = 0;
+    newClient.m_synchronized = SY_DESYNCHRONIZED;
     newClient.m_socket = clientSocket;
     newClient.m_queue = 0;
     newClient.m_isStartClickedByPlayer = false;
@@ -455,6 +456,26 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
             else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             this->showClientsInUI();
+
+            return;
+        }
+    }
+    qCritical() << "client not found";
+}
+
+void Clients::setClientSynchronization(const Client& client, SYNCHRONIZED sync)
+{
+    foreach (Client cl, m_clients)
+    {
+        if (cl == client)
+        {
+            Client changedClient = cl;
+            changedClient.m_synchronized = sync;
+
+            int nClientPos = m_clients.indexOf(cl);
+            if (nClientPos >= 0 && nClientPos < m_clients.size())
+                m_clients.replace(nClientPos, changedClient);
+            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
             return;
         }

@@ -1,5 +1,4 @@
 #include "tcpmsgs.h"
-#include <QDataStream>
 
 TCPMsgs::TCPMsgs()
 {

@@ -55,7 +55,7 @@ private:
 public:
     static bool isMoveInProperFormat(QString QStrMove, bool bErrorLog = false);
     bool isMoveARequestForPromotion(QString QStrMove)
-    { return m_legalMoves.contains(QStrMove + "q")? true : false; }
+    { return m_legalMoves.contains(QStrMove + "q") ? true : false; }
     static bool isSignProperPromotionType(QString QStrSign, bool bErrorLog = false);
 
     WHOSE_TURN getWhoseTurn() const { return m_WhoseTurn; }

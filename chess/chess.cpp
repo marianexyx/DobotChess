@@ -10,6 +10,7 @@ Chess::Chess(PieceController* pPieceController)
     m_pWebsockets = new Websockets();
     m_pClientsList = m_pWebsockets->getClientsListPointer();
     m_pTCPMsgs = new TCPMsgs();
+    m_pUSB = new ArduinoUsb();
 
     m_pStatus = new ChessStatus(m_pPieceController, m_pBoardMain, m_pClientsList);
     m_pMovements = new ChessMovements(m_pPieceController, m_pBoardMain, m_pBoardRemoved);
@@ -22,12 +23,14 @@ Chess::Chess(PieceController* pPieceController)
     m_keepConnectedTimer = new QTimer();
     m_keepConnectedTimer->setSingleShot(false);
     connect(m_keepConnectedTimer, SIGNAL(timeout()), this, SLOT(keepConnectedTimeOut()));
-    m_keepConnectedTimer->start(60*1000);
+    m_keepConnectedTimer->start(60*1000*30); //future: 30 mins is temporary, to not spam output
 
     connect(m_pTCPMsgs, SIGNAL(msgFromTcpToChess(QString, QString)),
             this, SLOT(checkMsgFromChessEngine(QString, QString)));
     connect(m_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, uint64_t)),
             this, SLOT(checkMsgFromClient(QString, uint64_t)));
+    connect(m_pUSB, SIGNAL(msgFromUsbToChess(QString)),
+            this, SLOT(checkMsgFromUsb(QString)));
     connect(m_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
             this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(m_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
@@ -75,7 +78,7 @@ void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID,
     {
         if (m_pClientsList->isClientInList(client)) return;
 
-        //BadRequestFromClient was set up in isClientRequestCanBeAccepted()- passed by &(ref)
+        //BadRequestFromClient was set(ted) up in isClientRequestCanBeAccepted()- passed by &(ref)
         if (BadRequestFromClient == RRR_NONE)
             BadRequestFromClient = RRR_RESEND_TABLE_DATA;
 
@@ -90,6 +93,20 @@ void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID,
     }
 
     this->executeClientRequest(client, bService);
+}
+
+void Chess::checkMsgFromUsb(QString QStrMsg) //todo:
+{
+    if (QStrMsg == "start") //queue to tcp msg "think 5000"
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "move")
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "reset") //resetPiecePositions()
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else if (QStrMsg ==  "promoteTo")
+        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
+    else
+        qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
 }
 
 void Chess::sendDataToClient(Client client, ACTION_TYPE AT /*= AT_NONE*/,
@@ -115,10 +132,16 @@ void Chess::sendMsgToChessEngine(QString QStrMsg)
 
 void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
 {
+
+
     this->restorateGameIfDisconnectedClientAffectIt(client);
     m_pClientsList->clearClientSqlID(client);
-    this->sendDataToClient(client, rejectedRequestAsActionType(RRR));
-    m_pClientsList->removeClientFromList(client);
+    if (RRR == RRR_DOUBLE_LOGIN)
+        m_pClientsList->setClientSynchronization(client, SY_DOUBLE_LOGIN);
+    else if (RRR == RRR_REMOVE_AND_REFRESH_CLIENT)
+        m_pClientsList->setClientSynchronization(client, SY_REMOVE_AND_REFRESH_CLIENT);
+    this->sendDataToClient(client);
+    //don't remove client. his msgs will be blocked, till he will refresh page
     this->updateClientsInUI();
 }
 
@@ -132,16 +155,13 @@ void Chess::executeClientRequest(Client &client, bool bService /*= false*/)
     case RT_IM:
     {
         int nSqlID = m_request.param.left(m_request.param.indexOf("&")).toInt();
-        //todo: if the same IP sent "im.." (from still connected client [or just still...
-        //...connected client sent it?]), then allow it (?)
         if (m_pClientsList->isClientSqlIDExists(nSqlID)) //double login- kill old client
         {
             Client clientToKill = m_pClientsList->getClient(nSqlID, CID_SQL);
-            qDebug() << "kill client: ID =" << clientToKill.ID() << ", sqlID = "
-                     << clientToKill.sqlID() << ", name =" << clientToKill.name()
-                     << ". new client: ID =" << client.ID() << ", sqlID = "
-                     << client.sqlID() << ", name =" << client.name(DONT_SHOW_ERRORS);
-            this->killClient(m_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
+            if (client != clientToKill)
+                this->killClient(m_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
+            else qWarning() << "already set(ted) client sent 'im...' command again. client:"
+                            << client.dumpCrucialData();
         }
         m_pClientsList->setClientSqlIDAndName(client, nSqlID);
         this->sendDataToClient(client);
@@ -223,9 +243,11 @@ void Chess::manageMoveRequest(clientRequest request)
 {
     if (m_pStatus->isMoveARequestForPromotion(request.param))
     {
+        qDebug() << "isMoveARequestForPromotion == true";
         m_pStatus->setMove(request.param);
         m_ChessGameStatus = m_pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
                                                                     GS_TURN_BLACK_PROMOTE;
+        //todo: this info will contain data, that tells its time for promote? check it
         this->sendDataToClient(m_pClientsList->getPlayer(m_pStatus->getActivePlayerType()));
     }
     else if (!m_pStatus->isMoveLegal(request.param))

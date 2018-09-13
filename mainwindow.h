@@ -18,6 +18,11 @@
 #include "chess/chess.h"
 #include "client.h"
 #include "piece_controller.h"
+#include "errors.h"
+#include "arduino_usb.h"
+
+//todo: restore usb functionality to this class:
+//https://github.com/marianexyx/DobotChess/commit/290e4af0e5545bd8c52d1b4bc3ad0046d7083de8
 
 namespace Ui
 {

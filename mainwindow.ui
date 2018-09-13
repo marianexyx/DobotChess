@@ -676,7 +676,7 @@
           <item row="3" column="0" colspan="3">
            <widget class="QLineEdit" name="sendTcpLineEdit">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -699,7 +699,7 @@
           <item row="0" column="0" colspan="3">
            <widget class="QLineEdit" name="emulatePlayerMsgLineEdit">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>

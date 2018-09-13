@@ -122,7 +122,6 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
 
     this->initDobotsBasicButtonsControl(); //init dobot JOG control from form
     this->setDobotPTEValidatorsInUI();
-    m_pWebsockets->listenOnPort(1234); //todo: dont start it in here
 }
 
 MainWindow::~MainWindow()
@@ -180,7 +179,7 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
     qInfo() << QStrMsg;
 
     //prevent big string data
-    int nMaximum = 30 * 1000;
+    int nMaximum = 50 * 1000;
     ui->logPTE->setPlainText(ui->logPTE->toPlainText().right(nMaximum));
 
     //auto scroll
@@ -191,7 +190,10 @@ void MainWindow::writeInConsole(QString QStrMsg, LOG TypeOfMsg)
 ///board data slots
 void MainWindow::changeWindowTitle()
 {
-    this->setWindowTitle(gameStatusAsQStr(m_pChess->getGameStatus()));
+    QString QStrTitle = gameStatusAsQStr(m_pChess->getGameStatus());
+    if (Errors::newErrors > 0)
+        QStrTitle = "ERROR OCCURED (new=" + QString::number(Errors::newErrors) + "). " + QStrTitle;
+    this->setWindowTitle(QStrTitle);
 }
 
 void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType)
@@ -442,10 +444,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->calibrateBtn->setEnabled(false);
         ui->upBtn->setEnabled(false);
         ui->downBtn->setEnabled(false);
-        ui->sendTcpBtn->setEnabled(false);
-        ui->sendTcpLineEdit->setEnabled(false);
-        ui->emulatePlayerMsgLineEdit->setEnabled(false);
-        ui->sendSimulatedMsgBtn->setEnabled(false);
         ui->openGripperBtn->setEnabled(false);
         ui->closeGripperBtn->setEnabled(false);
         ui->homeBtn->setEnabled(false);
@@ -475,8 +473,6 @@ void MainWindow::setDobotButtonsStates(bool bDobotButtonsStates)
         ui->calibrateBtn->setEnabled(true);
         ui->upBtn->setEnabled(true);
         ui->downBtn->setEnabled(true);
-        ui->sendTcpLineEdit->setEnabled(true);
-        ui->emulatePlayerMsgLineEdit->setEnabled(true);
         ui->openGripperBtn->setEnabled(true);
         ui->closeGripperBtn->setEnabled(true);
         ui->homeBtn->setEnabled(true);
