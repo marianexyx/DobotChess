@@ -28,6 +28,7 @@ inline PLAYER_TYPE playerTypeFromQStr(QString QStrPlayer)
 {
     PLAYER_TYPE playerType = PT_NONE;
 
+    //todo: func could check regardless of upper strings
     if (QStrPlayer == "White") playerType = PT_WHITE;
     else if (QStrPlayer == "Black") playerType = PT_BLACK;
     else qCritical() << "unknwown parameter:" << QStrPlayer;

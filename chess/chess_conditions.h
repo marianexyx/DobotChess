@@ -18,16 +18,15 @@ private:
 
     ChessConditions(Clients* pClientsList, ChessStatus* pStatus);
 
-    bool isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
-                                      GAME_STATUS GS, REJECTED_REQUEST_REACTION& RRR);
-    QString extractParamIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
-                                                   REJECTED_REQUEST_REACTION& RRR);
-    bool isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog = false);
-    bool isRequestParameterInProperFormat(clientRequest request);
+    static bool isRequestMsgInProperFormat(QString QStrMsg);
+    static bool isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog = false);
+    static bool isRequestParameterInProperFormat(clientRequest request);
+    static QString extractParamIfExists(QString QStrMsg);
+    REJECTED_REQUEST_REACTION isClientRequestCanBeExecuted(clientRequest request, GAME_STATUS GS);
     bool isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_STATUS Status);
     bool isSenderAppropriate(Client *pSender, REQUEST_TYPE Type);
-    bool isThereAnySpecialConditionBeenMet(Client *pSender, clientRequest request,
-                                           REJECTED_REQUEST_REACTION& RRR);
+    REJECTED_REQUEST_REACTION isThereAnySpecialConditionBeenMet(Client *pSender,
+                                                                clientRequest request);
 };
 
 #endif // CHESS_CONDITIONS_H

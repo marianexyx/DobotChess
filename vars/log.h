@@ -12,7 +12,10 @@ enum LOG
     LOG_DOBOT,
     LOG_TCP,
     LOG_WEBSOCKET,
-    LOG_MAINWINDOW
+    LOG_MAINWINDOW,
+    LOG_USB,
+    LOG_USB_SENT,
+    LOG_USB_RECEIVED
 };
 
 inline QString logAsQstr(LOG Log)
@@ -26,6 +29,9 @@ inline QString logAsQstr(LOG Log)
     case LOG_TCP: QStrLog = "TCP"; break;
     case LOG_WEBSOCKET: QStrLog = "websocket"; break;
     case LOG_MAINWINDOW: QStrLog = "mainwindow"; break;
+    case LOG_USB: QStrLog = "USB"; break;
+    case LOG_USB_SENT: QStrLog = "to_USB"; break;
+    case LOG_USB_RECEIVED: QStrLog = "from_USB"; break;
     default:
         qCritical() << "wrong arg = " << QString::number(Log);
         return "";

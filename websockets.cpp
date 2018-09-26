@@ -51,16 +51,16 @@ void Websockets::onNewConnection()
     emit this->addTextToLogPTE("New connection (new ID = " + QString::number(clientID) + ")\n",
                                LOG_WEBSOCKET);
     m_pClientsList->showClientsInUI();
-    emit this->msgFromWebsocketsToChess("getTableDataAsJSON", clientID);
+    //future: do this function immadietely, like in return, f.e.: getStartData() from...
+    //...chess class, where i can just return table data. BUT websockets are inside chess...
+    //...class, so until i changed it, it could be only emitted by singal
+    emit this->msgFromWebsocketsToChess("getTableData", clientID);
 }
 
 //future: make a container of incomming msgs (not easy task)
 //todo: test bad request reactions, and site implementation for this reaction
 void Websockets::receivedMsg(QString QStrMsg)
 {    
-    if (QStrMsg == "keepConnected")
-        return;
-
     QWebSocket* pSocket = qobject_cast<QWebSocket*>(sender());
     if (!m_pClientsList->isClientInList(m_pClientsList->getClient(pSocket)))
     {
@@ -105,7 +105,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
         QString QStrFullInfo = QStrSynchronization + "," + QStrMsg;
         QString QStrFullInfoJSON = Websockets::toJSON(QStrFullInfo);
 
-        if (QStrMsg != "keepConnected")
+        if (QStrMsg != "getTableData")
             emit this->addTextToLogPTE("send to all (" + client.name(DONT_SHOW_ERRORS)
                                        + "): "  + QStrFullInfoJSON + "\n", LOG_WEBSOCKET);
 

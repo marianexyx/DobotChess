@@ -65,6 +65,10 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     connect(m_pChess, SIGNAL(showHistoryMovesInUI(QStringList)),
             this, SLOT(showHistoryMovesInUI(QStringList)));
 
+    //usb signals
+    connect(m_pChess, SIGNAL(updatePortsComboBox(int)),
+            this, SLOT(updatePortsComboBox(int)));
+
     //dobot slots
     connect(m_pDobot, SIGNAL(JointLabelText(QString, short)),
             this, SLOT(setJointLabelText(QString, short)));
@@ -111,14 +115,16 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     ui->emulatePlayerMsgLineEdit->setToolTip("Write player move command, f.e.: "
                                              "'e2' or 'e2r' or 'e2e4.");
     ui->sendSimulatedMsgBtn->setToolTip("Execute player move command, f.e.: 'e2' "
-                                        "or 'e2r' or 'e2e4.");
+                                        "or 'e2r' or 'e2e4 or 'move b2b4 b7b5 b1c3 b8c6'. "
+                                        "For list of moves game must be started on website.");
     ui->sendTcpLineEdit->setToolTip("Write command directly to TCP chess engine.");
     ui->sendTcpBtn->setToolTip("Send command directly to TCP chess engine.");
     ui->sendPointBtn->setToolTip("Send Cartesian point immediately to arm to "
-                                 "execute.");
+                                 "execute."); //todo: does it work?
     ui->resetDobotIndexBtn->setToolTip("Reset dobot (only) current ID.");
     ui->teachMode->setToolTip("Change manual arm control with buttons between "
                               "joint and axis buttons.");
+    //todo: write usb btns tooltips
 
     this->initDobotsBasicButtonsControl(); //init dobot JOG control from form
     this->setDobotPTEValidatorsInUI();
@@ -346,6 +352,65 @@ void MainWindow::showHistoryMovesInUI(QStringList historyMoves)
     }
 
     ui->historyPTE->setPlainText(history);
+}
+
+
+///usb slots
+void MainWindow::updatePortsComboBox(int nUsbPorst)
+{
+    QString QStrUsbPortsAmount = QString::number(nUsbPorst) + ((nUsbPorst == 1) ?
+                " port is ready to use\n" : " ports are ready to use\n");
+    this->writeInConsole(QStrUsbPortsAmount, LOG_USB);
+    //refresh ports list
+    ui->portsComboBox->clear();
+    ui->portsComboBox->addItem("NULL");
+    for(int i=0; i<nUsbPorst; i++)
+        ui->portsComboBox->addItem(m_pChess->getUSBPointer()->availablePort.at(i).portName());
+}
+
+void MainWindow::on_portsComboBox_currentIndexChanged(int nID)
+{
+    m_pChess->getUSBPointer()->portIndexChanged(nID);
+}
+
+void MainWindow::on_reloadPortsBtn_clicked()
+{
+    ui->usbCmdLine->setEnabled(true);
+    ui->portsComboBox->setEnabled(true);
+    ui->SimulateFromUsbLineEdit->setEnabled(true);
+    m_pChess->getUSBPointer()->searchDevices();
+}
+
+void MainWindow::on_sendUsbBtn_clicked()
+{
+    if(m_pChess->getUSBPointer()->usbInfo == NULL)
+        this->writeInConsole("None port selected\n", LOG_USB);
+    else
+    {
+        m_pChess->getUSBPointer()->sendDataToUsb(ui->usbCmdLine->text());
+        ui->usbCmdLine->clear();
+    }
+}
+
+void MainWindow::on_SimulateFromUsbBtn_clicked()
+{
+    if (!ui->SimulateFromUsbLineEdit->text().isEmpty())
+    {
+        m_pChess->getUSBPointer()->msgFromUsbToChess(ui->SimulateFromUsbLineEdit->text());
+        ui->SimulateFromUsbLineEdit->clear();
+    }
+}
+
+void MainWindow::on_usbCmdLine_textChanged(const QString& QStrTextChanged)
+{
+    if (QStrTextChanged != NULL) ui->sendUsbBtn->setEnabled(true);
+    else ui->sendUsbBtn->setEnabled(false);
+}
+
+void MainWindow::on_SimulateFromUsbLineEdit_textChanged(const QString& QStrTextChanged)
+{
+    if (QStrTextChanged != NULL) ui->SimulateFromUsbBtn->setEnabled(true);
+    else ui->SimulateFromUsbBtn->setEnabled(false);
 }
 
 
@@ -707,6 +772,7 @@ void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrText
     else ui->sendSimulatedMsgBtn->setEnabled(false);
 }
 
+//future: this function make moves directly to arm and throw the whole game too (misleading mix)
 void MainWindow::on_sendSimulatedMsgBtn_clicked()
 {
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
@@ -722,6 +788,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 Field* pFieldFrom = m_pBoardMain->getField(fromTo.from);
                 m_pPieceController->movePieceWithManipulator(m_pBoardMain, pFieldFrom);
             }
+            else qWarning() << "move isn't in proper format (1). move =" << QStrServiceMove;
         }
         else if (QStrServiceMove.length() == 3 && QStrServiceMove.right(1) == "r")
         {
@@ -737,6 +804,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 }
                 m_pPieceController->movePieceWithManipulator(m_pBoardRemoved, pFieldFrom);
             }
+            else qWarning() << "move isn't in proper format (2). move =" << QStrServiceMove;
         }
         else if (QStrServiceMove.length() == 4)
         {
@@ -748,10 +816,58 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
                 m_pPieceController->movePieceWithManipulator(m_pBoardMain, pFieldFrom, VM_GRAB);
                 m_pPieceController->movePieceWithManipulator(m_pBoardMain, pFieldTo, VM_PUT);
             }
+            else qWarning() << "move isn't in proper format (3). move =" << QStrServiceMove;
+        }
+        else if ((QStrServiceMove.left(5) == "move " && QStrServiceMove.length() > 13) ||
+                 QStrServiceMove.length() > 8)
+        {
+            qInfo() << "queue many moves at once";
 
+            if (m_pChess->getWhoseTurn() != NO_TURN)
+            {
+                QStringList list = QStrServiceMove.split(" ");
+                if (!list.isEmpty())
+                {
+                    if (list.first().contains("move"))
+                        list.removeFirst();
+                }
+                else qWarning() << "list is empty (1)";
+
+                if (!list.isEmpty())
+                {
+                    foreach (QString QStrMove, list)
+                    {
+                        if (!PosFromTo::isMoveInProperFormat(QStrMove))
+                        {
+                            qWarning() << "move isn't in proper format (4). move =" << QStrMove;
+                            return;
+                        }
+                    }
+                }
+                else qWarning() << "list is empty (2)";
+
+                uint64_t nWhitePlayerID = m_pClientsList->getPlayer(PT_WHITE).ID();
+                uint64_t nBlackPlayerID = m_pClientsList->getPlayer(PT_BLACK).ID();
+                WHOSE_TURN ActualSimulatedTurn = WHITE_TURN; //todo: = actual turn
+                foreach (QString QStrMove, list)
+                {
+                    if (ActualSimulatedTurn == WHITE_TURN)
+                    {
+                        m_pChess->checkMsgFromClient("move " + QStrMove, nWhitePlayerID);
+                        ActualSimulatedTurn = BLACK_TURN;
+                    }
+                    else
+                    {
+                         m_pChess->checkMsgFromClient("move " + QStrMove, nBlackPlayerID);
+                         ActualSimulatedTurn = WHITE_TURN;
+                    }
+                }
+            }
+            else qWarning() << "game is not running (web table is not fully occupied)";
         }
         else qWarning() << "QStrServiceMove msg =" << QStrServiceMove;
     }
+
 
     ui->emulatePlayerMsgLineEdit->clear();
 }
@@ -796,4 +912,3 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
     if (isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
         this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
 }
-

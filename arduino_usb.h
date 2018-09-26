@@ -31,7 +31,7 @@ public slots:
    void portIndexChanged(int nIndex);
 
 private slots:
-    //void portIndexChanged(int index);
+    //void portIndexChanged(int index); //todo: public?
     void readUsbData();
 
 signals:

@@ -32,7 +32,7 @@ public:
     static uint newErrors;
     Errors() {}
 
-    static Chess* pChess; //overloadDebugOutput can work only on statics
+    static Chess* pChess; //overloadDebugOutput() can work only on statics
 
     static void overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                                     const QString &msg);

@@ -6,45 +6,27 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
     m_pStatus = pStatus;
 }
 
-bool ChessConditions::isClientRequestCanBeAccepted(QString QStrMsg, Client* pSender,
-                                                   GAME_STATUS GS, REJECTED_REQUEST_REACTION& RRR)
+/*static*/ bool ChessConditions::isRequestMsgInProperFormat(QString QStrMsg)
 {
     clientRequest request;
-
-    if (requestTypeFromQStr(QStrMsg, SHOW_ERRORS) == RT_NONE) return false;
-
     request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
-    request.param = this->extractParamIfTypeIsInProperFormat(request.type, QStrMsg, RRR);
-
-    if (!this->isRequestAppropriateToGameStatus(request.type, GS)) return false;
-    if (!this->isSenderAppropriate(pSender, request.type)) return false;
-    if (!this->isThereAnySpecialConditionBeenMet(pSender, request, RRR)) return false;
-
-    return true;
-}
-
-QString ChessConditions::extractParamIfTypeIsInProperFormat(REQUEST_TYPE Type, QString QStrMsg,
-                                                            REJECTED_REQUEST_REACTION& RRR)
-{
-    if (this->isRequestAParameterType(Type))
+    if (request.type == RT_NONE)
+        return false;
+    else
     {
-        QString QStrParam = QStrMsg.mid(requestTypeAsQStr(Type).length() + 1);
-
-        clientRequest request;
-        request.type = Type;
-        request.param = QStrParam;
-        if (this->isRequestParameterInProperFormat(request))
-            return QStrParam;
-        else
+        if (ChessConditions::isRequestAParameterType(request.type))
         {
-            RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
-            return "";
+            request.param = QStrMsg.mid(requestTypeAsQStr(request.type).length() + 1);
+            if (ChessConditions::isRequestParameterInProperFormat(request))
+                return true;
+            else return true;
         }
+        else return true;
     }
-    else return "";
 }
 
-bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog /*= false*/)
+/*static*/ bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type,
+                                                         bool bErrorLog /*= false*/)
 {
     switch(Type)
     {
@@ -61,7 +43,7 @@ bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type, bool bErrorLog 
     }
 }
 
-bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
+/*static*/ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
 {
     bool bReturn = false;
 
@@ -104,6 +86,41 @@ bool ChessConditions::isRequestParameterInProperFormat(clientRequest request)
     return bReturn;
 }
 
+/*static*/ QString ChessConditions::extractParamIfExists(QString QStrMsg)
+{
+    clientRequest request;
+    request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
+    if (request.type == RT_NONE)
+    {
+        qCritical() << "Type == RT_NONE";
+        return "";
+    }
+
+    if (ChessConditions::isRequestAParameterType(request.type))
+    {
+        request.param = QStrMsg.mid(requestTypeAsQStr(request.type).length() + 1);
+        if (ChessConditions::isRequestParameterInProperFormat(request))
+            return request.param;
+        else return ""; //returning REJECTED_REQUEST_REACTION isn't needed here
+    }
+    else return "";
+}
+
+REJECTED_REQUEST_REACTION ChessConditions::isClientRequestCanBeExecuted(clientRequest request,
+                                                                        GAME_STATUS GS)
+{
+    //this method assumes that request param is already in proper format
+
+    //future: im passing locally created objects, not pointers. app works only because...
+    //...i'm using passed ID everywhere. 2 options: use only ID everywhere, or only pointers
+    Client sender = m_pClientsList->getClient(request.clientID);
+    if (!this->isRequestAppropriateToGameStatus(request.type, GS)) return RRR_RESEND_TABLE_DATA;
+    if (!this->isSenderAppropriate(&sender, request.type)) return RRR_RESEND_TABLE_DATA;
+    if (this->isThereAnySpecialConditionBeenMet(&sender, request) != RRR_NONE)
+        return this->isThereAnySpecialConditionBeenMet(&sender, request);
+
+    return RRR_NONE;
+}
 
 bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_STATUS Status)
 {
@@ -157,7 +174,7 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
         if (bLogged && !bSittingOnChair && bInQueue) bSuccess = true;
         else bSuccess = false;
         break;
-    case RT_GET_TABLE_DATA:
+    case RT_GET_TABLE_DATA: //redundant code- let it be here for safety
     case RT_IM:
     case RT_CLIENT_LEFT:
         bSuccess = true;
@@ -176,69 +193,60 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
     return bSuccess;
 }
 
-bool ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender, clientRequest request,
-                                                        REJECTED_REQUEST_REACTION& RRR)
+REJECTED_REQUEST_REACTION ChessConditions::isThereAnySpecialConditionBeenMet(Client* pSender,
+                                                                             clientRequest request)
 {
-    bool bSuccess = false;
+    REJECTED_REQUEST_REACTION RRR = RRR_NONE;
 
     switch(request.type)
     {
     case RT_NONE:
-        qCritical() << "Type = RT_NONE";
-        bSuccess = false;
+        qCritical() << "Type == RT_NONE";
+        RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
         break;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if ((pSender->type() == PT_WHITE && m_pStatus->getWhoseTurn() == WHITE_TURN) ||
-                (pSender->type() == PT_BLACK && m_pStatus->getWhoseTurn() == BLACK_TURN))
-            bSuccess = true;
-        else bSuccess = false;
+        if (!(pSender->type() == PT_WHITE && m_pStatus->getWhoseTurn() == WHITE_TURN) &&
+                !(pSender->type() == PT_BLACK && m_pStatus->getWhoseTurn() == BLACK_TURN))
+            RRR = RRR_RESEND_TABLE_DATA;
         break;
     case RT_SIT_ON:
     {
         PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
-        if (m_pClientsList->isPlayerChairEmpty(PlayerChair) &&
-                !m_pClientsList->isClientAPlayer(*pSender))
-            bSuccess = true;
-        else bSuccess = false;
+        if (!m_pClientsList->isPlayerChairEmpty(PlayerChair) ||
+                m_pClientsList->isClientAPlayer(*pSender))
+            RRR = RRR_RESEND_TABLE_DATA;
         break;
     }
     case RT_IM:
     {
         if (Sql::isClientHashOk(request.param))
         {
+            //double login is proper request. it's served in request execusion
             uint unSqlId = request.param.left(request.param.indexOf("&")).toInt();
-            if (pSender->sqlID() == 0 || pSender->sqlID() == unSqlId)
-                bSuccess = true;
-            else
-            {
+            if (pSender->sqlID() != 0 && pSender->sqlID() != unSqlId)
                 RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
-                bSuccess = false;
-            }
         }
-        else bSuccess = false;
+        else RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
         break;
     }
     case RT_QUEUE_ME:
-        if (m_pClientsList->isWholeGameTableOccupied())
-            bSuccess = true;
-        else bSuccess = false;
+        if (!m_pClientsList->isWholeGameTableOccupied())
+            RRR = RRR_RESEND_TABLE_DATA;
         break;
     case RT_LEAVE_QUEUE:
-        if (m_pClientsList->isClientInQueue(*pSender))
-            bSuccess = true;
-        else bSuccess = false;
+        if (!m_pClientsList->isClientInQueue(*pSender))
+            RRR = RRR_RESEND_TABLE_DATA;
         break;
     case RT_CLIENT_LEFT:
-        if (m_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
-            bSuccess = true;
-        else bSuccess = false;
+        if (!m_pClientsList->isClientInList(*pSender, SHOW_ERRORS))
+            RRR = RRR_RESEND_TABLE_DATA;
         break;
-    default: bSuccess = true;
+    default: RRR = RRR_NONE;
     }
 
-    if (!bSuccess)
-        qWarning() << "bSuccess = false";
+    if (RRR != RRR_NONE)
+        qWarning() << "RRR != RRR_NONE. it's =" << rejectedRequestReactionAsQStr(RRR);
 
-    return bSuccess;
+    return RRR;
 }

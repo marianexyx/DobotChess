@@ -20,20 +20,26 @@ enum REQUEST_TYPE
     RT_CLIENT_LEFT
 };
 
+QString requestTypeAsQStr(REQUEST_TYPE RT);
+
 struct clientRequest
 {
+    static uint64_t counter;
+    uint64_t clientID;
     REQUEST_TYPE type;
     QString param;
+    bool service;
 
-    clientRequest(): type(RT_NONE), param("") {}
-    clientRequest(REQUEST_TYPE R, QString p): type(R), param(p) {}
-    void clear() { type = RT_NONE; param.clear(); }
+    clientRequest();
+    clientRequest(uint64_t i, REQUEST_TYPE R, QString p, bool s = false);
+    void clear();
+    QString dumpAllData();
 };
 
 inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = false)
 {   
 
-    if (QStrRequest == "getTableDataAsJSON") return RT_GET_TABLE_DATA;
+    if (QStrRequest == "getTableData") return RT_GET_TABLE_DATA;
     else if (QStrRequest.left(2) == "im") return RT_IM;
     else if (QStrRequest.left(5) == "sitOn") return RT_SIT_ON;
     else if (QStrRequest == "newGame") return RT_NEW_GAME;
@@ -57,7 +63,7 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     switch(RT)
     {
     case RT_NONE: return "none";
-    case RT_GET_TABLE_DATA: return "getTableDataAsJSON";
+    case RT_GET_TABLE_DATA: return "getTableData";
     case RT_IM: return "im";
     case RT_SIT_ON: return "sitOn";
     case RT_NEW_GAME: return "newGame";

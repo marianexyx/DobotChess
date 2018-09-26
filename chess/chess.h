@@ -42,17 +42,23 @@ private:
     ChessMovements* m_pMovements;
 
     GAME_STATUS m_ChessGameStatus;
-    clientRequest m_request;
+    QList<clientRequest> m_requestList;
+    bool m_bExecutingClientRequest;
+    QTimer* m_executingClientRequestTimer;
     QTimer* m_keepConnectedTimer;
 
-    //future: those 2 blocks below can be divided into classes (game+communication)
+    //future: those 2 blocks below can be divided into classes (game+communication). game...
+    //...methods are mosty included in executeClientRequest() method (check it). ...
+    //...chess class will be small compared to communication class
 
     //communication methods
     void sendDataToClient(Client client, ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void sendDataToAllClients(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void sendMsgToChessEngine(QString QStrMsg);
     void killClient(const Client &client, REJECTED_REQUEST_REACTION RRR);
-    void executeClientRequest(Client &client, bool bService = false);
+    void startExecutingClientsRequests();
+    void closeClientRequest();
+    void executeClientRequest(clientRequest request);
     void playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);
     void manageMoveRequest(clientRequest request);
     void updateClientsInUI();
@@ -69,6 +75,7 @@ private:
     void playerLeftChair(PLAYER_TYPE PT);
 
 private slots:
+    void clientRequesTimeOut();
     void keepConnectedTimeOut();
 
 public:
@@ -80,6 +87,8 @@ public:
     QString dumpAllData();
 
     GAME_STATUS getGameStatus() const { return m_ChessGameStatus; }
+    WHOSE_TURN getWhoseTurn() const { return m_pStatus->getWhoseTurn(); }
+
     Clients* getClientsPointer() const { return m_pClientsList; }
     Dobot* getDobotPointer() const { return m_pDobot; }
     Chessboard* getBoardMainPointer() const { return m_pBoardMain; }
@@ -88,6 +97,7 @@ public:
     Websockets* getWebsocketsPointer() const { return m_pWebsockets; }
     PieceController* getPieceControllerPointer() const { return m_pPieceController; }
     TCPMsgs* getTCPMsgsPointer() const { return m_pTCPMsgs; }
+    ArduinoUsb* getUSBPointer() const { return m_pUSB; }
 
 public slots:
     void checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService = false);
@@ -96,15 +106,18 @@ public slots:
     void timeOutStart();
     void timeOutPlayer(PLAYER_TYPE Player);
     QString getTableData(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
+    //todo: standardize GUI slots names: UI/form
     void setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showLegalMovesInForm(QStringList legalMoves);
     void showHistoryMovesInForm(QStringList historyMoves);
+    void updatePortsComboBoxInUI(int nPorts);
 
 signals:
     void addTextToLogPTE(QString, LOG);
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
     void showLegalMovesInUI(QStringList);
     void showHistoryMovesInUI(QStringList);
+    void updatePortsComboBox(int);
 };
 
 #endif // CHESS_H

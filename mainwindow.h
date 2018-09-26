@@ -19,10 +19,6 @@
 #include "client.h"
 #include "piece_controller.h"
 #include "errors.h"
-#include "arduino_usb.h"
-
-//todo: restore usb functionality to this class:
-//https://github.com/marianexyx/DobotChess/commit/290e4af0e5545bd8c52d1b4bc3ad0046d7083de8
 
 namespace Ui
 {
@@ -67,6 +63,15 @@ private slots:
     void clearBoardInUI();
     void showLegalMovesInUI(QStringList legalMoves);
     void showHistoryMovesInUI(QStringList historyMoves);
+
+    //usb slots
+    void updatePortsComboBox(int nUsbPorst);
+    void on_portsComboBox_currentIndexChanged(int nID);
+    void on_reloadPortsBtn_clicked();
+    void on_sendUsbBtn_clicked();
+    void on_SimulateFromUsbBtn_clicked();
+    void on_SimulateFromUsbLineEdit_textChanged(const QString& QStrTextChanged);
+    void on_usbCmdLine_textChanged(const QString& QStrTextChanged);
 
     //dobot slots
     void onChangedMode();

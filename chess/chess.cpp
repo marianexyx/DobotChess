@@ -18,8 +18,9 @@ Chess::Chess(PieceController* pPieceController)
     m_pConditions = new ChessConditions(m_pClientsList, m_pStatus);
 
     m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
-    m_request.clear();
-
+    m_executingClientRequestTimer = new QTimer();
+    m_executingClientRequestTimer->setSingleShot(true);
+    connect(m_executingClientRequestTimer, SIGNAL(timeout()), this, SLOT(clientRequesTimeOut()));
     m_keepConnectedTimer = new QTimer();
     m_keepConnectedTimer->setSingleShot(false);
     connect(m_keepConnectedTimer, SIGNAL(timeout()), this, SLOT(keepConnectedTimeOut()));
@@ -30,7 +31,9 @@ Chess::Chess(PieceController* pPieceController)
     connect(m_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, uint64_t)),
             this, SLOT(checkMsgFromClient(QString, uint64_t)));
     connect(m_pUSB, SIGNAL(msgFromUsbToChess(QString)),
-            this, SLOT(checkMsgFromUsb(QString)));
+            this, SLOT(checkMsgFromUSB(QString)));
+    connect(m_pUSB, SIGNAL(updatePortsComboBox(int)),
+            this, SLOT(updatePortsComboBoxInUI(int)));
     connect(m_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
             this, SLOT(setBoardDataLabelInUI(QString, BOARD_DATA_LABEL)));
     connect(m_pTimers, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
@@ -54,59 +57,38 @@ Chess::~Chess()
 
 
 ///communication methods
-void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID,
-                                   bool bService /*= false*/)
+void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService /*= false*/)
 {
-    emit this->addTextToLogPTE("received msg (from client with id = " + QString::number(un64SenderID)
-                               + " ): " + QStrMsg + "\n", LOG_CORE);
-
     Client client = m_pClientsList->getClient(un64SenderID);
-    REJECTED_REQUEST_REACTION BadRequestFromClient = RRR_NONE;
-
-    if (m_pConditions->isClientRequestCanBeAccepted(QStrMsg, &client, m_ChessGameStatus,
-                                                   BadRequestFromClient) || bService)
+    if (ChessConditions::isRequestMsgInProperFormat(QStrMsg))
     {
-        m_request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
-        m_request.param = m_pConditions->extractParamIfTypeIsInProperFormat(m_request.type, QStrMsg,
-                                                                          BadRequestFromClient);
-        qInfo() << "accepted client's (with id =" <<  QString::number(client.ID())
-                << ") request type =" << requestTypeAsQStr(m_request.type)
-                << ", param =" << m_request.param << ", rejectedRequestReaction type ="
-                << rejectedRequestReactionAsQStr(BadRequestFromClient);
+        clientRequest request(un64SenderID, requestTypeFromQStr(QStrMsg, SHOW_ERRORS),
+                              ChessConditions::extractParamIfExists(QStrMsg), bService);
+        if (request.type == RT_GET_TABLE_DATA)
+        {
+            //respond to client with tableData w/o queueing this request (nothing is changed)
+            this->sendDataToClient(client);
+            return;
+        }
+
+        emit this->addTextToLogPTE("accepted client's request. " + request.dumpAllData()
+                                   + "\n", LOG_CORE);
+
+        m_requestList << request;
+        this->startExecutingClientsRequests();
     }
     else
     {
-        if (m_pClientsList->isClientInList(client)) return;
-
-        //BadRequestFromClient was set(ted) up in isClientRequestCanBeAccepted()- passed by &(ref)
-        if (BadRequestFromClient == RRR_NONE)
-            BadRequestFromClient = RRR_RESEND_TABLE_DATA;
-
-        if (BadRequestFromClient == RRR_RESEND_TABLE_DATA)
-            this->sendDataToClient(client);
-        else if (BadRequestFromClient == RRR_REMOVE_AND_REFRESH_CLIENT)
-            this->killClient(client, RRR_REMOVE_AND_REFRESH_CLIENT);
-
         qWarning() << "client request can't be accepted. client sqlID =" << client.sqlID()
                    << ", client name =" << client.name(DONT_SHOW_ERRORS);
+        this->killClient(client, RRR_REMOVE_AND_REFRESH_CLIENT);
         return;
     }
-
-    this->executeClientRequest(client, bService);
 }
 
-void Chess::checkMsgFromUsb(QString QStrMsg) //todo:
+void Chess::checkMsgFromUSB(QString QStrMsg) //todo:
 {
-    if (QStrMsg == "start") //queue to tcp msg "think 5000"
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else if (QStrMsg ==  "move")
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else if (QStrMsg ==  "reset") //resetPiecePositions()
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else if (QStrMsg ==  "promoteTo")
-        qDebug() << "Chess::checkMsgFromUsb(): msg =" << QStrMsg;
-    else
-        qDebug() << "ERROR: Chess::checkMsgFromUsb(): unknown msg =" << QStrMsg;
+    if (QStrMsg == "") qDebug();
 }
 
 void Chess::sendDataToClient(Client client, ACTION_TYPE AT /*= AT_NONE*/,
@@ -132,29 +114,82 @@ void Chess::sendMsgToChessEngine(QString QStrMsg)
 
 void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
 {
-
-
     this->restorateGameIfDisconnectedClientAffectIt(client);
     m_pClientsList->clearClientSqlID(client);
     if (RRR == RRR_DOUBLE_LOGIN)
         m_pClientsList->setClientSynchronization(client, SY_DOUBLE_LOGIN);
     else if (RRR == RRR_REMOVE_AND_REFRESH_CLIENT)
         m_pClientsList->setClientSynchronization(client, SY_REMOVE_AND_REFRESH_CLIENT);
+    m_bExecutingClientRequest = false;
     this->sendDataToClient(client);
     //don't remove client. his msgs will be blocked, till he will refresh page
     this->updateClientsInUI();
 }
 
-void Chess::executeClientRequest(Client &client, bool bService /*= false*/)
+void Chess::startExecutingClientsRequests()
 {
-    switch(m_request.type)
+    if (!m_bExecutingClientRequest && !m_requestList.isEmpty())
     {
-    case RT_GET_TABLE_DATA:
+        clientRequest request = m_requestList.takeFirst();
+        REJECTED_REQUEST_REACTION checkedRequest =
+                m_pConditions->isClientRequestCanBeExecuted(request, m_ChessGameStatus);
+        if (checkedRequest == RRR_NONE)
+        {
+            qInfo() << "checkedRequest == RRR_NONE";
+            m_executingClientRequestTimer->start(7000);
+            this->executeClientRequest(request);
+        }
+        else
+        {
+            qInfo() << "checkedRequest != RRR_NONE";
+            Client client;
+            if (m_pClientsList->isClientIDExists(request.clientID)) //client can be offline already
+                client = m_pClientsList->getClient(request.clientID);
+            else return;
+
+            if (checkedRequest == RRR_RESEND_TABLE_DATA)
+                this->sendDataToClient(client);
+            else if (checkedRequest == RRR_REMOVE_AND_REFRESH_CLIENT)
+                this->killClient(client, RRR_REMOVE_AND_REFRESH_CLIENT);
+        }
+    }
+}
+
+void Chess::closeClientRequest()
+{
+    qInfo();
+
+    if (!m_bExecutingClientRequest)
+    {
+        qCritical() << "m_bExecutingClientRequest is already false";
+        return;
+    }
+
+    m_bExecutingClientRequest = false;
+    m_executingClientRequestTimer->stop();
+
+    if (!m_requestList.isEmpty())
+        this->startExecutingClientsRequests();
+}
+
+//future: divide it to function with cases with only core calculations, and with tcp requests (?)
+void Chess::executeClientRequest(clientRequest request)
+{
+    qInfo() << "request data:" << request.dumpAllData();
+
+    m_bExecutingClientRequest = true;
+    Client client = m_pClientsList->getClient(request.clientID);
+
+    //don't mix case order
+    switch(request.type)
+    {
+    case RT_GET_TABLE_DATA: //redundant code- let it be here for safety
+        this->closeClientRequest();
         this->sendDataToClient(client);
         break;
     case RT_IM:
     {
-        int nSqlID = m_request.param.left(m_request.param.indexOf("&")).toInt();
+        int nSqlID = request.param.left(request.param.indexOf("&")).toInt();
         if (m_pClientsList->isClientSqlIDExists(nSqlID)) //double login- kill old client
         {
             Client clientToKill = m_pClientsList->getClient(nSqlID, CID_SQL);
@@ -164,64 +199,70 @@ void Chess::executeClientRequest(Client &client, bool bService /*= false*/)
                             << client.dumpCrucialData();
         }
         m_pClientsList->setClientSqlIDAndName(client, nSqlID);
+        this->closeClientRequest();
         this->sendDataToClient(client);
         break;
     }
     case RT_SIT_ON:
     {
-        PLAYER_TYPE PT = playerTypeFromQStr(m_request.param);
+        PLAYER_TYPE PT = playerTypeFromQStr(request.param);
         m_pClientsList->setPlayerType(client, PT);
         if (m_pClientsList->isWholeGameTableOccupied())
             m_ChessGameStatus = m_pTimers->startQueueTimer();
+        this->closeClientRequest();
         this->sendDataToAllClients(PT == PT_WHITE ? AT_NEW_WHITE_PLAYER : AT_NEW_BLACK_PLAYER);
         break;
     }
     case RT_NEW_GAME:
-        if (client == m_pClientsList->getPlayer(PT_WHITE))
+        if (request.service)
+            this->playerWantToStartNewGame(PT_NONE, request.service);
+        else if (client == m_pClientsList->getPlayer(PT_WHITE))
             this->playerWantToStartNewGame(PT_WHITE);
         else if (client == m_pClientsList->getPlayer(PT_BLACK))
             this->playerWantToStartNewGame(PT_BLACK);
-        else if (bService)
-            this->playerWantToStartNewGame(PT_NONE, bService);
         else qCritical() << "client isn't a player";
         break;
-    case RT_MOVE:
-        this->manageMoveRequest(m_request);
-        break;
     case RT_PROMOTE_TO:
-        m_request.param = m_pStatus->m_PosMove.asQStr() + m_request.param;
-        m_pStatus->promotePawn(m_pStatus->m_PosMove.from, m_request.param.right(1));
+        request.param = m_pStatus->m_PosMove.asQStr() + request.param;
+        m_pStatus->promotePawn(m_pStatus->m_PosMove.from, request.param.right(1));
         //without break;
+    case RT_MOVE: //RT_PROMOTE_TO case must be be4 RT_MOVE case
+        this->manageMoveRequest(request);
+        break;
     case RT_STAND_UP:
-        this->playerLeftChair(client.type());
+        this->playerLeftChair(client.type()); //request is closed inside this method
         break;
     case RT_QUEUE_ME:
         m_pClientsList->addClientToQueue(client);
+        this->closeClientRequest();
         this->sendDataToAllClients();
         break;
     case RT_LEAVE_QUEUE:
         m_pClientsList->removeClientFromQueue(client);
+        this->closeClientRequest();
         this->sendDataToAllClients();
         break;
     case RT_CLIENT_LEFT:
         this->restorateGameIfDisconnectedClientAffectIt(client);
+        this->closeClientRequest();
         m_pClientsList->removeClientFromList(client);
         break;
     default:
-        qCritical() << "received m_request.type:" << QString::number(m_request.type);
+        qCritical() << "received request.type:" << QString::number(request.type);
+        this->restartGame(ET_DRAW); //future: inform clients about server errors be4 restarting
     }
 
     this->updateClientsInUI();
 }
 
-void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = false*/)
+void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /*= false*/)
 {
-    if (PlayerType == PT_WHITE)
-        m_pClientsList->setClientStartConfirmation(PT_WHITE, true);
-    else if (PlayerType == PT_BLACK)
-        m_pClientsList->setClientStartConfirmation(PT_BLACK, true);
-    else if (bService)
+    qInfo();
+
+    if (bService)
         qInfo() << "service start";
+    else if (PlayerType == PT_WHITE || PlayerType == PT_BLACK)
+        m_pClientsList->setClientStartConfirmation(PlayerType, true);
     else
         qCritical() << "unknown playerWantToStartNewGame val:" << playerTypeAsQStr(PlayerType);
 
@@ -237,21 +278,24 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /* = 
             m_pClientsList->setClientStartConfirmation(PT_BLACK, false);
         }
     }
+    else this->closeClientRequest();
 }
 
 void Chess::manageMoveRequest(clientRequest request)
 {
     if (m_pStatus->isMoveARequestForPromotion(request.param))
     {
-        qDebug() << "isMoveARequestForPromotion == true";
+        qDebug() << "isMoveARequestForPromotion == true"; //todo:
         m_pStatus->setMove(request.param);
         m_ChessGameStatus = m_pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
                                                                     GS_TURN_BLACK_PROMOTE;
+        this->closeClientRequest();
         //todo: this info will contain data, that tells its time for promote? check it
         this->sendDataToClient(m_pClientsList->getPlayer(m_pStatus->getActivePlayerType()));
     }
     else if (!m_pStatus->isMoveLegal(request.param))
     {
+        this->closeClientRequest();
         Client player = m_pClientsList->getPlayer(m_pStatus->getActivePlayerType());
         this->sendDataToClient(player, AT_BAD_MOVE); //move itself is not included in answer
     }
@@ -308,6 +352,8 @@ void Chess::checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespo
     default: qCritical() << "unknown ProcessedChenardMsgType:"
                          << QString::number(ProcessedChenardMsgType);
     }
+
+    //todo: execute next request if its queued
 }
 
 void Chess::startNewGameInCore()
@@ -317,14 +363,14 @@ void Chess::startNewGameInCore()
     m_ChessGameStatus = GS_TURN_WHITE_FIRST_TURN;
 
     //first legal and status always looks the same:
-    m_pStatus->saveStatusData("* rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n");
-    m_pStatus->setLegalMoves("OK 20 b1c3 b1a3 g1h3 g1f3 a2a3 a2a4 b2b3 b2b4 c2c3 c2c4 d2d3 "
-                            "d2d4 e2e3 e2e4 f2f3 f2f4 g2g3 g2g4 h2h3 h2h4");
+    m_pStatus->saveStatusData(FIRST_STATUS);
+    m_pStatus->setLegalMoves(FIRST_LEGAL);
 
     m_pTimers->resetGameTimers();
     m_pTimers->startGameTimer();
     m_pClientsList->resetPlayersStartConfirmInfo();
 
+    this->closeClientRequest();
     this->sendDataToAllClients(AT_NEW_GAME_STARTED);
 }
 
@@ -333,10 +379,12 @@ void Chess::restartGame(END_TYPE ET)
     qInfo() << endTypeAsQstr(ET);
     m_ChessGameStatus = GS_TURN_NONE_RESETING;
     this->resetTableData();
+    //todo: php could detect who left chair direct from this one table data (?)
     this->sendDataToAllClients(AT_END_GAME, ET);
     this->changePlayersOnChairs();
     if (m_pMovements->resetPiecePositions())
         this->makeCoreReadyForNewGame();
+    this->closeClientRequest();
     this->sendDataToAllClients();
 }
 
@@ -373,7 +421,8 @@ void Chess::fillTableWithNextQueuedClientsIfTheyExist()
     }
     else m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
-    if (m_pClientsList->getAmountOfQueuedClients() <= 0) return;
+    if (m_pClientsList->getAmountOfQueuedClients() <= 0)
+        return;
     else
     {
         if (m_pClientsList->isPlayerChairEmpty(PT_WHITE))
@@ -408,6 +457,7 @@ void Chess::continueGameplay()
 {
     m_pTimers->switchPlayersTimers(m_pStatus->getWhoseTurn());
     m_ChessGameStatus = m_pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE : GS_TURN_BLACK;
+    this->closeClientRequest();
     this->sendDataToAllClients();
 }
 
@@ -443,6 +493,15 @@ void Chess::playerLeftChair(PLAYER_TYPE PT)
 
 
 ///private slots:
+void Chess::clientRequesTimeOut()
+{
+    if (m_bExecutingClientRequest)
+    {
+        qCritical();
+        this->restartGame(ET_DRAW);
+    }
+}
+
 void Chess::keepConnectedTimeOut()
 {
     qInfo();
@@ -511,6 +570,11 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
     return TD;
 }
 
+void Chess::updatePortsComboBoxInUI(int nPorts)
+{
+    emit this->updatePortsComboBox(nPorts);
+}
+
 void Chess::setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType)
 {
     emit this->setBoardDataLabel(QStrLabel, LabelType);
@@ -533,8 +597,10 @@ QString Chess::dumpAllData()
 
     QStrData = "[chess.h]\n";
     QStrData += "m_ChessGameStatus: " + gameStatusAsQStr(m_ChessGameStatus) + "\n";
-    QStrData += "m_request.type: " + requestTypeAsQStr(m_request.type) + "\n";
-    QStrData += "m_request.param: " + m_request.param + "\n";
+    QString QStrExecutingClientReques = m_bExecutingClientRequest ? "true" : "false";
+    QStrData += "m_bExecutingClientRequest: " + QStrExecutingClientReques + "\n";
+    foreach (clientRequest clReq, m_requestList)
+        QStrData += clReq.dumpAllData() + "\n";
     QStrData += "\n";
     QStrData += m_pStatus->dumpAllData();
     QStrData += "\n";

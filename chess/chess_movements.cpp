@@ -247,7 +247,7 @@ void ChessMovements::tryToMovePieceFromHisNotStartingField(Piece* pPiece, Field*
         this->regularMoveSequence(pField, pFieldToPutAsidePiece);
     else if (pField == m_pBoardMain->getField(pPieceOnPutAsideField->getStartFieldNr()))
         this->removeMoveSequence(pField);
-    //else: do nothing. one of the next function callings will trigger one of the "if"
+    //else: do nothing (one of the next for loop iteration will trigger one of the conditions above)
 }
 
 bool ChessMovements::isPieceSetOnBoardsIdentical(Chessboard& board1, Chessboard& board2)

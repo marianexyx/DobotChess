@@ -13,6 +13,7 @@
 enum XML_FILE_TYPE { XFT_GAME_LIMITS, XFT_GAME_CONFIG, XFT_DATABASE };
 
 //future: make game vars dir for those structs + some other ones
+//future: let xml reader read only data without knowing wkat kind of game (chess) data core needs
 struct LimitsVars
 {
     float fPieceHeightMin, fPieceHeightMax;

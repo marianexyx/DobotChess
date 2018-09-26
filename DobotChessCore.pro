@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     dobot/dobot.cpp \
     dobot/dobot_gripper.cpp \
     dobot/dobot_queue.cpp \
-    arduino_usb.cpp
+    arduino_usb.cpp \
+    chess/vars/request_types.cpp
 
 
 HEADERS  += \
