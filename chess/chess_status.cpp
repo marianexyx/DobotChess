@@ -15,7 +15,7 @@ ChessStatus::ChessStatus(PieceController* pPieceController, Chessboard* pBoardMa
 void ChessStatus::setMove(QString QStrMove)
 {
     m_MoveType = this->findMoveType(QStrMove);
-    qDebug() << "found move type:" << sequenceTypeAsQstr(m_MoveType);
+    qInfo() << "found move type:" << sequenceTypeAsQstr(m_MoveType);
     if (m_MoveType == ST_PROMOTION || m_MoveType == ST_PROMOTION_WITH_REMOVING)
         QStrMove = QStrMove.left(4);
     m_PosMove = PosFromTo::fromQStr(QStrMove);

@@ -57,12 +57,10 @@ void Websockets::onNewConnection()
     emit this->msgFromWebsocketsToChess("getTableData", clientID);
 }
 
-//future: make a container of incomming msgs (not easy task)
-//todo: test bad request reactions, and site implementation for this reaction
 void Websockets::receivedMsg(QString QStrMsg)
 {    
     QWebSocket* pSocket = qobject_cast<QWebSocket*>(sender());
-    if (!m_pClientsList->isClientInList(m_pClientsList->getClient(pSocket)))
+    if (!m_pClientsList->isClientInList(pSocket))
     {
         qWarning() << "sender not in clients list";
         return;

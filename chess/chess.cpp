@@ -57,6 +57,7 @@ Chess::~Chess()
 
 
 ///communication methods
+//future: do I use/need (or will) bService? can it even work now?
 void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService /*= false*/)
 {
     Client client = m_pClientsList->getClient(un64SenderID);
@@ -120,7 +121,6 @@ void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
         m_pClientsList->setClientSynchronization(client, SY_DOUBLE_LOGIN);
     else if (RRR == RRR_REMOVE_AND_REFRESH_CLIENT)
         m_pClientsList->setClientSynchronization(client, SY_REMOVE_AND_REFRESH_CLIENT);
-    m_bExecutingClientRequest = false;
     this->sendDataToClient(client);
     //don't remove client. his msgs will be blocked, till he will refresh page
     this->updateClientsInUI();
@@ -157,13 +157,12 @@ void Chess::startExecutingClientsRequests()
 
 void Chess::closeClientRequest()
 {
-    qInfo();
-
     if (!m_bExecutingClientRequest)
     {
         qCritical() << "m_bExecutingClientRequest is already false";
         return;
     }
+    else qInfo();
 
     m_bExecutingClientRequest = false;
     m_executingClientRequestTimer->stop();
@@ -175,16 +174,17 @@ void Chess::closeClientRequest()
 //future: divide it to function with cases with only core calculations, and with tcp requests (?)
 void Chess::executeClientRequest(clientRequest request)
 {
-    qInfo() << "request data:" << request.dumpAllData();
+    Client client = m_pClientsList->getClient(request.clientID);
+    qInfo() << "request data:" << request.dumpAllData()
+            << ", client data:" << client.dumpCrucialData();
 
     m_bExecutingClientRequest = true;
-    Client client = m_pClientsList->getClient(request.clientID);
+    bool bSentMsgToChessEngine = false;
 
     //don't mix case order
     switch(request.type)
     {
     case RT_GET_TABLE_DATA: //redundant code- let it be here for safety
-        this->closeClientRequest();
         this->sendDataToClient(client);
         break;
     case RT_IM:
@@ -195,11 +195,18 @@ void Chess::executeClientRequest(clientRequest request)
             Client clientToKill = m_pClientsList->getClient(nSqlID, CID_SQL);
             if (client != clientToKill)
                 this->killClient(m_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
-            else qWarning() << "already set(ted) client sent 'im...' command again. client:"
+            else
+            {
+                //future: when loggouting player, site is sending 'im...' few times (1st is...
+                //...when site catch 'reset complited' info). it's barely warning, so repair...
+                //...it in future
+                qDebug() << "already set(ted) client sent 'im...' command again. client:"
                             << client.dumpCrucialData();
+                this->sendDataToClient(client);
+                break;
+            }
         }
         m_pClientsList->setClientSqlIDAndName(client, nSqlID);
-        this->closeClientRequest();
         this->sendDataToClient(client);
         break;
     }
@@ -209,17 +216,16 @@ void Chess::executeClientRequest(clientRequest request)
         m_pClientsList->setPlayerType(client, PT);
         if (m_pClientsList->isWholeGameTableOccupied())
             m_ChessGameStatus = m_pTimers->startQueueTimer();
-        this->closeClientRequest();
         this->sendDataToAllClients(PT == PT_WHITE ? AT_NEW_WHITE_PLAYER : AT_NEW_BLACK_PLAYER);
         break;
     }
     case RT_NEW_GAME:
         if (request.service)
-            this->playerWantToStartNewGame(PT_NONE, request.service);
+            bSentMsgToChessEngine = this->playerWantToStartNewGame(PT_NONE, request.service);
         else if (client == m_pClientsList->getPlayer(PT_WHITE))
-            this->playerWantToStartNewGame(PT_WHITE);
+            bSentMsgToChessEngine = this->playerWantToStartNewGame(PT_WHITE);
         else if (client == m_pClientsList->getPlayer(PT_BLACK))
-            this->playerWantToStartNewGame(PT_BLACK);
+            bSentMsgToChessEngine = this->playerWantToStartNewGame(PT_BLACK);
         else qCritical() << "client isn't a player";
         break;
     case RT_PROMOTE_TO:
@@ -227,35 +233,36 @@ void Chess::executeClientRequest(clientRequest request)
         m_pStatus->promotePawn(m_pStatus->m_PosMove.from, request.param.right(1));
         //without break;
     case RT_MOVE: //RT_PROMOTE_TO case must be be4 RT_MOVE case
-        this->manageMoveRequest(request);
+        bSentMsgToChessEngine = this->manageMoveRequest(request);
         break;
     case RT_STAND_UP:
-        this->playerLeftChair(client.type()); //request is closed inside this method
+        this->playerLeftChair(client.type());
         break;
     case RT_QUEUE_ME:
         m_pClientsList->addClientToQueue(client);
-        this->closeClientRequest();
         this->sendDataToAllClients();
         break;
     case RT_LEAVE_QUEUE:
         m_pClientsList->removeClientFromQueue(client);
-        this->closeClientRequest();
         this->sendDataToAllClients();
         break;
     case RT_CLIENT_LEFT:
         this->restorateGameIfDisconnectedClientAffectIt(client);
-        this->closeClientRequest();
-        m_pClientsList->removeClientFromList(client);
+        if (m_pClientsList->isClientInList(client.ID()))
+            m_pClientsList->removeClientFromList(client);
         break;
     default:
         qCritical() << "received request.type:" << QString::number(request.type);
         this->restartGame(ET_DRAW); //future: inform clients about server errors be4 restarting
     }
 
+    if (!bSentMsgToChessEngine)
+        this->closeClientRequest();
+
     this->updateClientsInUI();
 }
 
-void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /*= false*/)
+bool Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /*= false*/)
 {
     qInfo();
 
@@ -277,33 +284,34 @@ void Chess::playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService /*= f
             m_pClientsList->setClientStartConfirmation(PT_WHITE, false);
             m_pClientsList->setClientStartConfirmation(PT_BLACK, false);
         }
+        return MSG_WAS_SENT_TO_CHESS_ENGINE;
     }
-    else this->closeClientRequest();
+    else return MSG_WAS_NOT_SENT_TO_CHESS_ENGINE;
 }
 
-void Chess::manageMoveRequest(clientRequest request)
+bool Chess::manageMoveRequest(clientRequest request)
 {
     if (m_pStatus->isMoveARequestForPromotion(request.param))
     {
-        qDebug() << "isMoveARequestForPromotion == true"; //todo:
         m_pStatus->setMove(request.param);
         m_ChessGameStatus = m_pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE_PROMOTE :
                                                                     GS_TURN_BLACK_PROMOTE;
-        this->closeClientRequest();
-        //todo: this info will contain data, that tells its time for promote? check it
+
         this->sendDataToClient(m_pClientsList->getPlayer(m_pStatus->getActivePlayerType()));
+        return MSG_WAS_NOT_SENT_TO_CHESS_ENGINE;
     }
     else if (!m_pStatus->isMoveLegal(request.param))
     {
-        this->closeClientRequest();
         Client player = m_pClientsList->getPlayer(m_pStatus->getActivePlayerType());
         this->sendDataToClient(player, AT_BAD_MOVE); //move itself is not included in answer
+        return MSG_WAS_NOT_SENT_TO_CHESS_ENGINE;
     }
     else
     {
         m_pStatus->setMove(request.param); //no need for earlier clear
         m_pMovements->doMoveSequence(m_pStatus->m_PosMove, m_pStatus->m_MoveType);
         this->sendMsgToChessEngine(chenardMsgTypeAsQStr(CMT_MOVE) + request.param);
+        return MSG_WAS_SENT_TO_CHESS_ENGINE;
     }
 }
 
@@ -322,6 +330,7 @@ void Chess::checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespo
     qInfo() << "ProcessedChenardMsgType =" << chenardMsgTypeAsQStr(ProcessedChenardMsgType);
     if (!isChenardAnswerCorrect(ProcessedChenardMsgType, QStrTcpRespond, SHOW_ERRORS)) return;
 
+    //client's 'move' request execute following TCP msgs: move... -> status -> history -> legal
     switch(ProcessedChenardMsgType)
     {
     case CMT_NEW:
@@ -353,7 +362,8 @@ void Chess::checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespo
                          << QString::number(ProcessedChenardMsgType);
     }
 
-    //todo: execute next request if its queued
+    if (ProcessedChenardMsgType == CMT_NEW || ProcessedChenardMsgType == CMT_LEGAL)
+        this->closeClientRequest();
 }
 
 void Chess::startNewGameInCore()
@@ -370,7 +380,6 @@ void Chess::startNewGameInCore()
     m_pTimers->startGameTimer();
     m_pClientsList->resetPlayersStartConfirmInfo();
 
-    this->closeClientRequest();
     this->sendDataToAllClients(AT_NEW_GAME_STARTED);
 }
 
@@ -384,7 +393,6 @@ void Chess::restartGame(END_TYPE ET)
     this->changePlayersOnChairs();
     if (m_pMovements->resetPiecePositions())
         this->makeCoreReadyForNewGame();
-    this->closeClientRequest();
     this->sendDataToAllClients();
 }
 
@@ -457,7 +465,6 @@ void Chess::continueGameplay()
 {
     m_pTimers->switchPlayersTimers(m_pStatus->getWhoseTurn());
     m_ChessGameStatus = m_pStatus->getWhoseTurn() == WHITE_TURN ? GS_TURN_WHITE : GS_TURN_BLACK;
-    this->closeClientRequest();
     this->sendDataToAllClients();
 }
 

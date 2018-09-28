@@ -3,6 +3,8 @@
 /*static*/ Chess *Errors::pChess = nullptr;
 /*static*/ const QDir Errors::m_errorDir("errorLogs/");
 /*static*/ uint Errors::newErrors = 0;
+/*static*/ uint Errors::newWarnings = 0;
+
 
 /*static*/ void Errors::overloadDebugOutput(QtMsgType type, const QMessageLogContext &context,
                          const QString &msg)
@@ -26,7 +28,7 @@
     case QtWarningMsg:
         fprintf(stderr, C_PURPLE "WARNING: [%s %s:%u] %s" C_BLACK "\n",
                 QBaTime.constData(), context.function, context.line, localMsg.constData());
-        ++newErrors;
+        ++newWarnings;
         if (Errors::pChess != nullptr)
             Errors::saveErrorInFile(type, context, msg, QStrTime);
         break;
@@ -71,6 +73,7 @@
     return QStrErrorType;
 }
 
+//future: also save in file whole debug console msgs, whole log msgs from form, and whole stack
 /*static*/ void Errors::saveErrorInFile(QtMsgType msgType, const QMessageLogContext &context,
                                         QString QStrErrorMsg, QString QStrTime)
 {

@@ -33,6 +33,10 @@ private:
 
     ChessStatus(PieceController* pPieceController, Chessboard* pBoardMain, Clients* pClientsList);
 
+    //future: i can tell from legals which move is promotion, and which is promotion with...
+    //...removing without doing any calculations or request. legals can be send to web, and...
+    //...full move promotion move could be received in 1st request. if in legals promotion move...
+    //...letterTo is diffrent from letterFrom, then it's obvious promotion with removing.
     void setMove(QString QStrMove);
     SEQUENCE_TYPE findMoveType(QString QStrMove);
     bool isMoveLegal(QString QStrMove) { return m_legalMoves.contains(QStrMove)? true : false; }

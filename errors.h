@@ -30,6 +30,7 @@ private:
 
 public:
     static uint newErrors;
+    static uint newWarnings;
     Errors() {}
 
     static Chess* pChess; //overloadDebugOutput() can work only on statics

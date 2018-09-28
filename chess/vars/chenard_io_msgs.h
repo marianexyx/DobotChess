@@ -6,6 +6,9 @@
 
 //https://github.com/cosinekitty/chenard/wiki/ChenServer#complete-command-reference
 
+const bool MSG_WAS_SENT_TO_CHESS_ENGINE = true;
+const bool MSG_WAS_NOT_SENT_TO_CHESS_ENGINE = false;
+
 enum CHENARD_MSG_TYPE
 {
     CMT_ERROR,

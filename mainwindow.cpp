@@ -198,7 +198,9 @@ void MainWindow::changeWindowTitle()
 {
     QString QStrTitle = gameStatusAsQStr(m_pChess->getGameStatus());
     if (Errors::newErrors > 0)
-        QStrTitle = "ERROR OCCURED (new=" + QString::number(Errors::newErrors) + "). " + QStrTitle;
+        QStrTitle = "ERROR OCCURED. " + QStrTitle;
+    else if (Errors::newWarnings > 0)
+        QStrTitle = "WARNING OCCURED. " + QStrTitle;
     this->setWindowTitle(QStrTitle);
 }
 
@@ -773,6 +775,7 @@ void MainWindow::on_emulatePlayerMsgLineEdit_textChanged(const QString& QStrText
 }
 
 //future: this function make moves directly to arm and throw the whole game too (misleading mix)
+//future: dont make warnings in mainwindow, when something wrong was written. pop up msg boxex.
 void MainWindow::on_sendSimulatedMsgBtn_clicked()
 {
     if (!ui->emulatePlayerMsgLineEdit->text().isEmpty())
@@ -848,7 +851,7 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
                 uint64_t nWhitePlayerID = m_pClientsList->getPlayer(PT_WHITE).ID();
                 uint64_t nBlackPlayerID = m_pClientsList->getPlayer(PT_BLACK).ID();
-                WHOSE_TURN ActualSimulatedTurn = WHITE_TURN; //todo: = actual turn
+                WHOSE_TURN ActualSimulatedTurn = m_pChess->getWhoseTurn();
                 foreach (QString QStrMove, list)
                 {
                     if (ActualSimulatedTurn == WHITE_TURN)

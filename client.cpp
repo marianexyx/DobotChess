@@ -123,6 +123,20 @@ bool Clients::isClientInList(QWebSocket* pClientSocket, bool bErrorLog /*= false
     return false;
 }
 
+bool Clients::isClientInList(uint64_t un64ID, bool bErrorLog /*= false*/)
+{
+    foreach (Client cl, m_clients)
+    {
+        if (cl.m_ID == un64ID)
+            return true;
+    }
+
+    if (bErrorLog)
+        qCritical() << "client of not found";
+
+    return false;
+}
+
 bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
 {
     foreach (Client cl, m_clients)

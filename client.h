@@ -76,6 +76,16 @@ public:
         return "ID: " + QString::number(m_ID) + ", sqlID:" + QString::number(m_sqlID)
                 + ", name:" + m_name + "\n";
     }
+    QString dumpAllData()
+    {
+        return "ID: " + QString::number(m_ID)
+                + ", sqlID:" + QString::number(m_sqlID)
+                + ", synchronized: " + synchronizedAsQStr(m_synchronized)
+                + ", playerType: " + playerTypeAsQStr(m_Type)
+                + ", isStartClickedByPlayer: " + QString::number(m_isStartClickedByPlayer)
+                + ", queue: " + QString::number(m_queue)
+                + ", name:" + m_name + "\n";
+    }
 };
 
 class Clients: public QObject
@@ -93,6 +103,7 @@ public:
 
     bool isClientInList(const Client& client, bool bErrorLog = false);
     bool isClientInList(QWebSocket* pClientSocket, bool bErrorLog = false);
+    bool isClientInList(uint64_t un64ID, bool bErrorLog = false);
     bool isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog = false);
     bool isWholeGameTableEmpty();
     bool isWholeGameTableOccupied();

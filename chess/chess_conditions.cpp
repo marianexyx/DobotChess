@@ -246,7 +246,8 @@ REJECTED_REQUEST_REACTION ChessConditions::isThereAnySpecialConditionBeenMet(Cli
     }
 
     if (RRR != RRR_NONE)
-        qWarning() << "RRR != RRR_NONE. it's =" << rejectedRequestReactionAsQStr(RRR);
+        qWarning() << "RRR != RRR_NONE. RRR =" << rejectedRequestReactionAsQStr(RRR)
+                   << request.dumpAllData();
 
     return RRR;
 }

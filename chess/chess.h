@@ -59,8 +59,8 @@ private:
     void startExecutingClientsRequests();
     void closeClientRequest();
     void executeClientRequest(clientRequest request);
-    void playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);
-    void manageMoveRequest(clientRequest request);
+    bool playerWantToStartNewGame(PLAYER_TYPE PlayerType, bool bService = false);
+    bool manageMoveRequest(clientRequest request);
     void updateClientsInUI();
 
     //gameplay methods
@@ -106,7 +106,7 @@ public slots:
     void timeOutStart();
     void timeOutPlayer(PLAYER_TYPE Player);
     QString getTableData(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
-    //todo: standardize GUI slots names: UI/form
+    //future: standardize GUI slots names: UI/form
     void setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType);
     void showLegalMovesInForm(QStringList legalMoves);
     void showHistoryMovesInForm(QStringList historyMoves);
