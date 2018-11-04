@@ -65,7 +65,7 @@ public:
     void moveArmUpOrDown(DOBOT_MOVE_TYPE ArmDestination, double dHeight);
     void setItemInGripper(short sGrippersItemID);
     void clearGripper();
-    //todo: GetAlarmsState, ClearAllAlarmsState- react on them somehow
+    //future: GetAlarmsState, ClearAllAlarmsState- react on them somehow
     void forceStopArm();
 
     ushort getItemInGripper() const { return m_usItemIDInGripper; }

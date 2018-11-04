@@ -13,7 +13,8 @@ enum TABLE_DATA_TYPE
     TD_BLACK_PLAYER,
     TD_GAME_STATE,
     TD_WHITE_TIME,
-    TD_BLACK_TYPE,
+    TD_BLACK_TIME,
+    TD_TURN_TIME,
     TD_QUEUE,
     TD_START_TIME,
     TD_HISTORY,
@@ -30,7 +31,7 @@ inline QString tableDataTypeAsQstr(TABLE_DATA_TYPE TD)
     case TD_BLACK_PLAYER: return "blackPlayer";
     case TD_GAME_STATE: return "gameState";
     case TD_WHITE_TIME: return "whiteTime";
-    case TD_BLACK_TYPE: return "blackTime";
+    case TD_BLACK_TIME: return "blackTime";
     case TD_QUEUE: return "queue";
     case TD_START_TIME: return "startTime";
     case TD_HISTORY: return "history";

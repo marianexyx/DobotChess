@@ -39,7 +39,7 @@ void Clients::putOnChairNextQueuedClient(PLAYER_TYPE Chair)
     }
     else
     {
-        qCritical() << "there are no clients in queue";
+        qCritical() << "no clients in queue. queue =" << this->getQueuedClientsSqlIDsList();
         return;
     }
 }
@@ -138,7 +138,7 @@ bool Clients::isClientInList(uint64_t un64ID, bool bErrorLog /*= false*/)
 }
 
 bool Clients::isPlayerChairEmpty(PLAYER_TYPE Type, bool bErrorLog /*= false*/)
-{
+{    
     foreach (Client cl, m_clients)
     {
         if (cl.m_Type == Type)
@@ -267,6 +267,29 @@ bool Clients::isClientInQueue(const Client &client)
     return false;
 }
 
+bool Clients::isClientAGuest(const Client& client)
+{
+    if (client.sqlID() == GUEST1_ID || client.sqlID() == GUEST2_ID)
+        return true;
+    else return false;
+}
+
+bool Clients::isPlayerAGuest(PLAYER_TYPE Type)
+{
+    if (Type != PT_NONE)
+    {
+        foreach (Client client, m_clients)
+        {
+            if (client.m_Type == Type)
+                return this->isClientAGuest(client) ? true : false;
+        }
+        qWarning() << "player type not found";
+    }
+    else qWarning() << "Type == PT_NONE)";
+
+    return false;
+}
+
 void Clients::clearClientSqlID(const Client& client)
 {
     qInfo() << "client's ID =" << client.ID();
@@ -281,16 +304,24 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
         {
             if (client.m_Type == Type)
             {
-                Client changedClient = client;
-                changedClient.m_Type = PT_NONE;
-                changedClient.m_isStartClickedByPlayer = false;
+                if (this->isPlayerAGuest(Type))
+                {
+                    this->removeClientFromList(client);
+                    return;
+                }
+                else
+                {
+                    Client changedClient = client;
+                    changedClient.m_Type = PT_NONE;
+                    changedClient.m_isStartClickedByPlayer = false;
 
-                int nClientPos = m_clients.indexOf(client);
-                if (nClientPos >= 0 && nClientPos < m_clients.size())
-                    m_clients.replace(nClientPos, changedClient);
-                else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
+                    int nClientPos = m_clients.indexOf(client);
+                    if (nClientPos >= 0 && nClientPos < m_clients.size())
+                        m_clients.replace(nClientPos, changedClient);
+                    else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
-                return;
+                    return;
+                }
             }
         }
         qWarning() << "client.type not found";
@@ -367,6 +398,11 @@ void Clients::setClientSqlIDAndName(const Client& client, uint64_t un64SqlID)
         {
             Client changedClient = cl;
             changedClient.m_sqlID = un64SqlID;
+            //future: recognize client by guest ID, not guest synchro
+            if (un64SqlID == GUEST1_ID)
+                changedClient.m_synchronized = SY_GUEST1;
+            else if (un64SqlID == GUEST2_ID)
+                changedClient.m_synchronized = SY_GUEST2;
             changedClient.m_name = un64SqlID == 0 ? "" : Sql::getClientNameFromDB(un64SqlID);
 
             int nClientPos = m_clients.indexOf(cl);
@@ -761,6 +797,20 @@ uint64_t Clients::getNextAvailableClientID()
             maxID = client.m_ID;
     }
     return ++maxID;
+}
+
+PLAYER_TYPE Clients::getAvailableGuest(bool bErrorLog /*= false*/)
+{
+    if (this->isPlayerChairEmpty(PT_WHITE))
+        return PT_WHITE;
+    else if (this->isPlayerChairEmpty(PT_BLACK))
+        return PT_BLACK;
+    else
+    {
+        if (bErrorLog)
+            qCritical() << "all guests are taken";
+        return PT_NONE;
+    }
 }
 
 QString Clients::dumpAllData()

@@ -45,6 +45,8 @@ Chess::Chess(PieceController* pPieceController)
     connect(m_pTimers, SIGNAL(timeOutStart()), this, SLOT(timeOutStart()));
     connect(m_pTimers, SIGNAL(timeOutPlayer(PLAYER_TYPE)),
             this, SLOT(timeOutPlayer(PLAYER_TYPE)));
+    connect(m_pTimers, SIGNAL(timeOutTurn()),
+            this, SLOT(timeOutTurn()));
 }
 
 Chess::~Chess()
@@ -87,9 +89,11 @@ void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bSer
     }
 }
 
-void Chess::checkMsgFromUSB(QString QStrMsg) //todo:
+void Chess::checkMsgFromUSB(QString QStrMsg)
 {
-    if (QStrMsg == "") qDebug();
+    if (QStrMsg.contains("EMERGENCY_STOP"))
+        m_pDobot->forceStopArm();
+    else qWarning() << "unknown msg:" << QStrMsg;
 }
 
 void Chess::sendDataToClient(Client client, ACTION_TYPE AT /*= AT_NONE*/,
@@ -122,7 +126,7 @@ void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
     else if (RRR == RRR_REMOVE_AND_REFRESH_CLIENT)
         m_pClientsList->setClientSynchronization(client, SY_REMOVE_AND_REFRESH_CLIENT);
     this->sendDataToClient(client);
-    //don't remove client. his msgs will be blocked, till he will refresh page
+    //don't remove client. his msgs will be blocked, till he will refresh page (client will die)
     this->updateClientsInUI();
 }
 
@@ -199,7 +203,7 @@ void Chess::executeClientRequest(clientRequest request)
             {
                 //future: when loggouting player, site is sending 'im...' few times (1st is...
                 //...when site catch 'reset complited' info). it's barely warning, so repair...
-                //...it in future
+                //...it in distance future
                 qDebug() << "already set(ted) client sent 'im...' command again. client:"
                             << client.dumpCrucialData();
                 this->sendDataToClient(client);
@@ -213,6 +217,15 @@ void Chess::executeClientRequest(clientRequest request)
     case RT_SIT_ON:
     {
         PLAYER_TYPE PT = playerTypeFromQStr(request.param);
+        if (PT == PT_NONE)
+            PT = m_pClientsList->getAvailableGuest(SHOW_ERRORS);
+        if (!m_pClientsList->isClientSqlIDExists(client))
+        {
+            if (PT == PT_WHITE)
+                m_pClientsList->setClientSqlIDAndName(client, GUEST1_ID);
+            else if (PT == PT_BLACK)
+                m_pClientsList->setClientSqlIDAndName(client, GUEST2_ID);
+        }
         m_pClientsList->setPlayerType(client, PT);
         if (m_pClientsList->isWholeGameTableOccupied())
             m_ChessGameStatus = m_pTimers->startQueueTimer();
@@ -388,7 +401,7 @@ void Chess::restartGame(END_TYPE ET)
     qInfo() << endTypeAsQstr(ET);
     m_ChessGameStatus = GS_TURN_NONE_RESETING;
     this->resetTableData();
-    //todo: php could detect who left chair direct from this one table data (?)
+    //future: php could detect who left chair direct from this one table data (?)
     this->sendDataToAllClients(AT_END_GAME, ET);
     this->changePlayersOnChairs();
     if (m_pMovements->resetPiecePositions())
@@ -424,31 +437,38 @@ void Chess::fillTableWithNextQueuedClientsIfTheyExist()
 
     if (m_pClientsList->isWholeGameTableOccupied())
     {
-        qCritical() << "table is already occupied";
+        qCritical() << "table is already fully occupied";
         return;
     }
-    else m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
 
-    if (m_pClientsList->getAmountOfQueuedClients() <= 0)
-        return;
-    else
-    {
-        if (m_pClientsList->isPlayerChairEmpty(PT_WHITE))
-        {
-            m_pClientsList->putOnChairNextQueuedClient(PT_WHITE);
-            this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
-        }
-        if (m_pClientsList->isPlayerChairEmpty(PT_BLACK))
-        {
-            m_pClientsList->putOnChairNextQueuedClient(PT_BLACK);
-            this->sendDataToAllClients(AT_NEW_BLACK_PLAYER);
-        }
-    }
+    this->putOnNextEmptyChairNextQueuedClientIfItsPossible();
+    this->putOnNextEmptyChairNextQueuedClientIfItsPossible();
 
     if (m_pClientsList->isWholeGameTableOccupied())
     {
         m_ChessGameStatus = m_pTimers->startQueueTimer();
         this->sendDataToAllClients();
+    }
+}
+
+void Chess::putOnNextEmptyChairNextQueuedClientIfItsPossible()
+{
+    if (!m_pClientsList->isWholeGameTableOccupied())
+    {
+        m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
+        if (m_pClientsList->getAmountOfQueuedClients() > 0)
+        {
+            if (m_pClientsList->isPlayerChairEmpty(PT_WHITE))
+            {
+                m_pClientsList->putOnChairNextQueuedClient(PT_WHITE);
+                this->sendDataToAllClients(AT_NEW_WHITE_PLAYER);
+            }
+            else if (m_pClientsList->isPlayerChairEmpty(PT_BLACK))
+            {
+                m_pClientsList->putOnChairNextQueuedClient(PT_BLACK);
+                this->sendDataToAllClients(AT_NEW_BLACK_PLAYER);
+            }
+        }
     }
 }
 
@@ -491,7 +511,7 @@ void Chess::playerLeftChair(PLAYER_TYPE PT)
     {
         m_ChessGameStatus = GS_TURN_NONE_WAITING_FOR_PLAYERS;
         this->resetTableData();
-        m_pClientsList->clearPlayerType(PT);
+         m_pClientsList->clearPlayerType(PT);
         this->sendDataToAllClients(PT == PT_WHITE ? AT_NEW_WHITE_PLAYER : AT_NEW_BLACK_PLAYER);
         this->fillTableWithNextQueuedClientsIfTheyExist();
     }
@@ -541,6 +561,12 @@ void Chess::timeOutPlayer(PLAYER_TYPE Player)
     this->restartGame(Player == PT_WHITE ? ET_TIMEOUT_GAME_WHITE : ET_TIMEOUT_GAME_BLACK);
 }
 
+void Chess::timeOutTurn()
+{
+    this->restartGame(m_pStatus->getWhoseTurn() == WHITE_TURN ? ET_TIMEOUT_GAME_WHITE
+                                                              : ET_TIMEOUT_GAME_BLACK);
+}
+
 QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NONE*/)
 {
     if (ET > ET_NONE && AT != AT_END_GAME)
@@ -563,8 +589,10 @@ QString Chess::getTableData(ACTION_TYPE AT /*= AT_NONE*/, END_TYPE ET /*= ET_NON
     TD += "," + QString::number(TD_GAME_STATE) + ":" + QString::number(m_ChessGameStatus);
     TD += "," + QString::number(TD_WHITE_TIME) + ":"
             + QString::number(m_pTimers->getWhiteTimeLeft(true));
-    TD += "," + QString::number(TD_BLACK_TYPE) + ":"
+    TD += "," + QString::number(TD_BLACK_TIME) + ":"
             + QString::number(m_pTimers->getBlackTimeLeft(true));
+    TD +="," + QString::number(TD_TURN_TIME) + ":"
+            + QString::number(m_pTimers->getTurnTimeLeft(true));
     TD += "," + QString::number(TD_QUEUE) + ":" + m_pClientsList->getQueuedClientsSqlIDsList();
     if (m_ChessGameStatus == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS)
         TD += "," + QString::number(TD_START_TIME) + ":"

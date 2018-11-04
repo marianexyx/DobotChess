@@ -6,6 +6,7 @@
 
 enum PLAYER_TYPE
 {
+    PT_ERROR,
     PT_NONE,
     PT_WHITE,
     PT_BLACK
@@ -15,7 +16,8 @@ inline QString playerTypeAsQStr(PLAYER_TYPE PT)
 {
     switch(PT)
     {
-    case PT_NONE: return "";
+    case PT_ERROR: return "";
+    case PT_NONE: return "None";
     case PT_WHITE: return "White";
     case PT_BLACK: return "Black";
     default:
@@ -24,16 +26,18 @@ inline QString playerTypeAsQStr(PLAYER_TYPE PT)
     }
 }
 
-inline PLAYER_TYPE playerTypeFromQStr(QString QStrPlayer)
+inline PLAYER_TYPE playerTypeFromQStr(QString QStrPlayer, bool bShowErrors = false)
 {
-    PLAYER_TYPE playerType = PT_NONE;
-
     //future: func could check regardless of upper strings
-    if (QStrPlayer == "White") playerType = PT_WHITE;
-    else if (QStrPlayer == "Black") playerType = PT_BLACK;
-    else qCritical() << "unknwown parameter:" << QStrPlayer;
-
-    return playerType;
+    if (QStrPlayer == "White") return PT_WHITE;
+    else if (QStrPlayer == "Black") return PT_BLACK;
+    else if (QStrPlayer == "None") return PT_NONE;
+    else
+    {
+        if (bShowErrors)
+            qCritical() << "unknwown parameter:" << QStrPlayer;
+        return PT_ERROR;
+    }
 }
 
 #endif // PLAYER_TYPE_H

@@ -13,14 +13,21 @@
 #include "typeinfo"
 #include "sql.h"
 
+//future: clients class could has its own dir
+
 enum CLIENT_ID { CID_CORE, CID_SQL };
 inline QString clientIDAsQStr(CLIENT_ID CID) { return CID == CID_CORE ? "coreID" : "sqlID"; }
+
+const uint GUEST1_ID = 1;
+const uint GUEST2_ID = 2;
 
 enum SYNCHRONIZED { SY_DESYNCHRONIZED,
                     SY_SYNCHRONIZED,
                     SY_DOUBLE_LOGIN,
-                    SY_REMOVE_AND_REFRESH_CLIENT };
-
+                    SY_REMOVE_AND_REFRESH_CLIENT,
+                    SY_GUEST1,
+                    SY_GUEST2
+                  };
 inline QString synchronizedAsQStr(SYNCHRONIZED SY)
 {
     switch(SY)
@@ -29,6 +36,8 @@ inline QString synchronizedAsQStr(SYNCHRONIZED SY)
     case SY_SYNCHRONIZED: return "synchronized";
     case SY_DOUBLE_LOGIN: return "doubleLogin";
     case SY_REMOVE_AND_REFRESH_CLIENT: return "removeAndRefreshClient";
+    case SY_GUEST1: return "guest1";
+    case SY_GUEST2: return "guest2";
     default:
         qCritical() << "wrong val =" << QString::number(SY);
         return "ERROR";
@@ -66,8 +75,8 @@ public:
         return m_name;
     }
     SYNCHRONIZED synchronized() const
-    {
-        if (m_synchronized != SY_DOUBLE_LOGIN && m_synchronized != SY_REMOVE_AND_REFRESH_CLIENT)
+    {   //todo: is it ok (work properly)?? it's messy for sure
+        if (m_synchronized == SY_SYNCHRONIZED || m_synchronized == SY_DESYNCHRONIZED)
             return m_sqlID > 0 ? SY_SYNCHRONIZED : SY_DESYNCHRONIZED;
         else return m_synchronized;
     }
@@ -114,6 +123,8 @@ public:
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
     bool isStartClickedByBothPlayers();
     bool isClientInQueue(const Client& client);
+    bool isClientAGuest(const Client& client);
+    bool isPlayerAGuest(PLAYER_TYPE Type);
 
     void clearClientSqlID(const Client& client);
     void clearPlayerType(PLAYER_TYPE Type);
@@ -140,6 +151,7 @@ public:
     uint getAmountOfQueuedClients();
     uint64_t getClientID(const Client& client);
     uint64_t getNextAvailableClientID();
+    PLAYER_TYPE getAvailableGuest(bool bErrorLog = false);
 
     QString dumpAllData();
 

@@ -7,6 +7,7 @@
 #include <QSerialPortInfo>
 #include "vars/log.h"
 
+//future: update names
 class ArduinoUsb: public QObject
 {
     Q_OBJECT
@@ -31,7 +32,6 @@ public slots:
    void portIndexChanged(int nIndex);
 
 private slots:
-    //void portIndexChanged(int index); //todo: public?
     void readUsbData();
 
 signals:

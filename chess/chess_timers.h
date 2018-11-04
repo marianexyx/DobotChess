@@ -18,12 +18,14 @@ private:
 
     QTimer* m_whiteTimer;
     QTimer* m_blackTimer;
+    QTimer* m_turnTimer;
     QTimer* m_updateLabelTimer;
     QTimer* m_startQueueTimer;
     uint m_unRemainingWhiteTime;
     uint m_unRemainingBlackTime;
     const ulong m_ulTimersStartTime;
     const ulong m_ulTimersStartQueue;
+    const ulong m_ulTimersTurnTime;
 
     ChessTimers(Clients* pClientsList);
 
@@ -39,17 +41,20 @@ private:
     uint getWhiteTimeLeft(bool bSeconds = false);
     uint getBlackTimeLeft(bool bSeconds = false);
     uint getStartTimeLeft(bool bSeconds = false);
+    uint getTurnTimeLeft(bool bSeconds = false);
 
 private slots:
     void startTimeOut();
     void whiteTimeOut() { emit this->timeOutPlayer(PT_WHITE); }
     void blackTimeOut() { emit this->timeOutPlayer(PT_BLACK); }
+    void turnTimeOut() { emit this->timeOutTurn(); }
     void updateTimeLabels();
 
 signals:
     void setBoardDataLabel(QString, BOARD_DATA_LABEL);
     void timeOutStart();
     void timeOutPlayer(PLAYER_TYPE);
+    void timeOutTurn();
 };
 
 #endif // CHESS_TIMERS_H

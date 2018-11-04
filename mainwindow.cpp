@@ -18,6 +18,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     m_pBoardChenard = m_pChess->getBoardChenardPointer();
     m_pTCPMsgs = m_pChess->getTCPMsgsPointer();
     m_pClientsList = m_pChess->getClientsPointer();
+    m_pArduinoUsb = m_pChess->getUSBPointer();
 
     m_titleFormTimer = new QTimer();
     m_titleFormTimer->setInterval(200);
@@ -43,6 +44,8 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     connect(m_pPieceController, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
     connect(m_pClientsList, SIGNAL(addTextToLogPTE(QString, LOG)),
+            this, SLOT(writeInConsole(QString, LOG)));
+    connect(m_pArduinoUsb, SIGNAL(addTextToLogPTE(QString, LOG)),
             this, SLOT(writeInConsole(QString, LOG)));
 
     //board data signals
@@ -124,7 +127,7 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     ui->resetDobotIndexBtn->setToolTip("Reset dobot (only) current ID.");
     ui->teachMode->setToolTip("Change manual arm control with buttons between "
                               "joint and axis buttons.");
-    //todo: write usb btns tooltips
+    //future: write usb btns tooltips
 
     this->initDobotsBasicButtonsControl(); //init dobot JOG control from form
     this->setDobotPTEValidatorsInUI();
@@ -218,6 +221,7 @@ void MainWindow::setBoardDataLabel(QString QStrLabel, BOARD_DATA_LABEL LabelType
     case BDL_ENPASSANT: ui->enpassantLbl->setText(QStrLabel); break;
     case BDL_WHITE_TIME: ui->whiteTimeLbl->setText(QStrLabel); break;
     case BDL_BLACK_TIME: ui->blackTimeLbl->setText(QStrLabel); break;
+    case BDL_TURN_TIME: ui->turnTimeLbl->setText(QStrLabel); break;
     case BDL_QUEUE_PLAYERS: ui->queuedPlayersLbl->setText(QStrLabel); break;
     case BDL_QUEUE_TIME: ui->queueTimeLbl->setText(QStrLabel); break;
     default: qWarning() << "unknown labelType:" << QString::number(LabelType);

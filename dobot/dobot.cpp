@@ -325,13 +325,12 @@ void Dobot::sendMoveToArm(DobotMove move)
         PTPCmd moveAsPtpCmd;
         moveAsPtpCmd.ptpMode = PTPMOVLXYZMode; //move type is Cartesian-linear
         //future: dobot may have better way of movemenst. maybe CPAbsoluteMode?
-        //todo: i've received mail with smooth way of controlling dobot with cool features
         moveAsPtpCmd.x = move.xyz.x;
         moveAsPtpCmd.y = move.xyz.y;
         moveAsPtpCmd.z = move.xyz.z;
         isArmReceivedCorrectCmd(SetPTPCmd(&moveAsPtpCmd, true, &move.ID), SHOW_ERRORS);
 
-        //todo: tests. propably i must figure it out from dobot app, or try to reach...
+        //future: tests. propably i must figure it out from dobot app, or try to reach...
         //...people on forum (search by nicks)
         /*CPCmd cpCmd;
         cpCmd.cpMode = CPAbsoluteMode;
@@ -356,7 +355,7 @@ void Dobot::sendMoveToArm(DobotMove move)
         emit this->addTextToLogPTE("HOME Cmd: recalibrating arm...\n", LOG_DOBOT);
 
         HOMECmd calibrateCmd;
-        //todo: I dont get this "1" ID. seen somewhere propably. ask of forum?...
+        //future: I dont get this "1" ID. seen somewhere propably. ask of forum?...
         //... maybe remove it, and see if anything would change (might be useless)...
         //...  Info from documentation:
         //queuedCmdIndex: If this command is added to the queue, queuedCmdIndex
@@ -395,9 +394,14 @@ void Dobot::clearGripper()
 
 void Dobot::forceStopArm() //todo: control through arduino, and dobot alarms
 {
-    m_pQueue->m_queuedArmCmdsOnCore.clear();
-    isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS);
-    isArmReceivedCorrectCmd(SetQueuedCmdForceStopExec(), SHOW_ERRORS);
+    if (m_bConnectedToDobot)
+    {
+        qCritical();
+        m_pQueue->m_queuedArmCmdsOnCore.clear();
+        isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS);
+        isArmReceivedCorrectCmd(SetQueuedCmdForceStopExec(), SHOW_ERRORS);
+        m_bConnectedToDobot = false;
+    }
 }
 
 Point3D Dobot::getHomePos()

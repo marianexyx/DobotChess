@@ -17,6 +17,7 @@ enum BOARD_DATA_LABEL
     BDL_ENPASSANT,
     BDL_WHITE_TIME,
     BDL_BLACK_TIME,
+    BDL_TURN_TIME,
     BDL_QUEUE_PLAYERS,
     BDL_QUEUE_TIME
 };
@@ -35,6 +36,7 @@ inline QString boardDataLabelsAsQstr(BOARD_DATA_LABEL BDL)
     case BDL_ENPASSANT: return "enapssant";
     case BDL_WHITE_TIME: return "whiteTime";
     case BDL_BLACK_TIME: return "blackTime";
+    case BDL_TURN_TIME: return "turnTime";
     case BDL_QUEUE_PLAYERS: return "queuePlayers";
     case BDL_QUEUE_TIME: return "queueTime";
     default:

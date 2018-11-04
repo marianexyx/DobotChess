@@ -69,6 +69,7 @@ private:
     void resetTableData();
     void changePlayersOnChairs();
     void fillTableWithNextQueuedClientsIfTheyExist();
+    void putOnNextEmptyChairNextQueuedClientIfItsPossible();
     void makeCoreReadyForNewGame();
     void continueGameplay();
     void restorateGameIfDisconnectedClientAffectIt(const Client& clientToDisconnect);
@@ -103,8 +104,9 @@ public slots:
     void checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService = false);
     void checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespond);
     void checkMsgFromUSB(QString QStrMsg);
-    void timeOutStart();
+    void timeOutStart(); //future: pack timeOuts in 1 slot
     void timeOutPlayer(PLAYER_TYPE Player);
+    void timeOutTurn();
     QString getTableData(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     //future: standardize GUI slots names: UI/form
     void setBoardDataLabelInUI(QString QStrLabel, BOARD_DATA_LABEL LabelType);

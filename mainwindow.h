@@ -45,6 +45,7 @@ private:
     Chessboard* m_pBoardChenard;
     TCPMsgs* m_pTCPMsgs;
     Clients* m_pClientsList;
+    ArduinoUsb* m_pArduinoUsb;
     Chess* m_pChess;
 
     QTimer* m_titleFormTimer;

@@ -52,7 +52,6 @@ void ArduinoUsb::readUsbData()
 {
     QByteA_data = usbPort->readAll();
 
-    qInfo() << "QByteA_data = usbPort->readAll():" << QByteA_data;
     QString QsQByteA(QByteA_data);
     QStrFullSerialMsg += QsQByteA;
 
@@ -61,7 +60,8 @@ void ArduinoUsb::readUsbData()
         QStrFullSerialMsg.remove('$');
         QStrFullSerialMsg.remove('@');
 
-        emit this->addTextToLogPTE(QStrFullSerialMsg + "\n", LOG_USB_RECEIVED);
+        if (!QStrFullSerialMsg.contains("EMERGENCY_STOP")) //prevent infinity logs
+            emit this->addTextToLogPTE(QStrFullSerialMsg + "\n", LOG_USB_RECEIVED);
         emit this->msgFromUsbToChess(QStrFullSerialMsg);
 
         QByteA_data.clear();

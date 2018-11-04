@@ -16,6 +16,7 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
     {
         if (ChessConditions::isRequestAParameterType(request.type))
         {
+            //in request string between its type and param there is always 1 spacebar
             request.param = QStrMsg.mid(requestTypeAsQStr(request.type).length() + 1);
             if (ChessConditions::isRequestParameterInProperFormat(request))
                 return true;
@@ -30,9 +31,9 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 {
     switch(Type)
     {
-    case RT_MOVE:
-    case RT_SIT_ON:
     case RT_IM:
+    case RT_SIT_ON:
+    case RT_MOVE:
     case RT_PROMOTE_TO:
         return true;
     default:
@@ -49,28 +50,28 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 
     switch(request.type)
     {
+    case RT_IM:
+    {
+        QRegExp reg("\\d+"); //a digit (\d), one or more times (+)
+        QString QStrSqlId = request.param.left(request.param.indexOf("&"));            
+        QString QStrHash = request.param.mid(request.param.indexOf("&")+1);
+        if (!request.param.isEmpty() && request.param.contains("&")
+                && reg.exactMatch(QStrSqlId) && QStrHash.length() == 20
+                && QStrSqlId != GUEST1_ID && QStrSqlId != GUEST2_ID)
+            bReturn = true;
+        else bReturn = false;
+        break;
+    }
+    case RT_SIT_ON:
+        if (playerTypeFromQStr(request.param) != PT_ERROR) //PT_NONE is ok for guests
+            bReturn = true;
+        else bReturn = false;
+        break;
     case RT_MOVE:
         if (ChessStatus::isMoveInProperFormat(request.param, SHOW_ERRORS))
             bReturn = true;
         else bReturn = false;
         break;
-    case RT_SIT_ON:
-        if (playerTypeFromQStr(request.param) != PT_WHITE &&
-                playerTypeFromQStr(request.param) != PT_BLACK)
-            bReturn = false;
-        else bReturn = true;
-        break;
-    case RT_IM:
-    {
-        QRegExp reg("\\d+"); //a digit (\d), one or more times (+)
-        QString QStrSqlId = request.param.left(request.param.indexOf("&"));
-        QString QStrHash = request.param.mid(request.param.indexOf("&")+1);
-        if (!request.param.isEmpty() && request.param.contains("&")
-                && reg.exactMatch(QStrSqlId) && QStrHash.length() == 20)
-            bReturn = true;
-        else bReturn = false;
-        break;
-    }
     case RT_PROMOTE_TO:
         if (ChessStatus::isSignProperPromotionType(request.param))
             bReturn = true;
@@ -129,6 +130,7 @@ bool ChessConditions::isRequestAppropriateToGameStatus(REQUEST_TYPE Type, GAME_S
     case RT_NONE:
         qCritical() << "Type == RT_NONE";
         return false;
+
     case RT_NEW_GAME: return Status == GS_TURN_NONE_WAITING_FOR_START_CONFIRMS ? true : false;
     case RT_MOVE: return whoseTurnFromGameStatus(Status) != NO_TURN ? true : false;
     case RT_SIT_ON: return Status == GS_TURN_NONE_WAITING_FOR_PLAYERS ? true : false;
@@ -162,16 +164,23 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
     case RT_MOVE:
     case RT_STAND_UP:
     case RT_PROMOTE_TO:
-        if (bSittingOnChair && !bInQueue) bSuccess = true;
+        if (bLogged && bSittingOnChair && !bInQueue)
+            bSuccess = true;
         else bSuccess = false;
         break;
     case RT_SIT_ON:
+        if (!bSittingOnChair && !bInQueue) //if not logged then it's guest
+            bSuccess = true;
+        else bSuccess = false;
+        break;
     case RT_QUEUE_ME:
-        if (bLogged && !bSittingOnChair && !bInQueue) bSuccess = true;
+        if (bLogged && !bSittingOnChair && !bInQueue)
+            bSuccess = true;
         else bSuccess = false;
         break;
     case RT_LEAVE_QUEUE:
-        if (bLogged && !bSittingOnChair && bInQueue) bSuccess = true;
+        if (bLogged && !bSittingOnChair && bInQueue)
+            bSuccess = true;
         else bSuccess = false;
         break;
     case RT_GET_TABLE_DATA: //redundant code- let it be here for safety
@@ -185,7 +194,7 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
     }
 
     if (!bSuccess)
-        qWarning() << "Type = " << requestTypeAsQStr(Type) << ". bLogged ="
+        qWarning() << "Type =" << requestTypeAsQStr(Type) << ". bLogged ="
                     << QString::number(bLogged) << ", bSittingOnChair ="
                     << QString::number(bSittingOnChair) << ", bInQueue ="
                     << QString::number(bInQueue);
@@ -206,15 +215,19 @@ REJECTED_REQUEST_REACTION ChessConditions::isThereAnySpecialConditionBeenMet(Cli
         break;
     case RT_MOVE:
     case RT_PROMOTE_TO:
-        if (!(pSender->type() == PT_WHITE && m_pStatus->getWhoseTurn() == WHITE_TURN) &&
-                !(pSender->type() == PT_BLACK && m_pStatus->getWhoseTurn() == BLACK_TURN))
+        if (!(pSender->type() == PT_WHITE && m_pStatus->getWhoseTurn() == WHITE_TURN)
+                && !(pSender->type() == PT_BLACK && m_pStatus->getWhoseTurn() == BLACK_TURN))
             RRR = RRR_RESEND_TABLE_DATA;
         break;
     case RT_SIT_ON:
     {
-        PLAYER_TYPE PlayerChair = playerTypeFromQStr(request.param);
-        if (!m_pClientsList->isPlayerChairEmpty(PlayerChair) ||
-                m_pClientsList->isClientAPlayer(*pSender))
+        PLAYER_TYPE Chair = playerTypeFromQStr(request.param);
+        if ((Chair != PT_NONE && !m_pClientsList->isPlayerChairEmpty(Chair))
+                || (Chair == PT_WHITE && m_pClientsList->isClientSqlIDExists(GUEST1_ID))
+                || (Chair == PT_BLACK && m_pClientsList->isClientSqlIDExists(GUEST2_ID))
+                || m_pClientsList->isClientAPlayer(*pSender)
+                || m_pClientsList->isClientAGuest(*pSender)
+                || m_pClientsList->isWholeGameTableOccupied())
             RRR = RRR_RESEND_TABLE_DATA;
         break;
     }

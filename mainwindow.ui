@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1330</width>
-    <height>840</height>
+    <height>849</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,17 +39,17 @@
           <string>Game</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
-          <item row="4" column="1">
-           <widget class="QLabel" name="gameStatusLbl">
-            <property name="text">
-             <string>-1</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QLabel" name="whiteNameLbl">
             <property name="text">
              <string>WHITE</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="gameStatusLbl">
+            <property name="text">
+             <string>-1</string>
             </property>
            </widget>
           </item>
@@ -74,6 +74,13 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="socketsLbl">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_24">
             <property name="text">
@@ -95,10 +102,10 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="socketsLbl">
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_28">
             <property name="text">
-             <string>0</string>
+             <string>Halfmove/fullmove</string>
             </property>
            </widget>
           </item>
@@ -109,10 +116,10 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_28">
+          <item row="0" column="3">
+           <widget class="QLabel" name="castlingsLbl">
             <property name="text">
-             <string>Halfmove/fullmove</string>
+             <string>-1</string>
             </property>
            </widget>
           </item>
@@ -130,31 +137,10 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="castlingsLbl">
-            <property name="text">
-             <string>-1</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="2">
            <widget class="QLabel" name="label_27">
             <property name="text">
              <string>Enpassant </string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLabel" name="enpassantLbl">
-            <property name="text">
-             <string>-1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label_30">
-            <property name="text">
-             <string>White time</string>
             </property>
            </widget>
           </item>
@@ -165,17 +151,17 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="label_31">
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_30">
             <property name="text">
-             <string>Black  time</string>
+             <string>White time</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
-           <widget class="QLabel" name="blackTimeLbl">
+          <item row="1" column="3">
+           <widget class="QLabel" name="enpassantLbl">
             <property name="text">
-             <string>30:00</string>
+             <string>-1</string>
             </property>
            </widget>
           </item>
@@ -200,10 +186,38 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="3">
+           <widget class="QLabel" name="blackTimeLbl">
+            <property name="text">
+             <string>30:00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Black  time</string>
+            </property>
+           </widget>
+          </item>
           <item row="5" column="3">
            <widget class="QLabel" name="queueTimeLbl">
             <property name="text">
              <string>2:00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>Turn time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3">
+           <widget class="QLabel" name="turnTimeLbl">
+            <property name="text">
+             <string>3:00</string>
             </property>
            </widget>
           </item>
@@ -232,6 +246,8 @@
          <zorder>queuedPlayersLbl</zorder>
          <zorder>label_33</zorder>
          <zorder>queueTimeLbl</zorder>
+         <zorder>label_40</zorder>
+         <zorder>turnTimeLbl</zorder>
         </widget>
        </item>
        <item row="1" column="0">
