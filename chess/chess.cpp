@@ -264,6 +264,12 @@ void Chess::executeClientRequest(clientRequest request)
         if (m_pClientsList->isClientInList(client.ID()))
             m_pClientsList->removeClientFromList(client);
         break;
+    case RT_LOGOUT:
+        this->restorateGameIfDisconnectedClientAffectIt(client);
+        m_pClientsList->clearClientSqlID(client);
+        m_pClientsList->setClientSynchronization(client, SY_DESYNCHRONIZED);
+        this->sendDataToClient(client);
+        break;
     default:
         qCritical() << "received request.type:" << QString::number(request.type);
         this->restartGame(ET_DRAW); //future: inform clients about server errors be4 restarting
@@ -401,7 +407,7 @@ void Chess::restartGame(END_TYPE ET)
     qInfo() << endTypeAsQstr(ET);
     m_ChessGameStatus = GS_TURN_NONE_RESETING;
     this->resetTableData();
-    //future: php could detect who left chair direct from this one table data (?)
+    //future: php could detect who left chair direct from this one table data below(?)
     this->sendDataToAllClients(AT_END_GAME, ET);
     this->changePlayersOnChairs();
     if (m_pMovements->resetPiecePositions())

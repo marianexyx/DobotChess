@@ -17,7 +17,8 @@ enum REQUEST_TYPE
     RT_STAND_UP,
     RT_QUEUE_ME,
     RT_LEAVE_QUEUE,
-    RT_CLIENT_LEFT
+    RT_CLIENT_LEFT,
+    RT_LOGOUT
 };
 
 QString requestTypeAsQStr(REQUEST_TYPE RT);
@@ -49,6 +50,7 @@ inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = fa
     else if (QStrRequest == "queueMe") return RT_QUEUE_ME;
     else if (QStrRequest == "leaveQueue") return RT_LEAVE_QUEUE;
     else if (QStrRequest == "clientLeft") return RT_CLIENT_LEFT;
+    else if (QStrRequest == "logout") return RT_LOGOUT;
     else
     {
         if (bErrorLog)
@@ -73,6 +75,7 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     case RT_QUEUE_ME: return "queueMe";
     case RT_LEAVE_QUEUE: return "leaveQueue";
     case RT_CLIENT_LEFT: return "clientLeft";
+    case RT_LOGOUT: return "logout";
     default:
         qCritical() << "wrong arg =" << QString::number(RT);
         return "";

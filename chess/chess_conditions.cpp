@@ -10,9 +10,7 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 {
     clientRequest request;
     request.type = requestTypeFromQStr(QStrMsg, SHOW_ERRORS);
-    if (request.type == RT_NONE)
-        return false;
-    else
+    if (request.type != RT_NONE)
     {
         if (ChessConditions::isRequestAParameterType(request.type))
         {
@@ -24,6 +22,7 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
         }
         else return true;
     }
+    else return true;
 }
 
 /*static*/ bool ChessConditions::isRequestAParameterType(REQUEST_TYPE Type,
@@ -183,7 +182,11 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
             bSuccess = true;
         else bSuccess = false;
         break;
-    case RT_GET_TABLE_DATA: //redundant code- let it be here for safety
+    case RT_LOGOUT:
+        if (bLogged)
+            bSuccess = true;
+        else bSuccess = false;
+    case RT_GET_TABLE_DATA: //redundant case code- let it be here for safety
     case RT_IM:
     case RT_CLIENT_LEFT:
         bSuccess = true;
