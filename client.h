@@ -18,30 +18,35 @@
 enum CLIENT_ID { CID_CORE, CID_SQL };
 inline QString clientIDAsQStr(CLIENT_ID CID) { return CID == CID_CORE ? "coreID" : "sqlID"; }
 
-const uint GUEST1_ID = 1;
-const uint GUEST2_ID = 2;
-
-enum SYNCHRONIZED { SY_DESYNCHRONIZED,
-                    SY_SYNCHRONIZED,
-                    SY_DOUBLE_LOGIN,
-                    SY_REMOVE_AND_REFRESH_CLIENT,
-                    SY_GUEST1,
-                    SY_GUEST2
+enum SYNCHRONIZED { SY_UNLOGGED_REMOVE_AND_REFRESH_CLIENT = -4,
+                    SY_UNLOGGED_DOUBLE_LOGIN,
+                    SY_UNLOGGED_LOGOUT,
+                    SY_UNLOGGED_LOGIN_FAILED,
+                    SY_UNLOGGED,
+                    SY_LOGGED_GUEST1,
+                    SY_LOGGED_GUEST2
                   };
 inline QString synchronizedAsQStr(SYNCHRONIZED SY)
 {
     switch(SY)
     {
-    case SY_DESYNCHRONIZED: return "desynchronized";
-    case SY_SYNCHRONIZED: return "synchronized";
-    case SY_DOUBLE_LOGIN: return "doubleLogin";
-    case SY_REMOVE_AND_REFRESH_CLIENT: return "removeAndRefreshClient";
-    case SY_GUEST1: return "guest1";
-    case SY_GUEST2: return "guest2";
+    case SY_UNLOGGED_REMOVE_AND_REFRESH_CLIENT: return "removeAndRefreshClient";
+    case SY_UNLOGGED_DOUBLE_LOGIN: return "doubleLogin";
+    case SY_UNLOGGED_LOGOUT: return "logout";
+    case SY_UNLOGGED_LOGIN_FAILED: return "loginFailed";
+    case SY_UNLOGGED: return "notLogged";
+    case SY_LOGGED_GUEST1: return "guest1";
+    case SY_LOGGED_GUEST2: return "guest2";
     default:
         qCritical() << "wrong val =" << QString::number(SY);
         return "ERROR";
     }
+}
+inline QString synchronizedAsQStr(int64_t nSqlId)
+{
+    if (nSqlId >= SY_UNLOGGED_REMOVE_AND_REFRESH_CLIENT && nSqlId <= SY_LOGGED_GUEST2)
+        return synchronizedAsQStr(static_cast<SYNCHRONIZED>(nSqlId));
+    else return "client";
 }
 
 class Client
@@ -50,8 +55,7 @@ class Client
 
 private:
     uint64_t m_ID;
-    uint64_t m_sqlID;
-    SYNCHRONIZED m_synchronized;
+    int64_t m_sqlID;
     QWebSocket* m_socket;
     PLAYER_TYPE m_Type;
     bool m_isStartClickedByPlayer;
@@ -62,8 +66,9 @@ public:
     bool operator ==(const struct Client& cl) { return m_ID == cl.m_ID; }
     bool operator !=(const struct Client& cl) { return m_ID != cl.m_ID; }
 
+    //todo: name those as "get..."
     uint64_t ID() const { return m_ID; }
-    uint64_t sqlID() const { return m_sqlID; }
+    int64_t sqlID() const { return m_sqlID; }
     QWebSocket *socket() const { return m_socket; }
     PLAYER_TYPE type() const { return m_Type; }
     bool isStartClickedByPlayer() const { return m_isStartClickedByPlayer; }
@@ -74,12 +79,6 @@ public:
             qCritical() << "tried to access client's name without setting his sqlID 1st";
         return m_name;
     }
-    SYNCHRONIZED synchronized() const
-    {   //todo: is it ok (work properly)?? it's messy for sure
-        if (m_synchronized == SY_SYNCHRONIZED || m_synchronized == SY_DESYNCHRONIZED)
-            return m_sqlID > 0 ? SY_SYNCHRONIZED : SY_DESYNCHRONIZED;
-        else return m_synchronized;
-    }
     QString dumpCrucialData()
     {
         return "ID: " + QString::number(m_ID) + ", sqlID:" + QString::number(m_sqlID)
@@ -89,7 +88,6 @@ public:
     {
         return "ID: " + QString::number(m_ID)
                 + ", sqlID:" + QString::number(m_sqlID)
-                + ", synchronized: " + synchronizedAsQStr(m_synchronized)
                 + ", playerType: " + playerTypeAsQStr(m_Type)
                 + ", isStartClickedByPlayer: " + QString::number(m_isStartClickedByPlayer)
                 + ", queue: " + QString::number(m_queue)
@@ -118,7 +116,7 @@ public:
     bool isWholeGameTableOccupied();
     bool isClientIDExists(uint64_t un64ID, bool bErrorLog = false);
     bool isClientSqlIDExists(const Client& client, bool bErrorLog = false);
-    bool isClientSqlIDExists(uint64_t un64sqlID, bool bErrorLog = false);
+    bool isClientSqlIDExists(int64_t n64sqlID, bool bErrorLog = false);
     bool isClientAPlayer(const Client& client, bool bErrorLog = false);
     bool isStartClickedByPlayer(PLAYER_TYPE Type);
     bool isStartClickedByBothPlayers();
@@ -132,15 +130,14 @@ public:
     void removeClientFromList(const Client& client);
     void removeClientFromQueue(const Client& client);
 
-    void setClientSqlIDAndName(const Client& client, uint64_t un64SqlID);
+    void setClientSqlIDAndName(const Client& client, int64_t n64SqlID);
     void setPlayerType(const Client& client, PLAYER_TYPE Type);
     void setClientStartConfirmation(const Client& client, bool bState);
     void setClientStartConfirmation(PLAYER_TYPE Type, bool bState);
-    void setClientSynchronization(const Client& client, SYNCHRONIZED sync);
 
     QList<Client> getClientsList() const { return m_clients; }
     Client getClient(QWebSocket* pClientSocket);
-    Client getClient(uint64_t un64ClientID, CLIENT_ID IdType = CID_CORE);
+    Client getClient(int64_t n64ClientID, CLIENT_ID IdType = CID_CORE);
     Client getPlayer(PLAYER_TYPE Type);
     Client getNextQueuedClient();
     QString getQueuedClientsSqlIDsList();

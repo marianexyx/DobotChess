@@ -67,6 +67,7 @@ private slots:
 
     //usb slots
     void updatePortsComboBox(int nUsbPorst);
+    void updateSensorsLabels(Sensors sensors);
     void on_portsComboBox_currentIndexChanged(int nID);
     void on_reloadPortsBtn_clicked();
     void on_sendUsbBtn_clicked();

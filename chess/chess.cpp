@@ -30,8 +30,8 @@ Chess::Chess(PieceController* pPieceController)
             this, SLOT(checkMsgFromChessEngine(QString, QString)));
     connect(m_pWebsockets, SIGNAL(msgFromWebsocketsToChess(QString, uint64_t)),
             this, SLOT(checkMsgFromClient(QString, uint64_t)));
-    connect(m_pUSB, SIGNAL(msgFromUsbToChess(QString)),
-            this, SLOT(checkMsgFromUSB(QString)));
+    connect(m_pUSB, SIGNAL(msgFromUsbToChess(Sensors)),
+            this, SLOT(checkMsgFromUSB(Sensors)));
     connect(m_pUSB, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBoxInUI(int)));
     connect(m_pStatus, SIGNAL(setBoardDataLabel(QString, BOARD_DATA_LABEL)),
@@ -89,11 +89,14 @@ void Chess::checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bSer
     }
 }
 
-void Chess::checkMsgFromUSB(QString QStrMsg)
-{
-    if (QStrMsg.contains("EMERGENCY_STOP"))
+void Chess::checkMsgFromUSB(Sensors sensors)
+{   
+    if (sensors.fDustDensity > 350.f || sensors.fCurrent > 4.f
+            || sensors.fTemp1 > 40.f || sensors.fTemp2 > 40.f)
+        qWarning() << "sensor exceeded maximum value:" << sensors.getAsQStr();
+
+    if (sensors.bStopButton == true)
         m_pDobot->forceStopArm();
-    else qWarning() << "unknown msg:" << QStrMsg;
 }
 
 void Chess::sendDataToClient(Client client, ACTION_TYPE AT /*= AT_NONE*/,
@@ -122,11 +125,18 @@ void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
     this->restorateGameIfDisconnectedClientAffectIt(client);
     m_pClientsList->clearClientSqlID(client);
     if (RRR == RRR_DOUBLE_LOGIN)
-        m_pClientsList->setClientSynchronization(client, SY_DOUBLE_LOGIN);
+    {
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED_DOUBLE_LOGIN);
+        this->sendDataToClient(client);
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
+    }
     else if (RRR == RRR_REMOVE_AND_REFRESH_CLIENT)
-        m_pClientsList->setClientSynchronization(client, SY_REMOVE_AND_REFRESH_CLIENT);
-    this->sendDataToClient(client);
-    //don't remove client. his msgs will be blocked, till he will refresh page (client will die)
+    {
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED_REMOVE_AND_REFRESH_CLIENT);
+        this->sendDataToClient(client);
+        //don't remove client. his msgs will be blocked, till he will refresh page (client will die)
+    }
+
     this->updateClientsInUI();
 }
 
@@ -191,27 +201,26 @@ void Chess::executeClientRequest(clientRequest request)
     case RT_GET_TABLE_DATA: //redundant code- let it be here for safety
         this->sendDataToClient(client);
         break;
-    case RT_IM:
+    case RT_LOGIN:
     {
-        int nSqlID = request.param.left(request.param.indexOf("&")).toInt();
-        if (m_pClientsList->isClientSqlIDExists(nSqlID)) //double login- kill old client
+        QString QStrLogin = request.param.left(request.param.indexOf("&"));
+        QString QStrPass = request.param.mid(request.param.indexOf("&")+1);
+        if (Sql::isLoginAndPassExistInDB(QStrLogin, QStrPass))
         {
-            Client clientToKill = m_pClientsList->getClient(nSqlID, CID_SQL);
-            if (client != clientToKill)
-                this->killClient(m_pClientsList->getClient(nSqlID, CID_SQL), RRR_DOUBLE_LOGIN);
-            else
-            {
-                //future: when loggouting player, site is sending 'im...' few times (1st is...
-                //...when site catch 'reset complited' info). it's barely warning, so repair...
-                //...it in distance future
-                qDebug() << "already set(ted) client sent 'im...' command again. client:"
-                            << client.dumpCrucialData();
-                this->sendDataToClient(client);
-                break;
-            }
+            int64_t n64SqlID = Sql::getClientIdFromDB(QStrLogin);
+
+            if (m_pClientsList->isClientSqlIDExists(n64SqlID)) //double login- kill old client 1st
+                this->killClient(m_pClientsList->getClient(n64SqlID, CID_SQL), RRR_DOUBLE_LOGIN);
+
+            m_pClientsList->setClientSqlIDAndName(client, n64SqlID);
+            this->sendDataToClient(client);
         }
-        m_pClientsList->setClientSqlIDAndName(client, nSqlID);
-        this->sendDataToClient(client);
+        else
+        {
+            m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED_LOGIN_FAILED);
+            this->sendDataToClient(client);
+            m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
+        }
         break;
     }
     case RT_SIT_ON:
@@ -222,9 +231,9 @@ void Chess::executeClientRequest(clientRequest request)
         if (!m_pClientsList->isClientSqlIDExists(client))
         {
             if (PT == PT_WHITE)
-                m_pClientsList->setClientSqlIDAndName(client, GUEST1_ID);
+                m_pClientsList->setClientSqlIDAndName(client, SY_LOGGED_GUEST1);
             else if (PT == PT_BLACK)
-                m_pClientsList->setClientSqlIDAndName(client, GUEST2_ID);
+                m_pClientsList->setClientSqlIDAndName(client, SY_LOGGED_GUEST2);
         }
         m_pClientsList->setPlayerType(client, PT);
         if (m_pClientsList->isWholeGameTableOccupied())
@@ -249,7 +258,12 @@ void Chess::executeClientRequest(clientRequest request)
         bSentMsgToChessEngine = this->manageMoveRequest(request);
         break;
     case RT_STAND_UP:
-        this->playerLeftChair(client.type());
+        this->restorateGameIfDisconnectedClientAffectIt(client);
+        if (m_pClientsList->isClientAGuest(client))
+        {
+            m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
+            this->sendDataToClient(client);
+        }
         break;
     case RT_QUEUE_ME:
         m_pClientsList->addClientToQueue(client);
@@ -266,9 +280,9 @@ void Chess::executeClientRequest(clientRequest request)
         break;
     case RT_LOGOUT:
         this->restorateGameIfDisconnectedClientAffectIt(client);
-        m_pClientsList->clearClientSqlID(client);
-        m_pClientsList->setClientSynchronization(client, SY_DESYNCHRONIZED);
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED_LOGOUT);
         this->sendDataToClient(client);
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
         break;
     default:
         qCritical() << "received request.type:" << QString::number(request.type);
@@ -509,7 +523,7 @@ void Chess::restorateGameIfDisconnectedClientAffectIt(const Client &clientToDisc
                                     + QString::number(clientToDisconnect.ID()) + "\n", LOG_CORE);
 }
 
-void Chess::playerLeftChair(PLAYER_TYPE PT)
+void Chess::playerLeftChair(PLAYER_TYPE PT) //todo: change name
 {
     emit this->addTextToLogPTE(playerTypeAsQStr(PT) + " player left chair\n", LOG_CORE);
 

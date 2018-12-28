@@ -30,7 +30,7 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 {
     switch(Type)
     {
-    case RT_IM:
+    case RT_LOGIN:
     case RT_SIT_ON:
     case RT_MOVE:
     case RT_PROMOTE_TO:
@@ -49,15 +49,18 @@ ChessConditions::ChessConditions(Clients* pClientsList, ChessStatus* pStatus)
 
     switch(request.type)
     {
-    case RT_IM:
+    case RT_LOGIN:
     {
-        QRegExp reg("\\d+"); //a digit (\d), one or more times (+)
-        QString QStrSqlId = request.param.left(request.param.indexOf("&"));            
-        QString QStrHash = request.param.mid(request.param.indexOf("&")+1);
-        if (!request.param.isEmpty() && request.param.contains("&")
-                && reg.exactMatch(QStrSqlId) && QStrHash.length() == 20
-                && QStrSqlId != GUEST1_ID && QStrSqlId != GUEST2_ID)
+        QString QStrLogin = request.param.left(request.param.indexOf("&"));
+        QString QStrParamTemp = request.param.simplified();
+        QStrParamTemp.replace( " ", "" );
+        QRegExp reg("[a-zA-Z0-9]+"); //alphanumeric (kinda). same on site (register)
+        if (!request.param.isEmpty() && request.param.contains("&") &&
+                request.param.length() == QStrParamTemp.length() && request.param.length() >= 5 &&
+                request.param.length() <= 46 && reg.exactMatch(QStrLogin))
+        {
             bReturn = true;
+        }
         else bReturn = false;
         break;
     }
@@ -187,7 +190,7 @@ bool ChessConditions::isSenderAppropriate(Client* pSender, REQUEST_TYPE Type)
             bSuccess = true;
         else bSuccess = false;
     case RT_GET_TABLE_DATA: //redundant case code- let it be here for safety
-    case RT_IM:
+    case RT_LOGIN:
     case RT_CLIENT_LEFT:
         bSuccess = true;
         break;
@@ -226,24 +229,12 @@ REJECTED_REQUEST_REACTION ChessConditions::isThereAnySpecialConditionBeenMet(Cli
     {
         PLAYER_TYPE Chair = playerTypeFromQStr(request.param);
         if ((Chair != PT_NONE && !m_pClientsList->isPlayerChairEmpty(Chair))
-                || (Chair == PT_WHITE && m_pClientsList->isClientSqlIDExists(GUEST1_ID))
-                || (Chair == PT_BLACK && m_pClientsList->isClientSqlIDExists(GUEST2_ID))
+                || (Chair == PT_WHITE && m_pClientsList->isClientSqlIDExists(SY_LOGGED_GUEST1))
+                || (Chair == PT_BLACK && m_pClientsList->isClientSqlIDExists(SY_LOGGED_GUEST2))
                 || m_pClientsList->isClientAPlayer(*pSender)
                 || m_pClientsList->isClientAGuest(*pSender)
                 || m_pClientsList->isWholeGameTableOccupied())
             RRR = RRR_RESEND_TABLE_DATA;
-        break;
-    }
-    case RT_IM:
-    {
-        if (Sql::isClientHashOk(request.param))
-        {
-            //double login is proper request. it's served in request execusion
-            uint unSqlId = request.param.left(request.param.indexOf("&")).toInt();
-            if (pSender->sqlID() != 0 && pSender->sqlID() != unSqlId)
-                RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
-        }
-        else RRR = RRR_REMOVE_AND_REFRESH_CLIENT;
         break;
     }
     case RT_QUEUE_ME:

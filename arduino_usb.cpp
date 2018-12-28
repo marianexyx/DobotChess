@@ -9,6 +9,12 @@ ArduinoUsb::ArduinoUsb()
     connect(usbPort, SIGNAL(readyRead()), this, SLOT(readUsbData()));
 }
 
+ArduinoUsb::~ArduinoUsb()
+{
+    if(usbPort->isOpen())
+        usbPort->close();
+}
+
 void ArduinoUsb::searchDevices()
 {
     availablePort = QSerialPortInfo::availablePorts();
@@ -60,17 +66,37 @@ void ArduinoUsb::readUsbData()
         QStrFullSerialMsg.remove('$');
         QStrFullSerialMsg.remove('@');
 
-        if (!QStrFullSerialMsg.contains("EMERGENCY_STOP")) //prevent infinity logs
-            emit this->addTextToLogPTE(QStrFullSerialMsg + "\n", LOG_USB_RECEIVED);
-        emit this->msgFromUsbToChess(QStrFullSerialMsg);
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(QStrFullSerialMsg.toUtf8());
+        if (!jsonDoc.isNull() && jsonDoc.isObject())
+        {
+            Sensors sensors = this->readSensors(QStrFullSerialMsg);
+            emit this->updateSensorsInUI(sensors);
+            emit this->msgFromUsbToChess(sensors);
+        }
 
         QByteA_data.clear();
         QStrFullSerialMsg.clear();
     }
 }
 
-ArduinoUsb::~ArduinoUsb()
+/*static*/ Sensors ArduinoUsb::readSensors(const QString& QStrMsg)
 {
-    if(usbPort->isOpen())
-        usbPort->close();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(QStrMsg.toUtf8());
+    QJsonObject jsonObj;
+    if(!jsonDoc.isNull())
+    {
+        if (jsonDoc.isObject())
+            jsonObj = jsonDoc.object();
+        else qCritical() << "Document is not an object";
+    }
+    else qCritical() << "Invalid JSON: " << QStrMsg;
+
+    Sensors sensors;
+    sensors.bStopButton = jsonObj["stopBtn"].toInt();
+    sensors.fDustDensity = jsonObj["dust"].toDouble();
+    sensors.fCurrent = jsonObj["current"].toDouble();
+    sensors.fTemp1 = jsonObj["temp1"].toDouble();
+    sensors.fTemp2 = jsonObj["temp2"].toDouble();
+    return sensors;
 }
+

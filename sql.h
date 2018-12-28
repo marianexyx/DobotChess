@@ -18,6 +18,8 @@ struct Sql
     static bool isClientHashOk(QString QStrIDandHash);
     static bool isClientHashOk(int64_t n64sqlId, QString QStrHash);
     static QString getClientNameFromDB(int64_t n64sqlId);
+    static bool isLoginAndPassExistInDB(QString QStrLogin, QString QStrPassword);
+    static int64_t getClientIdFromDB(QString QStrLogin);
 };
 
 #endif // SQL_H

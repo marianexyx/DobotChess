@@ -71,6 +71,8 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     //usb signals
     connect(m_pChess, SIGNAL(updatePortsComboBox(int)),
             this, SLOT(updatePortsComboBox(int)));
+    connect(m_pArduinoUsb, SIGNAL(updateSensorsInUI(Sensors)),
+            this, SLOT(updateSensorsLabels(Sensors)));
 
     //dobot slots
     connect(m_pDobot, SIGNAL(JointLabelText(QString, short)),
@@ -100,10 +102,10 @@ MainWindow::MainWindow(Chess* pChess, QWidget* parent):
     ui->homeBtn->setToolTip("Go to start position.");
     ui->calibrateBtn->setToolTip("Initialize move sequence: calibrate stepper"
                                  " motors. Needed after power up arm.");
-    ui->startGmPosBtn->setToolTip("Initialize move sequence: go to game's start "
-                                  "position, from dobot's start position.");
-    ui->startDtPosBtn->setToolTip("Initialize move sequence: go to dobot's start "
-                                  "position, from game's start position.");
+    ui->startGmPosBtn->setToolTip("Start game position: Initialize move sequence: go to "
+                                  "game's start position, from dobot's start position.");
+    ui->startDtPosBtn->setToolTip("Start dobot position: Initialize move sequence: go to "
+                                  "dobot's start position, from game's start position.");
     ui->retreatLeftBtn->setToolTip("Go to left side of chessboard (retreat) "
                                    "position.");
     ui->middleAboveBtn->setToolTip("Go to middle point of chessboard, above the "
@@ -374,6 +376,15 @@ void MainWindow::updatePortsComboBox(int nUsbPorst)
         ui->portsComboBox->addItem(m_pChess->getUSBPointer()->availablePort.at(i).portName());
 }
 
+void MainWindow::updateSensorsLabels(Sensors sensors)
+{
+    ui->stopButtonLabel->setText(QString::number(sensors.bStopButton));
+    ui->dustLabel->setText(QString::number(sensors.fDustDensity));
+    ui->currentLabel->setText(QString::number(sensors.fCurrent));
+    ui->tempsLabel->setText(QString::number(sensors.fTemp1, 'f', 1) + "/"
+                            + QString::number(sensors.fTemp2, 'f', 1));
+}
+
 void MainWindow::on_portsComboBox_currentIndexChanged(int nID)
 {
     m_pChess->getUSBPointer()->portIndexChanged(nID);
@@ -402,7 +413,8 @@ void MainWindow::on_SimulateFromUsbBtn_clicked()
 {
     if (!ui->SimulateFromUsbLineEdit->text().isEmpty())
     {
-        m_pChess->getUSBPointer()->msgFromUsbToChess(ui->SimulateFromUsbLineEdit->text());
+        m_pChess->getUSBPointer()->msgFromUsbToChess(
+                    ArduinoUsb::readSensors(ui->SimulateFromUsbLineEdit->text()));
         ui->SimulateFromUsbLineEdit->clear();
     }
 }

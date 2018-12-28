@@ -70,10 +70,10 @@ void Websockets::receivedMsg(QString QStrMsg)
                  << "; msg =" << QStrMsg;
 
     Client cl = m_pClientsList->getClient(pSocket);
-    if (cl.synchronized() != SY_DOUBLE_LOGIN && cl.synchronized() != SY_REMOVE_AND_REFRESH_CLIENT)
+    if (cl.sqlID() >= SY_UNLOGGED)
         emit this->msgFromWebsocketsToChess(QStrMsg, m_pClientsList->getClient(pSocket).ID());
     else qWarning() << "incoming msg from client with forbidden synchronization type:"
-                    << synchronizedAsQStr(cl.synchronized()) << ", cl:" << cl.dumpCrucialData();
+                    << synchronizedAsQStr(cl.sqlID()) << ", cl:" << cl.dumpCrucialData();
 }
 
 void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
@@ -84,12 +84,10 @@ void Websockets::sendMsgToClient(QString QStrMsg, uint64_t un64ReceiverID)
             return;
 
         Client receiver = m_pClientsList->getClient(un64ReceiverID);
-        QString QStrSynchronization = "0:" + QString::number(receiver.synchronized());
-        QStrMsg = QStrSynchronization + "," + QStrMsg;
+        QStrMsg = "0:" + QString::number(receiver.sqlID()) + "," + QStrMsg;
         QStrMsg = Websockets::toJSON(QStrMsg);
         QString QStrReceiverName = receiver.sqlID() > 0 ? receiver.name() : "client";
-        emit this->addTextToLogPTE("send to: " + QStrReceiverName + " : "
-                                   + QStrMsg + "\n", LOG_WEBSOCKET);
+        emit this->addTextToLogPTE(QStrReceiverName + " << " + QStrMsg + "\n", LOG_WEBSOCKET);
         receiver.socket()->sendTextMessage(QStrMsg);
     }
     else qCritical() << "receiver ID < 1. it's =" << QString::number(un64ReceiverID);
@@ -99,8 +97,7 @@ void Websockets::sendMsgToAllClients(QString QStrMsg)
 {
     foreach (Client client, m_pClientsList->getClientsList())
     {
-        QString QStrSynchronization = "0:" + QString::number(client.synchronized());
-        QString QStrFullInfo = QStrSynchronization + "," + QStrMsg;
+        QString QStrFullInfo = "0:" + QString::number(client.sqlID()) + "," + QStrMsg;
         QString QStrFullInfoJSON = Websockets::toJSON(QStrFullInfo);
 
         if (QStrMsg != "getTableData")

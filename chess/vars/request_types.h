@@ -9,7 +9,7 @@ enum REQUEST_TYPE
 {
     RT_NONE,
     RT_GET_TABLE_DATA,
-    RT_IM,
+    RT_LOGIN,
     RT_SIT_ON,
     RT_NEW_GAME,
     RT_MOVE,
@@ -41,7 +41,7 @@ inline REQUEST_TYPE requestTypeFromQStr(QString QStrRequest, bool bErrorLog = fa
 {   
 
     if (QStrRequest == "getTableData") return RT_GET_TABLE_DATA;
-    else if (QStrRequest.left(2) == "im") return RT_IM;
+    else if (QStrRequest.left(5) == "login") return RT_LOGIN;
     else if (QStrRequest.left(5) == "sitOn") return RT_SIT_ON;
     else if (QStrRequest == "newGame") return RT_NEW_GAME;
     else if (QStrRequest.left(4) == "move") return RT_MOVE;
@@ -66,7 +66,7 @@ inline QString requestTypeAsQStr(REQUEST_TYPE RT)
     {
     case RT_NONE: return "none";
     case RT_GET_TABLE_DATA: return "getTableData";
-    case RT_IM: return "im";
+    case RT_LOGIN: return "login";
     case RT_SIT_ON: return "sitOn";
     case RT_NEW_GAME: return "newGame";
     case RT_MOVE: return "move";

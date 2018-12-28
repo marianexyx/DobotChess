@@ -392,7 +392,7 @@ void Dobot::clearGripper()
     m_usItemIDInGripper = 0;
 }
 
-void Dobot::forceStopArm() //todo: control through arduino, and dobot alarms
+void Dobot::forceStopArm() //todo: additionally control with dobot alarms
 {
     if (m_bConnectedToDobot)
     {

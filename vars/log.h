@@ -27,16 +27,16 @@ inline QString logAsQstr(LOG Log)
     case LOG_CORE: QStrLog = "core"; break;
     case LOG_DOBOT: QStrLog = "dobot"; break;
     case LOG_TCP: QStrLog = "TCP"; break;
-    case LOG_WEBSOCKET: QStrLog = "websocket"; break;
+    case LOG_WEBSOCKET: QStrLog = "WS"; break;
     case LOG_MAINWINDOW: QStrLog = "mainwindow"; break;
     case LOG_USB: QStrLog = "USB"; break;
     case LOG_USB_SENT: QStrLog = "to_USB"; break;
     case LOG_USB_RECEIVED: QStrLog = "from_USB"; break;
     default:
-        qCritical() << "wrong arg = " << QString::number(Log);
+        qCritical() << "wrong arg =" << QString::number(Log);
         return "";
     }
-    return "<" + QStrLog + ">: ";
+    return "<" + QStrLog + "> ";
 }
 
 #endif /* LOG_H */

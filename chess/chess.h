@@ -103,7 +103,7 @@ public:
 public slots:
     void checkMsgFromClient(QString QStrMsg, uint64_t un64SenderID, bool bService = false);
     void checkMsgFromChessEngine(QString QStrTcpMsgType, QString QStrTcpRespond);
-    void checkMsgFromUSB(QString QStrMsg);
+    void checkMsgFromUSB(Sensors sensors);
     void timeOutStart(); //future: pack timeOuts in 1 slot
     void timeOutPlayer(PLAYER_TYPE Player);
     void timeOutTurn();

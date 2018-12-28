@@ -5,7 +5,6 @@ void Clients::newClient(QWebSocket* const clientSocket)
     Client newClient;
     newClient.m_ID = this->getNextAvailableClientID();
     newClient.m_sqlID = 0;
-    newClient.m_synchronized = SY_DESYNCHRONIZED;
     newClient.m_socket = clientSocket;
     newClient.m_queue = 0;
     newClient.m_isStartClickedByPlayer = false;
@@ -192,9 +191,9 @@ bool Clients::isClientSqlIDExists(const Client& client, bool bErrorLog /*= false
     }
 }
 
-bool Clients::isClientSqlIDExists(uint64_t un64sqlID, bool bErrorLog /*= false*/)
+bool Clients::isClientSqlIDExists(int64_t n64sqlID, bool bErrorLog /*= false*/)
 {
-    if (un64sqlID == 0)
+    if (n64sqlID == 0)
     {
         if (bErrorLog)
             qCritical() << "sqlID == 0";
@@ -203,12 +202,12 @@ bool Clients::isClientSqlIDExists(uint64_t un64sqlID, bool bErrorLog /*= false*/
 
     foreach (Client cl, m_clients)
     {
-        if (cl.m_sqlID == un64sqlID)
+        if (cl.m_sqlID == n64sqlID)
             return true;
     }
 
     if (bErrorLog)
-        qCritical() << "sqlID:" << QString::number(un64sqlID) << "not found in clients list";
+        qCritical() << "sqlID:" << QString::number(n64sqlID) << "not found in clients list";
 
     return false;
 }
@@ -269,7 +268,7 @@ bool Clients::isClientInQueue(const Client &client)
 
 bool Clients::isClientAGuest(const Client& client)
 {
-    if (client.sqlID() == GUEST1_ID || client.sqlID() == GUEST2_ID)
+    if (client.sqlID() == SY_LOGGED_GUEST1 || client.sqlID() == SY_LOGGED_GUEST2)
         return true;
     else return false;
 }
@@ -293,7 +292,7 @@ bool Clients::isPlayerAGuest(PLAYER_TYPE Type)
 void Clients::clearClientSqlID(const Client& client)
 {
     qInfo() << "client's ID =" << client.ID();
-    this->setClientSqlIDAndName(client, 0);
+    this->setClientSqlIDAndName(client, SY_UNLOGGED);
 }
 
 void Clients::clearPlayerType(PLAYER_TYPE Type)
@@ -304,24 +303,16 @@ void Clients::clearPlayerType(PLAYER_TYPE Type)
         {
             if (client.m_Type == Type)
             {
-                if (this->isPlayerAGuest(Type))
-                {
-                    this->removeClientFromList(client);
-                    return;
-                }
-                else
-                {
-                    Client changedClient = client;
-                    changedClient.m_Type = PT_NONE;
-                    changedClient.m_isStartClickedByPlayer = false;
+                Client changedClient = client;
+                changedClient.m_Type = PT_NONE;
+                changedClient.m_isStartClickedByPlayer = false;
 
-                    int nClientPos = m_clients.indexOf(client);
-                    if (nClientPos >= 0 && nClientPos < m_clients.size())
-                        m_clients.replace(nClientPos, changedClient);
-                    else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
+                int nClientPos = m_clients.indexOf(client);
+                if (nClientPos >= 0 && nClientPos < m_clients.size())
+                    m_clients.replace(nClientPos, changedClient);
+                else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
 
-                    return;
-                }
+                return;
             }
         }
         qWarning() << "client.type not found";
@@ -381,13 +372,13 @@ void Clients::removeClientFromQueue(const Client &client)
     emit this->showQueuedClientsListInUI(this->getQueuedClientsNamesList());
 }
 
-void Clients::setClientSqlIDAndName(const Client& client, uint64_t un64SqlID)
+void Clients::setClientSqlIDAndName(const Client& client, int64_t n64SqlID)
 {
     foreach (Client cl, m_clients)
     {
-        if (cl.m_sqlID == un64SqlID && cl.m_sqlID > 0)
+        if (cl.m_sqlID > 0 && cl.m_sqlID == n64SqlID)
         {
-            qCritical() << "sqlID" << QString::number(un64SqlID) << "already exists, or it's 0";
+            qCritical() << "sqlID" << QString::number(n64SqlID) << "already exists, or it's 0";
             return;
         }
     }
@@ -397,13 +388,8 @@ void Clients::setClientSqlIDAndName(const Client& client, uint64_t un64SqlID)
         if (cl == client)
         {
             Client changedClient = cl;
-            changedClient.m_sqlID = un64SqlID;
-            //future: recognize client by guest ID, not guest synchro
-            if (un64SqlID == GUEST1_ID)
-                changedClient.m_synchronized = SY_GUEST1;
-            else if (un64SqlID == GUEST2_ID)
-                changedClient.m_synchronized = SY_GUEST2;
-            changedClient.m_name = un64SqlID == 0 ? "" : Sql::getClientNameFromDB(un64SqlID);
+            changedClient.m_sqlID = n64SqlID;
+            changedClient.m_name = n64SqlID > 0 ? Sql::getClientNameFromDB(n64SqlID) : "";
 
             int nClientPos = m_clients.indexOf(cl);
             if (nClientPos >= 0 && nClientPos < m_clients.size())
@@ -513,26 +499,6 @@ void Clients::setClientStartConfirmation(PLAYER_TYPE Type, bool bState)
     qCritical() << "client not found";
 }
 
-void Clients::setClientSynchronization(const Client& client, SYNCHRONIZED sync)
-{
-    foreach (Client cl, m_clients)
-    {
-        if (cl == client)
-        {
-            Client changedClient = cl;
-            changedClient.m_synchronized = sync;
-
-            int nClientPos = m_clients.indexOf(cl);
-            if (nClientPos >= 0 && nClientPos < m_clients.size())
-                m_clients.replace(nClientPos, changedClient);
-            else qCritical() << "iteration error. iter val =" << QString::number(nClientPos);
-
-            return;
-        }
-    }
-    qCritical() << "client not found";
-}
-
 Client Clients::getClient(QWebSocket* pClientSocket)
 {
     foreach (Client cl, m_clients)
@@ -548,12 +514,12 @@ Client Clients::getClient(QWebSocket* pClientSocket)
     return client;
 }
 
-Client Clients::getClient(uint64_t un64ClientID, CLIENT_ID IdType /* = CID_CORE */)
+Client Clients::getClient(int64_t n64ClientID, CLIENT_ID IdType /* = CID_CORE */)
 {
-    if (un64ClientID <= 0)
+    if (n64ClientID <= 0)
     {
         qCritical() << "tried to find client with" << clientIDAsQStr(IdType)
-                    << "<= 0:" << QString::number(un64ClientID);
+                    << "<= 0:" << QString::number(n64ClientID);
         return *new Client;
     }
 
@@ -561,6 +527,7 @@ Client Clients::getClient(uint64_t un64ClientID, CLIENT_ID IdType /* = CID_CORE 
     {
         foreach (Client cl, m_clients)
         {
+            uint64_t un64ClientID = n64ClientID; //compile warning walkaround
             if (cl.m_ID == un64ClientID)
             {
                 Client& client = cl;
@@ -572,7 +539,7 @@ Client Clients::getClient(uint64_t un64ClientID, CLIENT_ID IdType /* = CID_CORE 
     {
         foreach (Client cl, m_clients)
         {
-            if (cl.m_sqlID == un64ClientID)
+            if (cl.m_sqlID == n64ClientID)
             {
                 Client& client = cl;
                 return client;
@@ -585,7 +552,7 @@ Client Clients::getClient(uint64_t un64ClientID, CLIENT_ID IdType /* = CID_CORE 
         return *new Client;
     }
 
-    qCritical() << "client not found. ID =" << QString::number(un64ClientID);
+    qCritical() << "client not found. ID =" << QString::number(n64ClientID);
     return *new Client;
 }
 
