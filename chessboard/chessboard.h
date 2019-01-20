@@ -23,15 +23,22 @@ class Chessboard: public QObject
 private:
     BOARD m_boardType;
     bool m_bBoardIsReal;
+    //future: could create struct "4 corners" or smtg
     Point3D  m_a1, m_a8, m_h1, m_h8;
-    Point3D m_remWhiteCloserOuter, m_remWhiteFurtherInner;
-    Point3D m_remBlackCloserOuter, m_remBlackFurtherInner;
-    double m_dSquareWidth;
+    Point3D m_remWhiteCloserOuter, m_remWhiteCloserInner;
+    Point3D m_remWhiteFurtherOuter, m_remWhiteFurtherInner;
+    Point3D m_remBlackCloserOuter, m_remBlackCloserInner;
+    Point3D m_remBlackFurtherOuter, m_remBlackFurtherInner;
     Field* m_pField[64];
 
+    double calculateFieldCenter(Point3D bottomLeft, Point3D bottomRight, Point3D topLeft,
+                                Point3D topRight, int nHorizontalFields, int nVerticalFields,
+                                int nHorizontalFieldNr, int nVerticalFieldNr, AXIS axis);
     void calculateFieldsPointsOnMainBoard(Point3D A1, Point3D A8, Point3D H1, Point3D H8);
     void calculateFieldsPointsOnRemovedBoard(Point3D whiteCloserOuter,
-          Point3D whiteFutherInner, Point3D blackCloserOuter, Point3D blackFutherInner);
+          Point3D whiteCloserInner, Point3D whiteFutherOuter, Point3D whiteFutherInner,
+          Point3D blackCloserOuter, Point3D blackCloserInner, Point3D blackFutherOuter,
+          Point3D blackFutherInner);
 
     void setPieceOnField(Piece* pPiece, Field* pField, bool bDebugLog = false);
     void clearField(Field* pField, bool bErrorLog = false) { pField->clearField(bErrorLog); }
@@ -41,7 +48,7 @@ public:
                BoardsRealVars realVars = BoardsRealVars());
     ~Chessboard();
 
-    const double dMaxPieceHeight;
+    const double dMaxPieceHeight; //todo: set and use as static?
 
     bool isBoardReal(bool bErrorLog = false);
     bool isPieceAlreadyExistsOnBoard(Piece* pPiece, bool bErrorLog = false);

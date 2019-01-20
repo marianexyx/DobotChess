@@ -55,6 +55,7 @@ private:
     void sendDataToClient(Client client, ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void sendDataToAllClients(ACTION_TYPE AT = AT_NONE, END_TYPE ET = ET_NONE);
     void sendMsgToChessEngine(QString QStrMsg);
+    void logoutClient(const Client &client);
     void killClient(const Client &client, REJECTED_REQUEST_REACTION RRR);
     void startExecutingClientsRequests();
     void closeClientRequest();
@@ -72,7 +73,7 @@ private:
     void putOnNextEmptyChairNextQueuedClientIfItsPossible();
     void makeCoreReadyForNewGame();
     void continueGameplay();
-    void restorateGameIfDisconnectedClientAffectIt(const Client& clientToDisconnect);
+    void restorateGameIfDisappearedClientAffectIt(const Client& clientToDisconnect);
     void playerLeftChair(PLAYER_TYPE PT);
 
 private slots:

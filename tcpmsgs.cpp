@@ -130,10 +130,10 @@ void TCPMsgs::readyRead()
 
         emit this->msgFromTcpToChess(QStrData.QStrMsgForTcp, QStrMsgFromTcp);
     }
-    //future: looks like i haven't seen this warning types for a longer while
     else if (QStrMsgFromTcp.isEmpty())
     {
         qWarning() << "received empty msg.";
+        //todo: retry. if this leads to desynchronization with chenard, then announce draw
         return;
     }
     else if (QStrMsgFromTcp == "\n")  qWarning() << "received '\\n' msg.";

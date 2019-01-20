@@ -816,6 +816,8 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
             {
                 PosFromTo fromTo = PosFromTo::fromQStr(QStrServiceMove);
                 Field* pFieldFrom = m_pBoardRemoved->getField(fromTo.from);
+                qDebug() << "field" << pFieldFrom->getPos().getAsQStr() <<
+                            pFieldFrom->getLocation3D().getAsQStr();
                 if ((int)fromTo.from.Digit > 4)
                 {
                     qWarning() << "fromTo.from.Digit > 4";
@@ -893,23 +895,28 @@ void MainWindow::on_sendSimulatedMsgBtn_clicked()
 
 void MainWindow::on_calibrateBtn_clicked()
 {
-    if (ui->xLabel->text().toInt() == (int)m_pDobot->getHomePos().x &&
-            ui->yLabel->text().toInt() == (int)m_pDobot->getHomePos().y &&
-            ui->zLabel->text().toInt() == (int)m_pDobot->getHomePos().z)
+    Point3D labelPoint(ui->xLabel->text().toDouble(), ui->yLabel->text().toDouble(),
+                       ui->zLabel->text().toDouble());
+
+    if (Point3D::isPointCloseToAnother(labelPoint, m_pDobot->getHomePos()))
     {
         m_pPieceController->clearLastPos();
         m_pDobot->addArmMoveToQueue(DM_CALIBRATE);
     }
-    else
-        qWarning() << "Dobot not in home positions";
+    else qWarning() << "Dobot not in home positions";
 }
 
 void MainWindow::on_upBtn_clicked()
-{
+{   
     if (m_pPieceController->isMoveSet())
     {
-        double dZAxisVal = m_pBoardMain->getField(m_pPieceController->getLastPos())
-                ->getLocation3D().z + m_pBoardMain->dMaxPieceHeight;
+        Chessboard *pLastBoard;
+        if (m_pPieceController->getLastBoardType() == B_MAIN)
+            pLastBoard = m_pBoardMain;
+        else pLastBoard = m_pBoardRemoved;
+
+        double dZAxisVal = pLastBoard->getField(m_pPieceController->getLastPos())
+                ->getLocation3D().z + pLastBoard->dMaxPieceHeight;
         m_pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
     }
     else qWarning() << "move isn't set";
@@ -919,7 +926,12 @@ void MainWindow::on_downBtn_clicked()
 {
     if (m_pPieceController->isMoveSet())
     {
-        double dZAxisVal = m_pBoardMain->getField(m_pPieceController->getLastPos())
+        Chessboard *pLastBoard;
+        if (m_pPieceController->getLastBoardType() == B_MAIN)
+            pLastBoard = m_pBoardMain;
+        else pLastBoard = m_pBoardRemoved;
+
+        double dZAxisVal = pLastBoard->getField(m_pPieceController->getLastPos())
                 ->getLocation3D().z;
         m_pDobot->moveArmUpOrDown(DM_DOWN, dZAxisVal);
     }
@@ -930,4 +942,11 @@ void MainWindow::on_resetDobotIndexBtn_clicked()
 {
     if (isArmReceivedCorrectCmd(SetQueuedCmdClear(), SHOW_ERRORS))
         this->writeInConsole("Cleared Dobot Queued Cmds.\n", LOG_DOBOT);
+}
+
+void MainWindow::on_clearTitleError_clicked()
+{
+    Errors::newErrors = 0;
+    Errors::newWarnings = 0;
+    this->changeWindowTitle();
 }

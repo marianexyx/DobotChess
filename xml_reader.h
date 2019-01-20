@@ -25,8 +25,8 @@ struct BoardsRealVars
 {
     float fPieceHeight;
     Point3D A1, A8, H1, H8;
-    Point3D remWhiteCloserOuter, remWhiteFurtherInner;
-    Point3D remBlackCloserOuter, remBlackFurtherInner;
+    Point3D remWhiteCloserOuter, remWhiteCloserInner, remWhiteFurtherOuter, remWhiteFurtherInner;
+    Point3D remBlackCloserOuter, remBlackCloserInner, remBlackFurtherOuter, remBlackFurtherInner;
 };
 
 struct DobotRealVars

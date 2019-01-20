@@ -122,7 +122,7 @@ void Chess::sendMsgToChessEngine(QString QStrMsg)
 
 void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
 {
-    this->restorateGameIfDisconnectedClientAffectIt(client);
+    this->restorateGameIfDisappearedClientAffectIt(client);
     m_pClientsList->clearClientSqlID(client);
     if (RRR == RRR_DOUBLE_LOGIN)
     {
@@ -138,6 +138,21 @@ void Chess::killClient(const Client& client, REJECTED_REQUEST_REACTION RRR)
     }
 
     this->updateClientsInUI();
+}
+
+void Chess::logoutClient(const Client &client)
+{
+    if (m_pClientsList->isClientAGuest(client))
+    {
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
+        this->sendDataToClient(client);
+    }
+    else
+    {
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED_LOGOUT);
+        this->sendDataToClient(client);
+        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
+    }
 }
 
 void Chess::startExecutingClientsRequests()
@@ -258,7 +273,7 @@ void Chess::executeClientRequest(clientRequest request)
         bSentMsgToChessEngine = this->manageMoveRequest(request);
         break;
     case RT_STAND_UP:
-        this->restorateGameIfDisconnectedClientAffectIt(client);
+        this->restorateGameIfDisappearedClientAffectIt(client);
         if (m_pClientsList->isClientAGuest(client))
         {
             m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
@@ -274,15 +289,13 @@ void Chess::executeClientRequest(clientRequest request)
         this->sendDataToAllClients();
         break;
     case RT_CLIENT_LEFT:
-        this->restorateGameIfDisconnectedClientAffectIt(client);
+        this->restorateGameIfDisappearedClientAffectIt(client);
         if (m_pClientsList->isClientInList(client.ID()))
             m_pClientsList->removeClientFromList(client);
         break;
     case RT_LOGOUT:
-        this->restorateGameIfDisconnectedClientAffectIt(client);
-        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED_LOGOUT);
-        this->sendDataToClient(client);
-        m_pClientsList->setClientSqlIDAndName(client, SY_UNLOGGED);
+        this->restorateGameIfDisappearedClientAffectIt(client);
+        this->logoutClient(client);
         break;
     default:
         qCritical() << "received request.type:" << QString::number(request.type);
@@ -419,11 +432,16 @@ void Chess::startNewGameInCore()
 void Chess::restartGame(END_TYPE ET)
 {
     qInfo() << endTypeAsQstr(ET);
+
     m_ChessGameStatus = GS_TURN_NONE_RESETING;
     this->resetTableData();
     //future: php could detect who left chair direct from this one table data below(?)
     this->sendDataToAllClients(AT_END_GAME, ET);
     this->changePlayersOnChairs();
+    if (m_pClientsList->isClientSqlIDExists(SY_LOGGED_GUEST1))
+        this->logoutClient(m_pClientsList->getClient(SY_LOGGED_GUEST1, CID_SQL));
+    if (m_pClientsList->isClientSqlIDExists(SY_LOGGED_GUEST2))
+        this->logoutClient(m_pClientsList->getClient(SY_LOGGED_GUEST2, CID_SQL));
     if (m_pMovements->resetPiecePositions())
         this->makeCoreReadyForNewGame();
     this->sendDataToAllClients();
@@ -508,7 +526,7 @@ void Chess::continueGameplay()
     this->sendDataToAllClients();
 }
 
-void Chess::restorateGameIfDisconnectedClientAffectIt(const Client &clientToDisconnect)
+void Chess::restorateGameIfDisappearedClientAffectIt(const Client &clientToDisconnect)
 {
     qInfo() << "client's ID =" << QString::number(clientToDisconnect.ID());
 

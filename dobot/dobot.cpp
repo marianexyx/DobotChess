@@ -196,15 +196,15 @@ void Dobot::saveActualDobotPosition()
     m_realTimePoint.y = pose.y;
     m_realTimePoint.z = pose.z;
 
-    emit JointLabelText(QString::number(pose.jointAngle[0]), 1);
-    emit JointLabelText(QString::number(pose.jointAngle[1]), 2);
-    emit JointLabelText(QString::number(pose.jointAngle[2]), 3);
-    emit JointLabelText(QString::number(pose.jointAngle[3]), 4);
+    emit JointLabelText(QString::number(pose.jointAngle[0], 'f', 2), 1);
+    emit JointLabelText(QString::number(pose.jointAngle[1], 'f', 2), 2);
+    emit JointLabelText(QString::number(pose.jointAngle[2], 'f', 2), 3);
+    emit JointLabelText(QString::number(pose.jointAngle[3], 'f', 2), 4);
 
-    emit AxisLabelText(QString::number(pose.x), 'x');
-    emit AxisLabelText(QString::number(pose.y), 'y');
-    emit AxisLabelText(QString::number(pose.z), 'z');
-    emit AxisLabelText(QString::number(pose.r), 'r');
+    emit AxisLabelText(QString::number(pose.x, 'f', 2), 'x');
+    emit AxisLabelText(QString::number(pose.y, 'f', 2), 'y');
+    emit AxisLabelText(QString::number(pose.z, 'f', 2), 'z');
+    emit AxisLabelText(QString::number(pose.r, 'f', 2), 'r');
 }
 
 void Dobot::queueMoveSequence(Point3D dest3D, double dJump, VERTICAL_MOVE VertMove
@@ -266,12 +266,12 @@ void Dobot::addArmMoveToQueue(DOBOT_MOVE_TYPE Type, Point3D point)
 
 bool Dobot::isMoveSafe(Point3D point)
 {
-    if (point.z <= m_intermediatePoints.safeAxisZ.z
+    if (point.z > m_intermediatePoints.safeAxisZ.z
             && point.x != m_lastGivenPoint.x && point.y != m_lastGivenPoint.y)
     {
         qCritical() << "it's not. given point =" << point.getAsQStr()
                     << ", m_lastGivenPoint =" << m_lastGivenPoint.getAsQStr()
-                    << ", _fSafeAxisZ =" << m_intermediatePoints.safeAxisZ.z;
+                    << ", safe xyz =" << m_intermediatePoints.safeAxisZ.z;
         return false;
     }
     else return true;

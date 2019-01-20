@@ -94,6 +94,7 @@ void PieceController::movePieceWithManipulator(Chessboard* pRealBoard, Field* pF
         if (!this->isPieceSetOk()) return;
     }
 
+    m_lastBoardType = pRealBoard->getBoardType();
     m_lastPos = pField->getPos();
     Point3D xyz = pField->getLocation3D();
     m_pDobot->queueMoveSequence(xyz, m_pBoardMain->dMaxPieceHeight, VertMove, bRetreat);
@@ -177,6 +178,7 @@ QString PieceController::dumpAllData()
 
     QStrData = "[piece_controller.h]\n";
     QStrData += "m_lastPos: " + m_lastPos.getAsQStr() + "\n";
+    QStrData += "m_lastBoardType: " + boardTypeAsQstr(m_lastBoardType) + "\n";
 
     return QStrData;
 }

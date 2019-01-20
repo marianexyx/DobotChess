@@ -14,7 +14,7 @@
                                             RV.retreatRight, IP.maxGame);
     IP.cournerBelow = calculateCournerPoint(IP_COURNER_BELOW, RV);
     IP.cournerAbove = calculateCournerPoint(IP_COURNER_ABOVE, RV, &IP.maxGame);
-    IP.safeAxisZ = calculateSafeAxisZPoint(RV, IP.middleAbove);
+    IP.safeAxisZ = calculateSafeAxisZPoint(IP.middleAbove);
 
     if (!XmlReader::isPointInLimits(IP.minGame))
         qFatal("calulated minGame point out of working range");
@@ -120,13 +120,15 @@
     }
 }
 
-/*static*/ Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(RealVars RV, Point3D midAbove)
+/*static*/ Point3D IntermediatePointsCalc::calculateSafeAxisZPoint(Point3D midAbove)
 {
     Point3D safeAxisZPoint;
     //x and y points are only for avoiding points limits errors
     safeAxisZPoint.x = midAbove.x;
     safeAxisZPoint.y = midAbove.y;
-    safeAxisZPoint.z = qMin(qMin(RV.boards.A1.z, RV.boards.A8.z),
-                            qMin(RV.boards.H1.z, RV.boards.H8.z)) + RV.boards.fPieceHeight;
+    /*safeAxisZPoint.z = qMin(qMin(RV.boards.A1.z, RV.boards.A8.z),
+                            qMin(RV.boards.H1.z, RV.boards.H8.z)) + RV.boards.fPieceHeight + 5;*/
+    safeAxisZPoint.z = 50.9; //future: middle above is == 50, and calculated for pieces...
+    //...is just about 25
     return safeAxisZPoint;
 }

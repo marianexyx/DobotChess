@@ -115,6 +115,7 @@ private slots:
     void on_upBtn_clicked();
     void on_downBtn_clicked();
     void on_resetDobotIndexBtn_clicked();
+    void on_clearTitleError_clicked();
 };
 
 #endif // MAINWINDOW_H

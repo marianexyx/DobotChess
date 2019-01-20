@@ -46,10 +46,18 @@ void XmlReader::readGameConfigNodes()
             this->getPointParam(m_xmlDocConfig, "points", "point", "mainFieldH8");
     m_gameConfigVars.boards.remWhiteCloserOuter =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteCloserOuter");
+    m_gameConfigVars.boards.remWhiteCloserInner =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteCloserInner");
+    m_gameConfigVars.boards.remWhiteFurtherOuter =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteFurtherOuter");
     m_gameConfigVars.boards.remWhiteFurtherInner =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remWhiteFurtherInner");
     m_gameConfigVars.boards.remBlackCloserOuter =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackCloserOuter");
+    m_gameConfigVars.boards.remBlackCloserInner =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackCloserInner");
+    m_gameConfigVars.boards.remBlackFurtherOuter =
+            this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackFurtherOuter");
     m_gameConfigVars.boards.remBlackFurtherInner =
             this->getPointParam(m_xmlDocConfig, "points", "point", "remBlackFurtherInner");
     m_gameConfigVars.dobot.home =

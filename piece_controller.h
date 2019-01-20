@@ -23,6 +23,7 @@ private:
     Chessboard* m_pBoardMain;
     Chessboard* m_pBoardRemoved;
     PosOnBoard m_lastPos;
+    BOARD m_lastBoardType;
 
     bool isPieceSetOk();
     bool isAnyPawnPromoted();
@@ -38,7 +39,8 @@ public:
     void clearLastPos() { m_lastPos.Letter = L_X; m_lastPos.Digit = D_X; }
     void clearPawnsPromotions();
 
-    PosOnBoard getLastPos() const { return m_lastPos; } //dumpAllData
+    PosOnBoard getLastPos() const { return m_lastPos; }
+    BOARD getLastBoardType() const { return m_lastBoardType; }
     QString getPromotedPawnsPositions();
     Piece* getPiece(short sPieceNr) const { return m_pPieceSet->getPiece(sPieceNr); }
     QString dumpAllData();

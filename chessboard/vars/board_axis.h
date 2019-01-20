@@ -5,6 +5,8 @@
 #include <QString>
 #include <QDebug>
 
+enum AXIS { AXIS_X, AXIS_Y, AXIS_Z };
+
 enum LETTER
 {
     L_X = 0,

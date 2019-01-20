@@ -147,10 +147,9 @@ bool ChessMovements::resetPiecePositions()
 
     if (!this->isPieceSetOnStartFields())
     {
-        Chessboard tempBoard(B_MAIN, IMAGINARY);
-
         do
         {
+            Chessboard tempBoard(B_MAIN, IMAGINARY); //re-alocate temp board each time
             this->copyPiecesToBoard(*m_pBoardMain, tempBoard);
 
             for (short sField=1; sField<=64; ++sField)

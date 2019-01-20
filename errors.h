@@ -21,6 +21,7 @@
 #define CB_BLACK "\e[1;30m"
 #define CB_RED "\e[1;31m"
 
+//todo: clear error msg in title bar
 class Errors: public QObject
 {
     Q_OBJECT

@@ -22,8 +22,8 @@ struct Point3D
     { return qAbs(p1.x-p2.x) < 3.f && qAbs(p1.y-p2.y) < 3.f && qAbs(p1.z-p2.z) < 3.f; }
     bool isPointSet() { return (x == 0.f && y == 0.f && z == 0.f) ? false : true; }
     void setPoint(double dX, double dY, double dZ) { x = dX; y = dY; z = dZ; }
-    QString getAsQStr() const { return QString::number((int)x) + ", " +
-                QString::number((int)y) + ", " + QString::number((int)z); }
+    QString getAsQStr() const { return QString::number(x, 'f', 2) + ", " +
+                QString::number(y, 'f', 2) + ", " + QString::number(z, 'f', 2); }
 };
 
 #endif // POINT3D_H
